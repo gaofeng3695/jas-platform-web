@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>自定义表单配置</title>
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <jas-list-wrapper>
+      <jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig"
+        @search="searchList"></jas-search-for-list>
+      <jas-table-for-list ref="table" slot="list" :privilege-code="privilegeCode" :fields="tableFields"
+        :form="topSearch" :search-path="searchPath" :add-url="addUrl" :detail-url="detailUrl" :delete-path="deletePath"
+        @selectchanged="selectedRows">
+        <template slot="btns">
+          <el-button @click="setRolePrivilege" size="small" plain type="primary" icon="fa fa-cog"
+            :disabled="selectedRowOids.length!=1">角色权限分配</el-button>
+            
+          <el-button @click="userAllocation" size="small" plain type="primary" icon="fa fa-cog"
+          :disabled="selectedRowOids.length!=1">角色用户分配</el-button>
+        </template>
+      </jas-table-for-list>
+    </jas-list-wrapper>
+
+  </div>
+</body>
+
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+  (function () { //加载配置未见
+    var param = window.jasTools.base.getParamsInUrl(location.href);
+    var pageCode = param.pageCode;
+    pageCode && $.getScript('./config/' + pageCode + '.js', function (data, textStatus, jqxhr) {
+      window.vm = new Vue({
+        el: '#app',
+        data: function () {
+          return {
+            className: '',
+            templateCode: '',
+            searchPath: '',
+            deletePath: '',
+            upcallPath: '',
+            addUrl: '',
+            detailUrl: '',
+            privilegeCode: '',
+            topSearch: {},
+            searchFields: [],
+            pageConfig: {},
+            fieldsConfig: [],
+            tableFields: [],
+            selectedRowOids: [],
+            projectOid: '',
+          }
+        },
+        watch: {
+
+        },
+        created: function () {
+          var that = this;
+          that.pageConfig = window.pageConfig;
+          var param = window.jasTools.base.getParamsInUrl(location.href);
+          that.privilegeCode = param.privilegeCode || pageConfig.privilegeCode;
+          that.templateCode = param.templateCode; // 导入导出模板
+          that.pageCode = param.pageCode;
+          that.className = param.className;
+          that.projectOid = param.projectOid;
+          that.topSearch.projectOid = that.projectOid;
+
+
+          that.addUrl = jasTools.base.rootPath +
+            '/jasmvvm/pages/module-privilege/role-manage/mulit-project-role-manage/dialogs/add.html?pageCode=' + that.pageCode + '&projectOid=' + that.projectOid;
+          that.detailUrl = jasTools.base.rootPath +
+            '/jasmvvm/pages/module-privilege/role-manage/mulit-project-role-manage/dialogs/detail.html?pageCode=' + that.pageCode;
+
+          that.searchPath = that.pageConfig.searchPath;
+          that.deletePath = that.pageConfig.deletePath;
+
+          that.fieldsConfig = that.pageConfig.fieldsConfig;
+          that.searchFields = that.formatFields(that.pageConfig.searchFields, that.fieldsConfig);
+          that.tableFields = that.formatFields(that.pageConfig.tableFields, that.fieldsConfig);
+
+
+
+        },
+        mounted: function () {
+
+        },
+        methods: {
+          selectedRows: function (val) {
+            var selects = [];
+            val.forEach(function (item) {
+              selects.push(item.oid);
+            });
+            this.selectedRowOids = selects;
+           
+          },
+	
+          formatFields: function (fields, fieldsConfig) {
+            return fields.map(function (item) {
+              return {
+                name: fieldsConfig[item].name,
+                field: item,
+                formatter: fieldsConfig[item].formatter,
+              };
+            });
+          },
+          searchList: function () {
+            this.$refs.table.search();
+          },
+          setRolePrivilege: function () {
+            var that = this;
+            var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/set-role-privilege.html';
+            top.jasTools.dialog.show({
+              width: '40%',
+              height: '80%',
+              title: '角色权限分配',
+              src: baseSrc + '?roleId=' + that.selectedRowOids,
+              cbForClose: function () {
+                that.requestList();
+              }
+            });
+          },
+          handleSelectionChange: function (selects) {
+            this.selectedRows = selects;
+          },
+          //角色人员分配页面
+          userAllocation: function () {
+            var that = this;
+            top.jasTools.dialog.show({
+              width: '600px',
+              height: '80%',
+              title: '人员分配',
+              src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/mulit-project-role-manage/dialogs/user-allocation.html?projectOid=' + that.projectOid
+                + '&roleOid=' + that.selectedRowOids[0],
+              cbForClose: function (param) {
+                if (param == 1) {
+                  that.$refs.table.search();
+                }
+              }
+            });
+          },
+
+        },
+      });
+    });
+    !pageCode && alert('请传入配置参数')
+  })();
+</script>
+<script>
+
+</script>
+
+
+</html>

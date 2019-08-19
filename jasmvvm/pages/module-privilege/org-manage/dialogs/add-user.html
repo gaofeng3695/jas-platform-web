@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="120px">
+				<jas-base-group-title name="基本信息"></jas-base-group-title>
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="用户名" prop="loginName">
+							<el-input v-model="tableFormData.loginName" clearable placeholder="请输入用户名" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="姓名" prop="userName">
+							<el-input v-model="tableFormData.userName" clearable placeholder="请输入姓名" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="电话" prop="phone">
+							<el-input v-model="tableFormData.phone" clearable placeholder="请输入联系电话" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="Email" prop="email">
+							<el-input v-model="tableFormData.email" clearable placeholder="请输入Email地址" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="密码到期时间" prop="passwordExpiredDate">
+							<el-date-picker v-model="tableFormData.passwordExpiredDate" type="date" placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<jas-base-group-title name="其他信息"></jas-base-group-title>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="描述" prop="description">
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				but_disabled:false,				
+				rules: {
+					loginName: [{
+						required: true,
+						message: '请输入用户名',
+						trigger: 'blur'
+					}],
+					userName: [{
+						required: true,
+						message: '请输入姓名',
+						trigger: 'blur'
+					}]
+				},
+				tableFormData: {
+					"loginName": "", //用户名
+					"userName": "", //姓名
+					"phone": "", //电话
+					"email": "", //email地址
+					"passwordExpiredDate": "", //密码过期时间
+					"description": "", //描述
+					"unitId": "f4b587f5-4f84-4e51-9ae7-529a7f16b2f6", //部门oid
+				},
+			}
+		},
+		
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.isEdit = true;
+				this.oid = param.oid;
+				this.tableFormData.oid = this.oid;
+				this._requestUserDetail(param.oid);
+			}
+			if (param.pid) {
+				this.tableFormData.unitId = param.pid;
+			}
+		},
+		methods: {
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.save();
+					}
+				});
+			},
+			_requestUserDetail: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/user/get.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					that.tableFormData = data.data;
+					that.tableFormData.passwordExpiredDate = new Date(data.data.passwordExpiredDate);
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/user/save.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/user/update.do";
+				}
+				that.but_disabled = true;
+				if (!that.tableFormData.unitId) {
+					that.tableFormData.unitId = 'f4b587f5-4f84-4e51-9ae7-529a7f16b2f6';
+				}
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: msg
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

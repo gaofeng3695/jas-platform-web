@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+	<title>组织机构管理</title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #409EFF;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.filterwrap {
+			padding: 10px 10px 0px 10px;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.content .el-tabs__content {
+			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+			overflow: auto;
+		}
+
+		.el-table th>.cell {
+			/* margin: 5px; */
+		}
+
+		.el-tabs__content {
+			/* margin: 10px */
+		}
+
+		.el-tab-pane {
+			height: 100%;
+		}
+		.jas-detail-table .table_wrap th {
+			width:120px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading.allLoading">
+
+		<jas-two-panel-resizer layout="vertical" length="300px">
+			<template slot="closePanel">
+				<div class="filterwrap">
+					<el-input prefix-icon="el-icon-search" size="small" placeholder="输入关键字进行过滤" v-model="filterText">
+					</el-input>
+				</div>
+				<div class="orgtool">
+					<el-button type="text" @click="addNode" :disabled="notShowAddBtn">新增</el-button>
+					<el-button type="text" @click="editNode" :disabled="notShowEditAndDeleteBtn">修改</el-button>
+					<el-button type="text" @click="deleteNode" :disabled="notShowEditAndDeleteBtn">删除</el-button>
+				</div>
+				<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" :props="defaultProps"
+					highlight-current :filter-node-method="filterNode" @node-click="clicknode" @node-expand="expandnode"
+					lazy :expand-on-click-node="false" :render-content="renderContent"></el-tree>
+			</template>
+			<div class="content" slot="mainPanel">
+				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto"
+					@tab-click="requestTabsData">
+					<template v-if="isShowOrgDetailAndPerson">
+						<el-tab-pane label="项目组织机构详情" value="details" name="1">
+							<div v-loading="loading.orgDetail">
+								<jas-detail-table :titles="detailTitle" :detail="detail" />
+							</div>
+						</el-tab-pane>
+						<el-tab-pane label="范围管理" values="scopeArea" name="2">
+							<iframe :src="scopeUrl" width="100%" height="100%" frameborder="0"></iframe>
+						</el-tab-pane>
+						<el-tab-pane label="人员管理" value="userManage" name="3">
+							<div v-loading="loading.scopeTree" style="height:100%">
+								<div style="height:750px">
+									<div style="margin-bottom: 10px">
+										<el-button size="small" type="primary" icon="el-icon-plus" @click="addUsers">
+											批量添加用户</el-button>
+										<el-button size="small" type="primary" icon="el-icon-delete"
+											@click="removeUsers" :disabled="selectedRows.length==0">移除用户</el-button>
+										<el-button size="small" type="primary" icon="el-icon-edit"
+											@click="roleAllocation" :disabled="selectedRows.length!=1">角色分配</el-button>
+									</div>
+									<el-table ref="mytable" highlight-current-row :data="tableData"
+										@selection-change='handleSelectionChange' style="width: 100%"
+										highlight-current-row show-overflow-tooltip=true border @row-click="clickRow"
+										:header-cell-style="headStyle">
+										<el-table-column type="selection" align="center"> </el-table-column>
+										<el-table-column type="index" label="序号" width="70px" align="center">
+										</el-table-column>
+										<el-table-column prop="userName" label="用户姓名" align="center"> </el-table-column>
+										<el-table-column prop="loginName" label="账号" align="center"> </el-table-column>
+										<el-table-column prop="roleName" label="角色" align="center"> </el-table-column>
+									</el-table>
+								</div>
+								<div style="padding: 15px 0 0;" class="clearfix">
+									<el-pagination class="fr" @size-change="handleSizeChange"
+										@current-change="handleCurrentChange" :current-page="currentPage"
+										:page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+										layout="total, sizes, prev, pager, next, jumper" :total="total">
+									</el-pagination>
+								</div>
+							</div>
+						</el-tab-pane>
+					</template>
+					<el-tab-pane label="项目角色管理" value="projectRole" name="4" v-if="isShowProjectRole">
+						<iframe :src="url" width="100%" height="98%" frameborder="0"></iframe>
+					</el-tab-pane>
+				</el-tabs>
+			</div>
+		</jas-two-panel-resizer>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				isShowOrgDetailAndPerson: false,
+				isShowProjectRole: false,
+				url: '',
+				scopeUrl: '',
+				notShowAddBtn: true,
+				notShowEditAndDeleteBtn: true,
+				detail: null,
+				detailTitle: [ //
+					{
+						name: '项目组织机构名称',
+						field: 'name',
+					}, {
+						name: '专业',
+						field: 'professionCodeName',
+					}, {
+						name: '项目组织机构编号',
+						field: 'code',
+					}, {
+						name: '组织机构类型',
+						field: 'typeCode',
+						formatter: function (a, b, value, c) {
+							if (value == "0") return "单位";
+							if (value == "1") return "部门";
+						}
+					}, {
+						name: '分类',
+						field: 'projectOrgTypeCodeName',
+					}, {
+						name: '企业组织机构名称',
+						field: 'enterpriseOrganizationName',
+					}, {
+						name: '顺序号',
+						field: 'projectSerialNo',
+					}
+				],
+				loading: {
+					allLoading: false,
+					orgDetail: false,
+					scopeTree: false,
+					projectRole: false
+				},
+				panelMoving: false,
+				panelShowed: true,
+				activeName: '1',
+				filterText: '',
+				currentNode: '',
+				currentNodeId: '',
+
+				orgnData: [],
+				defaultProps: {
+					label: 'text',
+					orgnData: 'orgnData'
+				},
+				tableData: [],
+				oids: [],
+				rows: [],
+				currentPage: 1,
+				total: 0,
+				pageSize: 10,
+				projectOid: '',
+				selectedRowOids: [],
+				selectedRows: [],
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+			}
+		},
+		watch: {
+			filterText: function (val) {
+				this.$refs.orgtree.filter(val);
+			},
+			selectedRows: function () {
+				var selects = [];
+				// 监测选中行变化
+				this.selectedRows.forEach(function (item) {
+					selects.push(item.oid);
+				});
+				this.selectedRowOids = selects;
+			}
+		},
+		mounted: function () {
+			this._requestTable();
+		},
+		methods: {
+			openProjectRolePage: function () {
+				var that = this;
+				alert(that.currentNode.id);
+			},
+			filterNode: function (value, data) {
+				if (!value) return true;
+				return data.text.indexOf(value) !== -1;
+			},
+			// 请求工程节点
+			_requestTable: function () {
+				var that = this;
+				that.isShowOrgDetailAndPerson = false;
+				that.isShowProjectRole = false;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/engineering/getEngineeringOfUser.do";
+				jasTools.ajax.post(url, {}, function (data) {
+					var obj1 = [];
+					for (var i = 0; i < data.rows.length; i++) {
+						var obj = {};
+						obj.id = data.rows[i].key;
+						obj.text = data.rows[i].value;
+						obj.type = data.rows[i].type;
+						obj.children = [];
+						obj1[i] = obj;
+
+					}
+
+					that.orgnData = obj1;
+					that.$nextTick(function () {
+						if (!that.currentNodeId) {
+							that.currentNodeId = data.rows[0].id;
+						}
+					})
+				});
+			},
+			// 请求项目组织机构详情
+			_requestOrgInfo: function (oid) {
+				var that = this;
+				that.loading.orgDetail = true;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/projectOrganization/get.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					setTimeout(function () {
+						that.loading.orgDetail = false;
+					}, 300)
+					that.detail = data.data;
+				});
+			},
+			// 请求项目节点
+			_requestChildProject: function (parentData, parentNode) {
+				var that = this;
+				var orgtree = this.$refs.orgtree;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/project/getProjectInfoByEngineering.do";
+				jasTools.ajax.post(url, {
+					engineeringoid: parentData.id
+				}, function (data) {
+					if (data.rows.length > 0) {
+						var obj1 = [];
+						parentNode.childNodes = [];
+						for (var i = 0; i < data.rows.length; i++) {
+							var obj = {};
+							obj.id = data.rows[i].KEY;
+							obj.text = data.rows[i].VALUE;
+							obj.type = data.rows[i].TYPE;
+							obj.children = [];
+							obj1[i] = obj;
+							orgtree.append(obj, parentNode);
+						}
+						parentNode.isLeaf = false;
+					} else {
+						parentNode.isLeaf = true;
+					}
+				});
+			},
+			// 请求项目组织机构根节点
+			_requestFatherOrg: function (parentData, parentNode) {
+				var that = this;
+				var orgtree = this.$refs.orgtree;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/project/getSonOrgByProjectOid.do";
+				jasTools.ajax.post(url, {
+					projectOid: parentData.id
+				}, function (data) {
+					if (data.rows.length > 0) {
+						parentNode.childNodes = [];
+						for (var i = 0; i < data.rows.length; i++) {
+							var obj = {};
+							obj.id = data.rows[i].KEY;
+							obj.text = data.rows[i].VALUE;
+							obj.type = data.rows[i].TYPE;
+							obj.children = [];
+							orgtree.append(obj, parentNode);
+						}
+					} else {
+						parentNode.isLeaf = true;
+					}
+				});
+			},
+			// 请求项目组织机构的子节点
+			_requestSonOrg: function (parentData, parentNode, cb) {
+				var that = this;
+				var orgtree = this.$refs.orgtree;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/project/getSonOrgByOrgOid.do";
+				jasTools.ajax.post(url, {
+					orgOid: parentData.id
+				}, function (data) {
+					if (data.rows.length > 0) {
+						parentNode.childNodes = [];
+						for (var i = 0; i < data.rows.length; i++) {
+							var obj = {};
+							obj.id = data.rows[i].KEY;
+							obj.text = data.rows[i].VALUE;
+							obj.type = data.rows[i].TYPE;
+							obj.children = [];
+							orgtree.append(obj, parentNode);
+						}
+						cb && cb(-1);
+					} else {
+						parentNode.isLeaf = true;
+						cb && cb(1);
+					}
+				});
+			},
+			// 节点点击
+			clicknode: function (data, node, element) {
+				var that = this;
+				that.currentNode = data;
+				that.currentNodeId = data.id;
+				if (node.level === 1) {
+					that.isShowProjectRole = false;
+					that.isShowOrgDetailAndPerson = false;
+					that.notShowAddBtn = true;
+					that.notShowEditAndDeleteBtn = true;
+				}
+				if (node.level === 2) {
+					that.projectOid = that.currentNode.id;
+					that.url = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/mulit-project-role-manage/mulit-project-role-manage.html?pageCode=mulit-project-role-manage&projectOid=' + that.currentNode.id
+					that.activeName = "4";
+					that.isShowProjectRole = true;
+					that.isShowOrgDetailAndPerson = false;
+					that.notShowAddBtn = false
+					that.notShowEditAndDeleteBtn = true
+				}
+				if (node.level >= 3) {
+					that.scopeUrl = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/demo.html';
+					that.activeName = "1";
+					that.isShowProjectRole = false;
+					that.isShowOrgDetailAndPerson = true;
+					that.notShowAddBtn = false
+					that.notShowEditAndDeleteBtn = false;
+					var currentTree = that.$refs.orgtree.currentNode;
+					that.projectOid =  that.getFatherProject(currentTree);
+				}
+				if (data.type === "org") {
+					this._requestOrgInfo(data.id);
+				}
+			},
+			getFatherProject: function (currentTree) {
+				var that = this;
+				var parentTree = currentTree.$parent;
+				var parentNodeType = parentTree.node.data.type;
+				if (parentNodeType != 'project') {
+					return that.getFatherProject(parentTree);
+				} else {
+					return parentTree.node.data.id;
+				}
+			},
+			// 节点展开
+			expandnode: function (data, node, e) {
+				this.currentNode = data;
+				this.currentNodeId = data.id;
+				var that = this;
+				if (node.level >= 3) {
+					that.notShowAddBtn = false
+					that.notShowEditAndDeleteBtn = false
+				}
+				if (data.type === "engineering") {
+					this._requestChildProject(data, node);
+				} else if (data.type === "project") {
+					that.projectOid = data.id;
+					this._requestFatherOrg(data, node);
+				} else if (data.type === "org") {
+					this._requestSonOrg(data, node);
+				}
+			},
+			// 新增节点方法
+			addNode: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '新增项目组织机构',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/add.html?pid=' + this.currentNodeId + '&type=' + that.currentNode.type,
+					cbForClose: function (param) {
+						if (param == 1) {
+							// that._requestTable();
+							// console.log(that.currentNode);
+							that._refreshParentNode();
+						}
+					}
+				});
+			},
+			// 编辑节点方法
+			editNode: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '修改项目组织机构',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/add.html?oid=' + this.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							// that._requestTable();
+							// console.log(that.currentNode);
+							that._refreshParentNode();
+							that._requestOrgInfo(that.currentNodeId);
+						}
+					}
+				});
+			},
+			// 删除节点方法
+			_requestDeleteNode: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/projectOrganization/delete.do";
+				jasTools.ajax.post(url, { oid: oid }, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功！'
+					});
+					// that._requestTable();
+					// console.log(that.currentNode);
+					that._refreshParentNode();
+				});
+			},
+			// 删除节点
+			deleteNode: function () {
+				var that = this;
+				window.top.Vue.prototype.$confirm('您确定要删除本条数据吗？', '提示', {
+					type: 'warning',
+					callback: function (action) {
+						// if (action === 'confirm') {
+						// 	that._requestDeleteNode(that.currentNodeId);
+						// }
+						if (action === 'confirm') {
+							that.checkPrivilege(function (data) {
+								if (data == 1) {
+									that._requestDeleteNode(that.currentNodeId);
+								} else {
+									top.Vue.prototype.$message({
+										type: 'error',
+										message: '本组织机构下有子组织机构，不能删除'
+									});
+								}
+							});
+						}
+					}
+				});
+			},
+			// 确认是否有子节点
+			checkPrivilege: function (cb) {
+				var that = this;
+				var node = that.$refs.orgtree.currentNode.node;
+				that._requestSonOrg(node.data, node, function (data) {
+					cb && cb(data)
+				});
+			},
+			// 刷新父节点
+			_refreshParentNode: function () {
+				var that = this;
+				var parentObj = that.$refs.orgtree.currentNode.$parent;
+				var parentNode = parentObj.node;
+				parentNode.childNodes = [];
+				var parentLevel = parentNode.level;
+				if (parentLevel === 1) {
+					that._requestChildProject(parentNode.data, parentNode);
+				} else if (parentLevel === 2) {
+					that._requestFatherOrg(parentNode.data, parentNode);
+				} else {
+					that._requestSonOrg(parentNode.data, parentNode);
+				}
+			},
+			// 刷新祖父节点
+			_refreshGrandNode: function () {
+				var that = this;
+				var parentNode = that.$refs.orgtree.currentNode.$parent.$parent.node;
+				var parentLevel = parentNode.level;
+			},
+			// 为项目组织机构树的每级添加不同的图标
+			renderContent(h, { node, data, store }) {
+				var createElement = arguments[0];
+				var level = arguments[1].node.level;
+				var icon_class = 'fa fa-sitemap';
+				switch (level) {
+					case 1:
+						icon_class = 'fa fa-lock';
+						break;
+					case 2:
+						icon_class = 'fa fa-product-hunt';
+						break;
+					case 3:
+						icon_class = 'fa fa-sitemap';
+						break;
+				}
+				return createElement('span', [
+					createElement('i', { attrs: { class: '' + icon_class + ' my_el_tree_item' } }),
+					createElement('span', "     "),
+					createElement('span', arguments[1].node.label)
+				]);
+			},
+
+			// 人员管理选中状态的数据拼接
+			handleSelectionChange: function (val) {
+				var that = this;
+				this.selectedRows = val;
+				that.oids = val.map(function (item) {
+					return {
+						resourceType: 'privilege_user',
+						resourceOid: item.oid,
+					}
+				});
+			},
+			// 分页need方法
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestUserData();
+			},
+			// 分页need方法
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestUserData();
+			},
+			// 判断当前选项卡是否为人员管理
+			requestTabsData: function (tabs) {
+				console.log(tabs);
+				if (tabs.paneName === "3") {
+					this.requestUserData();
+				}
+			},
+			// 请求人员管理数据
+			requestUserData: function () {
+				var that = this;
+				that.isShowOrgDetailAndPerson = true;
+				that.isShowProjectRole = false;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/userManage/getPage.do";
+				jasTools.ajax.post(url, {
+					type: "query",
+					unitId: that.currentNode.id,
+					projectOid: that.projectOid,
+					pageNo: that.currentPage,
+					pageSize: that.pageSize,
+				}, function (data) {
+					that.tableData = data.rows;
+					that.total = data.total;
+				});
+			},
+			// 批量添加用户
+			addUsers: function () {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '80%',
+					title: '批量添加用户',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/addUser.html?projectOid=' + that.projectOid + '&unitId=' + that.currentNode.id,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.requestUserData();
+						}
+					}
+				});
+			},
+			// 批量移除用户
+			removeUsers: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/sharepool/removeResource.do";
+				jasTools.ajax.post(url, {
+					ownerOid: that.currentNode.id,
+					resourceList: that.oids
+				}, function (data) {
+					if (data.status == 1) {
+						that.requestUserData();
+					}
+				});
+			},
+			//角色分配页面
+			roleAllocation: function () {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '80%',
+					title: '角色分配',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/role-allocation.html?projectOrganizationOid=' + that.currentNode.id
+						+ '&userOid=' + that.selectedRows[0].oid,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.requestUserData();
+						}
+					}
+				});
+			},
+			// 点击行，切换选中状态
+			clickRow: function (row, event, column) {
+				if (column.label == '操作') return;
+				this.$refs['mytable'].toggleRowSelection(row)
+			},
+
+		},
+	});
+</script>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="120px">
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="上级组织机构" prop="parentId">
+							<el-cascader :options="treeData" :props="treeProps" v-model="parentIdArr" :show-all-levels="false" change-on-select clearable
+							  placeholder="请选择上级组织机构" size="small">
+							</el-cascader>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="组织机构名称" prop="unitName">
+							<el-input v-model="tableFormData.unitName" clearable placeholder="请输入组织机构名称" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="组织机构编号" prop="unitCode">
+							<el-input v-model="tableFormData.unitCode" clearable placeholder="请输入组织机构编号" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="组织机构类型" prop="unitType">
+							<el-select v-model="tableFormData.unitType" placeholder="请选择组织机构类型" size="small">
+								<el-option label="部门" value="1"></el-option>
+								<el-option label="单位" value="2"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="顺序编号" prop="orderNum">
+							<!-- <el-input v-model="tableFormData.orderNum" clearable placeholder="请输入顺序编号" size="small"></el-input> -->
+							<el-input-number v-model="tableFormData.orderNum" size="small" :precision="1" clearable placeholder="请输入顺序编号" controls-position="right"
+							  :min="1" :max="100"></el-input-number>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="联系电话" prop="phone">
+							<el-input v-model="tableFormData.phone" clearable placeholder="请输入联系电话" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="地址" prop="address">
+							<el-input v-model="tableFormData.address" clearable placeholder="请输入地址" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="描述" prop="description">
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<!--<script src="js/ajaxFileUpload.js"></script>-->
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				but_disabled:false,
+				treeProps: {
+					value: 'id',
+					label: 'text',
+				},
+				treeData: [],
+				rules: {
+					unitName: [{
+						required: true,
+						message: '请输入组织机构名称',
+						trigger: 'blur'
+					}],
+					unitCode: [{
+						required: true,
+						message: '请输入组织机构编号',
+						trigger: 'blur'
+					}]
+				},
+				tableFormData: {
+					"address": "", //地址
+					"description": "", //描述
+					"orderNum": "1", //序号
+					"parentId": "f4b587f5-4f84-4e51-9ae7-529a7f16b2f6", //父节点oid
+					"phone": "", //电话
+					"unitCode": "", //组织机构编号
+					"unitName": "", //组织机构名称
+					"unitType": "1", //组织机构类型 1部门 2单位
+					"hierarchy": ""
+				},
+			}
+		},
+		computed: {
+			parentIdArr: {
+				get: function () {
+					if (!this.treeData || !this.tableFormData.parentId || !this.treeData.length) return [];
+					return jasTools.base.getIdArrFromTree(this.treeData, this.tableFormData.parentId);
+				},
+				set: function (newValue) {
+					this.tableFormData.parentId = newValue[newValue.length - 1];
+				}
+			}
+		},
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this._requestNodeTree();
+			if (param.oid) {
+				this.isEdit = true;
+				this.oid = param.oid;
+				this.tableFormData.oid = this.oid;
+				this._requestNodeDetail(param.oid);
+			}
+			if (param.pid) {
+				this.tableFormData.parentId = param.pid;
+			}
+
+
+		},
+		methods: {
+			_requestNodeTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					that.treeData = data[0].children;
+				});
+			},
+			_requestNodeDetail: function (oid) {
+				var that = this;
+				that.loading = true;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/findUnitById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					// console.log(data);
+					setTimeout(function () {
+						that.loading = false;
+					}, 300)
+					that.tableFormData = data;
+				});
+			},
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+// 						that.checkNameOrCodeExist(function () {
+							that.save();
+// 						});
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/unit/save.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/unit/update.do";
+				}
+				that.but_disabled = true;
+				if (!that.tableFormData.parentId) {
+					that.tableFormData.parentId = 'f4b587f5-4f84-4e51-9ae7-529a7f16b2f6';
+				}
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: msg
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			checkNameOrCodeExist: function (cb) {
+				var that = this;
+				if (this.isEdit) {
+					this.tableFormData.oid = this.oid;
+				}
+				var url = jasTools.base.rootPath + '/jasframework/privilege/unit/checkUnitExist.do';
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					cb && cb(data);
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

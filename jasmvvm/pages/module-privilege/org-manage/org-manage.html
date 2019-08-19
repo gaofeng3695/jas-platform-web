@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>组织机构管理</title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #409EFF;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.filterwrap {
+			padding: 10px 10px 0px 10px;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.content .el-tabs__content {
+			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+			overflow: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading.allLoading">
+
+		<jas-two-panel-resizer layout="vertical" length="300px">
+			<template slot="closePanel">
+				<div class="filterwrap">
+					<el-input prefix-icon="el-icon-search" size="small" placeholder="输入关键字进行过滤" v-model="filterText">
+					</el-input>
+				</div>
+				<div class="orgtool">
+					<el-button type="text" @click="addNode">新增</el-button>
+					<el-button type="text" @click="editNode" :disabled="!currentNodeId || isFixed">修改</el-button>
+					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId || isFixed">删除</el-button>
+				</div>
+				<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" default-expand-all :props="defaultProps" :default-expanded-keys="[currentNodeId]"
+				  highlight-current @node-click="clicknode" :expand-on-click-node="false" :filter-node-method="filterNode"></el-tree>
+			</template>
+			<div class="content" slot="mainPanel">
+				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
+					<el-tab-pane label="部门详情" name="details">
+						<div v-loading="loading.orgDetail">
+							<jas-detail-table :titles="detailTitle" :detail="detail" />
+						</div>
+					</el-tab-pane>
+					<el-tab-pane label="实施范围" name="scale" v-if = "isMultiProject">
+						<div v-loading="loading.scopeTree" v-show="!isFixed">
+							<div style="border-bottom: 1px solid #ececec;padding:0 0 10px;">
+								<el-button size="small" type="primary" @click="requestSaveScope">保存</el-button>
+							</div>
+							<el-tree ref="tree" :data="scopeData.treeData" show-checkbox node-key="id" :default-expanded-keys="scopeData.expandedKeys"
+							  :default-checked-keys="scopeData.checkedKeys" :props="scopeData.defaultProps">
+							</el-tree>
+						</div>
+					</el-tab-pane>
+					<el-tab-pane label="用户管理" name="users">
+						<div v-loading="loading.userManage">
+							<div style="height:800px;">
+								<jas-list-wrapper ref="mylist" style="padding:0;">
+									<div slot="search">
+										<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
+											<el-row>
+												<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+													<el-form-item label="用户名" prop="loginName" style="margin-bottom: 15px ">
+														<el-input v-model="form.loginName" :placeholder="'请输入用户名'" size="small" clearable></el-input>
+													</el-form-item>
+												</el-col>
+												<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+													<el-form-item label="姓名" prop="userName" style="margin-bottom: 15px ">
+														<el-input v-model="form.userName" :placeholder="'请输入姓名'" size="small" clearable></el-input>
+													</el-form-item>
+												</el-col>
+												<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
+													<el-form-item style="float:right;margin-bottom: 0px;">
+														<el-button size="small" @click="_requestUserManage(1)">重置</el-button>
+														<el-button size="small" type="primary" @click="_requestUserManage(2)">查询</el-button>
+													</el-form-item>
+												</el-col>
+											</el-row>
+										</el-form>
+									</div>
+									<div slot="list" class="jas-flex-box is-vertical is-grown">
+										<div style="padding: 15px 0;">
+											<el-button @click="createNewUser" size="small" plain type="primary" icon="fa fa-plus" :disabled="!currentNodeId">新增</el-button>
+											<el-button @click="resetPwd" size="small" plain type="primary" icon="fa fa-eraser" :disabled="selectedRowOids.length==0">重置密码</el-button>
+											<el-button @click="setUserRole" size="small" plain type="primary" icon="fa fa-cog" :disabled="selectedRowOids.length!=1">角色分配</el-button>
+											<el-button @click="deleteUsers" size="small" plain plain type="primary" icon="fa fa-minus" :disabled="selectedRowOids.length==0">删除</el-button>
+											<span class="fr">
+												<el-tooltip class="item" content="刷新" placement="top">
+													<el-button size="small" icon="el-icon-refresh" @click="_requestUserManage"></el-button>
+												</el-tooltip>
+												<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+													<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+												</el-tooltip>
+												<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+													<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+												</el-tooltip>
+											</span>
+										</div>
+										<div class="is-grown">
+											<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="getDetail" @row-click="checkRow"
+													height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%"
+												stripe>
+												<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
+												<el-table-column label="序号" type="index" align="center" width="50" fixed>
+												</el-table-column>
+												<el-table-column label="用户名" prop="loginName" min-width="70px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="姓名" prop="userName" min-width="70px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="角色名称" prop="roleNames" min-width="80px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="部门名称" prop="unitName"  min-width="80px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="电话" prop="phone" min-width="80px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="Email" prop="email" min-width="80px" show-overflow-tooltip align="center">
+												</el-table-column>
+												<el-table-column label="描述" prop="description" min-width="100px" show-overflow-tooltip align="center">
+												</el-table-column>		
+												<el-table-column label="操作" align="center" width="270" fixed="right">
+													<template slot-scope="scope">																	
+														<el-button @click="getDetail(scope.row)" type="text" size="small">详情</el-button>
+														<el-button @click="editUser(scope.row)" type="text" size="small">修改</el-button>
+														<el-button @click="copyRole(scope.row)" type="text" size="small" v-if="!isMulti">复制角色</el-button>
+														<el-button @click="confirmPasteRole(scope.row)" type="text" size="small" v-if="!isMulti">粘贴角色</el-button>
+														<el-button @click="deleteUser(scope.row)" type="text" size="small">删除</el-button>
+													</template>
+												</el-table-column>
+											</el-table>
+										</div>
+										<div style="padding: 15px 0 ;" class="clearfix">
+											<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+												:page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+											</el-pagination>
+										</div>
+									</div>
+		
+								</jas-list-wrapper>
+							</div>
+						</div>
+					</el-tab-pane>
+				</el-tabs>
+			</div>
+		</jas-two-panel-resizer>
+
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {				
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				detail: null,
+				scopeData: {
+					treeData: [],
+					defaultProps: {
+						children: 'children',
+						label: 'text',
+					},
+					checkedKeys: [],
+					expandedKeys: []
+				},
+				detailTitle: [ 
+					{
+						name: '上级组织机构',
+						field: 'parentName',
+					}, {
+						name: '组织机构名称',
+						field: 'unitName',
+					}, {
+						name: '组织机构编号',
+						field: 'unitCode',
+					}, {
+						name: '顺序编号',
+						field: 'orderNum',
+					}, {
+						name: '组织机构类型',
+						field: 'unitType',
+					}, {
+						name: '联系电话',
+						field: 'phone',
+					}, {
+						name: '地址',
+						field: 'address',
+					}, {
+						name: '组织机构描述',
+						field: 'description',
+					},
+				],
+				loading: {
+					allLoading: false,
+					orgDetail: false,
+					scopeTree: false,
+					userManage:false
+				},
+				panelMoving: false,
+				panelShowed: true,
+				activeName: 'details',
+				filterText: '',
+				currentNode: '',
+				currentNodeId: '',
+				orgnData: [],
+				defaultProps: {
+					label: 'text',
+					orgnData: 'orgnData'
+				},
+				isClosed: false,
+				form: {},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				isEditMode: false,
+				selectedRowOids: [],
+				selectedRows: [],
+				tableData: [],
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				isMultiProject: true,
+				copyObj: {
+					oid:'',
+					userName:''
+				},
+				isMulti: null
+			}
+		},
+		computed: {
+			isFixed: function () {
+				var arr = [
+					'e8109332-8a6e-4d16-8e73-549154818205',
+					'8432ae89-470e-4fb9-a351-f0f48eff5548',
+					'46b894cd-714c-4af8-8cf1-f3ea2db01a62',
+					'b7e5ff3c-8e3a-4bd7-89d0-d45189f8c2a6',
+					'29248863-3583-4b64-915c-c1472e87fba7',
+				];
+				return (arr.indexOf(this.currentNodeId) > -1);
+
+			},
+		},
+		watch: {
+			filterText: function (val) {
+				this.$refs.orgtree.filter(val);
+			},		
+			selectedRows: function () {
+				var selects = [];
+				this.selectedRows.forEach(function (item) {
+					selects.push(item.oid);					
+				});
+				this.selectedRowOids = selects;
+			},
+		},
+		mounted: function () {
+			var isMulti = sessionStorage.getItem("multiProject");
+			if(isMulti == 1){
+				this.isMultiProject = false;
+			}else{			
+				this.isMultiProject = false;
+			}
+			
+			this._requestTable();
+			this.setFieldsPattern();
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			// console.log(param)
+			if (param.isEditMode) {
+				this.isEditMode = true;
+			} else {
+				this.isEditMode = false;
+			}
+			var isMultiProject = sessionStorage.getItem("multiProject");
+			if (isMultiProject == "1") {
+				that.isMulti = true;
+			}
+			
+		},
+		methods: {
+			filterNode: function (value, data) {
+				if (!value) return true;
+				return data.text.indexOf(value) !== -1;
+			},
+			_requestTable: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true";
+				jasTools.ajax.get(url, {}, function (data) {
+					that.orgnData = data;
+					that.$nextTick(function () {
+						if (!that.currentNodeId) {
+							that.currentNodeId = data[0].id;
+						}
+						that.$refs.orgtree.setCurrentKey(that.currentNodeId);
+						that._requestOrgDetail(that.currentNodeId);
+						//that._requestScopeTree(that.currentNodeId);
+						that._requestUserManage(0);
+					})
+				});
+			},
+			_requestOrgDetail: function (oid) {
+				var that = this;
+				that.loading.orgDetail = true;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/findUnitById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					setTimeout(function () {
+						that.loading.orgDetail = false;
+					}, 300)
+					that.detail = data;
+				});
+			},
+
+			_requestScopeTree: function (unitOid) {
+				var that = this;
+				that.loading.scopeTree = true;
+				var src = jasTools.base.rootPath + '/daq/implementScope/getImplementScopeTree.do';
+				jasTools.ajax.post(src, {
+					unitOid: unitOid
+				}, function (data) {
+					setTimeout(function () {
+						that.loading.scopeTree = false;
+					}, 300)
+					that.scopeData.treeData = data.rows;
+					var expandedKeys = that.getNodekeysByGrade(that.scopeData.treeData, 1);
+					that.scopeData.expandedKeys = expandedKeys;
+					that.scopeData.checkedKeys = that.getCheckedNodekeys(that.scopeData.treeData);
+
+				});
+			},
+			requestSaveScope: function () {
+				var that = this;
+				this.loading.allLoading = true;
+				var checkedNodes = this.$refs.tree.getCheckedNodes().filter(function (item) {
+					if (item.attributes && item.attributes.type > 0) return true;
+				});
+				var src = jasTools.base.rootPath + '/daq/implementScope/saveRef.do';
+				var arr = checkedNodes.map(function (item) {
+					return {
+						scopeOid: item.id,
+						projectOid: item.attributes.projectOid,
+						pipelineOid: item.attributes.pipelineOid,
+						tendersOid: item.attributes.tendersOid,
+						scopeType: item.attributes.type
+					};
+				});
+				jasTools.ajax.post(src, {
+					unitOid: this.currentNodeId, //标段oid
+					data: arr
+				}, function (data) {
+					setTimeout(function () {
+						that.loading.allLoading = false;
+					}, 0)
+					that._requestScopeTree(that.currentNodeId);
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '保存成功'
+					});
+				});
+			},
+			clicknode: function (node, b, c) {
+				// console.log(a, b, c)
+				this.currentNode = node;
+				this.currentNodeId = node.id;
+				this._requestOrgDetail(node.id);
+				//this._requestScopeTree(node.id);
+				this._requestUserManage(0);
+			},
+			addNode: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '新增组织机构',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?pid=' + this.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that._requestTable();
+						}
+					}
+				});
+			},
+			editNode: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '修改组织机构',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?oid=' + this.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that._requestTable();
+						}
+					}
+				});
+			},
+			_requestDeleteNode: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/removeUnitById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功！'
+					});
+					that._requestTable()
+				});
+			},
+
+			deleteNode: function () {
+				var that = this;
+				window.top.Vue.prototype.$confirm('您确定要删除本条数据吗？', '提示', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							that._requestDeleteNode(that.currentNodeId);
+						}
+					}
+				});
+			},
+			getCheckedNodekeys: function (treeData) {
+				var checkedKeys = [];
+				var getCheckedKeysFromArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.checked) {
+							checkedKeys.push(item.id);
+						}
+						if (item.children) {
+							getCheckedKeysFromArr(item.children);
+						}
+					})
+				};
+				getCheckedKeysFromArr(treeData);
+				return checkedKeys;
+			},
+			getNodekeysByGrade: function (treeData, nGrade) {
+				var grades = [];
+				var getGradeKeysFromArr = function (arr, index) {
+					++index;
+					arr.forEach(function (item) {
+						if (grades[index]) {
+							grades[index].push(item.id)
+						} else {
+							grades[index] = [item.id]
+						}
+						if (item.children) {
+							getGradeKeysFromArr(item.children, index);
+						}
+					});
+				};
+				getGradeKeysFromArr(treeData, -1);
+				nGrade = nGrade < 1 ? 1 : nGrade;
+				nGrade = nGrade > grades.length ? grades.length : nGrade;
+				return grades[nGrade - 1];
+			},
+			
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+
+			setFieldsPattern: function () {
+				var nFields = 5;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+
+			_requestUserManage: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/getList.do";
+				var paramData = {};
+				if (that.isMulti) {
+					paramData = {
+						projectOid:'platform',
+						unitId: this.currentNodeId,
+						loginName: this.form.loginName,
+						userName: this.form.userName,				
+						pageNo: this.currentPage,
+						pageSize: this.pageSize,
+						page: this.currentPage,
+						rows: this.pageSize,
+					}
+				}else{
+					paramData = {
+						unitId: this.currentNodeId,
+						loginName: this.form.loginName,
+						userName: this.form.userName,				
+						pageNo: this.currentPage,
+						pageSize: this.pageSize,
+						page: this.currentPage,
+						rows: this.pageSize,
+					}
+				}
+				that.loading = true;
+				jasTools.ajax.postForm(url, paramData, function (data) {
+					that.loading.userManage = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			createNewUser: function () {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add-user.html';
+				top.jasTools.dialog.show({
+					width: '800px',
+					height: '500px',
+					title: '新建用户',
+					src: baseSrc + '?pid=' + this.currentNodeId,
+					cbForClose: function () {
+						that._requestUserManage(1);
+						that._requestTable();
+					}
+				});
+			},		
+			editUser: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add-user.html';
+				top.jasTools.dialog.show({
+					width: '800px',
+					height: '500px',
+					title: '修改用户',
+					src: baseSrc + '?oid=' + row.oid,
+					cbForClose: function () {
+						that._requestUserManage(1);
+						that._requestTable();
+					}
+				});
+			},
+			resetPwd: function(){
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/resetUserPWD.do?ids="+that.selectedRowOids;
+				jasTools.ajax.post(url, {
+				}, function (data) {
+					if(data.success==1){
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '重置密码成功'
+						});
+					}
+					that._requestUserManage(0);
+					that._requestTable();
+				});
+			},
+			getDetail: function(row){
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/detail-user.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					oid: row.oid
+				});
+				top.jasTools.dialog.show({
+					width: '800px',
+					height: '500px',
+					title: '用户详情',
+					src: src,
+				});
+			},			
+			deleteUsers: function () {
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+					});
+					that._requestUserManage(0);
+					that._requestTable();
+				};
+				window.top.Vue.prototype.$confirm('您确定要删除吗？', '删除用户', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							if (that.selectedRowOids.length >= 1) {
+								var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids="+that.selectedRowOids;
+								jasTools.ajax.get(url, {
+								}, function (data) {
+									afterDelete();
+								});
+							} 
+						}
+					}
+				});
+			},
+			deleteUser: function (row) {
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+					});
+					that._requestUserManage(0);
+					that._requestTable();
+				};
+				window.top.Vue.prototype.$confirm('您确定要删除吗？', '删除用户', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+								var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids="+row.oid;
+								jasTools.ajax.get(url, {
+								}, function (data) {
+									afterDelete();
+								});
+						}
+					}
+				});
+			},
+			setUserRole: function () {
+				var that = this;
+				var isMulti = sessionStorage.getItem("multiProject");
+				// 判断是否多项目
+				if(isMulti === "1"){
+					//新接口页面
+					top.jasTools.dialog.show({
+						width: '600px',
+						height: '80%',
+						title: '角色分配',
+						src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/role-allocation.html?userOid=' + that.selectedRows[0].oid,
+						cbForClose: function (param) {
+							if (param == 1) {
+								that._requestUserManage(0);
+							}
+						}
+					})
+				}else {
+					//旧接口页面
+					top.jasTools.dialog.show({
+						width: '600px',
+						height: '80%',
+						title: '角色分配',
+						src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/role-allocation.html?userId=' + that.selectedRowOids,
+						cbForClose: function (param) {
+							if (param == 1) {
+								that._requestUserManage(0);
+							}
+						}
+					})
+				}	
+			},			
+			handleSelectionChange: function (selects) {
+				this.selectedRows = selects;
+			},
+			checkRow: function (row, event, column) {
+				if (column.label == '操作') return;
+				this.$refs['mytable'].toggleRowSelection(row)
+			},			
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this._requestUserManage(0);
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this._requestUserManage(0);
+			},
+			copyRole:function(row){
+				var that = this;
+				// 清空copyObj且赋值，以便粘贴的时候判断是否相同行操作
+				that.copyObj = {};
+				that.copyObj.oid = row.oid;
+				that.copyObj.userName = row.userName;
+				var obj = {oid: row.oid};
+				var param = {};
+				param.clipboardItemList = [];
+				param.clipboardItemList.push(obj);
+				var url = jasTools.base.rootPath + "/clipboard/copy.do";
+				jasTools.ajax.post(url, param, function (data) {
+					if(data.status==1){
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '复制成功'
+						});
+					}
+				});
+			},
+			confirmPasteRole:function(row){
+				var that = this;
+				if(that.copyObj.oid == row.oid){
+					top.Vue.prototype.$message({
+						type: 'warning',
+						message: '请勿操作同一行数据'
+					});
+				}else{
+					window.top.Vue.prototype.$confirm('您确定要将 '+that.copyObj.userName+' 拥有的角色赋给 '+row.userName+' 吗？', '提示', {
+						type: 'warning',
+						callback: function (action) {
+							if (action === 'confirm') {
+								that.pasteRole(row);
+							}
+						}
+					});
+				}
+			},
+			pasteRole: function(row){
+				var that = this;
+				var entityClass = "cn.jasgroup.jasframework.security.dao.entity.PriRole";
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/pasteRole.do?targetUserOid="+row.oid+ "&entityClass=" + entityClass;
+				jasTools.ajax.get(url, {}, function (data) {
+					if(data.status==1){
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '已将 '+that.copyObj.userName+' 拥有的角色赋给了 '+row.userName
+						});
+					}
+				});
+			}
+		},
+	});
+</script>
+
+</html>

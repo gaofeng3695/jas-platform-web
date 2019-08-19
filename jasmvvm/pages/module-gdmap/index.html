@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.13&key=879a392ebda1675d4cdc8eac70d9d4dc"></script>
+  <link rel="stylesheet" href="../../common/css/main.css">
+
+  <style>
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+</body>
+<script>
+  var map = new AMap.Map("container", {
+    resizeEnable: true,
+    center: [116.388904, 39.913423],
+    zoom: 14
+  });
+
+
+
+  function getPath(total) {
+    var lng = 116.368904;
+    var lat = 39.913423;
+    var path = [
+      [lng, lat]
+    ];
+
+    function makePath(total, nNow) {
+      if (nNow > total) return;
+      var lng = path[path.length - 1][0];
+      var lat = path[path.length - 1][1];
+      var alnglat = [];
+      var time = Math.ceil(nNow / 2);
+      var switcher = time % 2 ? -1 : 1;
+      // var switcher = 1;
+      if ((nNow % 2 === 0)) {
+        alnglat = [lng + 0.001 * (time + 1) * switcher, lat];
+      } else {
+        alnglat = [lng, lat - 0.001 * (time + 1) * switcher];
+      }
+      nNow++;
+      path.push(alnglat);
+      makePath(total, nNow)
+    }
+    total = total || 1000;
+    makePath(total, 1)
+    return path.map(function(item){
+      return new AMap.LngLat(item[0], item[1])
+    });
+  }
+
+
+  // 创建包含4个节点的折线及文字标注
+  // var path = [
+  //   new AMap.LngLat(116.368904, 39.913423),
+  //   new AMap.LngLat(116.398258, 39.904600)
+  // ];
+
+  function renderOriginLine() {
+    var path = getPath(1000);
+    // 创建折线实例
+    var polyline = new AMap.Polyline({
+      path: path,
+      borderWeight: 1, // 线条宽度，默认为 1
+      strokeColor: 'red', // 线条颜色
+      lineJoin: 'round' // 折线拐点连接处样式
+    });
+    // 将折线添加至地图实例
+    map.add(polyline);
+
+    var text1 = new AMap.Text({
+      position: new AMap.LngLat(116.368904, 39.913423),
+      text: 'gps坐标',
+      offset: new AMap.Pixel(-20, -20)
+    })
+    map.add(text1);
+  }
+
+  // renderOriginLine();
+
+  //   gps:GPS原始坐标；
+  // baidu：百度经纬度；
+  // mapbar：图吧经纬度；
+  function swithLoca(type, total) { //gps
+    type = type || 'gps'
+    var smap = {
+      gps: 'GPS原始坐标',
+      baidu: '百度经纬度',
+      mapbar: '图吧经纬度'
+
+    }
+    total = total || 1000;
+    var path = getPath(total);
+
+    var polyline2;
+    var text2;
+    var st = new Date().getTime()
+    // 坐标转换
+    AMap.convertFrom(path, type, function (status, result) {
+      if (result.info === 'ok') {
+        var path2 = result.locations;
+        console.log(result)
+        console.log('——' + smap[type] + '————转换耗时：' + (new Date().getTime() - st) / 1000 + 's')
+        polyline2 = new AMap.Polyline({
+          path: path2,
+          borderWeight: 1, // 线条宽度，默认为 1
+          strokeColor: 'blue', // 线条颜色
+          lineJoin: 'round' // 折线拐点连接处样式
+        });
+        map.add(polyline2);
+        text2 = new AMap.Text({
+          position: result.locations[0],
+          text: smap[type],
+          offset: new AMap.Pixel(-20, -20)
+        })
+        map.add(text2);
+        var st2 = new Date().getTime()
+        console.log('——' + smap[type] + '————总耗时时间：' + (st2 - st) / 1000 + 's')
+      }
+    });
+
+  }
+
+
+  swithLoca('gps',100)
+  console.log('gps__________________')
+  // swithLoca('baidu')
+  // console.log('baidu__________________')
+  // swithLoca('mapbar')
+</script>
+
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>自定义表单配置</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+    <jas-list-wrapper :if-search="searchFields.length<1">
+      <jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig"
+        @search="searchList"></jas-search-for-list>
+
+      <jas-table-for-list ref="table" slot="list" :is-search-btn="searchFields.length>0" @locate="locate"
+        :privilege-code="privilegeCode" :fields="tableFields" :form="topSearch" :search-path="searchPath"
+        :delete-path="deletePath" :add-url="addUrl" :detail-url="detailUrl" :upcall-path="upcallPath"
+        :class-name="className" @deleterow="deleteRow" @clickrowbtn="clickrowbtn" :row-btns="rowBtns"
+        :btncolwidth="btncolwidth" :propconfig="{oid:'oid'}" :import-config="importConfig" :template-code="templateCode"
+        :export-template-code="exportTemplateCode" :is-hide-btn-col="isHideBtnCol">
+        <template slot="btns">
+          <el-button v-for="item in topBtns" v-if="item.method" size="small" plain :icon="item.icon"
+            @click="clickCustomFn(item.method,item)" type="primary">{{item.name}}</el-button>
+        </template>
+      </jas-table-for-list>
+    </jas-list-wrapper>
+
+  </div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+  (function () { //加载配置未见
+    var param = window.jasTools.base.getParamsInUrl(location.href);
+    var pageCode = param.pageCode;
+    pageCode && $.getScript('./config/' + pageCode + '.js', function (data, textStatus, jqxhr) {
+      window.vm = new Vue({
+        el: '#app',
+        data: function () {
+          return {
+            topBtns: [],
+            className: '',
+            templateCode: '',
+            exportTemplateCode: '',
+            importConfig: '',
+            searchPath: '',
+            deletePath: '',
+            upcallPath: '',
+            addUrl: '',
+            detailUrl: '',
+            privilegeCode: '',
+            topSearch: {},
+            searchFields: [],
+            pageConfig: {},
+            fieldsConfig: [],
+            tableFields: [],
+            rowBtns: [] || ['配置', '审核'],
+            btncolwidth: '180px',
+            isHideBtnCol: false,
+          }
+        },
+        created: function () {
+          var that = this;
+          that.pageConfig = window.pageConfig;
+          var param = window.jasTools.base.getParamsInUrl(location.href);
+          that.privilegeCode = param.privilegeCode || pageConfig.privilegeCode;
+          that.templateCode = param.templateCode; // 导入导出模板
+          that.pageCode = param.pageCode;
+          that.className = param.className;
+
+
+          that.addUrl = jasTools.base.rootPath +
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/add.html?pageCode=' + that.pageCode;
+          if(pageConfig.addParams){
+            that.addUrl = jasTools.base.setParamsToUrl(that.addUrl,pageConfig.addParams)
+          }
+          
+          
+            that.detailUrl = jasTools.base.rootPath +
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/detail.html?pageCode=' + that
+            .pageCode;
+
+          that.className = that.pageConfig.searchPath;
+          if (that.pageConfig.excelConfig) {
+            that.importConfig = that.pageConfig.excelConfig.importConfig;
+            that.templateCode = that.pageConfig.excelConfig.templateCode;
+            that.exportTemplateCode = that.pageConfig.excelConfig.exportTemplateCode;
+          }
+
+          that.searchPath = that.pageConfig.searchPath;
+          that.deletePath = that.pageConfig.deletePath;
+
+          that.isHideBtnCol = that.pageConfig.isHideBtnCol || false;
+          that.btncolwidth = that.pageConfig.btncolwidth ? that.pageConfig.btncolwidth : that.btncolwidth;
+          that.topBtns = that.pageConfig.topBtns;
+          that.rowBtns = that.pageConfig.rowBtns && that.pageConfig.rowBtns.map(function (item) {
+            return item.name
+          });
+
+          that.fieldsConfig = that.pageConfig.fieldsConfig;
+          that.searchFields = that.formatFields(that.pageConfig.searchFields, that.fieldsConfig);
+          that.tableFields = that.formatFields(that.pageConfig.tableFields, that.fieldsConfig);
+          that.topSearch = that.formatForm(that.pageConfig.searchFields);
+
+
+        },
+        mounted: function () {
+          console.log(pageConfig.searchFields.length > 0, 1, 1)
+          if (pageConfig.ifHideSearch && (pageConfig.searchFields.length > 0)) {
+            this.$refs.table.toggleSearch();
+          }
+        },
+        methods: {
+          clickCustomFn: function (name, a, b, c, d) {
+            var fn = this.pageConfig.methods[name];
+            if (fn) {
+              fn.call(this, a, b, c, d);
+            }
+          },
+          formatForm: function (fields) {
+            var obj = {};
+            fields.forEach(function (item) {
+              obj[item] = '';
+            });
+            if( pageConfig.searchParams){
+              obj = jasTools.base.extend(obj, pageConfig.searchParams);
+            }
+            return obj;
+          },
+          formatFields: function (fields, fieldsConfig) {
+            return fields.map(function (item) {
+              return fieldsConfig[item] ? {
+                name: fieldsConfig[item].name,
+                field: item,
+                formatter: fieldsConfig[item].formatter,
+                width: fieldsConfig[item].width,
+                sortable: fieldsConfig[item].sortable,
+                tablehidden: fieldsConfig[item].tablehidden,
+              } : {
+                field: item
+              };
+            });
+          },
+          searchList: function () {
+            this.$refs.table.search();
+          },
+          locate: function (row) {
+            var resizer = top.app.$refs.resizer;
+            if (top.app.gisUrl && resizer.panelShowed) {
+              top.gisWindow.jasMap.flashGraphic(row.oid, 'daq_median_stake')
+            } else {
+
+              if (!top.app.gisUrl) {
+                resizer.panelShowed = true;
+                top.app.statuschanged(true); // 加载地图
+
+                top.Vue.prototype.$message({
+                  message: '正在初始化地图，请稍后定位',
+                  type: 'warning'
+                });
+              } else {
+                resizer.panelShowed = true;
+                setTimeout(function () {
+                  top.gisWindow.jasMap.flashGraphic(row.oid, 'daq_median_stake')
+                }, 300);
+              }
+            }
+          },
+          clickrowbtn: function (a, b) {
+            // console.log(a, b)
+            var fn = null;
+            var that = this;
+            that.pageConfig.rowBtns && that.pageConfig.rowBtns.forEach(function (item) {
+              if (item.name == b) {
+                fn = that.pageConfig.methods[item.method];
+              }
+            });
+            if (fn) {
+              fn.call(this, a, b);
+            }
+          },
+          deleteRow: function (a, b) {
+            console.log(a, b)
+          },
+        },
+      });
+    });
+    !pageCode && alert('请传入配置参数')
+  })();
+</script>
+<script>
+
+</script>
+
+
+</html>

@@ -1,0 +1,203 @@
+{
+  "appName":"天地图地图应用",
+  "style":"lightblue",
+  "context":{
+    "tdt-key":"46631a6a7eeeefecf46ebc480483d9ca"
+  },
+  "resources":[
+    { "type":"css","url":"basepath:../lib/openlayer_v5.0.2/ol.css"},
+    { "type":"js","url":"basepath:../lib/openlayer_v5.0.2/ol.js","id":"ol.js" },
+    { "type":"js","url":"basepath:../lib/proj4js/proj4_2.4.4.js"},
+    { "type":"js","url":"basepath:../lib/jquery/jquery-1.12.4.min.js","id":"jquery.js"  },
+    { "type":"js","url":"basepath:../lib/jquery-easyui/1.5.2/jquery.easyui.min.js","id":"easyui.js" ,"relyOn":"jquery.js"  },
+    { "type":"js","url":"basepath:mapmodules.js"  ,"relyOn":"easyui.js" },
+    { "type":"js","url":"basepath:../lib/FileSaver.min.js"},
+    { "type":"js","url":"basepath:mapstyles/default.js" ,"relyOn":"ol.js"  }
+
+  ],
+  "map":{
+    "id":"jasMap",
+    "scale":true,
+    "attribution":false,
+    "mapOptions":{
+      "center":[104.41, 33.82],
+      "level":5,
+      "projection":"EPSG:4490",
+      "resolutions": [{
+        "resolution":0.703125,
+        "matrixId":"1"
+      },{
+        "resolution":0.3515625,
+        "matrixId":"2"
+      },{
+        "resolution":0.17578125,
+        "matrixId":"3"
+      },{
+        "resolution":0.087890625,
+        "matrixId":"4"
+      },{
+        "resolution":0.0439453125,
+        "matrixId":"5"
+      },{
+        "resolution":0.02197265625,
+        "matrixId":"6"
+      },{
+        "resolution":0.010986328125,
+        "matrixId":"7"
+      },{
+        "resolution":0.0054931640625,
+        "matrixId":"8"
+      },{
+        "resolution":0.00274658203125,
+        "matrixId":"9"
+      },{
+        "resolution":0.001373291015625,
+        "matrixId":"10"
+      },{
+        "resolution":0.0006866455078125,
+        "matrixId":"11"
+      }]
+    },
+    "basemaps":{
+      "label": "基础底图",
+      "baseMapLayers": [{
+        "id":"china_shp_tdt" ,"visible":false,
+        "label":"天地图矢量","icon":"stylepath:images/basemap_shp.png",
+        "layerSet":[{
+          "id":"china_shp_tdt_0" ,
+          "index":5,
+          "label":"全球地形图标注",
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"cva"
+        },{
+          "id":"china_shp_tdt_1" ,
+          "index":2,
+          "label":"全球矢量图",
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"vec"
+        }]
+      },{
+        "id":"china_img_tdt" ,"visible":true,
+        "label":"天地图影像","icon":"stylepath:images/basemap_img.png",
+        "layerSet":[{
+          "id":"china_img_tdt_0" ,
+          "index":5,
+          "label":"全球影像图标注",
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"cia"
+        },{
+          "id":"china_img_tdt_1" ,
+          "index":2,
+          "label":"全球影像图",
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"img"
+        }]
+      },{
+        "id":"china_ter_tdt" ,"visible":false,
+        "label":"天地图地形","icon":"stylepath:images/basemap_img.png",
+        "layerSet":[{
+          "id":"china_ter_tdt_0" ,
+          "index":5,
+          "label":"全球地形图标注" ,
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"cta"
+        },{
+          "id":"china_ter_tdt_1" ,
+          "index":2,
+          "label":"全球地形图",
+          "type":"Tile",
+          "source":"tdt",
+          "layer":"ter"
+        }]
+      }]
+    },
+    "optionallayers":[
+      {
+        "id":"daq_median_stake",
+        "label":"中线桩",
+        "index":33,
+        "flash":true,
+        "outFields":"*",
+        "maxScale____":250000,
+        "listener":{
+           "onHover":{
+               "responseType":"tip",
+               "template":"桩号：${stakenumber},<br>里程：${mileage}",
+               "callback":""
+           },
+           "onClick2":{
+             "responseType":"dialog",
+             "title":"中线桩",
+             "url":"dialog-stake.html"
+           },
+           "onClick":{
+             "responseType":"infoWindow",
+             "title":"信息弹窗",
+             "content":"桩号：${stakenumb}<br>里程：${mileage}<br>位置：${administrativedivision}",
+             "width":"",
+             "height":"",
+             "callback":""
+           },
+           "onDbClick2":{
+             "responseType":"function",
+             "callback":"onLayerClicked"
+           }
+         },
+        "renderer":{
+           "style":"centerlinestake" ,
+           "labelStyle":"secondLevelPointLabelStyle",
+           "labelField":"stakenumber"
+        }
+   }
+    ]
+  },
+  "modules":[
+    {
+    "id": "baseMapToolsBar",
+    "class": "BaseMapToolsBar",
+    "label":"导航工具条",
+    "controller": true,
+    "moduleSet": [
+      {
+        "type": "api",
+        "label":"地图复位",
+        "target": "zoomHome"
+      },
+      {
+        "type": "api",
+        "target": "startPanMode"
+      },
+      {
+        "type": "api",
+        "target": "zoomIn"
+      },
+      {
+        "type": "api",
+        "target": "zoomOut"
+      },
+      {
+        "type": "api",
+        "target": "drawLineAndGetLength"
+      },
+      {
+        "type": "api",
+        "target": "drawPolygonAndGetArea"
+      },
+      {
+        "type": "api",
+        "target": "clearAllGraphics"
+      },{
+        "type":"api","target":"export","label":"导出图片","index":"","toggle":true,"icon":"stylepath:images/export.png"
+      }
+    ]
+  },
+    {
+      "id":"baseMapsGallary","label":"底图切换","class":"BaseMapsGallary","enable":true
+    }
+  ]
+}

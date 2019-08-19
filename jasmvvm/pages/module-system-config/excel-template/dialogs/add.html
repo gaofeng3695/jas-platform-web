@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-form-item {
+			margin-bottom: 15px !important;
+		}
+
+		.el-textarea.el-input--small {
+			padding-top: 4px;
+		}
+
+		.upload-demo {
+			line-height: 1.4;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="content">
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="100px">
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="模板名称" prop="excelTemplateName">
+							<el-input v-model="tableFormData.excelTemplateName" clearable placeholder="请输入模板名称" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="模板编号" prop="excelTemplateCode">
+							<el-input v-model="tableFormData.excelTemplateCode" clearable placeholder="请输入模板编号" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="模板类型" prop="excelTemplateType" required>
+							<el-switch v-model="tableFormData.excelTemplateType" active-text="导入模板" inactive-text="导出模板" active-value="1" inactive-value="2">>
+							</el-switch>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="备注" prop="description">
+							<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.remark"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="模板上传" prop="file">
+							<el-upload ref="upload" :data="uploadParam" class="upload-demo" accept=".xls,.xlsx" :limit="1" :auto-upload="false" :on-change="changeFiles"
+							  :file-list="fileList" :on-success="fileUploaded" :on-remove="removeFile" :on-exceed="uploaodNumberlimit" drag :action="uploadurl">
+								<i class="el-icon-upload"></i>
+								<div class="el-upload__text">将文件拖到此处，或
+									<em>点击上传</em>
+								</div>
+								<div class="el-upload__tip" slot="tip">只能上传Excel模板文件，最多同时上传一个</div>
+							</el-upload>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<!--<form-add :datasource="tableDataSource" :form="tableFormData" labelwidth="100px"></form-add>-->
+		</div>
+		<div slot="footer" class="dialog-footer" style="text-align: center">
+			<el-button size="small" @click="cancel()">取 消</el-button>
+			<el-button size="small" type="primary" @click="submit('tableFormData')">确 定</el-button>
+		</div>
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<!--<script src="js/ajaxFileUpload.js"></script>-->
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				uploadurl: jasTools.base.rootPath + "/attachment/upload.do?token=" + localStorage.getItem("token"),
+				fileList: [],
+				rules: {
+					excelTemplateName: [{
+						required: true,
+						message: '请输入模板名称',
+						trigger: 'blur'
+					}],
+					excelTemplateCode: [{
+						required: true,
+						message: '请输入模板编号',
+						trigger: 'blur'
+					}],
+					file: [{
+						required: true,
+						validator: function (rule, value, callback) {
+							if (that.$refs.upload.uploadFiles.length === 0) {
+								callback(new Error('请上传模板'));
+							} else {
+								callback();
+							}
+						}
+					}]
+				},
+				uploadParam: {},
+				tableFormData: {
+					excelTemplateName: "",
+					excelTemplateCode: "",
+					excelTemplateType: "1",
+					remark: "",
+					file: ''
+				},
+			}
+		},
+
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.oid = param.oid;
+				this.tableFormData.oid = this.oid;
+				this.uploadurl = jasTools.base.rootPath + "/attachment/upload.do?token=" + localStorage.getItem("token") +
+					"&businessId=" + this.oid + "&businessType=excelTemplate";
+				this.isEdit = true;
+				this.tableFormData.excelTemplateName = decodeURI(param.excelTemplateName);
+				this.tableFormData.excelTemplateCode = decodeURI(param.excelTemplateCode);
+				this.tableFormData.excelTemplateType=param.excelTemplateType;
+				this.tableFormData.remark = decodeURI(param.remark);
+				// this.__getDetailByObjectId();
+				this.requestFiles(decodeURI(param.excelTemplatePath));
+			};
+
+		},
+		methods: {
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.checkNameOrCodeExist(function () {
+							that.save();
+						});
+					}
+				});
+			},
+			requestFiles: function (path) {
+				var that = this;
+				var arr = path.split('/');
+				var name = arr[arr.length - 1];
+				var file = {
+					name: name,
+					oid: 'this is oid' // 仅用于判断是否是服务器上的文件
+				};
+				that.fileList.push(file);
+				that.fileListlength = that.fileList.length;
+			},
+			fileUploaded: function (response, file, fileList) {
+				top.Vue.prototype.$message({
+					type: 'success',
+					message: this.isEdit ? '修改成功' : '新增成功'
+				});
+				this.cancel();
+			},
+			changeFiles: function (file, fileList) {
+				var that = this;
+				if (file.status === "ready") {
+					var aFileName = file.name.split('.');
+					var type = aFileName[aFileName.length - 1 || 1];
+					if (!type || ['xls', 'xlsx', 'XLSX', 'XLS'].indexOf(type) === -1) { // 不是规定格式的文件
+						top.Vue.prototype.$message('请上传规定格式的文件');
+						var index = fileList.indexOf(file);
+						fileList.splice(index, 1);
+					}
+				} else {
+					this.$refs.tableFormData.validateField('file');
+				}
+			},
+			removeFile: function (file, fileList) {
+				if (file.status === 'success' && file.oid) {
+					if (this.filesToBeDelete) {
+						this.filesToBeDelete.push(file.oid);
+					} else {
+						this.filesToBeDelete = [file.oid];
+					}
+				}
+			},
+			uploadFile: function (oid) {
+				var that = this;
+				var excelTemplateType = this.tableFormData.excelTemplateType;
+				that.uploadurl = jasTools.base.rootPath + "/jasframework/excelTemplate/upload.do?token=" + localStorage.getItem(
+						"token") +
+					"&oid=" + oid + "&excelTemplateType=" + (excelTemplateType || 1);
+				that.uploadParam = {
+					excelTemplateType: excelTemplateType || 1,
+					oid: oid
+				};
+				that.$nextTick(function () {
+					var afileToSubmit = that.$refs.upload.uploadFiles.filter(function (item) {
+						return !item.oid
+					});
+					if (afileToSubmit.length > 0) {
+						that.$refs.upload.submit();
+					} else {
+						that.fileUploaded();
+					}
+				});
+
+			},
+			__deleteFilesToServer: function (cb) {
+				var that = this;
+				if (!that.filesToBeDelete) {
+					cb && cb();
+					return;
+				}
+				jasTools.ajax.get(jasTools.base.rootPath + "/attachment/delete.do", {
+					oids: that.filesToBeDelete.join(',')
+				}, function (data) {
+					cb && cb();
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jasframework/excelTemplate/save.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jasframework/excelTemplate/update.do";
+				}
+
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					that.uploadFile(data.data || that.oid);
+				});
+
+			},
+			checkNameOrCodeExist: function (cb) {
+				var that = this;
+				if (this.isEdit) {
+					this.tableFormData.oid = this.oid;
+				}
+				var url = jasTools.base.rootPath + '/jasframework/excelTemplate/checkNameOrCodeExist.do';
+				jasTools.ajax.get(url, that.tableFormData, function (data) {
+					// console.log(data);
+					cb && cb();
+				});
+			},
+
+			__getDetailByObjectId: function () {
+				var that = this;
+
+				jasTools.ajax.get(url, that.tableFormData, function (data) {
+					// console.log(data);
+					cb && cb();
+				});
+				$.ajax({
+					type: "get",
+					dataType: "json",
+					contentType: "application/json",
+					url: jasTools.base.rootPath + "/hibernate/commonData/domain/get.do?token=" + localStorage.getItem(
+						"token") + "&oid=" + oid,
+					success: function (data) {
+						if (data.status == 1) {
+							that.tableFormData = data.data;
+						} else {
+							that.$message({
+								type: 'error',
+								message: '服务异常，请稍候尝试'
+							});
+						}
+					}
+				});
+			},
+			uploaodNumberlimit: function () {
+				top.Vue.prototype.$message('模板文件只允许上传一个')
+			},
+			cancel: function () {
+				window.parent.jasTools.dialog.close(1);
+			}
+		},
+	});
+</script>
+
+</html>

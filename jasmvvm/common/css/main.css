@@ -1,0 +1,420 @@
+/**
+* table of Contents 目录
+* 1. basic-css 项目基础样式
+* 2. element-css-fix elementUi优化样式
+* 3. 3rd-part-module-css-fix 第三方组件样式
+* 4. jas-compoennts-css 通用组件样式
+* 5. customer-main-css 项目私有公共样式
+*
+* @gf 2019/1/21
+*/
+
+/** basic-css--start ********************************************************************************************************************/
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body,
+#app,
+.outerwrapper {
+    width: 100%;
+    height: 100%;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5em;
+    background: #fff;
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+a {
+    text-decoration: none
+}
+
+a,
+input,
+button {
+    outline: none;
+}
+
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+    height: 0;
+}
+
+.clearfix {
+    zoom: 1;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.maincolor {
+    color: #319ce4;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset;
+}
+
+.jas-flex-box {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.jas-flex-box.is-vertical {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: 100%;
+}
+
+.jas-flex-box.is-horizontal {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
+
+.jas-flex-box.is-vertical .is-grown {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    min-height: 0;
+    height: 0%;
+}
+
+.jas-flex-box.is-horizontal .is-grown {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    min-width: 0;
+    width: 0%;
+}
+
+
+/** basic-css--end ********************************************************************************************************************/
+
+
+
+/** element-css-fix--begin ********************************************************************************************************************/
+
+/* font-awesome+element font fix */
+.el-menu-item [class^=fa] {
+    margin-right: 5px;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 18px;
+    vertical-align: middle;
+}
+
+.el-submenu [class^=fa] {
+    vertical-align: middle;
+    margin-right: 5px;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 18px;
+}
+
+.el-button [class*=fa-]+span {
+    margin-left: 5px;
+}
+
+
+.el-cascader {
+    width: 100%;
+}
+
+.el-cascader-menu__item--extensible:after {
+    right: 6px;
+}
+
+.el-select.el-select--small {
+    width: 100%;
+}
+
+.el-input-number.el-input-number--small {
+    width: 100%;
+}
+
+.el-form-item__content {
+    min-height: 41px;
+}
+
+.el-input-number .el-input__inner {
+    text-align: left;
+}
+
+.jas-search-for-list .el-form-item {
+    margin-bottom: 0px !important;
+}
+
+.el-table td,
+.el-table th {
+    padding: 8px 0;
+}
+
+/** element-css-fix--end ********************************************************************************************************************/
+
+
+
+
+
+/** 3rd-part-module-css-fix--begin ********************************************************************************************************************/
+
+
+/* multipane */
+
+.multipane:not(.is-resizing) .resizepanel {
+    transition: all 0.3s;
+}
+
+.multipane.foo.layout-v {
+    height: 100%;
+}
+
+.multipane.foo.layout-h {
+    height: 100%;
+}
+
+.multipane.foo.layout-v .multipane-resizer {
+    margin: 0;
+    left: 0;
+    /* reset default styling */
+    width: 10px;
+    background: #f1f1f1;
+}
+
+.multipane.foo.layout-h .multipane-resizer {
+    margin: 0;
+    top: 0;
+    /* reset default styling */
+    height: 10px;
+    background: #f1f1f1;
+}
+
+.multipane-resizer {
+    margin: 0;
+    left: 0;
+    position: relative;
+}
+
+.multipane.foo.layout-h .multipane-resizer .resizertap {
+    height: 100%;
+    width: 50px;
+    background: #409EFF;
+    opacity: 0.5;
+    color: #fff;
+    left: 50%;
+    top: 0;
+    position: absolute;
+    margin-left: -25px;
+    cursor: pointer;
+    line-height: 10px;
+    text-align: center;
+    border-radius: 0px;
+}
+
+.multipane.foo.layout-h .multipane-resizer .resizertap i.fa {
+    margin: -2px;
+}
+
+.multipane.foo.layout-h .multipane-resizer .resizertap:hover {
+    opacity: 0.7;
+}
+
+.multipane.foo.layout-v .multipane-resizer .resizertap {
+    width: 100%;
+    height: 50px;
+    background: #409EFF;
+    opacity: 0.5;
+    color: #fff;
+    top: 50%;
+    left: 0;
+    position: absolute;
+    margin-top: -25px;
+    cursor: pointer;
+    line-height: 50px;
+    text-align: center;
+}
+
+.multipane.foo.layout-v .multipane-resizer .resizertap:hover {
+    opacity: 0.7;
+}
+
+/* multipane */
+
+/* v-bar */
+
+.vb>.vb-dragger {
+    z-index: 5;
+    width: 12px;
+    right: 0;
+}
+
+.vb>.vb-dragger>.vb-dragger-styler {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: rotate3d(0, 0, 0, 0);
+    transform: rotate3d(0, 0, 0, 0);
+    -webkit-transition: background-color 100ms ease-out, margin 100ms ease-out, height 100ms ease-out;
+    transition: background-color 100ms ease-out, margin 100ms ease-out, height 100ms ease-out;
+    background-color: rgba(48, 121, 244, .1);
+    margin: 5px 5px 5px 0;
+    border-radius: 20px;
+    height: calc(100% - 10px);
+    display: block;
+}
+
+.vb.vb-scrolling-phantom>.vb-dragger>.vb-dragger-styler {
+    background-color: rgba(48, 121, 244, .3);
+}
+
+.vb>.vb-dragger:hover>.vb-dragger-styler {
+    background-color: rgba(48, 121, 244, .5);
+    margin: 0px;
+    height: 100%;
+}
+
+.vb.vb-dragging>.vb-dragger>.vb-dragger-styler {
+    background-color: rgba(48, 121, 244, .5);
+    margin: 0px;
+    height: 100%;
+}
+
+.vb.vb-dragging-phantom>.vb-dragger>.vb-dragger-styler {
+    background-color: rgba(48, 121, 244, .5);
+}
+
+/* v-bar */
+
+/** 3rd-part-module-css-fix--end ********************************************************************************************************************/
+
+
+
+
+/** jas-compoennts-css--start ********************************************************************************************************************/
+
+
+/* jas-iframe-dialog */
+.jas-iframe-dialog .el-dialog__header {
+    padding: 10px 0 10px;
+    border-bottom: 1px solid #e4e7ed;
+    /* margin: 0 20px; */
+    background: rgb(236, 245, 255);
+    text-align: center;
+}
+
+.jas-iframe-dialog .el-dialog__headerbtn {
+    top: 10px;
+}
+
+.jas-iframe-dialog .el-dialog {
+    height: 70vh;
+    margin-bottom: 0px;
+}
+
+.jas-iframe-dialog .el-dialog__body {
+    height: calc(100% - 44px);
+    -webkit-height: calc(100% - 54px);
+    -moz-height: calc(100% - 54px);
+    box-sizing: border-box;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding: 0px 0px 10px;
+}
+
+.jas-iframe-dialog .dialog-iframe {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* jas-detail-table */
+.jas-detail-table .table_wrap {
+    width: 100%;
+    table-layout: fixed;
+    empty-cells: show;
+    border-collapse: collapse;
+    border: 1px solid #cad9ea;
+}
+
+.jas-detail-table .table_wrap tr,
+.jas-detail-table .table_wrap th,
+.jas-detail-table .table_wrap td {
+    border: 1px solid #cad9ea;
+    padding: 6px 6px;
+    color: #333;
+    font-weight: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+    line-height: 1.8;
+}
+
+.jas-detail-table .table_wrap th {
+    background-color: #f3f8fc;
+    width: 100px;
+    text-align: right
+}
+
+/* jas-file-list */
+.jas-file-list .tipBtn {
+    position: absolute;
+    top: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    opacity: 0.8;
+}
+
+.jas-file-list .tipBtn:hover {
+    color: #66b1ff;
+    opacity: 1;
+}
+
+/** jas-compoennts-css--end ********************************************************************************************************************/
+
+
+
+/** customer-main-css--start ********************************************************************************************************************/
+
+
+
+
+
+/** customer-main-css--end ********************************************************************************************************************/

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>自定义表单配置</title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.out-wrap {
+			padding: 15px;
+			box-sizing: border-box;
+			height: 100%;
+		}
+
+		.ta-right {
+			text-align: right;
+		}
+
+		.search-wrap {
+			padding-bottom: 10px;
+			border-bottom: 1px solid #e4e7ed;
+		}
+
+		.el-form-item {
+			margin-bottom: 0px;
+		}
+
+		.table-btn-wrap {
+			padding: 15px 0;
+		}
+
+		.table-opera-wrap {
+			padding: 15px 0 0;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="out-wrap jas-flex-box is-vertical">
+			<div class="search-wrap">
+				<el-form :model="topSearch" label-width="100px">
+					<el-row>
+						<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+							<el-form-item label="模板名称" prop="name">
+								<el-input size="small" v-model="topSearch.excelTemplateName" placeholder="请输入模板名称"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+							<el-form-item label="模板编号" prop="source">
+								<el-input size="small" v-model="topSearch.excelTemplateCode" placeholder="请输入模板编号"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="8" :lg="12" :xl="12">
+							<el-form-item class="ta-right">
+								<el-button size="small" type="primary" @click="search">查询</el-button>
+								<el-button size="small" @click="reset">重置</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+
+			<div class="table-btn-wrap">
+				<el-button size="small" plain type="primary" icon="fa fa-plus" @click="add">增加</el-button>
+				<!-- <el-button class="fr" size="small" type="" icon="fa fa-refresh" @click="refresh"></el-button> -->
+				<el-button class="fr" size="small" icon="el-icon-refresh" @click="refresh"></el-button>
+			</div>
+			<div class="table-main-wrap is-grown">
+				<el-table v-loading="loading" height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%">
+					<el-table-column label="序号" type="index" align="center" width="50">
+					</el-table-column>
+					<!--  <el-table-column label="模板ID" align="center" prop="oid">
+					</el-table-column>-->
+					<el-table-column label="模板名称" align="center" prop="excelTemplateName">
+					</el-table-column>
+					<el-table-column label="模板编号" align="center" prop="excelTemplateCode">
+					</el-table-column>
+					<el-table-column label="模板类型" align="center" :formatter="formatter" prop="excelTemplateType">
+					</el-table-column>
+					<el-table-column label="创建时间" align="center" prop="createDatetime">
+					</el-table-column>
+					<el-table-column label="备注" align="center" prop="remark">
+					</el-table-column>
+					<el-table-column label="操作" align="center" width="240">
+						<template slot-scope="scope">
+							<el-button @click="download(scope.row)" type="text" size="small">下载</el-button>
+							<!-- <el-button @click="preview(scope.row)" type="text" size="small">预览</el-button> -->
+							<el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+							<el-button @click="deleteItem(scope.row)" type="text" size="small">删除</el-button>
+						</template>
+					</el-table-column>
+				</el-table>
+			</div>
+			<div class="table-opera-wrap clearfix">
+				<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+				  :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+				</el-pagination>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				token: localStorage.getItem("token"),
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				topSearch: {
+					excelTemplateName: '',
+					excelTemplateCode: ''
+				},
+				currentPage: 1,
+				pageSize: 10,
+				total: 0,
+				loading: false,
+				tableData: [],
+				formatter: function (row, column, cellValue, index) {
+					return cellValue == 1 ? '导入' : '导出';
+				}
+			}
+		},
+		mounted: function () {
+			//this.getdataSoucreAndType();
+			// this.add();
+			this.search();
+		},
+		methods: {
+			add: function () {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '600px',
+					title: '增加',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-system-config/excel-template/dialogs/add.html',
+					cbForClose: function () {
+						that.refresh()
+					}
+				});
+			},
+			search: function () {
+				this._requestTable();
+			},
+			_requestTable: function (str, cb) {
+				var that = this;
+				that.loading = true;
+				var url = jasTools.base.rootPath + "/jasframework/excelTemplate/getPage.do";
+				//console.log(this.currentPage);
+				jasTools.ajax.post(url, {
+					excelTemplateName: that.topSearch.excelTemplateName,
+					excelTemplateCode: that.topSearch.excelTemplateCode,
+					pageNo: that.currentPage,
+					pageSize: that.pageSize,
+				}, function (data) {
+					setTimeout(function () {
+						that.loading = false;
+					}, 300);
+					that.tableData = data.rows;
+					that.total = data.total;
+				});
+			},
+			reset: function () {
+				this.topSearch.excelTemplateName = '';
+				this.topSearch.excelTemplateCode = '';
+				this.search();
+			},
+			refresh: function () {
+				this.search();
+			},
+			download: function (row) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/excelTemplate/download.do";
+				jasTools.ajax.downloadByIframe('post', url, {
+					excelTemplateCode: row.excelTemplateCode
+				});
+			},
+			requestFiles: function (oid, cb) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/attachment/getInfo.do";
+				jasTools.ajax.get(url, {
+					businessType: 'excelTemplate',
+					businessId: oid
+				}, function (data) {
+					if (data.rows[0].oid) {
+						cb && cb(data.rows[0].oid)
+					}
+				});
+			},
+			preview: function (row) {
+				var that = this;
+				that.requestFiles(row.oid, function (oid) {
+					top.jasTools.dialog.show({
+						width: '80%',
+						height: '90%',
+						title: '预览模板',
+						src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
+						cbForClose: function () {
+							that.refresh()
+						}
+					});
+				});
+			},
+			edit: function (row) {
+				var that = this;
+				var src = jasTools.base.rootPath + '/jasmvvm/pages/module-system-config/excel-template/dialogs/add.html';
+				var url = jasTools.base.setParamsToUrl(src, row)
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '600px',
+					title: '修改',
+					src: url,
+					cbForClose: function () {
+						that.refresh()
+					}
+				});
+			},
+			deleteItem: function (row) {
+				var that = this;
+				window.top.Vue.prototype.$confirm('您确定要删除本条数据吗？', '提示', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							that._deleteItem(row.oid);
+						}
+					}
+				});
+			},
+			_deleteItem: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/excelTemplate/delete.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+					});
+					that.refresh();
+				});
+			},
+
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.search();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.search();
+			}
+		},
+	});
+</script>
+
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="150px">
+				<jas-base-group-title name="基本信息"></jas-base-group-title>
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="应用系统名称" prop="appName">
+							<el-input v-model="tableFormData.appName" clearable placeholder="请输入应用系统名称" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="应用系统管理角色" prop="roleId">
+							<el-select v-model="tableFormData.roleId" clearable placeholder="请选择应用系统管理角色" size="small">						
+								<el-option v-for="item in roles" :key="item.oid" :label="item.roleName" :value="item.oid">
+								</el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="12" :md="12" :lg="24" :xl="24">
+						<el-form-item label="应用系统前缀" prop="appUrl">
+							<el-input v-model="tableFormData.appUrl" clearable placeholder="请输入应用系统前缀" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>				
+				<jas-base-group-title name="其他信息"></jas-base-group-title>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="应用系统描述" prop="description">
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				but_disabled:false,				
+				rules: {
+					appName: [{
+						required: true,
+						message: '请输入应用系统名称',
+						trigger: 'blur'
+					}],
+					roleId: [{
+						required: true,
+						message: '请选择应用系统管理角色',
+						trigger: 'blur'
+					}]
+				},
+				tableFormData: {
+					"appName": "", 
+					"roleId": "", 
+					"appUrl": "", 
+					"description": "", //描述
+				},
+				roles: []
+			}
+		},
+		
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.isEdit = true;
+				this.oid = param.oid;
+				this.tableFormData.oid = this.oid;
+				this.requestApplicationDetail(param.oid);
+			}
+			this.initRoles();
+		},
+		methods: {
+			initRoles: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/role/getList.do";
+				jasTools.ajax.get(url, {
+				}, function (data) {
+					data.forEach(function (item) {
+						that.roles.push(item);
+					});
+				});
+            },
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.save();
+					}
+				});
+			},
+			requestApplicationDetail: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					that.tableFormData = data;
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jasframework/privilege/application/saveApp.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jasframework/privilege/application/update.do";
+				}
+				that.but_disabled = true;				
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: msg
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

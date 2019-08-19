@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" v-cloak v-loading="loading">
+
+    <jas-dialog-wrapper>
+      <el-form ref="formData" :model="form" label-width="150px">
+
+        <jas-form-items-group ref="mainForm" :form="form" :fields-config="fieldsConfig" :names-group="namesGroup"
+          :fields-group="fieldsGroup"></jas-form-items-group>
+
+        <jas-base-group-title v-if="ifAttachment" name="附件信息"></jas-base-group-title>
+        <jas-file-upload v-if="ifAttachment" ref="upload" @success="uploadSuccess"></jas-file-upload>
+      </el-form>
+      <div slot="footer">
+        <el-button size="small" @click="cancel()">取 消</el-button>
+        <el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
+      </div>
+    </jas-dialog-wrapper>
+
+  </div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<!-- <script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+  (function () { //加载配置未见
+    var param = window.jasTools.base.getParamsInUrl(location.href);
+    var pageCode = param.pageCode;
+    pageCode && $.getScript('./../config/' + pageCode + '.js', function (data, textStatus, jqxhr) {
+      window.app = new Vue(vueConfig);
+    });
+  })();
+
+  var vueConfig = {
+    el: "#app",
+    data: function () {
+      var that = this;
+      return {
+        namesGroup: [],
+        fieldsGroup: [],
+        fieldsConfig: {},
+        ifAttachment: false,
+        loading:false,
+        form: {},
+        options: [{
+          "key": "2ae3f66d-bcf7-4427-a8e0-14c2bd4702f5",
+          "value": "高压管线01"
+        }, {
+          "key": "c7bcd53c-c59c-4cb0-842c-36cfe7d078a6",
+          "value": "高压管线02"
+        }, {
+          "key": "99417af1-fbce-459a-879a-d5efe3a49e0e",
+          "value": "高压管线03"
+        }]
+      }
+    },
+    created: function () {
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.pageCode = param.pageCode;
+      this.pageConfig = window.pageConfig;
+      this.fieldsConfig = window.pageConfig.fieldsConfig;
+
+      this.detailPath = window.pageConfig.detailPath;
+      this.savePath = window.pageConfig.savePath;
+      this.updatePath = window.pageConfig.updatePath;
+      this.ifAttachment = window.pageConfig.ifAttachment;
+
+
+      var allfields = [];
+      this.pageConfig.addFields.forEach(function (item) {
+        that.namesGroup.push(item.title);
+        that.fieldsGroup.push(that.formatFields(item.fields, pageConfig.fieldsConfig));
+        allfields = allfields.concat(item.fields);
+      });
+      this.form = this.formatForm(allfields);
+    },
+    mounted: function () {
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      // var userBo = JSON.parse(localStorage.getItem("user"));
+      // that.form.constructUnit = userBo.unitId;
+      // this.requestDomainFromBizTable('/daq/privilege/getCurrentUnitId.do', {}, function (arr) {
+      //   that.fieldsConfig.constructUnit.options = arr;
+      // });
+      if (param.oid) {
+        this.oid = param.oid;
+        this.form.oid = this.oid;
+        this.isEdit = true;
+        this.getDetailByObjectId();
+        ifAttachment && this.$refs.upload.requestFile(this.oid);
+      };
+    },
+    methods: {
+      formatForm: function (fields) {
+        var obj = {};
+        fields.forEach(function (item) {
+          obj[item] = '';
+        });
+        return obj;
+      },
+      formatFields: function (fields, fieldsConfig) {
+        return fields.map(function (item) {
+          return {
+            name: fieldsConfig[item].name,
+            field: item,
+            formatter: fieldsConfig[item].formatter,
+          };
+        });
+      },
+      cancel: function (param) {
+        window.parent.jasTools.dialog.close(param);
+      },
+      submit: function (formName) {
+        var that = this;
+        this.$refs[formName].validate(function (valid) {
+          if (valid) {
+            that.save();
+          }
+        });
+      },
+      save: function () {
+        var that = this;
+        var msg = "";
+        if (!this.isEdit) {
+          msg = "增加成功";
+          url = jasTools.base.rootPath + this.savePath;
+        } else {
+          msg = "修改成功";
+          url = jasTools.base.rootPath + this.updatePath;
+        }
+        this.loading = true;
+        jasTools.ajax.post(url, that.form, function (data) {
+          if (this.ifAttachment) {
+            that.$refs.upload.uploadFile(data.data || that.oid);
+          } else {
+            that.uploadSuccess();
+          }
+        });
+        
+      },
+      uploadSuccess: function () {
+        this.loading = false;
+        top.Vue.prototype.$message({
+          type: 'success',
+          message: !this.isEdit ? '保存成功' : '修改成功'
+        });
+        this.cancel(1);
+      },
+      getDetailByObjectId: function () {
+        var that = this;
+        var url = jasTools.base.rootPath + this.detailPath;
+        jasTools.ajax.get(url, {
+          oid: that.oid
+        }, function (data) {
+          that.form = data.data;
+          that.$refs['mainForm'].triggerFatherSelectsChange();
+        });
+      },
+      requestDomainFromBizTable: function (url, obj, cb) {
+        var that = this;
+        var url = jasTools.base.rootPath + url;
+        jasTools.ajax.post(url, obj, function (data) {
+          cb && cb(data.rows);
+        }, function () {
+          cb && cb([]);
+        });
+      },
+    },
+  };
+</script>
+
+</html>

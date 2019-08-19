@@ -1,0 +1,17 @@
+{
+  "name": "form-demo",
+  "version": "1.0.0",
+  "description": "jas-vue-front-end-project",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "http-proxy-middleware": "^0.17.4",
+    "lite-server": "^2.3.0"
+  },
+  "scripts": {
+    "start": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gf",
+  "license": "ISC"
+}

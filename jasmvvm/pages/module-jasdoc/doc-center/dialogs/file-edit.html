@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="文档信息"></jas-base-group-title>
+			<el-form ref="formData" :model="form" :rules="rules" label-width="120px">
+				<el-row>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="文档名称" prop="filename">
+							<el-input v-model="form.filename" disabled placeholder="请输入文档名称" size="small" clearable></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="文档编号" prop="fileno">
+							<el-input v-model="form.fileno" placeholder="请输入文档编号" size="small" clearable></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="关键词" prop="keyword">
+							<el-input v-model="form.keyword" placeholder="请输入关键词" size="small" clearable></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="文档分类" prop="foldername">
+							<!-- <el-input v-model="form.foldername" placeholder="请输入文档分类" size="small" clearable></el-input> -->
+							<treeselect :multiple="true" :flat="true" :options="treeList" :normalizer="normalizer" v-model="treeValue">
+							</treeselect>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<jas-base-group-title name="摘要信息"></jas-base-group-title>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="文档摘要" prop="summary">
+							<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" :rows="2" size="small" v-model="form.summary"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<jas-base-group-title name="其他信息"></jas-base-group-title>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="备注" prop="remark">
+							<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.remark"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				rules: {
+					fileno: [
+						// {
+						// 	required: true,
+						// 	message: '该字段为必填项',
+						// 	trigger: 'blur'
+						// },
+						{
+							min: 0,
+							max: 100,
+							message: '长度在 0 到 100 个字符',
+							trigger: 'blur'
+						}
+					]
+				},
+				form: {},
+				treeList: [],
+				treeValue: [],
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.oid = param.oid;
+				this.getDetailByObjectId(param.oid);
+				this.getDocClassifyTree(param.oid);
+			};
+		},
+		methods: {
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.save();
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/updateDoc.do";
+				jasTools.ajax.postForm(url, {
+					eventid: this.oid,
+					filename: this.form.filename,
+					fileclassify: this.treeValue.join(',') || null,
+					fileno: this.form.fileno,
+					keyword: this.form.keyword,
+					summary: this.form.summary,
+					remark: this.form.remark,
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: data.message
+					});
+					that.cancel(1);
+				});
+			},
+			getDetailByObjectId: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/getFileInfoById.do";
+				jasTools.ajax.postForm(url, {
+					docId: oid
+				}, function (data) {
+					that.form = data;
+				});
+			},
+			getDocClassifyTree: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/classify/getDocClassifyTreeSync.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					that.treeList = data;
+					that.getDocClassifyValue(oid);
+					// console.log(data)
+				});
+			},
+			getDocClassifyValue: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/classify/getFolderidByFileid.do";
+				jasTools.ajax.postForm(url, {
+					fileid: oid
+				}, function (data) {
+					that.treeValue = data.map(function (item) {
+						return item.id;
+					});
+					// console.log(data)
+				});
+			},
+			normalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text,
+					children: node.children,
+					isDefaultExpanded: true
+				}
+			},
+		},
+	});
+</script>
+
+</html>

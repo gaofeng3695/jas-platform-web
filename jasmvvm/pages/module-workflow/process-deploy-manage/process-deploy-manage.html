@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>流程部署管理</title>
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.searchWrapper {
+			overflow: unset !important;
+		}
+		.vue-treeselect__control {
+			height: 34px;
+		}
+	</style>
+</head>
+<body>
+	<div id="app" v-cloak>
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="150px">
+					<el-row>						
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="流程名称" prop="processKey" style="margin-bottom: 15px ">
+								<el-select v-model="form.processKey" filterable placeholder="请选择流程名称" size="small">
+									<el-option v-for="item in proNameData" :key="item.processKey"
+										:label="item['processName-Key']" :value="item.processKey">
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>				
+						<el-col :xs="24" :sm="24" :md="12" :lg="16" :xl="18">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+					<el-button @click="createNewDeploy" size="small" plain type="primary" icon="fa fa-plus">流程部署</el-button>
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" v-loading="loading" height="100%" :data="tableData" border
+						:header-cell-style="headStyle" style="width: 100%" stripe>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column label="流程定义ID" fixed prop="processId" min-width="250px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程Key" fixed prop="processKey" min-width="200px" show-overflow-tooltip
+							align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程名称" prop="processName" min-width="200px" show-overflow-tooltip
+							align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程部署ID" prop="deploymentId" min-width="200px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="部署时间" prop="deploymentTime" min-width="200px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="应用系统名称" prop="appName" min-width="300px" show-overflow-tooltip 
+							:formatter="formatName" align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="版本号" prop="processVersion" min-width="100px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="操作" align="center" width="150px" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="seeFlow(scope.row)" type="text" size="small">流程图</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+						:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+						layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+
+		</jas-list-wrapper>
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				isClosed: false,
+				tableData: [],
+				form: {
+
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+				proNameData: [],
+			}
+		},
+
+		mounted: function () {
+			this.requestNames();
+			this.requestList(0);
+		},
+		methods: {	
+			createNewDeploy: function(){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/process-deploy-manage/dialogs/add.html';
+				top.jasTools.dialog.show({
+					width: '50%',
+					height: '60%',
+					title: '流程部署',
+					src: baseSrc,
+					cbForClose: function () {
+						that.requestList(0);
+					}
+				});
+			},		
+			requestNames: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/deploy/getNameList.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					data.rows.forEach(function (item) {
+						that.proNameData.push(item);
+					});
+				});
+			},	
+			formatName: function (row, column, cellValue, index){
+				return row.appName||row.appId;
+			},		
+			seeFlow: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-workflow/common/dialogs/workflow-viewer.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					processId: row.processId
+				});
+				top.jasTools.dialog.show({
+					width: '80%',
+					height: '80%',
+					title: '流程图',
+					src: src,
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasframework/workflow/deploy/getAllList.do";
+				that.loading = true;
+				jasTools.ajax.post(url, {
+					processKey: this.form.processKey,
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList(0);
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList(0);
+			}
+		},
+	});
+</script>
+
+</html>

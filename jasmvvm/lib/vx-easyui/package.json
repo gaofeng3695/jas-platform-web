@@ -1,0 +1,86 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "vx-easyui",
+        "scope": null,
+        "escapedName": "vx-easyui",
+        "name": "vx-easyui",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "E:\\project\\risk-test\\risk"
+    ]
+  ],
+  "_from": "vx-easyui@latest",
+  "_hasShrinkwrap": false,
+  "_id": "vx-easyui@1.1.24",
+  "_inCache": true,
+  "_location": "/vx-easyui",
+  "_nodeVersion": "10.4.1",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/vx-easyui_1.1.24_1564555353475_0.12301642630428011"
+  },
+  "_npmUser": {
+    "name": "stworthy",
+    "email": "info@jeasyui.com"
+  },
+  "_npmVersion": "6.1.0",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "vx-easyui",
+    "scope": null,
+    "escapedName": "vx-easyui",
+    "name": "vx-easyui",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/vx-easyui/-/vx-easyui-1.1.24.tgz",
+  "_shasum": "cdb48b1460d13cec20602f8efc99f42c2d0f8723",
+  "_shrinkwrap": null,
+  "_spec": "vx-easyui",
+  "_where": "E:\\project\\risk-test\\risk",
+  "author": {
+    "name": "jeasyui.com",
+    "email": "info@jeasyui.com"
+  },
+  "dependencies": {},
+  "description": "The EasyUI for Vue",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "integrity": "sha512-0vx+RqhBtjCvNYsn8SZswttkHsiv64Vf4bw/pCje0kosvFFBV3RXbK17cniMrAFr0+/wCb9TG6eJqCKDjdmOAw==",
+    "shasum": "cdb48b1460d13cec20602f8efc99f42c2d0f8723",
+    "tarball": "https://registry.npmjs.org/vx-easyui/-/vx-easyui-1.1.24.tgz",
+    "fileCount": 542,
+    "unpackedSize": 2477720,
+    "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJdQThaCRA9TVsSAnZWagAA+9UP+QAc7AkMjmp4IgxSJFmr\nYby0lwAmJcn9nQtGbEGi4fmNRAIZ7QI/zLSz9dONs12BewwRBL1L2hnjujS9\nlsjL0uwDiiduqQ2XdQdPvCwKypr0nd3+srx29FhYxRc6p5CzRiJYGP4Lv/mT\nYvo6+C5YXqwy8ZnNBNUAAsmA8t1usPB1gCYXbNThp/7RxDnxWDOstxOzCIcu\n8cZmvss6UsAn7bFjb8uD8CjOY4sJXk0bWLcQbCsbDuGjBkawMEhx7iQ5yBSR\njNfTVdwlo6OdSDiMKKtpvBS4HTDLHvwyRmtx68VPz66qPu1ClJNWOfoEs1o7\nNoNEOwOV9Jh9yYpVCRo9jrUFKFZOCxMn7pVPZ/i5ttQRqVjEgHegXUIQUTUm\nEqaDv8eEvHpIkahitIuEmfCpd1qCvbiFVB5tXSA8QIyh1AJxvl2GzFrwSv+3\nYIcIGeRyeTBNyxoEIuS7MOz/da9IR4KsolXtjLSTpF3KfvDoVDgxZeGtb9TZ\nFWSWfADWiLacIJzamI0GTCq7/rjNIggnjQc1THrwDr9+HVAT8hjRak9XIksL\ns0i7oRmujwRd6tj98PN4MdRrWtMqvL6v6DomfA+83P3EXr5VbldVd4xi1kE1\npF5OoMioAjSmnbLrhmzjxucX9iyYUDn1of1SrqCWcY48MarjSJewFIIWYXFp\n+58R\r\n=v6hZ\r\n-----END PGP SIGNATURE-----\r\n"
+  },
+  "homepage": "https://www.jeasyui.com/demo-vue/main/index.php",
+  "keywords": [
+    "vue",
+    "easyui"
+  ],
+  "license": "SEE LICENSE IN license_freeware.txt",
+  "main": "dist/vx-easyui-min.js",
+  "maintainers": [
+    {
+      "name": "stworthy",
+      "email": "info@jeasyui.com"
+    }
+  ],
+  "name": "vx-easyui",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.1.24"
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="文档分类"></jas-base-group-title>
+			<el-form ref="formData" label-width="100px">
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
+						<el-form-item label="文档分类" prop="foldername">
+							<treeselect :multiple="true" aria-placeholder="请选择文档分类" :flat="true" :options="treeList" :normalizer="normalizer" v-model="treeValue">
+							</treeselect>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<jas-base-group-title name="选择文件"></jas-base-group-title>
+			<div style="text-align: center">
+
+				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload" class="upload-demo" drag
+				  :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false">
+					<i class="el-icon-upload"></i>
+					<div class="el-upload__text">将文件拖到此处，或
+						<em>点击上传</em>
+					</div>
+					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
+				</el-upload>
+			</div>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="upload('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				treeList: [],
+				treeValue: [],
+				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do'
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.oid = param.oid;
+				this.getDocClassifyTree();
+			};
+		},
+		methods: {
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+			upload: function () {
+				var that = this;
+				this.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
+					token: localStorage.getItem('token'),
+					fileclassifys: this.treeValue.join(','),
+					folderId: this.oid
+				});
+				this.$nextTick(function () {
+					that.$refs.uploader.submit();
+				});
+			},
+			getDocClassifyTree: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/classify/getDocClassifyTreeSync.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					that.treeList = data;
+				});
+			},
+			normalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text,
+					children: node.children,
+					isDefaultExpanded: true
+				}
+			},
+			limitNum: function () {
+				top.Vue.prototype.$message({
+					type: 'info',
+					message: '最多上传一个文件'
+				});
+			},
+			successUpload: function () {
+				top.Vue.prototype.$message({
+					type: 'success',
+					message: '上传成功'
+				});
+				this.cancel(1);
+			},
+			errorUpload: function (err, file, fileList) {
+				top.Vue.prototype.$message({
+					type: 'error',
+					message: '上传失败'
+				});
+				// this.cancel(1);
+			},
+		},
+	});
+</script>
+
+</html>

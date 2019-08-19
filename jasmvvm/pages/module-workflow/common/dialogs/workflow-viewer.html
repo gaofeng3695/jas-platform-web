@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>角色管理</title>
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		.title {
+			overflow: hidden;
+			width: 330px;
+			position: absolute;
+			top: 0;
+			z-index: 10;
+			left: 50%;
+			margin-left: -162px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="title" v-show="isShow">
+			<el-alert style="float:left;width:154px;margin:6px 3px 0;" title="绿色表示办理完成" :closable="false" type="success">
+			</el-alert>
+			<el-alert style="float:left;width:154px;margin:6px 3px 0;" title="红色表示正在办理" :closable="false" type="error">
+			</el-alert>
+		</div>
+		<div style="position: relative;overflow: auto;height: 100%;">
+			<image :src="imageSrc" />
+			<el-tooltip v-for="item in detail" placement="top">
+				<div slot="content">
+					<template v-for="tip,key in item.vars">
+						<span>
+							{{key + '：' + tip}}
+						</span>
+						<br />
+					</template>
+
+				</div>
+				<div :style="formatStyle(item)"></div>
+			</el-tooltip>
+		</div>
+	</div>
+</body>
+
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				imageSrc: '',
+				proInstId: '',
+				detail: [],
+				loading: true,
+				isShow: false,
+			}
+		},
+
+		created: function () {
+			var params = window.jasTools.base.getParamsInUrl(location.href);
+			this.proInstId = params.proInstId;
+			this.processId = params.processId;
+			if(params.proInstId){
+				this.requestDetail();
+				this.isShow = true;
+			}
+			var url = jasTools.base.rootPath + '/jasframework/workflow/getChart.do';
+			
+			this.imageSrc = jasTools.base.setParamsToUrl(url, {
+				proInstId: this.proInstId,
+				processId: this.processId,
+				token: localStorage.getItem('token'),
+			});
+		},
+		mounted: function () {},
+		methods: {
+			formatStyle: function (obj) {
+				var border = 'none';
+				var bgcolor = 'none';
+				if (obj.endActiviti) {
+					border = '3px solid #67c23a';
+					bgcolor = '#67c23a55';
+				}
+				if (obj.currentActiviti) {
+					border = '3px solid #ff3e3e';
+					bgcolor = '#ff3e3e55';
+
+				}
+				return {
+					position: 'absolute',
+					'background-color': bgcolor,
+					border: border,
+					top: obj.y + 'px',
+					left: obj.x + 'px',
+					width: obj.width + 'px',
+					height: obj.height + 'px',
+					'border-radius': '8px',
+					'box-sizing': 'border-box'
+				}
+			},
+			requestDetail: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow//instance/getTraces.do";
+				jasTools.ajax.postForm(url, {
+					proInstId: this.proInstId
+				}, function (data) {
+					that.loading = false;
+					that.detail = data.data;
+				});
+			},
+		},
+	});
+</script>
+
+</html>

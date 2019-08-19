@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		/* .el-table th>.cell {
+		margin: 5px;
+	} */
+		/* .el-tabs__content{
+		margin: 10px
+	} */
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="jas-flex-box is-vertical">
+			<div class="is-grown">
+				<div style="margin:10px">
+					<el-table ref="table" :data="tableData" highlight-current-row
+						@selection-change='handleSelectionChange' style="width: 100%" highlight-current-row border
+						:header-cell-style="headStyle">
+						<el-table-column type="selection" align="center"></el-table-column>
+						<el-table-column type="index" label="序号" width="80px" align="center"> </el-table-column>
+						<el-table-column prop="userName" label="用户姓名" align="center"> </el-table-column>
+						<el-table-column prop="loginName" label="账号" align="center"> </el-table-column>
+					</el-table>
+				</div>
+			</div>
+			<div
+				style="text-align: center; padding-top: 10px; margin: 0px 20px; border-top: 1px solid rgb(228, 231, 237);">
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+						:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+						layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+				<div style="margin: 15px 0 0;" class="clearfix">
+					<el-button size="small" @click="cancel()">取 消</el-button>
+					<el-button size="small" type="primary" @click="save()">确 定</el-button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+	var vmin = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				tableData: [],
+				oids: [],
+				currentPage: 1,
+				pageSize: 10,
+				total: 0,
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+			}
+		},
+		created: function () {
+		},
+		mounted: function () {
+			this.requestUserData();
+		},
+		methods: {
+			handleSelectionChange: function (val) {
+				var that = this;
+				that.oids = val.map(function (item) {
+					return {
+						resourceType: 'privilege_user',
+						resourceOid: item.oid,
+					}
+				});
+
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestUserData();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestUserData();
+			},
+			requestUserData: function () {
+				var that = this;
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				var url = jasTools.base.rootPath + "/jdbc/commonData/userManage/getPage.do";
+				jasTools.ajax.post(url, {
+					type: "add",
+					unitId: param.unitId,
+					projectOid: param.projectOid,
+					pageNo: that.currentPage,
+					pageSize: that.pageSize,
+				}, function (data) {
+					that.tableData = data.rows;
+					that.total = data.total;
+				});
+			},
+			save: function () {
+				var that = this;
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				var ownerOid = param.unitId;
+				var url = jasTools.base.rootPath + "/sharepool/registerResource.do";
+				jasTools.ajax.post(url, {
+					ownerOid: ownerOid,
+					resourceList: that.oids
+				}, function (data) {
+					if (data.status == 1) {
+						window.parent.jasTools.dialog.close(1);
+					}
+				});
+			},
+
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+		}
+	});
+</script>
+
+</html>

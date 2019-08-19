@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		.el-form-item {
+			margin-bottom: 14px;
+		}
+
+		.outwrap {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.outwrap .footer {
+			padding: 10px 0 0 0;
+			border-top: 1px solid #ececec;
+			text-align: center;
+		}
+
+		.tabswrapper .el-tabs__header {
+			/* padding: 0 10px; */
+			box-sizing: border-box;
+			width: 100%;
+			margin: 0;
+			background: #fff;
+		}
+
+		.tabswrapper .el-tabs__content {
+			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+		}
+
+		.tabswrapper .el-tabs__content .el-tab-pane {
+			height: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="outwrap jas-flex-box is-vertical">
+			<el-tabs class="tabswrapper is-grown jas-flex-box " v-model="activeName" @tab-click="handleClick">
+				<el-tab-pane label="业务信息" name="first">
+					<div style="height: 100%;">
+						<iframe class="iframe" :src="detailSrc" width="100%" height="100%" frameborder="0"></iframe>
+					</div>
+				</el-tab-pane>
+				<el-tab-pane label="审批记录" name="second">
+					<div class="jas-flex-box is-vertical" style="padding: 15px 5px;box-sizing:border-box;">
+						<el-table v-loading="loading.table" class="is-grown" :data="tableData" height="100"
+							style="width: 100%;" :header-cell-style="headStyle" border stripe>
+							<el-table-column type="index" label="序号" width="50" align="center" fixed></el-table-column>
+							<el-table-column prop="taskName" label="节点名称" width="140" align="center"></el-table-column>
+							<el-table-column prop="auditContent" label="审批意见" align="center"></el-table-column>
+							<el-table-column prop="approveUserName" label="操作人员" width="140" align="center">
+							</el-table-column>
+							<el-table-column prop="approveTime" label="操作时间" width="160" align="center">
+							</el-table-column>
+						</el-table>
+						<el-pagination style="text-align: right;margin-top:15px" @size-change="handleSizeChange"
+							@current-change="handleCurrentChange" :current-page="searchform.page"
+							:page-sizes="[10,20,50,100]" :page-size="searchform.rows"
+							layout="total, sizes, prev, pager, next, jumper" :total="total">
+						</el-pagination>
+					</div>
+				</el-tab-pane>
+			</el-tabs>
+			<div v-if="isEdit && isEdit!=0 " style="padding-top:10px;border-top: 1px solid #ececec;">
+				<el-form label-width="80px" ref="myform" :model="form" :rules="rules">
+					<el-form-item v-if="!carbonId" label="审批意见" prop="auditContent">
+						<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small"
+							v-model="form.auditContent"></el-input>
+					</el-form-item>
+					<el-form-item v-if="carbonId" label="审阅意见" prop="comment">
+						<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small"
+							v-model="form.comment"></el-input>
+					</el-form-item>
+					<el-form-item label="传阅人">
+						<jas-base-el-multi-select-box ref="peopleSelect" v-model="form.toUsers" value-key="oid"
+							label-key="userName" @click="showPeople">
+						</jas-base-el-multi-select-box>
+					</el-form-item>
+					<el-form-item label="传阅备注">
+						<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small"
+							v-model="form.remark"></el-input>
+					</el-form-item>
+				</el-form>
+			</div>
+			<div class="footer" v-if="isEdit && isEdit!=0 ">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button v-if="!carbonId" size="small" type="danger" @click="submitForm">驳回至发起人</el-button>
+				<el-button v-for="item in btns" size="small" type="primary" @click="submitForm(item)">
+					{{item.outflowName}}</el-button>
+				<el-button size="small" v-if="carbonId" type="primary" @click="requestRead">
+					审 阅</el-button>
+
+			</div>
+
+		</div>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				isEdit: false,
+				proInstId: '',
+				businessKey: '',
+				taskId: '',
+				carbonId: '',
+
+				activeName: 'first',
+				tableData: [],
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				loading: {
+					table: false,
+				},
+				searchform: {
+					page: 1,
+					rows: 10,
+				},
+				total: 0,
+				tableData: [],
+				currentPage: 1,
+				total: 0,
+				pageSize: 10,
+				form: {
+					remark: '',
+					toUsers: [],
+					auditContent: '',
+					comment: '',
+				},
+				detailSrc: '',
+				btns: [],
+				rules: {
+					auditContent: [{
+						required: true,
+						message: '该字段为必填项',
+						trigger: 'blur'
+					}]
+				},
+
+			}
+		},
+		computed: {},
+		created: function () {
+			var that = this;
+			var params = window.jasTools.base.getParamsInUrl(location.href);
+			this.type = params.type;
+			this.isEdit = params.isEdit;
+			this.businessKey = params.businessKey;
+			this.proInstId = params.proInstId;
+			this.taskId = params.taskId;
+			this.carbonId = params.carbonId;
+
+			this.queryDetailUrl();
+			if (!this.carbonId && this.isEdit) { // 非传阅
+				this.queryOutflows();
+			}
+		},
+		methods: {
+			showPeople: function () {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-workflow/common/dialogs/choseTransferUsers.html';
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '选择用户',
+					src: baseSrc,
+					cbForClose: function (peoples) {
+						that.form.toUsers = peoples;
+					}
+				});
+			},
+			handleClick: function (vm) {
+				if (vm.name === 'second') {
+					this.requestTableList();
+				}
+			},
+			handleSizeChange: function (val) {
+				this.searchform.rows = val;
+				this.requestTableList();
+			},
+			handleCurrentChange: function (val) {
+				this.searchform.page = val;
+				this.requestTableList();
+			},
+			queryDetailUrl: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/instance/getBusinessPageUrl.do";
+				jasTools.ajax.postForm(url, {
+					taskId: this.carbonId ? '' : this.taskId,
+					businessKey: this.businessKey,
+					proInstId: this.proInstId,
+					isGlobal: false
+				}, function (data) {
+					that.detailSrc = jasTools.base.rootPath + '/' + data.data;
+					console.log(that.detailSrc)
+				});
+			},
+			queryOutflows: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/task/getOutflows.do";
+				jasTools.ajax.get(url, {
+					taskId: this.taskId
+				}, function (data) {
+					console.log(data);
+					that.btns = data.data.outflows;
+				});
+			},
+			requestTableList: function () {
+				var that = this;
+				if (this.isrequested) return;
+				that.loading.table = true;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/instance/getComments.do';
+				jasTools.ajax.postForm(url, {
+					proInstId: this.proInstId,
+					businessKey: this.businessKey,
+				}, function (data) {
+					that.isrequested = true;
+					that.loading.table = false;
+					that.tableData = data.rows;
+					that.total = data.total;
+				});
+			},
+			submitForm: function (outflow) {
+				var that = this;
+				this.$refs.myform.validate(function (valid) {
+					if (valid) {
+						if (outflow) {
+							that.requestApprove(outflow);
+						} else {
+							that.requestUnApprove();
+						}
+					} else {
+						console.log('error submit!!');
+						return false;
+					}
+				});
+			},
+			requestUnApprove: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/task/approve.do';
+				jasTools.ajax.post(url, {
+					flowVars: {
+						auditContent: this.form.auditContent,
+						outflowId: "returnToStart",
+						outflowName: "驳回至发起人",
+						pass: "false",
+						returnToStart: "true",
+					},
+					taskId: this.taskId
+				}, function (data) {
+					console.log(data);
+					top.Vue.prototype.$message.success('驳回成功');
+					that.cancel();
+
+				});
+			},
+			requestApprove: function (outflow) {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/task/approve.do';
+				var flowVars = jasTools.base.extend({
+					auditContent: this.form.auditContent
+				}, outflow);
+
+				jasTools.ajax.post(url, {
+					flowVars: flowVars,
+					taskId: this.taskId
+				}, function (data) {
+					// that.form.toUsers = ["1df621c3346c4a8bac91d1238afc8400"];
+					if (that.form.toUsers.length > 0) {
+						that.requestCopy()
+					} else {
+						top.Vue.prototype.$message.success('审批成功');
+						that.cancel();
+					}
+				});
+			},
+			requestRead: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/carbon/read.do';
+				jasTools.ajax.post(url, {
+					comment: this.form.comment,
+					carbonId: this.carbonId
+				}, function (data) {
+					// that.form.toUsers = ["1df621c3346c4a8bac91d1238afc8400"];
+					if (that.form.toUsers.length > 0) {
+						that.requestCopy(1)
+					} else {
+						top.Vue.prototype.$message.success('审阅成功');
+						that.cancel();
+					}
+				});
+			},
+			requestCopy: function (isRead) {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/carbon/copyTo.do';
+				jasTools.ajax.post(url, {
+					remark: this.form.remark,
+					toUsers: this.$refs.peopleSelect._value,
+					taskId: this.taskId
+				}, function (data) {
+					console.log(data)
+					var tip = isRead ? '审阅' : '审批';
+					top.Vue.prototype.$message.success(tip + '并传阅成功');
+					that.cancel();
+				});
+			},
+			cancel: function (param) {
+				window.top.jasTools.dialog.close(param);
+			},
+
+		},
+	});
+</script>
+
+</html>

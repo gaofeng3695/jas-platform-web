@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>待阅工作</title>
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+	
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+            <div slot="list" class="jas-flex-box is-vertical is-grown">
+
+				<div class="is-grown" style="padding: 15px 20px;overflow: auto;">
+					<el-table ref="mytable"  v-loading="loading" 
+                        height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%" stripe>
+                        <el-table-column prop="businessKey"  label="业务数据Id" v-if="columnShow"> </el-table-column>
+                        <el-table-column prop="proInstId"  label="流程实例Id" v-if="columnShow"> </el-table-column>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+                        </el-table-column>		
+						<el-table-column label="流程名称" fixed prop="processName" min-width="100px" show-overflow-tooltip align="center" header-align="center">
+                        </el-table-column>						
+						<el-table-column label="流程主题" fixed prop="proInstName" min-width="100px" show-overflow-tooltip align="center" header-align="center">
+                        </el-table-column>
+						<el-table-column label="节点名称/节点Id" prop="taskName" :formatter='taskNameFormatter'  min-width="100px" show-overflow-tooltip align="center" header-align="center">
+                        <el-table-column prop="taskId"  label="节点Id" v-if="columnShow"> </el-table-column>									
+						</el-table-column>
+                        <el-table-column label="传阅人" prop="userName" min-width="100px" show-overflow-tooltip align="center" header-align="center">
+                        </el-table-column>
+                        <el-table-column label="传阅时间" prop="createDatetime" min-width="100px" show-overflow-tooltip align="center" header-align="center">
+                        </el-table-column>
+                        <el-table-column label="传阅备注" prop="remark" min-width="100px"  show-overflow-tooltip align="center" header-align="center">
+                         </el-table-column>
+						<el-table-column label="操作" align="center" width="200" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="showReadPage(scope.row)" type="text" size="small">审阅</el-button>
+								<el-button @click="showWorkFlowChart(scope.row)" type="text" size="small">流程图</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+		
+                <div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+						:page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+                </div>
+            </div>    
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+                headStyle: {
+					'background-color': '#f5f7fa ',
+                },
+                columnShow:false,
+                tableData:[],
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+			}
+		},		
+		computed: {
+		
+		},
+		watch: {		
+			
+		},
+		created: function () {
+			this.getMyToDoList();
+		},
+		mounted: function () {
+		
+		},
+		methods: {			
+			showWorkFlowChart: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-workflow/common/dialogs/workflow-viewer.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					proInstId: row.proInstId
+				});
+				top.jasTools.dialog.show({
+					width: '80%',
+					height: '80%',
+					title: '流程图',
+					src: src,
+				});
+			},
+			showReadPage: function(row){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/approve-dialog.html'; 
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					proInstId: row.proInstId,
+					isEdit: 1,
+					taskId: row.taskId,
+					businessKey:row.businessKey,
+					carbonId: row.oid
+				});
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '审阅任务',
+					src: src,
+					cbForClose: function () {
+						that.getMyToDoList();
+					}
+				});
+            },
+            getMyToDoList:function(){
+                var that = this;
+                this.pageSize = 10;
+                this.currentPage = 1;
+                var loginUserName=localStorage.getItem('user').loginUserName;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/carbon/myTodoList.do?loginUserName="+loginUserName;
+				that.loading = true;
+				jasTools.ajax.post(url, {
+
+                    pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					
+                }, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+            },
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.getMyToDoList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.getMyToDoList();
+            },
+           
+            taskNameFormatter:function(row, column, cellValue, index){
+                return row.taskName+'('+row.taskId+')';
+            }
+		},
+	});
+</script>
+
+</html>

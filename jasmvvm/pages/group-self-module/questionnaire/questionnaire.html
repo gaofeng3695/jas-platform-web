@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #99c8f8;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 0 0 10px;
+		}
+
+
+	.optionwrap:hover{
+		background: #f0f7ff;
+	}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+
+		<jas-two-panel-resizer layout="vertical" length="240px">
+			<template slot="closePanel">
+				<jas-base-module-title name="收藏夹列表" style="margin-bottom: 10px;"></jas-base-module-title>
+
+				<el-tree class="is-grown" ref="orgtree" node-key="id" :data="rawdata" :props="defaultProps" highlight-current
+				 @node-click="clicknode" icon-class="fa fa-file" :expand-on-click-node="false" default-expand-all>
+					<span class="custom-tree-node" slot-scope="{ node, data }">
+						<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
+						<span>{{ node.label }}</span>
+					</span>
+
+				</el-tree>
+			</template>
+			<div class="content" slot="mainPanel">
+				<div style="height:100%;">
+					<div style="height:40px;border-bottom:1px solid #ececec;box-sizing: border-box;overflow: hidden">
+						<div style="line-height:40px;float:left;padding-right:10px;">当前位置：</div>
+					</div>
+					<div style="height:calc(100% - 40px);" slot="list" class="jas-flex-box is-vertical is-grown">
+						<div style="padding: 15px 0;">
+							<el-button @click="" size="small" plain type="primary" icon="fa fa-plus">保存</el-button>
+
+							<span class="fr">
+								<el-tooltip class="item" content="刷新" placement="top">
+									<el-button size="small" icon="el-icon-refresh" @click=""></el-button>
+								</el-tooltip>
+							</span>
+						</div>
+						<div class="is-grown" style="overflow: auto;">
+							<div v-for="item01 in rawdata">
+								<div class="title01" style="font-size: 16px;line-height: 1.8;">{{item01.text}}</div>
+								<div v-if="item01.children" class="content01">
+									<div v-for="item02 in item01.children">
+										<div class="title01">{{item02.text}}</div>
+										<!-- <div v-if="item02.children" class="content01">
+
+										</div> -->
+										<div v-if="item02.options">
+											<el-radio-group v-model="item02.answer" style="display: block;">
+												<div class=" optionwrap" v-for="opt in  item02.options">
+													<el-radio :label="opt.id" style="padding:6px;display: block; ">{{opt.text}}</el-radio>
+												</div>
+											</el-radio-group>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div style="padding: 15px 0 ;" class="clearfix">
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</jas-two-panel-resizer>
+
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	/**
+	 * created by GF on 2018.12.14
+	 */
+	/**
+	 * 权限控制：
+	 * 20：查看
+	 * 30：
+	 * 60：
+	 * 90：
+	 */
+
+
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				rawdata: [],
+
+
+
+				loading: false,
+				defaultProps: {
+					label: 'text',
+					children: 'children',
+					isLeaf: function (data, node) {
+						return !data.children;
+					}
+				},
+
+			}
+		},
+		computed: {},
+		watch: {
+
+		},
+		mounted: function () {
+			this.requestData();
+		},
+		methods: {
+			requestData: function () {
+				var createObj = function () {
+					return {
+						id: jasTools.base.createuuid(),
+						text: '介质的短期危害性的评分',
+						children: [{
+							id: jasTools.base.createuuid(),
+							text: '介质燃烧性的评分',
+							answer: jasTools.base.createuuid(),
+							options: [{
+								id: jasTools.base.createuuid(),
+								text: '如果介质不可燃，则为0分',
+								rate: 0,
+							}, {
+								id: jasTools.base.createuuid(),
+								text: '如果介质可燃，介质闪点＞93℃，则为3分',
+								rate: 3,
+							}, {
+								id: jasTools.base.createuuid(),
+								text: '如果介质可燃，介质闪点∈(38℃，93℃]，则为6分',
+								rate: 6,
+							}, {
+								id: jasTools.base.createuuid(),
+								text: '如果介质可燃，介质闪点≤38℃并且介质沸点≤38℃，则为9分',
+								rate: 9,
+							}, {
+								id: jasTools.base.createuuid(),
+								text: '如果介质可燃，介质闪点≤23℃并且介质沸点≤38℃，则为12分',
+								rate: 12,
+							}, ]
+						}]
+					};
+				}
+
+				this.rawdata.push(createObj());
+				this.rawdata.push(createObj());
+				this.rawdata.push(createObj());
+				this.rawdata.push(createObj());
+				this.rawdata.push(createObj());
+			},
+
+
+			clicknode: function (node, b, c) {
+				this.currentNodeId = node.id;
+			},
+		},
+	});
+</script>
+
+</html>

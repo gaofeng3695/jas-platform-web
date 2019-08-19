@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>工作委托</title>
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.searchWrapper {
+			overflow: unset !important;
+		}
+		.vue-treeselect__control {
+			height: 34px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="150px">
+					<el-row>						
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="委托开始时间" prop="startTime" style="margin-bottom: 15px ">
+								<el-date-picker v-model="form.startTimeBegin" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker> -
+								<el-date-picker v-model="form.startTimeEnd" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="委托结束时间" prop="endTime" style="margin-bottom: 15px ">
+								<el-date-picker v-model="form.endTimeBegin" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker> -
+								<el-date-picker v-model="form.endTimeEnd" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker>
+							</el-form-item>
+						</el-col>						
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="记录创建时间" prop="createTime" style="margin-bottom: 15px ">
+								<el-date-picker v-model="form.createTimeBegin" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker> -
+								<el-date-picker v-model="form.createTimeEnd" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+					<el-button @click="createNewWE" size="small" plain type="primary" icon="fa fa-plus">新建</el-button>
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" v-loading="loading"  @row-dblclick="seeDetail" height="100%" :data="tableData" border
+						:header-cell-style="headStyle" style="width: 100%" stripe>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column label="委托用户" fixed prop="userName" min-width="150px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="委托类型" fixed prop="delegateType" min-width="150px" :formatter="formatType" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="委托开始时间" prop="startTime" min-width="200px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="委托结束时间" prop="endTime" min-width="180px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="委托状态" prop="status" min-width="120px" :formatter="formatStatus" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="被委托用户" prop="delegateUserName"  min-width="250px"
+							show-overflow-tooltip align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="被委托角色" prop="delegateRoleName" min-width="300px" show-overflow-tooltip
+							align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="创建时间" prop="createDatetime" min-width="200px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="备注" prop="remark" min-width="300px"
+							show-overflow-tooltip align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="操作" align="center" width="200" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="seeDetail(scope.row)" type="text" size="small">详情</el-button>
+								<el-button @click="editWE(scope.row)" type="text" :disabled="scope.row.status!=1" size="small">修改</el-button>
+								<el-button @click="deleteWE(scope.row)" type="text"  :disabled="scope.row.status!=1" size="small">取消</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+						:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+						layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+		</jas-list-wrapper>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				isClosed: false,
+				tableData: [],
+				form: {
+
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+				proNameData: [],
+			}
+		},
+
+		mounted: function () {
+			this.requestList();
+		},
+		methods: {		
+			createNewWE: function(){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/work-entrust/dialogs/add.html';
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '新增工作委托',
+					src: baseSrc,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+			},		
+			editWE: function(row){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/work-entrust/dialogs/add.html';
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '修改工作委托',
+					src: baseSrc + '?oid=' + row.oid,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+			},		
+			seeDetail: function(row){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/work-entrust/dialogs/detail.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					oid: row.oid
+				});
+				top.jasTools.dialog.show({
+					width: '50%',
+					height: '60%',
+					title: '工作委托详情',
+					src: src,
+				});
+			},
+			deleteWE: function (row) {
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '取消成功'
+					});
+					that.requestList();
+				};
+				window.top.Vue.prototype.$confirm('您确定要取消工作委托吗？', '取消工作委托', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							var url = jasTools.base.rootPath + "/jasframework/workflow/delegate/cancel.do";
+							jasTools.ajax.post(url, {
+								oid:row.oid
+							}, function (data) {
+								afterDelete();
+							});
+						}
+					}
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasframework/workflow/delegate/myList.do";
+				that.loading = true;
+				jasTools.ajax.post(url, {
+					startTimeBegin: Date.parse(new Date(this.form.startTimeBegin)) || '',
+					startTimeEnd: Date.parse(new Date(this.form.startTimeEnd)) || '',
+					endTimeBegin: Date.parse(new Date(this.form.endTimeBegin)) || '',
+					endTimeEnd: Date.parse(new Date(this.form.endTimeEnd)) || '',					
+					endTimeBegin: Date.parse(new Date(this.form.createTimeBegin)) || '',
+					endTimeEnd: Date.parse(new Date(this.form.createTimeEnd)) || '',
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			formatStatus: function (row, column, cellValue, index) {
+				if (row.status == "1") {
+					return "委托中";
+				}
+				if (row.status == "-1") {
+					return "已结束";
+				}
+				if (row.status == "-2") {
+					return "已取消";
+				}
+				return "-";
+			},
+			formatType: function (row, column, cellValue, index) {
+				if (row.delegateType == "1") {
+					return "角色委托";
+				}
+				if (row.delegateType == "2") {
+					return "流程委托";
+				}
+				if (row.delegateType == "3") {
+					return "任务委托";
+				}
+				return "-";
+			},
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			}
+		},
+	});
+</script>
+
+</html>

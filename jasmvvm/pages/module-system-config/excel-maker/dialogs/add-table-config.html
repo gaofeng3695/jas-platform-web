@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="formData" :model="form" label-width="150px">
+
+				<jas-form-items-group ref="mainForm" :form="form" :fields-config="fieldsConfig"
+					:names-group="namesGroup" :fields-group="fieldsGroup"></jas-form-items-group>
+                <jas-base-group-title name="其他信息"></jas-base-group-title>
+                    <el-row>
+                        <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <jas-textarea v-model="form.remark"></jas-textarea>
+                        </el-col>
+                    </el-row>
+            </el-form>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+    
+    var param = window.jasTools.base.getParamsInUrl(location.href);
+	var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+	var selectDisabled = param.eventid?true:false;
+	
+	var pageConfig = {
+		savePath: '/jasframework/excel/saveTableInfo.do',
+		updatePath: '/jasframework/excel/updateTableInfo.do',
+		detailPath: '/jasframework/excel/getTableInfoById.do',
+		addFields: [{
+			title: '新增表配置信息',
+			fields: [
+				"tableName",
+				"tableAlias",
+				'formType',
+				'geometryType',
+				'isMainTable',
+				'sheetIndex',
+				'fieldNames'
+			]
+		}],
+		fieldsConfig: {
+			tableName: {
+				name: '表名称',
+				type: 'select',
+				optionUrl: '/jasframework/excel/getTableNamesList.do?loginUserName='+ loginUserName +'&templateId='+ param.templateId,
+				props:{
+                    label: 'table_name',
+                    value: 'table_name'
+				},
+				isRequired: true,
+				disabled: selectDisabled,
+			},
+			tableAlias: {
+				name: '表别名',
+				type: 'input',
+				isRequired: true
+			},
+			formType: {
+				name: '表单类型',
+				type: 'select',
+				isRequired: true,
+				options: [{
+					key: 1,
+					value: "表格"
+					}, {
+					key: 2,
+					value: "列表"
+				}],
+				formatter: function (a, b, value, c) {
+					if (value == 1) return "表格";
+					if (value == 2) return "列表";
+				}
+			},
+			geometryType: {
+				name: '表类型',
+				type: 'select',
+				isRequired: true,
+				options: [{
+					key: "none",
+					value: "属性表"
+                }, {
+                    key: "Poin",
+                    value: "点空间表"
+                }, {
+                    key: "Polyline",
+                    value: "线空间表"
+                }, {
+                    key: "Polygon",
+                    value: "面空间表"
+				}],
+				formatter: function (a, b, value, c) {
+					if (value == "none") return "属性表";
+					if (value == "Poin") return "点空间表";
+					if (value == "Polyline") return "线空间表";
+					if (value == "Polygon") return "面空间表";
+				}
+			},
+			isMainTable: {
+				name: '是否主表',
+                type: 'select',
+                isRequired: true,
+				options: [{
+					key:0,
+					value: "否"
+					}, {
+					key: 1,
+					value: "是"
+				}],
+				formatter: function (a, b, value, c) {
+					if (value == 1) return "是";
+					if (value == 0) return "否";
+				}
+			},
+			sheetIndex: {
+				name: 'sheet索引',
+				type: 'input',
+			},
+			fieldNames: {
+				type: 'input',
+				name: '唯一性字段名称'
+			},
+			remark: {
+				type: 'textarea',
+				name: '备注'
+			}
+		},
+	};
+
+	var vm = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				namesGroup: [],
+				fieldsGroup: [],
+				fieldsConfig: {},
+                form: {},
+                loginUserName: '',
+                currentTemplateId: '',
+				currentTableId: '',
+				disabled:false
+			}
+		},
+		created: function () {
+			var that = this;
+            var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.pageCode = param.pageCode;
+			this.pageConfig = window.pageConfig;
+			this.fieldsConfig = window.pageConfig.fieldsConfig;
+            
+			this.detailPath = window.pageConfig.detailPath;
+			this.savePath = window.pageConfig.savePath;
+			this.updatePath = window.pageConfig.updatePath;
+            
+			var allfields = [];
+			this.pageConfig.addFields.forEach(function (item) {
+                that.namesGroup.push(item.title);
+				that.fieldsGroup.push(that.formatFields(item.fields, pageConfig.fieldsConfig));
+				allfields.concat(item.fields);
+			});
+			this.form = this.formatForm(allfields);
+            
+            
+            var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+            this.loginUserName = loginUserName;
+            this.currentTemplateId = param.templateId;
+            this.currentTableId = param.eventid;
+		},
+		// watch:{
+		// 	currentTableId: function(){
+		// 		if(currentTableId || currentTableId != ''){
+
+		// 		}
+		// 	}
+		// },
+		mounted: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.eventid) {
+				this.eventid = param.eventid;
+				this.form.eventid = this.eventid;
+				this.isEdit = true;
+				this.getDetailByTableId();
+			};
+		},
+		methods: {
+			formatForm: function (fields) {
+				var obj = {};
+				fields.forEach(function (item) {
+					obj[item] = '';
+				});
+				// obj.remarks = '';
+				return obj;
+			},
+			formatFields: function (fields, fieldsConfig) {
+				return fields.map(function (item) {
+					return {
+						name: fieldsConfig[item].name,
+						field: item,
+						formatter: fieldsConfig[item].formatter,
+					};
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.save();
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + this.savePath;
+				} else {
+                    msg = "修改成功";
+                    that.form.eventid = that.currentTableId;
+					url = jasTools.base.rootPath + this.updatePath;
+                }
+                that.form.templateId = that.currentTemplateId;
+				jasTools.ajax.postForm(url, that.form, function (data) {
+					if(data.success == 1){
+						window.parent.jasTools.dialog.close(1);
+					}
+				});
+
+			},
+			getDetailByTableId: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + this.detailPath +'?loginUserName='+ that.loginUserName;
+				jasTools.ajax.get(url, {
+					tableId: that.currentTableId
+				}, function (data) {
+					if(data.sheetIndex || data.sheetIndex == 0){
+						data.sheetIndex += 1;
+					}
+					that.form = data;
+					that.$refs['mainForm'].triggerFatherSelectsChange();
+				});
+			},
+		}
+	});
+</script>
+
+</html>

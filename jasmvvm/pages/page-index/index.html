@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>数字化管线维护系统</title>
+
+	<!-- 老框架的样式依赖 -->
+	<link rel="stylesheet" href="../../../jasframework/common/css/jasframework-layout.css" />
+	<link rel="stylesheet" href="../../../jasframework/common/lib/easyui/themes/default/easyui.css" />
+	<link rel="stylesheet" href="../../../jasframework/common/lib/easyui/themes/icon.css" />
+	<link rel="stylesheet" href="../../../jasframework/common/css/common.css" />
+	<!-- 老框架的样式依赖END -->
+
+	<link rel="stylesheet" href="../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../common/css/main.css">
+	<link rel="stylesheet" href="./index.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<el-container class="outerwrapper">
+
+			<el-header class="headerwrapper">
+				<!-- header 开始 -->
+				<div class="header">
+					<div class="logo item">
+					</div>
+					<div class="name item">
+						<div class="china">数字化管线维护系统</div>
+						<div class="english">Digital Pipeline Maintenance System</div>
+					</div>
+					<ul class="user-info">
+						<li class="items quit">
+							<a @click="_loginOut" style="display:block;padding:0px 10px">
+								<i class="fa fa-sign-out"></i> 退出
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items fullscreen">
+							<a @click="_goFullscreen" style="display:block;padding:0px 10px">
+								<i class="fa fa-arrows-alt"></i> 全屏
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items fullscreen">
+							<a @click="changeLayout" style="display:block;padding:0px 10px">
+								<i class="fa fa-columns"></i> 布局
+							</a>
+						</li>
+						<li class="border" v-if="projectOid"></li>
+						<li class="items fullscreen" v-if="projectOid">
+							<a @click="backToDesk" style="display:block;padding:0px 10px">
+								<i class="fa fa-desktop"></i> 工作桌面
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items">
+							<a style="display:block">
+								<el-dropdown class="dropdown-wrapper" trigger="click" @command="handleCommand">
+									<span class="el-dropdown-link">
+										<img class="user-logo" :src="userImg">
+										<div class="userInfo">
+											<div class="username">{{username}}</div>
+											<div class="userunit">{{userunit}}</div>
+										</div>
+									</span>
+									<el-dropdown-menu slot="dropdown">
+										<!--<el-dropdown-item command="fullscreen">切换全屏</el-dropdown-item>-->
+										<!-- <el-dropdown-item command="changeLayout">切换布局</el-dropdown-item> -->
+										<el-dropdown-item command="resetPassword">修改密码</el-dropdown-item>
+										<!--<el-dropdown-item command="loginout">退出登录</el-dropdown-item>-->
+									</el-dropdown-menu>
+								</el-dropdown>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- header 结束 -->
+			</el-header>
+
+			<el-container style="height: 0%;">
+				<el-aside id="aside" style="background-color: #344052;width:auto;" class="jas-flex-box is-vertical menuwrapper">
+					<!-- sider 结束 -->
+					<div class="is-grown menusubwrap" :style="menuStyle" ref="menubar" v-bar>
+						<div>
+
+
+							<el-menu unique-opened :default-active="currentTap" class="el-menu-vertical-demo" @select="selectMenu" :collapse="isCollapse">
+								<!-- 第一层菜单开始 -->
+								<!-- tip:为什么不用递归渲染？因为vue组件递归的方式跟elementui提供的可收缩菜单插件相冲突，若要使用递归，就必须取消菜单可收缩的功能 -->
+								<template v-for="item in items">
+									<el-submenu v-if="item.subs" :index="item.index">
+										<template slot="title">
+											<i :class="item.icon||'fa fa-folder' "></i>
+											<span slot="title">{{ item.title }}</span>
+										</template>
+										<!-- 第二层菜单开始 -->
+										<template v-for="subitem in item.subs">
+											<el-submenu v-if="subitem.subs" :index="subitem.index">
+												<template slot="title">
+													<i :class=" subitem.icon "></i>
+													<span slot="title">{{ subitem.title }}</span>
+												</template>
+
+												<!-- 第三层菜单开始 -->
+												<template v-for="thirditem in subitem.subs">
+													<el-submenu v-if="thirditem.subs" :index="thirditem.index">
+														<template slot="title">
+															<i :class="thirditem.icon"></i>
+															<span slot="title">{{ thirditem.title }}</span>
+														</template>
+														<!-- 第四层菜单开始 -->
+														<template v-for="fourthitem in thirditem.subs">
+															<el-submenu v-if="fourthitem.subs" :index="fourthitem.index">
+																<template slot="title">
+																	<i :class="fourthitem.icon"></i>
+																	<span slot="title">{{ fourthitem.title }}</span>
+																</template>
+
+																<!-- 第五层菜单开始 -->
+																<template v-for="fifthitem in fourthitem.subs">
+																	<el-submenu v-if="fifthitem.subs" :index="fifthitem.index">
+																		<template slot="title">
+																			<i :class="fifthitem.icon"></i>
+																			<span slot="title">{{ fifthitem.title }}</span>
+																		</template>
+
+																	</el-submenu>
+																	<el-menu-item :index="fifthitem.index" v-else>
+																		<i :class="fifthitem.icon"></i>
+																		<span slot="title">{{ fifthitem.title }}</span>
+																	</el-menu-item>
+																</template>
+																<!-- 第五层菜单结束 -->
+
+															</el-submenu>
+															<el-menu-item :index="fourthitem.index" v-else>
+																<i :class="fourthitem.icon"></i>
+																<span slot="title">{{ fourthitem.title }}</span>
+															</el-menu-item>
+														</template>
+														<!-- 第四层菜单结束 -->
+													</el-submenu>
+													<el-menu-item :index="thirditem.index" v-else>
+														<i :class="thirditem.icon"></i>
+														<span slot="title">{{ thirditem.title }}</span>
+													</el-menu-item>
+												</template>
+												<!-- 第三层菜单结束 -->
+
+
+											</el-submenu>
+											<el-menu-item :index="subitem.index" v-else>
+												<i :class="subitem.icon "></i>
+												<span slot="title">{{ subitem.title }}</span>
+											</el-menu-item>
+										</template>
+										<!-- 第二层菜单结束 -->
+
+									</el-submenu>
+									<el-menu-item :index="item.index" v-else>
+										<i :class=" item.icon||'fa fa-folder' "></i>
+										<span slot="title">{{ item.title }}</span>
+									</el-menu-item>
+								</template>
+								<!-- 第一层菜单结束 -->
+								<!-- <nav-menu :nav-menus="items" /> -->
+							</el-menu>
+
+
+						</div>
+
+					</div>
+					<div class="switchwrapper" @click="isExpend=!isExpend">
+
+						<i v-show="isExpend" class="fa fa-angle-left" aria-hidden="true"></i>
+						<i v-show="!isExpend" class="fa fa-angle-right" aria-hidden="true"></i>
+
+					</div>
+
+					<!-- sider 结束 -->
+				</el-aside>
+				<el-main>
+					<el-container style="height:100%">
+						<el-main style="height:100%;width:100%;overflow:hidden">
+
+							<jas-two-panel-resizer :showed="panelShowed" ref="resizer" :layout="panelLayout" length="40%" @paneresize="paneresize"
+							 @statuschanged="statuschanged">
+								<div slot="closePanel" id="jasMap" class="jasmap" style="height:100%;background-color: #ececec;">
+									<iframe name="gisWindow" class="iframe" :src="gisUrl" frameborder="0" height="100%"></iframe>
+								</div>
+								<el-tabs id="tabs" style="position:relative" slot="mainPanel" class="tabswrapper jas-flex-box" v-model="currentTap"
+								 type="card" @tab-remove="removeTab">
+									<el-popover ref="popover" placement="bottom" trigger="hover">
+										<el-dropdown-item @click.native="handleTabsOptions(1)">刷新当前选项卡</el-dropdown-item>
+										<el-dropdown-item @click.native="handleTabsOptions(2)">关闭当前选项卡</el-dropdown-item>
+										<el-dropdown-item @click.native="handleTabsOptions(3)">关闭其他选项卡</el-dropdown-item>
+										<el-dropdown-item @click.native="handleTabsOptions(4)">关闭所有选项卡</el-dropdown-item>
+									</el-popover>
+									<el-tab-pane v-for="(item, index) in tabs" :key="item.link" :name="item.name" :closable="item.closable">
+										<span slot="label">
+											<i v-show="currentTap == item.name" :class="item.icon||'fa fa-bookmark'"></i> {{item.title}}
+										</span>
+										<div class="iframewrapper">
+											<div class="iframesubwrapper">
+												<iframe class="iframe" :src="item.link" frameborder="0" height="100%"></iframe>
+											</div>
+										</div>
+									</el-tab-pane>
+									<!-- <div v-tabclose></div> -->
+								</el-tabs>
+							</jas-two-panel-resizer>
+						</el-main>
+					</el-container>
+				</el-main>
+			</el-container>
+
+		</el-container>
+
+	</div>
+
+</body>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="../../lib/jquery/jquery-1.12.4.min.js"></script>
+
+<!-- 老框架的JS依赖END -->
+<script type="text/javascript" src="../../../jasframework/common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>
+<script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
+<!-- 老框架的JS依赖END -->
+
+<script src="../../lib/screenfull/screenfull.min.js"></script>
+<script src="../../lib/vue-bar/vue-bar.js"></script>
+<script src="../../lib/vue-multipane/vue-multipane.js"></script>
+<script src="../../common/components/jas-components.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+
+<!-- <script src="./menu.js"></script> -->
+<script src="./index.js"></script>
+
+</html>

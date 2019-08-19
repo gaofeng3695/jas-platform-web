@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="150px">
+				<jas-base-group-title name="基本信息"></jas-base-group-title>
+				<el-row :gutter="10">	
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="委托开始时间" prop="startTime" style="margin-bottom: 15px ">
+							<el-date-picker v-model="tableFormData.startTime" type="datetime"  style="width:300px" placeholder="选择日期时间"
+								size="small"> </el-date-picker> 
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="委托结束时间" prop="endTime" style="margin-bottom: 15px ">
+							<el-date-picker v-model="tableFormData.endTime" type="datetime"  style="width:300px" placeholder="选择日期时间"
+								size="small" > </el-date-picker>
+						</el-form-item>
+					</el-col>	
+				</el-row>
+				<el-row>					
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="被委托用户">
+							<el-col :span="18">
+								<!-- <el-input v-model="tableFormData.toUsers" size="small"></el-input>								 -->
+								<jas-base-el-multi-select-box ref="tousers" v-model="toUser" value-key="oid"
+									label-key="userName" >
+								</jas-base-el-multi-select-box>
+							</el-col>
+							<el-col :span="6">
+								<el-button @click="choseEntrustUser()" size="small" plain type="primary" style="margin-left:10px">选择</el-button>
+								<el-button  @click="resetForm" size="small" plain type="danger">清空</el-button>
+							</el-col>
+						</el-form-item>	
+					</el-col>
+				</el-row>	
+				<el-row>					
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="委托类型" prop="delegateType" style="margin-bottom: 15px ">
+							<el-select v-model="tableFormData.delegateType" clearable placeholder="请选择委托类型" :disabled="true" size="small" style="width:300px;">
+								<el-option label="角色委托" value="1"></el-option>
+								<el-option label="流程委托" value="2"></el-option>
+								<el-option label="任务委托" value="3"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>					
+				<jas-base-group-title name="其他信息"></jas-base-group-title>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="描述" prop="remark">
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.remark"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				but_disabled:false,				
+				rules: {
+					startTime: [{
+						required: true,
+						message: '请输入委托开始时间',
+						trigger: 'blur',
+					}],
+					endTime: [{
+						required: true,
+						message: '请输入委托结束时间',
+						trigger: 'blur'
+					}],
+					delegateType: [{
+						required: true,
+						message: '请选择委托类型',
+						trigger: 'blur',
+					}]
+				},
+				tableFormData: {
+					"startTime": "", 
+					"endTime": "", 
+					"delegateuser": "",
+					"toUsers": [],
+					"delegateType": "1",
+					"remark": "", //描述
+				},
+				toUser: [],
+				isEdit: false,
+				flag: true
+			}
+		},
+			
+		computed: {
+		},
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.isEdit = true;
+				this.oid = param.oid;
+				this.tableFormData.oid = this.oid;
+				this.requestEntrustDetail(param.oid);
+			}
+		},
+		methods: {
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if(that.isEdit){
+						that.save();
+					}else{
+						that.checkEntrustExist(function () {
+							if(that.flag == false){
+								that.save();
+							}else{
+								top.Vue.prototype.$message({
+									type: 'waring',
+									message: '已存在'
+								});
+							}
+						});
+					}
+				});
+			},
+    		resetForm:function() {
+			   this.tableFormData.toUsers = '';
+			   this.toUser = '';
+	    	},
+			requestEntrustDetail: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/delegate/get.do";
+				var userNames = [];
+				var oids = [];
+				var users = [];			
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					that.tableFormData = data.data;
+					userNames = data.data.delegateUserName.split(",");
+					oids = data.data.delegateUser.split(",");
+					for(var i=0;i<oids.length;i++){
+						var row = {};
+						row.oid = oids[i];
+						row.userName = userNames[i];
+						users.push(row);						
+					}
+					that.toUser = users;
+					that.tableFormData.delegateuser = oids.join(",");
+					that.tableFormData.toUsers = oids;
+					that.tableFormData.startTime = new Date(data.data.startTime);
+					that.tableFormData.endTime = new Date(data.data.endTime);
+				});
+			},
+			choseEntrustUser:function(){
+				var that = this;
+				var userids = [];
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/choseTransferUsers.html';
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '选择委托人',
+					src: baseSrc ,
+					cbForClose: function (users) {
+						that.toUser = users;
+						users.forEach(function (item) {
+							userids.push(item.oid);
+						});
+						that.tableFormData.delegateuser = userids.join(",");						
+						that.tableFormData.toUsers = userids;
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				var users = that.toUser;
+				var userids = [];
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jasframework/workflow/delegate/add.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jasframework/workflow/delegate/update.do";
+				}
+				//that.but_disabled = true;		
+				that.tableFormData.startTime =  Date.parse(new Date(that.tableFormData.startTime)) || '',		
+				that.tableFormData.endTime =  Date.parse(new Date(that.tableFormData.endTime)) || '',	
+				users.forEach(function (item) {
+					userids.push(item.oid);
+				});			
+				that.tableFormData.delegateuser = userids.join(",");						
+				that.tableFormData.toUsers = userids;	
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: msg
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			checkEntrustExist: function (cb) {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/workflow/delegate/isExist.do';
+				jasTools.ajax.postForm(url, {
+					appId:that.tableFormData.appId,
+					oid:that.tableFormData.oid
+				}, function (data) {	
+					that.flag = data.data;					
+					cb && cb(data);
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

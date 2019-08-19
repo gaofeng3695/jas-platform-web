@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../../common/css/main.css">
+	<style>
+		/* .el-transfer-panel__body {
+			height: 600px;
+		} */
+		/* .el-transfer {
+			margin-top: 10px;
+			margin-left: 50px;
+		} */
+		.el-transfer {
+			height: 100%;
+			padding-left: 50px;
+		}
+		.el-transfer-panel {
+			height: 100%;
+		}
+		.el-transfer-panel__body {
+			height: 100%;
+		}
+		.el-transfer-panel__list.is-filterable {
+			height: 84%;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="jas-flex-box is-vertical">
+			<div class="is-grown">
+				<el-transfer style="text-align: left; " filterable :titles="titles" 
+					:data="noHasUser" v-model="hasUser" :props="defaultProps"/>
+			</div>
+			<div style="text-align: center;padding-top:40px">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="save()">确 定</el-button>
+			</div>
+			
+		</div>
+	</div>
+</body>
+<script src="./../../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../../lib/vue/vue.js"></script>
+<script src="./../../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../../common/components/jas-components.js "></script>
+<script src="./../../../../../common/js/jas-tools.js"></script>
+
+<script>
+	var vuser = new Vue({
+		el: "#app",
+		data: function () {
+			return {
+				noHasUser:[],
+				titles:["未拥有的人员","已拥有的人员"],
+				hasUser:[],
+				defaultProps:{
+					key: 'oid',
+					label: 'userName'
+				},
+
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			this.requestIsHasUserData();
+		},
+		methods: {
+			requestIsHasUserData: function(){
+				var that = this;
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				var url = jasTools.base.rootPath + "/jasframework/multiprojectUser/getProjectUserOfRole.do";
+				jasTools.ajax.post(url, {
+					projectOid: param.projectOid,
+					roleOid: param.roleOid
+				}, function (data) {
+					var array = data.noHasUser;
+					that.noHasUser = array.concat(data.hasUser);
+					for (let i = 0; i < data.hasUser.length; i++) {
+						that.hasUser.push(data.hasUser[i].oid);
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				
+				var url = jasTools.base.rootPath + "/jasframework/multiprojectUser/updateUser.do";
+				jasTools.ajax.post(url, {
+					projectOid: param.projectOid,
+					roleOid: param.roleOid,
+					userOidList: that.hasUser
+				}, function (data) {
+					if(data.status == 1){
+						window.parent.jasTools.dialog.close(1);
+					}
+				});
+			},
+
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+		}
+	});
+</script>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="选择文件"></jas-base-group-title>
+			<div style="text-align: center">
+				<br />
+				<br />
+				
+				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload" class="upload-demo" drag
+				  :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false" list-type="text" accept=".xls,.xlxs" :before-upload="beforeUpload">
+					<i class="el-icon-upload"></i>
+					<div class="el-upload__text">将文件拖到此处，或
+						<em>点击上传</em>
+					</div>
+					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
+				</el-upload>
+			</div>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="upload('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var param = window.jasTools.base.getParamsInUrl(location.href);
+	var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+	var token = localStorage.getItem('token');
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				uploadUrl: jasTools.base.rootPath + '/jasframework/excel/uploadExcelTemplate.do?templateId='+ param.templateId +'&loginUserName='+ loginUserName +'&token='+ token
+			}
+		},
+		created: function () {
+			
+		},
+		methods: {
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+			upload: function () {
+				var that = this;
+				this.$nextTick(function () {
+					that.$refs.uploader.submit();
+				});
+			},
+			limitNum: function () {
+				top.Vue.prototype.$message({
+					type: 'info',
+					message: '最多上传一个文件'
+				});
+			},
+			successUpload: function () {
+				top.Vue.prototype.$message({
+					type: 'success',
+					message: '上传成功'
+				});
+				this.cancel(1);
+			},
+			errorUpload: function (err, file, fileList) {
+				top.Vue.prototype.$message({
+					type: 'error',
+					message: '上传失败'
+				});
+			},
+			beforeUpload: function(file){
+				var fileType=file.name.substring(file.name.lastIndexOf('.')+1);
+				var notExpectType = fileType == 'xls' || fileType == 'xlsx';
+				if(!notExpectType){
+					top.Vue.prototype.$message({
+						type: 'warning',
+						message: '上传文件只能是 xls、xlsx格式!'
+					});
+				}
+				return notExpectType;
+			}
+		},
+	});
+</script>
+
+</html>

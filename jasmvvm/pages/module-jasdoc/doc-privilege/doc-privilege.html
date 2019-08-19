@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #99c8f8;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 10px;
+			overflow-y: auto;
+		}
+
+
+		.vue-treeselect__control {
+			height: 34px;
+		}
+
+		.el-tabs--border-card {
+			border: 0;
+		}
+
+		.el-tabs__content {
+			height: calc(100% - 40px);
+			padding: 0px !important;
+		}
+
+		.el-tabs__content .el-tab-pane {
+			height: 100%;
+		}
+
+		.roleFolder .el-tree-node {
+			position: relative;
+		}
+
+		.el-tabs__nav.is-top {
+			margin-left: 20px;
+		}
+
+		.el-tabs__header {
+			margin: 0;
+		}
+
+		.el-rate__text {
+			color: #666 !important;
+			font-size: 12px;
+			margin-top: 2px;
+		}
+		.content .el-tree-node__content {
+			max-width: 800px;
+			box-sizing: border-box;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+
+		<el-tabs v-model="currentTabs" style="height:100%;">
+			<el-tab-pane label="部门授权">
+				<jas-two-panel-resizer layout="vertical" length="300px">
+					<template slot="closePanel">
+						<jas-base-module-title name="组织结构列表"></jas-base-module-title>
+						<el-tree class="is-grown" default-expand-all ref="orgtree" node-key="id" :data="orgData" :props="defaultProps" highlight-current
+						  @node-click="clicknode" :expand-on-click-node="false">
+							<span class="custom-tree-node" slot-scope="{ node, data }">
+								<i class="fa fa-cube" style="color:#99c8f8;" aria-hidden="true"></i>
+								<span>{{ node.label }}</span>
+							</span>
+						</el-tree>
+					</template>
+					<div class="content" slot="mainPanel">
+
+						<jas-base-module-title name="部门可分配文件夹列表"></jas-base-module-title>
+
+						<div style="border-bottom:1px solid #ececec;padding: 10px 0 10px 0;">
+							<el-button size="small" plain type="primary" icon="fa fa-refresh" @click="requestOrgFolder">刷新</el-button>
+							<el-button size="small" type="primary" icon="fa fa-floppy-o" @click="saveOrgFolder">保存</el-button>
+						</div>
+						<el-tree class="is-grown" default-expand-all show-checkbox ref="orgFolder" node-key="id" :data="orgFolder" :props="defaultFolderProps"
+						  highlight-current icon-class="fa fa-file" :check-strictly="true" :check-on-click-node="true" :expand-on-click-node="false"
+						  :default-checked-keys="orgFolderCheckedKeys">
+							<span class="custom-tree-node" slot-scope="{ node, data }">
+								<i class="fa fa-folder" style="color:#99c8f8;" :aria-hidden="true"></i>
+								<span>{{ node.label }}</span>
+							</span>
+						</el-tree>
+					</div>
+				</jas-two-panel-resizer>
+			</el-tab-pane>
+			<el-tab-pane label="角色授权">
+				<jas-two-panel-resizer layout="vertical" length="300px">
+					<template slot="closePanel">
+						<jas-base-module-title name="角色列表"></jas-base-module-title>
+						<el-tree class="is-grown" default-expand-all ref="roletree" node-key="id" :data="roleData" :props="defaultProps" highlight-current
+						  @node-click="clickRolenode" :expand-on-click-node="false">
+							<span class="custom-tree-node" slot-scope="{ node, data }">
+								<i class="fa fa-user-circle-o" style="color:#99c8f8;" aria-hidden="true"></i>
+								<span>{{ node.label }}</span>
+							</span>
+						</el-tree>
+					</template>
+					<div class="content" slot="mainPanel">
+
+						<jas-base-module-title name="角色文件夹权限列表"></jas-base-module-title>
+
+						<div style="border-bottom:1px solid #ececec;padding: 10px 0 10px 0;">
+							<el-button size="small" plain type="primary" icon="fa fa-refresh" @click="requestRoleFolder">刷新</el-button>
+							<el-button size="small" type="primary" icon="fa fa-floppy-o" @click="saveRoleFolder">保存</el-button>
+						</div>
+						<el-tree ref="roleFolder" class="roleFolder" default-expand-all node-key="id" :data="roleFolder" :props="defaultFolderProps"
+						  :expand-on-click-node="false">
+							<!-- <span class="custom-tree-node" slot-scope="{ node, data }">
+								<i class="fa fa-folder" style="color:#99c8f8;" :aria-hidden="true"></i>
+								<span>{{ node.label }}</span>
+								<jas-rate @change="rateChanged(data)" style="margin-top:3px;padding-left:15px;position: absolute;left:400px;top:0;" v-model="data.folderprivilegetype"></jas-rate>
+							</span> -->
+							<div class="custom-tree-node" style="flex:1;display: flex;align-items:center;" slot-scope="{ node, data }">
+								<i class="fa fa-folder" style="color:#99c8f8;padding-right:4px;" :aria-hidden="true"></i>
+								<div style="flex:1;width:0;text-overflow: ellipsis;overflow: hidden;">{{ node.label }}</div>
+								<jas-rate @change="rateChanged(data)" style="width:300px;padding-left:15px;" v-model="data.folderprivilegetype"></jas-rate>
+							</div>
+						</el-tree>
+					</div>
+				</jas-two-panel-resizer>
+			</el-tab-pane>
+			<el-tab-pane label="用户授权">
+				<jas-two-panel-resizer layout="vertical" length="300px">
+					<template slot="closePanel">
+						<jas-base-module-title name="部门用户列表"></jas-base-module-title>
+						<div style="margin:10px;">
+							<treeselect style="margin-top: 3px;" :multiple="true" placeholder="请选择部门" :flat="true" :options="orgOptions" :normalizer="classifyTreeNormalizer"
+							  v-model="selectedOrgs"></treeselect>
+
+						</div>
+
+						<el-tree class="is-grown" default-expand-all ref="usertree" node-key="id" :data="userData" :props="defaultProps" highlight-current
+						  @node-click="clickUsernode" :expand-on-click-node="false">
+							<span class="custom-tree-node" slot-scope="{ node, data }">
+								<i class="fa fa-user" style="color:#99c8f8;" aria-hidden="true"></i>
+								<span>{{ node.label }}</span>
+							</span>
+						</el-tree>
+					</template>
+					<div class="content" slot="mainPanel">
+
+						<jas-base-module-title name="用户文件夹权限列表"></jas-base-module-title>
+
+						<div v-show="currentUserId" style="border-bottom:1px solid #ececec;padding: 10px 0 10px 0;">
+							<el-button size="small" plain type="primary" icon="fa fa-refresh" @click="requestUserFolder">刷新</el-button>
+							<el-button size="small" type="primary" icon="fa fa-floppy-o" @click="saveUserFolder">保存</el-button>
+						</div>
+						<el-tree v-show="currentUserId" ref="userFolder" class="roleFolder" default-expand-all node-key="id" :data="userFolder" :props="defaultFolderProps"
+						  :expand-on-click-node="false">
+							<div class="custom-tree-node" style="flex:1;display: flex;align-items:center;" slot-scope="{ node, data }">
+								<i class="fa fa-folder" style="color:#99c8f8;padding-right:4px;" :aria-hidden="true"></i>
+								<div style="flex:1;width:0;text-overflow: ellipsis;overflow: hidden;">{{ node.label }}</div>
+								<jas-rate @change="rateChanged(data)" style="width:300px;padding-left:15px;" v-model="data.folderprivilegetype"></jas-rate>
+							</div>
+						</el-tree>
+					</div>
+				</jas-two-panel-resizer>
+			</el-tab-pane>
+		</el-tabs>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	Vue.component('jas-rate', {
+		props: {
+			value: {
+				default: 0,
+				type: [String, Number]
+			},
+		},
+		computed: {
+			innerValue: {
+				get: function () {
+					return this.valueMap[this.value] || 1;
+				},
+				set: function (newVal) {
+					var val = this.valueArr[newVal] || '1';
+					this.$emit('input', val);
+					// this.$emit('change', val);
+				}
+			}
+		},
+		data: function () {
+			return {
+				rateTexts: ['无', '查看', '查看、下载', '查看、下载、修改', '查看、下载、修改、完全控制'],
+				valueMap: {
+					'1': 1,
+					'20': 2,
+					'30': 3,
+					'60': 4,
+					'90': 5,
+				},
+				valueArr: [null, '1', '20', '30', '60', '90'],
+				icons: ['fa fa-eye', 'fa fa-eye', 'fa fa-eye'],
+				icon: 'fa fa-eye'
+			}
+		},
+		template: [
+			'<el-rate :max="5"  @change="$emit(\'change\')"  v-model="innerValue" show-text :texts="rateTexts"></el-rate>'
+		].join(''),
+	});
+</script>
+
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				loading: false,
+				currentTabs: '',
+				tabInitedMap: {},
+
+				orgData: null,
+				currentOrgId: '',
+				orgFolder: null,
+				orgFolderCheckedKeys: [],
+
+				roleData: null,
+				currentRoleId: '',
+				roleFolder: null,
+
+				userData: null,
+				currentUserId: '',
+				userFolder: null,
+
+				selectedOrgs: [],
+				orgOptions: [],
+
+				defaultProps: {
+					label: 'text',
+					children: 'children',
+					isLeaf: function (data, node) {
+						if (node.children && node.children.length > 0) {
+							return false
+						}
+						return true;
+					}
+				},
+				defaultFolderProps: {
+					label: 'name',
+					children: 'children',
+					isLeaf: function (data, node) {
+						if (node.children && node.children.length > 0) {
+							return false
+						}
+						return true;
+					}
+				},
+			}
+		},
+		computed: {},
+		watch: {
+			currentTabs: function (tab) {
+				if (this.tabInitedMap[tab]) return;
+				this.tabInitedMap[tab] = true;
+				tab == 0 && this.requestOrgData();
+				tab == 1 && this.requestRoleData();
+				tab == 2 && this.getOrgOptions();
+			},
+			currentOrgId: function () {
+				this.requestOrgFolder();
+			},
+			currentRoleId: function () {
+				this.requestRoleFolder();
+			},
+			currentUserId: function () {
+				this.requestUserFolder();
+			},
+			selectedOrgs: function (val) {
+				if (val.length == 0 && this.orgOptions[0]) {
+					this.selectedOrgs = [this.orgOptions[0].id];
+				} else {
+					this.requestUserData();
+				}
+			},
+		},
+		mounted: function () {
+			this.currentTabs = '0';
+
+		},
+		methods: {
+			rateChanged: function (obj) {
+
+				var setChildrenVal = function (obj, val) {
+					if (obj.children && obj.children.length > 0) {
+						obj.children.forEach && obj.children.forEach(function (item) {
+							item.folderprivilegetype = val;
+							setChildrenVal(item, val)
+						});
+					}
+				};
+				setChildrenVal(obj, obj.folderprivilegetype);
+			},
+			classifyTreeNormalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text,
+					children: node.children,
+					isDefaultExpanded: true
+				}
+			},
+			getOrgOptions: function () {
+				var that = this;
+				var formatChildren = function (arr) {
+					arr.forEach && arr.forEach(function (item) {
+						if (!item.children || (item.children && item.children.length == 0)) {
+							item.children = undefined;
+						} else {
+							formatChildren(item.children);
+						}
+					})
+				}
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/getUnitAndChildrenTree.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					formatChildren(data);
+					that.orgOptions = data;
+					if (that.selectedOrgs.length == 0 && that.orgOptions[0]) {
+						that.selectedOrgs = [that.orgOptions[0].id];
+					}
+				});
+			},
+			requestOrgData: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/getUnitAndChildrenTree.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.orgData = data;
+					that.currentOrgId = data[0].id;
+					that.$nextTick(function () {
+						that.$refs.orgtree.setCurrentKey(that.currentOrgId);
+					});
+				});
+
+			},
+			requestRoleData: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/getRoleListByUserId.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.roleData = data;
+					that.currentRoleId = data && data[0].id;
+					that.$nextTick(function () {
+						that.$refs.roletree.setCurrentKey(that.currentRoleId);
+					});
+				});
+
+			},
+			requestUserData: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/getUserListByUnitId.do";
+				jasTools.ajax.postForm(url, {
+					unitIds: this.selectedOrgs.join(',')
+				}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.userData = data;
+					that.currentUserId = data && data[0] && data[0].id || '';
+					that.$nextTick(function () {
+						that.$refs.usertree.setCurrentKey(that.currentUserId);
+					});
+				});
+
+			},
+			requestOrgFolder: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/queryPrivilegeFolder.do";
+				jasTools.ajax.postForm(url, {
+					deptid: this.currentOrgId
+				}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.orgFolder = data;
+					that.orgFolderCheckedKeys = that.getCheckedNodekeys(data);
+				});
+
+			},
+			requestRoleFolder: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/queryRolePivilegeForFolder.do";
+				jasTools.ajax.postForm(url, {
+					selectRoleId: this.currentRoleId
+				}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.roleFolder = data;
+					// that.orgFolderCheckedKeys = that.getCheckedNodekeys(data);
+				});
+
+			},
+			requestUserFolder: function () {
+				var that = this;
+				that.loading = true;
+
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/queryUserPivilegeForFolder.do";
+				jasTools.ajax.postForm(url, {
+					userId: this.currentUserId
+				}, function (data) {
+					that.loading = false;
+
+					// console.log(data)
+					that.userFolder = data;
+				});
+
+			},
+			saveOrgFolder: function () {
+				var that = this;
+				that.loading = true;
+				var keys = that.$refs.orgFolder.getCheckedKeys();
+				var privilegeStr = keys.map(function (item) {
+					return {
+						folderid: item,
+						folderprivilegetype: 10,
+						deptid: that.currentOrgId,
+					}
+				});
+				// console.log(privilegeStr)
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/saveDeptPrivilege.do";
+				jasTools.ajax.postForm(url, {
+					deptid: this.currentOrgId,
+					privilegeStr: JSON.stringify(privilegeStr)
+				}, function (data) {
+					that.loading = false;
+					// console.log(data)
+					if (data.success == 1) {
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '保存成功'
+						});
+					}
+					// that.orgFolder = data;
+					// that.orgFolderCheckedKeys = that.getCheckedNodekeys(data);
+				});
+
+			},
+			saveRoleFolder: function () {
+				var that = this;
+				that.loading = true;
+				var folderRoleValuesStr = [];
+				var getRoleArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.folderprivilegetype > 1) {
+							folderRoleValuesStr.push({
+								folderid: item.id,
+								folderprivilegetype: item.folderprivilegetype
+							})
+						}
+						if (item.children && item.children.length > 0) {
+							getRoleArr(item.children);
+						}
+					});
+				};
+				getRoleArr(this.roleFolder)
+				// console.log(privilegeStr)
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/saveRoleFolderPrivilege.do";
+				jasTools.ajax.postForm(url, {
+					saveRoleId: this.currentRoleId,
+					folderRoleValuesStr: JSON.stringify(folderRoleValuesStr)
+				}, function (data) {
+					that.loading = false;
+					if (data.error == 1) {
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '保存成功'
+						});
+					}
+
+				});
+
+			},
+			saveUserFolder: function () {
+				var that = this;
+				that.loading = true;
+				var folderRoleValuesStr = [];
+				var getRoleArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.folderprivilegetype > 1) {
+							folderRoleValuesStr.push({
+								folderid: item.id,
+								folderprivilegetype: item.folderprivilegetype
+							})
+						}
+						if (item.children && item.children.length > 0) {
+							getRoleArr(item.children);
+						}
+					});
+				};
+				getRoleArr(this.userFolder)
+				// console.log(privilegeStr)
+				var url = jasTools.base.rootPath + "/jasdoc/privilege/privilege/saveUserFolderPrivilege.do";
+				jasTools.ajax.postForm(url, {
+					userId: this.currentUserId,
+					folderUserValuesStr: JSON.stringify(folderRoleValuesStr)
+				}, function (data) {
+					that.loading = false;
+					if (data.error == 1) {
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '保存成功'
+						});
+					}
+
+				});
+
+			},
+			clicknode: function (node, b, c) {
+				// this.currentNode = node;
+
+				this.currentOrgId = node.id;
+			},
+			clickRolenode: function (node) {
+				this.currentRoleId = node.id;
+			},
+			clickUsernode: function (node) {
+				this.currentUserId = node.id;
+			},
+			getCheckedNodekeys: function (treeData) {
+				var checkedKeys = [];
+				var getCheckedKeysFromArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.checked) {
+							checkedKeys.push(item.id);
+						}
+						if (item.children) {
+							getCheckedKeysFromArr(item.children);
+						}
+					})
+				};
+				getCheckedKeysFromArr(treeData);
+				return checkedKeys;
+			},
+		},
+	});
+</script>
+
+</html>

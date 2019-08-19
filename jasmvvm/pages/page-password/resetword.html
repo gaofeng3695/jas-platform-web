@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>施工数据采集</title>
+	<!-- <link rel="stylesheet" href="../../libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../common/css/main.css">
+	<style>
+		.login-wrap,
+		.allwrapper {
+			height: 100%;
+		}
+
+		.formwrap {
+			padding-top: 30px;
+			width: 400px;
+			margin: 0 auto;
+		}
+
+		.btnwrapper {
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="login-wrap">
+		<div class="allwrapper jas-flex-box is-vertical">
+			<div class="is-grown">
+				<el-form ref="password" label-position="right" :rules="rules" class="formwrap" label-width="100px" :model="form">
+					<el-form-item prop="oldPwd" label="原密码">
+						<el-input size="small" v-model="form.oldPwd" :clearable="true" type="password"></el-input>
+					</el-form-item>
+					<el-form-item prop="newPwd" label="新密码">
+						<el-input size="small" v-model="form.newPwd" :clearable="true" type="password"></el-input>
+					</el-form-item>
+					<el-form-item prop="newPwd2" label="确认密码">
+						<el-input size="small" v-model="form.newPwd2" :clearable="true" type="password"></el-input>
+					</el-form-item>
+				</el-form>
+			</div>
+			<div class="btnwrapper">
+				<el-button type="primary" size="small" @click="confirm">确 认</el-button>
+			</div>
+		</div>
+	</div>
+</body>
+<!-- import Vue before Element -->
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/jquery/jquery-1.12.4.min.js"></script>
+<!-- import JavaScript -->
+<script src="../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+
+<script>
+	var vm = new Vue({
+		el: ".login-wrap",
+		data: function () {
+			return {
+				form: {
+					oldPwd: '',
+					newPwd: '',
+					newPwd2: '',
+				},
+				rules: {
+					oldPwd: [{
+						required: true,
+						message: '旧密码为必填项'
+					}],
+					newPwd: [{
+						required: true,
+						message: '新密码为必填项'
+					}],
+					newPwd2: [{
+						required: true,
+						message: '确认密码为必填项'
+					}, {
+						required: true,
+						validator: this._checkTwoWords,
+					}]
+				}
+			};
+		},
+		methods: {
+			_checkTwoWords: function (rule, value, callback) {
+				if (value !== this.form.newPwd) {
+					callback(new Error('两次输入密码不一致!'));
+				} else {
+					callback();
+				}
+			},
+			gotoregist: function () {
+
+			},
+			confirm: function () {
+				var that = this;
+				this.$refs['password'].validate(function (valid) {
+					if (valid) {
+						var url = jasTools.base.rootPath + '/jasframework/privilege/user/editPassword.do';
+						jasTools.ajax.post(url, {
+							oldPwd: that.form.oldPwd, //旧密码
+							newPwd: that.form.newPwd, //新密码
+						}, function (data) {
+							if (data.status == 1) {
+								top.jasTools.dialog.close(1);
+							}
+						});
+					}
+				});
+			}
+		}
+	});
+</script>
+
+</html>

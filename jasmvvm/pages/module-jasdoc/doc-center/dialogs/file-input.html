@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="文档导入"></jas-base-group-title>
+			<el-form :model="form" ref="formData" ::rules="rules" label-width="160px">
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
+						<el-form-item label="导入位置" prop="foldreeventid" >
+							<treeselect aria-placeholder="请选择文件夹" placeholder="请选择文档位置" @input="valueChanged" :options="treeList" :load-options="queryChildrenFolderTree"
+							  :normalizer="normalizer" v-model="form.foldreeventid">
+							</treeselect>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="原文件或文件夹路径" prop="localPath" required>
+							<el-input size="small" v-model="form.localPath" placeholder="请输入原文件或文件夹路径" clearable></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<!-- <div style="color: #999;text-align: right;font-size: 12px;">
+					不支持文件夹移动操作
+				</div> -->
+			</el-form>
+			<jas-base-group-title name="温馨提示"></jas-base-group-title>
+			<div> 1.该功能是提供给管理员使用的，在服务器上进行文档的批量入库，一般用户在本机是无法使用该功能</div>
+			<div> 2.首先执行文档入库，文档保存进入数据库</div>
+			<div> 3.然后执行文档处理，主要包含创建索引、生成摘要、属性、预览、添加水印等操作</div>
+			<div> 4.导入文件夹路径下的文件不宜太多，如果文件太多，可以分多次导入</div>
+			<div> 5.如果文档保存方式为FILE时，文件导入总大小不超过系统盘剩余容量的四分之一</div>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="confirmMove('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				rules: {
+					targetFolderId: [{
+							required: true,
+							message: '该字段为必填项',
+							trigger: 'blur'
+						},
+					]
+				},
+				form: {
+					targetFolderId: null,
+					docNames: '',
+				},
+				treeList: [],
+
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.form.docIds = param.docIds;
+			this.queryFavoriteFolderTree();
+		},
+		methods: {
+			cancel: function (param) {
+				window.top.jasTools.dialog.close(param);
+			},
+			valueChanged: function () {
+				this.$refs.formData.clearValidate();
+			},
+			confirmMove: function (formName) {
+				var that = this;
+
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.requestDocumentImport();
+
+					}
+				});
+
+			},
+			requestDocumentImport: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/documentImport.do";
+				jasTools.ajax.postForm(url, {
+					foldreeventid: this.form.foldreeventid,
+					localPath: this.form.localPath,
+				}, function (data) {
+					if (data.success == false) {
+						top.Vue.prototype.$message({
+							type: 'error',
+							message: data.msg || '倒入失败'
+						});
+					} else {
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: data.msg || '倒入成功'
+						});
+						that.cancel();
+					}
+				});
+			},
+			queryFavoriteFolderTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/queryFavoriteFolderTree.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					data[0].children.forEach(function (item) {
+						if (item.state == null) {
+							item.children = undefined;
+						} else {
+							item.children = null;
+						}
+					})
+					that.treeList = data;
+				});
+			},
+			queryChildrenFolderTree: function (param) {
+				var that = this;
+				if (param.action === 'LOAD_CHILDREN_OPTIONS') {
+					var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/getChildren.do";
+					jasTools.ajax.postForm(url, {
+						folderId: param.parentNode.id,
+						folderType: 1,
+						id: param.parentNode.id
+					}, function (data) {
+						data.forEach(function (item) {
+							if (item.isParent) {
+								item.children = null;
+							} else {
+								item.children = undefined;
+							}
+						})
+						param.parentNode.children = data;
+						param.callback()
+					}, function () {
+						param.parentNode.children = undefined;
+						param.callback()
+					});
+
+				}
+			},
+			normalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text || node.name,
+					children: node.children,
+					isDefaultExpanded: node.state == 'open' ? true : false
+				}
+			},
+
+		},
+	});
+</script>
+
+</html>

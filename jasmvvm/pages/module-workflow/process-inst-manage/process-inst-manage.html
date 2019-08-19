@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>流程实例管理</title>
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.searchWrapper {
+			overflow: unset !important;
+		}
+
+		.vue-treeselect__control {
+			height: 34px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="150px">
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="流程实例ID" prop="proInstId" style="margin-bottom: 15px ">
+								<el-input v-model="form.proInstId" :placeholder="'请输入流程实例ID'" size="small" clearable>
+								</el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="业务数据ID" prop="businessKey" style="margin-bottom: 15px ">
+								<el-input v-model="form.businessKey" :placeholder="'请输入业务数据Id'" size="small" clearable>
+								</el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="流程名称" prop="processKey" style="margin-bottom: 15px ">
+								<el-select v-model="form.processKey" filterable placeholder="请选择流程名称" size="small">
+									<el-option v-for="item in proNameData" :key="item.processKey"
+										:label="item['processName-Key']" :value="item.processKey">
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="发起日期" prop="startTime" style="margin-bottom: 15px ">
+								<el-date-picker v-model="form.startTimeBegin" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker> -
+								<el-date-picker v-model="form.startTimeEnd" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="结束日期" prop="endTime" style="margin-bottom: 15px ">
+								<el-date-picker v-model="form.endTimeBegin" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker> -
+								<el-date-picker v-model="form.endTimeEnd" type="datetime" placeholder="选择日期时间"
+									size="small" style="width: 200px;"> </el-date-picker>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="流程状态" prop="status" style="margin-bottom: 15px ">
+								<el-select v-model="form.status" clearable placeholder="请选择流程状态" size="small">
+									<el-option label="全部" value=""></el-option>
+									<el-option label="办结" value="finished"></el-option>
+									<el-option label="运行中" value="unfinished"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" v-loading="loading" height="100%" :data="tableData" border
+						:header-cell-style="headStyle" style="width: 100%" stripe>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column label="流程实例ID" fixed prop="proInstId" min-width="130px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程主题" fixed prop="proInstName" min-width="150px" show-overflow-tooltip
+							align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="业务数据ID" prop="businessKey" min-width="240px" show-overflow-tooltip
+							align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="发起人" prop="startUserName" min-width="100px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="发起时间" prop="startTime" min-width="150px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程状态" prop="status" min-width="80px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="执行情况" prop="currentTasks" :formatter="formatTask" min-width="200px"
+							show-overflow-tooltip align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="流程key/版本号" prop="processKey" :processKeyFormatter="processKeyFormatter" min-width="150px" show-overflow-tooltip
+							align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="deleteReason" prop="deleteReason" min-width="100px" v-if="showColumn"
+							show-overflow-tooltip align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="操作" align="center" width="200" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="showWorkFlowChart(scope.row)" type="text" size="small">流程图</el-button>
+								<el-button @click="deleteProcessInst(scope.row)" type="text" size="small">删除</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+						:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+						layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+
+		</jas-list-wrapper>
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				showColumn:false,
+				isClosed: false,
+				tableData: [],
+				form: {
+
+				},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+				proNameData: [],
+			}
+		},
+
+		mounted: function () {
+			this.requestNames();
+			this.requestList();
+		},
+		methods: {
+			requestNames: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/workflow/deploy/getNameList.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					data.rows.forEach(function (item) {
+						that.proNameData.push(item);
+					});
+				});
+			},
+			showWorkFlowChart: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-workflow/common/dialogs/workflow-viewer.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					proInstId: row.proInstId
+				});
+				top.jasTools.dialog.show({
+					width: '80%',
+					height: '80%',
+					title: '流程图',
+					src: src,
+				});
+			},
+			deleteProcessInst:function(row){
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+				});
+				that.requestList(0);
+						};
+				window.top.Vue.prototype.$confirm('您确定要删除吗？', '', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+					var url = jasTools.base.rootPath + "/jasframework/workflow/instance/delete.do";
+					jasTools.ajax.post(url, {
+						proInstIds:[row.proInstId],
+							}, function (data) {
+								afterDelete();
+							});
+						}
+					}
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasframework/workflow/instance/getList.do";
+				that.loading = true;
+				jasTools.ajax.post(url, {
+					businessKey:this.form.businessKey,
+					proInstId: this.form.proInstId,
+					proInstName: this.form.proInstName,
+					processKey: this.form.processKey,
+					startTimeBegin: Date.parse(new Date(this.form.startTimeBegin)) || '',
+					startTimeEnd: Date.parse(new Date(this.form.startTimeEnd)) || '',
+					endTimeBegin: Date.parse(new Date(this.form.endTimeBegin)) || '',
+					endTimeEnd: Date.parse(new Date(this.form.endTimeEnd)) || '',
+					status: this.form.status,
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			formatTask: function (row, column, cellValue, index) {
+				var currentTasks = row.currentTasks;
+				var formmater = row.endTime || "";
+				if (formmater != "") {
+					var mills = row.duration;
+					var days = parseInt(mills / (1000 * 60 * 60 * 24));
+					var hours = parseInt((mills % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					var minutes = parseInt((mills % (1000 * 60 * 60)) / (1000 * 60));
+					var seconds = (mills % (1000 * 60)) / 1000;
+					days = days != 0 ? days + " 天 " : "";
+					hours = hours != 0 ? hours + " 小时 " : "";
+					minutes = minutes != 0 ? minutes + " 分钟 " : "";
+					seconds = seconds != 0 ? seconds + " 秒 " : "";
+					formmater = formmater + "（持续时长：" + days + hours + minutes + seconds + "）";
+				}
+				if (currentTasks.length == 0) {} else {
+					for (var i = 0; i < currentTasks.length; i++) {
+						var item = currentTasks[i];
+						formmater = "| " + (item.taskName || "") + "：" + (item
+							.approveUserName);
+					}
+					formmater = formmater.substring(1);
+				}
+				return formmater;
+			},
+			processKeyFormatter:function(row, column, cellValue, index){
+				return cellValue+'/'+row.processVersion;
+			},
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			},
+			setFieldsPattern: function () {
+				var nFields = 3;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			}
+		},
+	});
+</script>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>登录</title>
+	<link rel="stylesheet" href="../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../common/css/main.css">
+	<link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+	<div class="login-wrap">
+		<div class="applink" @click="centerDialogVisible = true">APP下载</div>
+		<el-dialog v-cloak title="APP下载" :visible.sync="centerDialogVisible" width="350px" center>
+			<div style="width:300px;height:300px;background: #00b7ff url(src/images/wecode.png) no-repeat center center">
+			</div>
+			<span slot="footer" class="dialog-footer">
+				<el-button size="small" @click="centerDialogVisible = false">取 消</el-button>
+				<el-button size="small" type="primary" @click="downloadApp">直接下载</el-button>
+			</span>
+		</el-dialog>
+		<div class="content">
+			<div class="content-bg">
+				<div class="start">
+				</div>
+				<div class="ms-login">
+					<div class="logo">
+					</div>
+					<div class="title">
+						施工数据采集
+					</div>
+					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" v-if="!logined" class="form">
+						<el-form-item prop="userid">
+							<el-input prefix-icon="fa fa-user" clearable v-model.number="ruleForm.userid" placeholder="请输入用户名称"></el-input>
+						</el-form-item>
+						<el-form-item prop="pass">
+							<el-input prefix-icon="fa fa-lock" clearable type="password" placeholder="请输入密码" v-model="ruleForm.pass"
+							 @keyup.enter.native="submitForm('ruleForm')"></el-input>
+						</el-form-item>
+						<div class="login-btn">
+							<el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+						</div>
+						<!--<div class="password" @click="forgetPass">
+							忘记密码
+						</div>-->
+					</el-form>
+				</div>
+			</div>
+		</div>
+		<div class="bottom">
+			<div class="bg1">
+			</div>
+			<div class="bg2">
+			</div>
+			<div class="bg3">
+			</div>
+			<div class="bg4">
+			</div>
+			<div class="bg5">
+			</div>
+		</div>
+		<p class="copyright">
+			版权所有：北京中盈安信技术服务股份有限公司 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;京ICP备12006059号-1
+		</p>
+	</div>
+</body>
+
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="../../common/components/jas-components.js"></script>
+<script src="../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: ".login-wrap",
+		data: function () {
+			return {
+				centerDialogVisible: false,
+				logined: 0,
+				isPersonal: false,
+				ruleForm: {
+					userid: '',
+					pass: '',
+					logintype: 0,
+					radio: "1"
+				},
+				rules: {
+					username: [{
+						required: true,
+						message: '请输入用户名称'
+					}],
+					password: [{
+						required: true,
+						message: '请输入密码'
+					}]
+				}
+			};
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+
+		},
+		methods: {
+			gotoreset: function () {
+
+			},
+			gotoregist: function () {
+
+			},
+			submitForm: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (!valid) {
+						return false;
+					}
+					var url = jasTools.base.rootPath + "/jasframework/login/login.do";
+					// var url = jasTools.base.rootPath + "/daq/privilege/appLogin.do";
+					jasTools.ajax.post(url, {
+						"logintype": "0",
+						"loginNum": that.ruleForm.userid,
+						"pass": that.ruleForm.pass,
+						"i18n": "zh_CN",
+						"appId": "402894a152681ba30152681e8b320003"
+					}, function (data) {
+						localStorage.setItem("token", data.token);
+						var userBo = data.user;
+						var unitName = userBo.unitName;
+						unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
+						userBo.unitName = unitName;
+						localStorage.setItem("user", JSON.stringify(userBo));
+						// location.href = "../page-index/index.html";
+						if(data.multiProject ){
+							sessionStorage.setItem("multiProject", 1);
+							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-plateform/index.html";
+						}else{
+							sessionStorage.setItem("multiProject", 0);
+							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
+						}
+
+					});
+				});
+			},
+			forgetPass: function () {
+				//忘记密码
+				var that = this;
+				alert("忘记密码操作");
+				// jasTools.dialog.show({
+				// 	title: '修改密码',
+				// 	width: '530px',
+				// 	height: '530px',
+				// 	src: 'resetword.html',
+				// 	cbForClose: function (param) {
+				// 		if (param === 1) {
+
+				// 		}
+				// 	}
+				// });
+			},
+			downloadApp: function () {
+				this.centerDialogVisible = false;
+				jasTools.ajax.downloadByIframe('get', 'http://download.zyax.cn/jasdaq.apk');
+			}
+		}
+	});
+</script>
+
+</html>
+

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.searchWrapper {
+			overflow: unset !important;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="操作人" prop="username" style="margin-bottom: 15px ">
+								<el-input v-model="form.username" :placeholder="'请输入操作人'" size="small" clearable></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="业务模块" prop="businessname" style="margin-bottom: 15px ">
+								<el-input v-model="form.businessname" :placeholder="'请输入业务模块'" size="small" clearable></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="操作时间" prop="uploadtime" style="margin-bottom: 15px ">
+								<el-date-picker size="small" v-model="form.uploadtime" type="daterange" value-format="yyyy-MM-dd HH:mm:ss"
+								 range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00','23:59:59']"
+								 style="width:100%;">
+								</el-date-picker>
+							</el-form-item>
+						</el-col>
+
+						<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+
+					<!-- <el-button @click="createNewFolder" v-if="isEditMode" size="small" plain type="primary" icon="fa fa-plus">新建分类</el-button>
+					<el-button @click="deleteFile" :disabled="selectedFiles.length==0" size="small" plain type="primary" icon="fa fa-minus">移除文档</el-button> -->
+
+
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" @row-dblclick="seeDetail" v-loading="loading" height="100%" :data="tableData" border
+					 :header-cell-style="headStyle" style="width: 100%" stripe>
+						<!-- <el-table-column type="selection" width="55" align="center" fixed></el-table-column> -->
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column label="业务模块" prop="businessName" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="操作人" prop="createUserName" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="操作类型" prop="optType" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="操作时间" prop="createTime" min-width="160px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="操作" align="center" min-width="80" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="seeDetail(scope.row)" type="text" size="small">详情</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+					 :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+
+		</jas-list-wrapper>
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	/**
+	 * created by GF on 2018.12.14
+	 */
+	/**
+	 * 权限控制：
+	 * 20：查看
+	 * 30：
+	 * 60：
+	 * 90：
+	 */
+
+
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				isClosed: false,
+				tableData: [],
+				form: {},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+
+			}
+		},
+		computed: {},
+		watch: {},
+		created: function () {
+			this.setFieldsPattern();
+			this.requestList(1);
+		},
+		mounted: function () {},
+		methods: {
+
+			seeDetail: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-record/dialogs/detail.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					oid: row.oid,
+				});
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '操作详情',
+					src: src,
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasdoc/operateLogSon/getAll.do";
+				that.loading = true;
+				jasTools.ajax.postForm(url, {
+
+					username: this.form.username,
+					beginDate: this.form.uploadtime && this.form.uploadtime[0],
+					endDate: this.form.uploadtime && this.form.uploadtime[1],
+					businessname: this.form.businessname,
+
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+
+
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			},
+			setFieldsPattern: function () {
+				var nFields = 3;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+		},
+	});
+</script>
+
+</html>

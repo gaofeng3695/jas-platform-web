@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+		.el-header {
+			background-color: #e0ecff; 
+			color: #333;
+			text-align: center;
+			line-height: 50px;
+			margin-left: 20px; 
+			border-radius: 4px;
+		}		
+		.el-main {
+			height:330px;
+			margin-left: 20px;
+			background-color: #f5f7fa;
+			color: #333;
+			text-align: left;
+			border-radius: 4px;
+		}
+		
+		body > .el-container {
+			margin-bottom: 40px;
+		}
+		
+		.el-container:nth-child(5) .el-aside,
+		.el-container:nth-child(6) .el-aside {
+			line-height: 260px;
+		}
+		
+		.el-container:nth-child(7) .el-aside {
+			line-height: 120px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :model="tableFormData" label-width="110px" style="margin-top:15px">
+				<el-row :gutter="10" v-show="isUpload">
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="附件信息">
+						<el-upload
+							class="upload-demo"
+							ref="upload"
+							:action="uploadFileUrl"
+							:file-list="fileList"
+							accept=".zip,.bar,.bpmn,.xml"
+							:before-upload="checkFile"
+							:on-success="successUpload" 
+							:auto-upload="false">
+							<el-button slot="trigger" size="small" type="primary">选取文件</el-button>	
+ 							<div slot="tip" class="el-upload__tip">支持文件格式：zip、bar、bpmn、bpmn20.xml；且上传文件总大小不允许大于3M</div>					  
+						</el-upload>
+					</el-form-item>
+					</el-col>							
+				</el-row>
+				<el-row v-show="isUploadSuccess">	
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="上传文件数量：" prop="filesNum">
+							<span>{{ filesNumSum }}</span>
+						</el-form-item>					
+					</el-col>
+				</el-row>
+				<el-row v-show="isUploadSuccess">	
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-container>
+							<el-container>
+								<el-header style="width:300px;height:50px;">成功部署文件({{ fileSuccess }})</el-header>
+								<el-main style="width:300px;"><span v-for="files in filesSuccessList">{{ files.fileName }}<br/></span></el-main>
+							</el-container>
+							<el-container>
+								<el-header style="width:540px;height:50px;">未部署文件({{ fileFailed }})</el-header>
+								<el-main style="width:540px;"><span v-for="files in filesFailedList" style="border-radius: 4px">{{ files.fileName }}： {{ files.msg }}<br/></span></el-main>
+							</el-container>
+						</el-container>
+					</el-col>	
+				</el-row>
+				<el-row v-show="isUploadSuccess" style="margin-top:15px">	
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-container>
+							
+						</el-container>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="submit('tableFormData')" v-show="isUpload">确 定</el-button>
+				<el-button size="small"  @click="resetForm" v-show="isUpload">重置</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				tableFormData: {
+				},	
+				isUploadSuccess: false,
+				isUpload: true,
+				filesNumSum: 0,
+				fileFailed: 0,
+				fileSuccess: 0,
+				filesSuccessList: [],
+				filesFailedList: [],
+				fileList: [],
+				uploadFileUrl: jasTools.base.rootPath + "/jasframework/workflow/deploy.do"
+			}
+		},
+			
+		computed: {
+		},
+		mounted: function () {
+		},
+		methods: {						
+			submit: function () {
+				var that = this;
+				that.uploadFileUrl = jasTools.base.setParamsToUrl(that.uploadFileUrl, {
+					token: localStorage.getItem('token')
+				});				
+				this.$nextTick(function () {
+					that.$refs.upload.submit();
+					that.isUpload = false;
+					that.isUploadSuccess = true;
+				});
+			},
+			checkFile: function (file) {
+				//const isZIP = file.type === 'application/zip';
+				const isLt3M = file.size / 1024 / 1024 < 3;
+				// if (!isZIP) {
+				// 	this.$message.error('上传头像图片只能是zip、bar、bpmn、bpmn20.xml格式!');
+				// }
+				if (!isLt3M) {
+					this.$message.error('上传文件大小不能超过3MB!');
+				}
+				//return isZIP && isLt2M;
+				return isLt3M;
+			},
+			successUpload: function (response, file, fileList) {
+				console.log(fileList)
+				var that = this;
+				var result = response.data;
+				var fileFailedSize = 0;
+				var fileSuccessSize = 0;
+				that.filesNumSum = 	fileList.length;		
+				result.allFileDeployResult.forEach(function (item) {
+					if(item.status == "-1"){
+						that.filesFailedList.push(item);
+						fileFailedSize = fileFailedSize + 1;
+					}else{						
+						that.filesSuccessList.push(item);
+						fileSuccessSize = fileSuccessSize + 1;
+					}					
+				});	
+				that.fileFailed = fileFailedSize;
+				that.fileSuccess = fileSuccessSize;
+			},
+    		resetForm:function() {
+	    	   this.$refs.upload.clearFiles();
+	    	},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

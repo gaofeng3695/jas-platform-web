@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<div>
+				<jas-base-group-title name="基本信息"></jas-base-group-title>
+				<jas-detail-table :titles="fields" :detail="detail"></jas-detail-table>
+				<jas-base-group-title name="摘要信息"></jas-base-group-title>
+				<jas-detail-table :titles="fields2" :detail="detail"></jas-detail-table>
+				<jas-base-group-title v-if="pageCode=='file'" name="其他信息"></jas-base-group-title>
+				<jas-detail-table :titles="fields3" :detail="detail"></jas-detail-table>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var filesConfig = {
+		folder: {
+			field1: [ //
+				{
+					name: '文件夹名称',
+					field: 'foldername',
+					formatter: null,
+				}, {
+					name: '文件夹路径',
+					field: 'folderlocation',
+				}, {
+					name: '创建人',
+					field: 'createuser',
+				}, {
+					name: '创建时间',
+					field: 'createtime',
+				}, {
+					name: '修改人',
+					field: 'updateuser',
+				}, {
+					name: '修改时间',
+					field: 'updatetime',
+				}
+			],
+			field2: [{
+				name: '文件夹描述',
+				field: 'description',
+			}]
+		},
+		file: {
+			field1: [ //
+				{
+					name: '文档名称',
+					field: 'filename',
+					formatter: null,
+				}, {
+					name: '文档编号',
+					field: 'fileno',
+				}, {
+					name: '文档格式',
+					field: 'filetype',
+				}, {
+					name: '文档位置',
+					field: 'filelocation',
+				}, {
+					name: '文档大小（kb）',
+					field: 'filesizeStr',
+				}, {
+					name: '文档作者',
+					field: 'author',
+				}, {
+					name: '文档创建时间',
+					field: 'createtime',
+				}, {
+					name: '文档修改时间',
+					field: 'updatetime',
+				}, {
+					name: '上传人',
+					field: 'createusername',
+				}, {
+					name: '上传时间',
+					field: 'uploadtime',
+				}, {
+					name: '关键词',
+					field: 'keyword',
+				},
+			],
+			field2: [{
+				name: '文档摘要',
+				field: 'summary',
+			}],
+			field3: [{
+				name: '备注',
+				field: 'remark',
+			}]
+
+		}
+	};
+</script>
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				pageCode: '',
+				fields: [],
+				fields2: [],
+				fields3: [],
+				detail: {},
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.pageCode = param.pageCode;
+			// console.log(param)
+			if (param.pageCode == 'file') {
+				this.fields = filesConfig['file'].field1;
+				this.fields2 = filesConfig['file'].field2;
+				this.fields3 = filesConfig['file'].field3;
+				param.oid && this.getFileDetailByOid(param.oid);
+			} else {
+				this.fields = filesConfig['folder'].field1;
+				this.fields2 = filesConfig['folder'].field2;
+				param.oid && this.getFolderDetailByOid(param.oid);
+			}
+		},
+		methods: {
+			getFileDetailByOid: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/getFileInfoById.do";
+				jasTools.ajax.postForm(url, {
+					docId: oid,
+				}, function (data) {
+					// console.log();
+					that.detail = data;
+				});
+			},
+			getFolderDetailByOid: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/viewFolderById.do";
+				jasTools.ajax.postForm(url, {
+					folderId: oid,
+				}, function (data) {
+					// console.log();
+					that.detail = data;
+				});
+			},
+		},
+	});
+</script>
+
+</html>

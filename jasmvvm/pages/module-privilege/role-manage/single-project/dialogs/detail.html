@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../../common/css/main.css">
+	<style>
+		.jas-detail-table .table_wrap th {
+			width:112px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<div>
+				<jas-base-group-title name="基本信息"></jas-base-group-title>
+				<jas-detail-table :titles="fields" :detail="detail"></jas-detail-table>
+				<jas-base-group-title name="其他信息"></jas-base-group-title>
+				<jas-detail-table :titles="fields2" :detail="detail"></jas-detail-table>
+			</div>
+		</jas-dialog-wrapper>
+	</div>
+</body>
+<script src="./../../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../../lib/vue/vue.js"></script>
+<script src="./../../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+
+<script src="./../../../../../common/components/jas-components.js "></script>
+<script src="./../../../../../common/js/jas-tools.js"></script>
+<script>
+	var filesConfig = {
+		folder: {
+			field1: [
+				{
+					name: '角色名称',
+					field: 'roleName',
+				}, {
+					name: '角色类型',
+					field: 'roleTypeName',					
+				}, {
+					name: '所属部门',
+					field: 'unitName',
+				}, {
+					name: '数据权限过滤规则',
+					field: 'dataFilterRegulationName',
+				}
+			],
+			field2: [{
+				name: '描述',
+				field: 'description',
+			}]
+		}
+	};
+</script>
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				fields: [],
+				fields2: [],
+				detail: {},
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.fields = filesConfig['folder'].field1;
+			this.fields2 = filesConfig['folder'].field2;
+			param.oid && this.getRoleDetailByOid(param.oid);
+		},
+		methods: {
+			getRoleDetailByOid: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/role/getRoleById.do";
+				jasTools.ajax.get(url, {
+					oid: oid,
+				}, function (data) {
+					that.detail = data.data;
+					if (that.detail.roleType=="1") {
+						that.detail.roleTypeName = "private";
+					} else{
+						that.detail.roleTypeName = "protect";
+					}
+				});
+			}
+		},
+	});
+</script>
+
+</html>

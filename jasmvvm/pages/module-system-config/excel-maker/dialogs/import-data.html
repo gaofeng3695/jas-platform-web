@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<div  v-if="isFirstStep">
+				<jas-base-group-title name="选择文件"></jas-base-group-title>
+			</div>
+			<div  v-if="isSecondStep">
+				<jas-base-group-title name="数据检查结果"></jas-base-group-title>
+			</div>
+			<div  v-if="isThirdStep">
+				<jas-base-group-title name="数据导入结果"></jas-base-group-title>
+			</div>
+			<div v-if="isFirstStep" style="text-align: center">
+				<br />
+				<br />
+				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload" class="upload-demo" drag
+				  :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false" list-type="text" accept=".xls,.xlxs" :before-upload="validateFileType">
+					<i class="el-icon-upload"></i>
+					<div class="el-upload__text">将文件拖到此处，或
+						<em>点击上传</em>
+					</div>
+					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
+				</el-upload>
+			</div>
+			<div v-if="isSecondStep && errorCode=='05'" v-html="errorMessage">
+				
+			</div>
+			<div v-if="isSecondStep && errorCode=='06'" v-html="errorMessage">
+				
+			</div>
+			<div v-if="isThirdStep" v-html="importToDBErrorInfo">
+				
+			</div>
+			<div v-if="isFirstStep" slot="footer">
+				<el-button size="small" @click="cancel(1)">取 消</el-button>
+				<el-button size="small" type="primary" @click="upload('formData')">确 定</el-button>
+			</div>
+			<div v-if="isSecondStep" slot="footer">
+				<el-button size="small" @click="cancel(1)">取 消</el-button>
+				<el-button size="small" type="primary" @click="importData('initial')" :disabled="validatedDataCount==0 || errorCode=='05'">初始导入</el-button>
+				<el-button size="small" type="primary" @click="importData('update')" :disabled="validatedDataCount==0 || errorCode=='05'">更新导入</el-button>
+			</div>
+			<div v-if="isThirdStep" slot="footer">
+				<el-button size="small" @click="cancel(1)">关 闭</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var param = window.jasTools.base.getParamsInUrl(location.href);
+	var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+	var token = localStorage.getItem('token');
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				isFirstStep: true,
+				isSecondStep: false,
+				isThirdStep: false,
+				fileNameWithId: '',		// 下载错误信息文件Id命名
+				totalCount: 0,
+				validatedDataCount: 0,
+				checkResutlMessage: '',
+				errorCode: '',
+				errorMessage: '',
+				importToDBErrorInfo: '',
+				uploadUrl: jasTools.base.rootPath + '/jasframework/excel/importExcelData.do?templateId='+ param.templateId +"&tableName="+ param.tableName +"&functionName="+param.functionName+"&fkName=&fkOid=&token="+ token,
+			}
+		},
+		created: function () {
+			
+		},
+		methods: {
+			limitNum: function () {
+				top.Vue.prototype.$message({
+					type: 'info',
+					message: '最多上传一个文件'
+				});
+			},
+			cancel: function (param) {
+				// var that = this;
+				// if(that.fileNameWithId!=""){
+				// 	that.deleteErrorFile();
+				// }else{
+					window.parent.jasTools.dialog.close(param);
+				// }
+			},
+			// deleteErrorFile: function(){
+			// 	var that = this;
+			// 	var url = jasTools.base.rootPath + "/jasframework/excel/deleteErrorFile.do?fileNameWithId="+ that.fileNameWithId;
+			// 	jasTools.ajax.get(url, that.form, function (data) {
+			// 		if(result.resultBoolean == true){
+			// 			window.parent.jasTools.dialog.close(1);
+			// 		}
+			// 	});
+			// },
+			validateFileType: function(file){
+				var fileType=file.name.substring(file.name.lastIndexOf('.')+1);
+				var notExpectType = fileType == 'xls' || fileType == 'xlsx';
+				if(!notExpectType){
+					top.Vue.prototype.$message({
+						type: 'warning',
+						message: '上传文件只能是 xls、xlsx格式!'
+					});
+				}
+				return notExpectType;
+			},
+			upload: function () {
+				var that = this;
+				this.$nextTick(function () {
+					that.$refs.uploader.submit();
+				});
+			},
+			successUpload: function (returnData,file) {
+				var that = this;
+				that.isFirstStep = false;
+				that.isSecondStep = true;
+				that.isThirdStep = false;
+				that.totalCount = returnData.totalCount;
+				that.validatedDataCount = returnData.validatedDataCount;
+				that.checkResutlMessage = returnData.errorMessage;
+				that.errorCode = returnData.errorCode;
+				if(that.errorCode=='01' || that.errorCode=='02' || that.errorCode=='03' || that.errorCode=='04' ){
+					top.Vue.prototype.$message({
+						type: 'error',
+						message: that.checkResutlMessage
+					});
+					that.isFirstStep = true;
+					that.isSecondStep = false;
+					that.isThirdStep = false;
+				}else if(that.errorCode=='05'){
+					that.errorMessage = "</br>数据总条数: <span style='font-weight:bold;color:red'>"+that.totalCount+"</span>"
+					+"有效数据条数: <span style='font-weight:bold;color:red'>"+that.validatedDataCount+"</span>";
+					if(that.totalCount!=that.validatedDataCount){
+						that.errorMessage += " 以下为具体检查结果：<br>";
+						var arr = that.checkResutlMessage.split("$");
+						that.errorMessage += arr.join("<br>");
+					}
+
+				}else{
+					that.errorMessage = "<br><span style='font-weight:bold;color:red'>" + that.checkResutlMessage;
+				}
+			},
+			errorUpload: function (err, file, fileList) {
+				var that = this;
+				that.isFirstStep = true;
+				that.isSecondStep = false;
+				that.isThirdStep = false;
+				top.Vue.prototype.$message({
+					type: 'error',
+					message: '上传失败'
+				});
+			},
+			importData: function(importType){
+				var that = this;
+				if(importType=='update'){
+					window.top.Vue.prototype.$confirm('更新导入比较耗时，确定要更新导入吗？', '提示', {
+						type: 'warning',
+						callback: function (action) {
+							if (action === 'confirm') {
+								that.importDataRequest(importType);
+							}
+						}
+					});
+				}else{
+					// showLoadingMessage('正在进行数据入库，请耐心等待...');
+					that.importDataRequest(importType);
+				}
+			},
+			importDataRequest: function(importType){
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/excel/saveDataToDatabase.do";
+				jasTools.ajax.postForm(url, {importType:importType}, function (returnData) {
+					
+					if(returnData.errorCode == "1"){
+						top.Vue.prototype.$message({
+							type: 'error',
+							message: returnData.errorMess
+						});
+					}
+					var addSuccessCount = returnData.addSuccessCount;
+					var addFailureCount = returnData.addFailureCount;
+					var addErrorMessage = returnData.addErrorMessage;
+					var updateSuccessCount = returnData.updateSuccessCount;
+					var updateFailureCount = returnData.updateFailureCount;
+					var updateErrorMessage = returnData.updateErrorMessage;
+					if(!addSuccessCount || addSuccessCount==''){
+						addSuccessCount = 0;
+					}
+					if(!addFailureCount || addFailureCount==''){
+						addFailureCount = 0;
+					}
+					if(!updateSuccessCount || updateSuccessCount==''){
+						updateSuccessCount = 0;
+					}
+					if(!updateFailureCount || updateFailureCount==''){
+						updateFailureCount = 0;
+					}
+					var totalSuccessCount = parseInt(addSuccessCount) + parseInt (updateSuccessCount);
+					var totalFailureCount = parseInt(addFailureCount) + parseInt (updateFailureCount);
+					if(!addErrorMessage){
+						addErrorMessage="";
+					}
+					if(!updateErrorMessage){
+						updateErrorMessage="";
+					}
+					if(importType=='initial'){
+						that.importToDBErrorInfo="成功导入数据条数： <span style='font-weight:bold;color:red'>" + addSuccessCount + "</span> ，未成功导入数据条数 <span style='font-weight:bold;color:red'>" + addFailureCount +"</span>";
+						if(addFailureCount!=0){
+							that.importToDBErrorInfo +=", 以下为具体错误信息：<br>";
+							var inintArr = addErrorMessage.split("$");
+							that.importToDBErrorInfo += inintArr.join("<br>")
+						}
+					}
+					if(importType=='update'){
+						if(totalSuccessCount!=0){
+							that.importToDBErrorInfo="成功导入数据条数：<span style='font-weight:bold;color:red'>" + totalSuccessCount +"</span>" + " ，其中添加条数：<span style='font-weight:bold;color:red'>"+addSuccessCount+"</span>" +" ，更新条数： <span style='font-weight:bold;color:red'>" + updateSuccessCount +"</span>" + " 。 未成功导入数据条数 <span style='font-weight:bold;color:red'>" + totalFailureCount +"</span>";
+						}
+						if(totalFailureCount!=0){
+							that.importToDBErrorInfo += " , 以下为具体错误信息：<br>";
+							var addArr = addErrorMessage.split("$");
+							that.importToDBErrorInfo += addArr.join("<br>");
+							var updateArr = updateErrorMessage.split("$");
+							that.importToDBErrorInfo += updateArr.join("<br>");
+						}	
+					}
+				});
+				that.isFirstStep = false;
+				that.isSecondStep = false;
+				that.isThirdStep = true;
+						
+			},
+		}
+	});
+</script>
+
+</html>

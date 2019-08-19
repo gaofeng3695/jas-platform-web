@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>权限定义</title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #409EFF;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.filterapplication {
+			padding: 10px 10px 0px 10px;
+		}
+
+		.filterwrap {
+			padding: 10px 10px 0px 10px;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.content .el-tabs__content {
+			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+			overflow: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading.allLoading">
+
+		<jas-two-panel-resizer layout="vertical" length="300px">
+			<template slot="closePanel">
+				<div class="filterapplication">
+					<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
+						@change="changeApplication(currentApplicationId)">
+						<el-option v-for="item in applications" :key="item.oid" :label="item.appName" :value="item.oid">
+						</el-option>
+					</el-select>
+				</div>
+				<div class="orgtool">
+					<el-button type="text" @click="addNode">新增</el-button>
+					<el-button type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
+					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId">删除</el-button>
+				</div>
+				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
+					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
+					:expand-on-click-node="false">
+					<span class="custom-tree-node" slot-scope="{ node, data}">
+						<!--<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>-->
+						<span>{{ node.label }}</span>
+					</span>
+				</el-tree>
+			</template>
+			<div class="content" slot="mainPanel">
+				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
+					<el-tab-pane label="权限详情" name="details">
+						<div v-loading="loading.orgDetail">
+							<jas-detail-table :titles="detailTitle" :detail="detail" />
+						</div>
+					</el-tab-pane>
+				</el-tabs>
+			</div>
+		</jas-two-panel-resizer>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				refreshTree: true,
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				detail: null,
+				detailTitle: [{
+					name: '父权限ID',
+					field: 'parentId',
+				}, {
+					name: '父权限名称',
+					field: 'parentName',
+				}, {
+					name: '父权限编码',
+					field: 'parentPrivilegeCode',
+				}, {
+					name: '权限ID',
+					field: 'oid',
+				}, {
+					name: '权限名称',
+					field: 'privilegeName',
+				}, {
+					name: '权限编码',
+					field: 'privilegeCode',
+				}, {
+					name: '权限类型',
+					field: 'privilegeTypeName',
+				}, {
+					name: '应用系统',
+					field: 'appName',
+				}, {
+					name: '权限URL',
+					field: 'url',
+				}, {
+					name: 'query全路径',
+					field: 'queryName',
+				}, {
+					name: '层级编号',
+					field: 'hierarchy',
+				}, {
+					name: '层级',
+					field: 'hlevel',
+				}, {
+					name: '同级权限顺序号',
+					field: 'orderNum',
+				}, {
+					name: '权限描述',
+					field: 'description',
+				}, ],
+				loading: {
+					allLoading: false,
+					orgDetail: false,
+				},
+				activeName: 'details',
+				currentNodeId: '',
+				defaultProps: {
+					label: 'name',
+					children: 'children',
+					isLeaf: function (data, node) {
+						return !data.isParent;
+					}
+				},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				isEditMode: false,
+				currentApplicationId: '',
+				appName:'',
+				applications: []
+			}
+		},
+		computed: {
+			
+		},
+		watch: {
+			
+		},
+		mounted: function () {
+			// this.initApplications();
+			this.setFieldsPattern();
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.isEditMode) {
+				this.isEditMode = true;
+			} else {
+				this.isEditMode = false;
+			}
+		},
+		methods: {
+			initApplications: function (cb) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getUserAppsystem.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					data.forEach(function (item) {
+						that.applications.push(item);
+					});
+					that.currentApplicationId = data[0].oid;
+					that.appName = data[0].appName;
+					cb && cb(that.currentApplicationId);
+				});
+			},
+			
+			changeApplication: function (cid) {
+				var that = this;
+				this.currentApplicationId = cid;
+				if (cid) {
+					this.refreshTree = false;
+					this.$nextTick(function () {
+						that.refreshTree = true;
+						that.currentNodeId = '';
+					})
+				}
+			},
+			_requestOrgDetail: function (oid) {
+				var that = this;
+				that.loading.orgDetail = true;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/findPrivilegeById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					setTimeout(function () {
+						that.loading.orgDetail = false;
+					}, 300)
+					that.detail = data;
+					that.detail.appName = that.$refs.selectApp.selectedLabel;
+					if (that.detail.privilegeType=="1") {
+						that.detail.privilegeTypeName = "菜单";
+					} else if(that.detail.privilegeType=="2"){
+						that.detail.privilegeTypeName = "功能点";
+					}else if(that.detail.privilegeType=="3"){
+						that.detail.privilegeTypeName = "表单";
+					}else{
+						that.detail.privilegeTypeName = "表单字段";
+					}
+				});
+			},
+			requestNode: function (node, resolve) {
+				var that = this;
+				var getNodes = function (currentid) {
+					if (node.level === 0) {
+						var url = jasTools.base.rootPath +
+							"/jasframework/privilege/privilege/getAllPrivilegeZTreebyappnumber.do";
+						jasTools.ajax.postForm(url, {
+							appId: currentid
+						}, function (data) {
+							data.forEach(function (item) {
+								item.children = [];
+							})
+							resolve(data);
+							that.$nextTick(function () {
+								if (!that.currentNodeId) {
+									that.currentNodeId = data[0].id;
+								}
+							})
+						});
+					}
+					if (node.level > 0 && !node.isLeaf) {
+						var url = jasTools.base.rootPath +
+						"/jasframework/privilege/privilege/getChildrenPrivilegeByappId.do";
+						jasTools.ajax.postForm(url, {
+							appId: currentid,
+							id: node.data.id
+						}, function (data) {
+							resolve(data);
+						});
+					};
+					return resolve([]);
+				};
+
+				if (this.isinitedtype) {
+					getNodes(that.currentApplicationId)
+				} else {
+					this.initApplications(function (currentid) {
+						that.isinitedtype = true;
+						getNodes(currentid)
+					});
+				}
+
+			},
+			clicknode: function (node, b, c) {
+				this.currentNodeId = node.id;
+				this._requestOrgDetail(node.id);
+			},
+			addNode: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '新增权限',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?appId=' + that.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {						
+							that.refreshTree = false;
+							that.$nextTick(function () {
+								that.refreshTree = true;
+								that.currentNodeId = '';
+							})
+						}
+					}
+				});
+			},
+			editNode: function (row) {
+				console.log(row)
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '修改权限',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?oid=' + that.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.refreshTree = false;
+							that.$nextTick(function () {
+								that.refreshTree = true;
+								that.currentNodeId = '';
+							})
+						}
+					}
+				});
+			},
+			_requestDeleteNode: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/deletePrivilegeById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功！'
+					});
+					that.refreshTree = false;
+					that.$nextTick(function () {
+						that.refreshTree = true;
+						that.currentNodeId = '';
+					})
+				});
+			},
+
+			deleteNode: function () {
+				var that = this;
+				window.top.Vue.prototype.$confirm('您确定要删除本条数据吗？', '提示', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							that.checkPrivilege(function (data) {	
+								if(data.success==1){
+									that._requestDeleteNode(that.currentNodeId);
+								}else{
+									top.Vue.prototype.$message({
+										type: 'error',
+										message: data.msg
+									});
+								}									
+							});
+						}
+					}
+				});
+			},
+			checkPrivilege: function (cb) {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/privilege/privilege/checkPrivilegeByeventId.do';
+				jasTools.ajax.postForm(url, {
+					oid:that.currentNodeId
+				}, function (data) {
+					cb && cb(data);
+				});
+			},
+			getCheckedNodekeys: function (treeData) {
+				var checkedKeys = [];
+				var getCheckedKeysFromArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.checked) {
+							checkedKeys.push(item.id);
+						}
+						if (item.children) {
+							getCheckedKeysFromArr(item.children);
+						}
+					})
+				};
+				getCheckedKeysFromArr(treeData);
+				return checkedKeys;
+			},
+			getNodekeysByGrade: function (treeData, nGrade) {
+				var grades = [];
+				var getGradeKeysFromArr = function (arr, index) {
+					++index;
+					arr.forEach(function (item) {
+						if (grades[index]) {
+							grades[index].push(item.id)
+						} else {
+							grades[index] = [item.id]
+						}
+						if (item.children) {
+							getGradeKeysFromArr(item.children, index);
+						}
+					});
+				};
+				getGradeKeysFromArr(treeData, -1);
+				nGrade = nGrade < 1 ? 1 : nGrade;
+				nGrade = nGrade > grades.length ? grades.length : nGrade;
+				return grades[nGrade - 1];
+			},
+
+			setFieldsPattern: function () {
+				var nFields = 5;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+
+		},
+	});
+</script>
+
+</html>

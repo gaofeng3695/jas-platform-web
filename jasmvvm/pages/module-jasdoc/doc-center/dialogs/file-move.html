@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="文档移动"></jas-base-group-title>
+			<el-form :model="form" :rules="rules" ref="formData" label-width="140px">
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
+						<el-form-item label="移动到的位置" prop="targetFolderId">
+							<treeselect aria-placeholder="请选择文件夹" placeholder="请选择文档位置" @input="valueChanged" :options="treeList"
+							 :load-options="queryChildrenFolderTree" :flat="true" :normalizer="normalizer" v-model="form.targetFolderId">
+							</treeselect>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="待移动文档" prop="remark">
+							<el-input disabled type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.docNames"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<!-- <div style="color: #999;text-align: right;font-size: 12px;">
+					不支持文件夹移动操作
+				</div> -->
+			</el-form>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="confirmMove('formData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				rules: {
+					targetFolderId: [{
+						required: true,
+						message: '该字段为必填项',
+						trigger: 'blur'
+					}, ]
+				},
+				form: {
+					targetFolderId: null,
+					docNames: '',
+				},
+				treeList: [],
+
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.form.docNames = decodeURI(param.docNames);
+			this.form.docIds = param.docIds;
+			this.queryFavoriteFolderTree();
+		},
+		methods: {
+			cancel: function (param) {
+				window.top.jasTools.dialog.close(param);
+			},
+			valueChanged: function () {
+				this.$refs.formData.clearValidate();
+			},
+			confirmMove: function (formName) {
+				var that = this;
+
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.requestMoveFile();
+
+					}
+				});
+
+			},
+			requestMoveFile: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/moveFiles.do";
+				jasTools.ajax.postForm(url, {
+					docIds: this.form.docIds,
+					targetFolderId: this.form.targetFolderId,
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '移动成功'
+					});
+					that.cancel();
+				});
+			},
+			queryFavoriteFolderTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/queryFavoriteFolderTree.do";
+				jasTools.ajax.postForm(url, {}, function (data) {
+					data[0].children.forEach(function (item) {
+						// item.isDisabled = false;
+						if (item.state == null) {
+							item.children = undefined;
+						} else {
+							item.children = null;
+						}
+					});
+					data[0].isDisabled = true;
+
+					that.treeList = data;
+				});
+			},
+			queryChildrenFolderTree: function (param) {
+				var that = this;
+				if (param.action === 'LOAD_CHILDREN_OPTIONS') {
+					var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/getChildren.do";
+					jasTools.ajax.postForm(url, {
+						folderId: param.parentNode.id,
+						folderType: 1,
+						id: param.parentNode.id
+					}, function (data) {
+						data.forEach(function (item) {
+							if (item.isParent) {
+								item.children = null;
+							} else {
+								item.children = undefined;
+							}
+						})
+						param.parentNode.children = data;
+						param.callback()
+					}, function () {
+						param.parentNode.children = undefined;
+						param.callback()
+					});
+
+				}
+			},
+			normalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text || node.name,
+					children: node.children,
+					isDefaultExpanded: node.state == 'open' ? true : false
+				}
+			},
+
+		},
+	});
+</script>
+
+</html>

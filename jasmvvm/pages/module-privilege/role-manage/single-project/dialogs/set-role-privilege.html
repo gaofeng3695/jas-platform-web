@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :model="tableFormData" label-width="100px" style="margin-top: 15px ">
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="12">
+						<el-form-item label="应用系统" prop="roleType" style="margin-bottom: 15px ">
+							<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
+								@change="changeApplication(currentApplicationId)">
+								<el-option v-for="item in applications" :key="item.oid" :label="item.appName" :value="item.oid">
+								</el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="权限分配" prop="roleType" style="margin-bottom: 15px ">		
+							<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" :props="defaultProps" show-checkbox :default-expanded-keys="[currentNodeId]"
+							 :default-checked-keys="checkedKeys" highlight-current @node-click="clicknode" :expand-on-click-node="false"  style="margin-top: 10px "></el-tree>					
+							</el-tree>
+						</el-form-item>						
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit()">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+	</div>
+</body>
+<script src="./../../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../../lib/vue/vue.js"></script>
+<script src="./../../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../../common/components/jas-components.js "></script>
+<script src="./../../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				but_disabled:false,								
+				tableFormData: {
+				},
+				currentApplicationId: '',
+				applications: [],
+				orgnData: [],
+				defaultProps: {
+					label: 'text',
+					orgnData: 'orgnData'
+				},
+				checkedKeys: [],
+				roleId:'',
+				currentApplicationId:'',
+				currentNodeId: '',
+
+			}
+		},
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.roleId) {
+				this.roleId = param.roleId;
+				this.tableFormData.roleId = param.roleId;
+			}
+			this.initApplications();
+		},
+		methods: {
+			initApplications: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getUserAppsystem.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					data.forEach(function (item) {
+						that.applications.push(item);
+					});
+					that.currentApplicationId = data[0].oid;	
+					that.requestUnitTree();
+				});
+			},
+			changeApplication: function (cid) {
+				var that = this;
+				this.currentApplicationId = cid;
+				that.requestUnitTree();
+			},
+			submit: function () {
+				var that = this;
+				var	url = jasTools.base.rootPath + "/jasframework/privilege/privilege/setPrivilege.do";			
+				jasTools.ajax.postForm(url,{
+					appId:that.currentApplicationId,
+					roleId:that.roleId,
+					privilegeIds:that.$refs.orgtree.getCheckedKeys().join(",")
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: "权限分配成功"
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			
+			clicknode: function (node, b, c) {
+				this.currentNodeId = node.id;
+			},
+			requestUnitTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/getAllConfig.do";
+				jasTools.ajax.get(url, {
+					roleId:that.roleId,
+					appId:that.currentApplicationId
+				}, function (data) {
+					that.checkedKeys = that.getCheckedNodekeys(data);
+					that.orgnData = data;
+				});
+			},
+			
+			getCheckedNodekeys: function (treeData) {
+				var checkedKeys = [];
+				var getCheckedKeysFromArr = function (arr) {
+					arr.forEach(function (item) {
+						if (item.checked) {
+							checkedKeys.push(item.id);
+						}
+						if (item.children) {
+							getCheckedKeysFromArr(item.children);
+						}
+					})
+				};
+				getCheckedKeysFromArr(treeData);
+				return checkedKeys;
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

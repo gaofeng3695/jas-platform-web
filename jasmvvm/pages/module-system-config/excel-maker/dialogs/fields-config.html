@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		.outwrap {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.outwrap .footer {
+			padding: 10px 0 0 0;
+			border-top: 1px solid #ececec;
+			text-align: center;
+		}
+
+		.fieldwrap {
+			border: 1px solid #dcdfe6;
+			border-radius: 4px;
+			padding: 5px;
+			overflow: hidden;
+		}
+
+		.fielditem {
+			padding: 2px 10px;
+			margin: 2px;
+			float: left;
+			cursor: pointer;
+			border-radius: 4px;
+			box-sizing: border-box;
+			border: 2px solid #fff;
+			color: white;
+		}
+
+		.fieldtitle {
+			text-align: center;
+			padding: 6px;
+			border: 1px solid #ececec;
+			margin: 0 10px;
+			border-bottom: none;
+			background: #ecf5ff;
+		}
+
+		.el-form-item {
+			margin-bottom: 12px;
+		}
+
+		.el-tabs__content{
+			overflow: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="outwrap jas-flex-box is-vertical" v-loading="loading">
+			<jas-base-group-title name="字段使用状态"></jas-base-group-title>
+			<div style="color:#666;padding:4px;">
+				<span style="color:#ff5656;">红色</span>表示使用且必填，
+				<span style="color:#67c23a;">绿色</span>表示使用且非必填，
+				<span style="color:#666;">灰色</span>表示不在Excel中使用。
+			</div>
+			<div class="fieldwrap">
+				<div class="fielditem" @click="activeFiled=item" :style="fieldstyle(item)" v-for="item in fields">
+					{{item.fieldName}}</div>
+			</div>
+
+			<jas-base-group-title v-if="activeFiled" :name="'字段配置'"></jas-base-group-title>
+			<div class="fieldtitle"><span style="font-weight: 900;">{{activeFiled.fieldName}}</span>
+				<span style="color:#999;"> （点击上面的字段，切换编辑）</span>
+			</div>
+			<el-tabs style="padding:0 10px;margin:0px 10px 10px;border:1px solid #ececec;" v-if="activeFiled"
+				class="is-grown jas-flex-box " v-model="activeName">
+				<el-tab-pane label="基础信息" name="first">
+					<div style="height: 100%;">
+						<el-form ref="formData" :model="activeFiled" label-width="130px">
+							<el-row>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="字段名称" prop="fieldName">
+										<el-input v-model="activeFiled.fieldName" disabled size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="字段别名" prop="fieldAlias">
+										<el-input v-model.trim="activeFiled.fieldAlias" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="Excel使用" prop="isShowed">
+										<el-switch v-model="activeFiled.isShowed">
+										</el-switch>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="必填" prop="isMandatory">
+										<el-switch :disabled="!activeFiled.isShowed" v-model="activeFiled.isMandatory" :active-value="1" :inactive-value="0">
+										</el-switch>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="是否外键" prop="isForeignField">
+										<el-switch v-model="activeFiled.isForeignField" :disabled="!activeFiled.isShowed" :active-value="1" :inactive-value="0">
+										</el-switch>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="外键字段" prop="foreignField">
+										<el-input v-model.trim="activeFiled.foreignField"  size="small" :disabled="!activeFiled.isForeignField" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="其他关联查询字段" prop="associateField">
+										<el-input v-model.trim="activeFiled.associateField"  size="small" :disabled="!activeFiled.isForeignField" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="对应字段" prop="associateValue">
+										<el-input v-model.trim="activeFiled.associateValue" size="small" :disabled="!activeFiled.isShowed" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="输入类型" prop="inputType">   
+										<el-select v-model="activeFiled.inputType" placeholder="请选择" size="small" :disabled="!activeFiled.isShowed">
+											<el-option-group v-for="group in inputTypeOptions" :key="group.label" :label="group.label">
+												<el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
+												</el-option>
+											</el-option-group>
+										</el-select>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="数据来源" prop="dataSource">
+										<el-input v-model.trim="activeFiled.dataSource=='null'?'':activeFiled.dataSource" size="small" :disabled="!activeFiled.isShowed || !(activeFiled.inputType=='select' || activeFiled.inputType=='auto_sysadd')" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="所属分组" prop="groupName">
+										<el-input v-model.trim="activeFiled.groupName" :disabled="!activeFiled.isShowed" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="单元起始行" prop="beginRow">
+										<el-input type="number" :disabled="!activeFiled.isShowed" @change="beginRowChanged" v-model="activeFiled.beginRow" :step="1" :min="0" :max="10000" controls-position="right" clearable size="small"></el-input-number>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="单元起始列" prop="beginColumn">
+										<el-input type="number" :disabled="!activeFiled.isShowed" v-model="activeFiled.beginColumn" :step="1" :min="1" :max="100000" controls-position="right" clearable size="small"></el-input-number>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="单元终止列" prop="endColumn">
+										<el-input type="number" :disabled="isShowEndColumn" v-model="activeFiled.endColumn" :step="1" :min="0" :max="10000" controls-position="right" clearable size="small"></el-input-number>
+										</el-input>
+									</el-form-item>
+								</el-col>
+							</el-row>
+							<el-row>
+								<el-col :xs="48" :sm="24" :md="24" :lg="24" :xl="16">
+									<jas-textarea v-model="activeFiled.remark"></jas-textarea>
+								</el-col>
+							</el-row>
+						</el-form>
+					</div>
+				</el-tab-pane>
+				<el-tab-pane label="数据有效性" name="second">
+					<div class="jas-flex-box is-vertical" style="padding: 15px 5px;box-sizing:border-box;">
+						<el-form ref="formData" :model="activeFiled" label-width="100px">
+							<el-row>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="验证类型" prop="validateType">
+										<el-select disabled  v-model="activeFiled.validateType" placeholder="请选择" size="small" clearable>
+											<el-option v-for="item in validateTypeList" :key="item.value" :label="item.label" :value="item.value">
+											</el-option>
+										</el-select>
+									</el-form-item>
+								</el-col>
+							</el-row>
+							<el-row v-if="activeFiled.validateType!=0">
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="运算符" prop="excelOperator">
+										<el-select  v-model="activeFiled.excelOperator" placeholder="请选择" size="small" :disabled="!activeFiled.isShowed" clearable>
+											<el-option v-for="item in excelOperatorList" :key="item.value" :label="item.label" :value="item.value">
+											</el-option>
+										</el-select>
+									</el-form-item>
+								</el-col>
+							</el-row>
+							<el-row  v-show="isShowValidateValue">
+								<el-col v-if="isShowBeginValue" :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item :label="beginLabel" prop="validateBeginValue">
+										<el-input v-model="activeFiled.validateBeginValue" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+								<el-col v-if="isShowEndValue" :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item :label="endLabel" prop="validateEndValue">
+										<el-input v-model="activeFiled.validateEndValue" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+							</el-row>
+							<el-row  v-show="isShowValidateDate">
+									<el-col v-if="isShowBeginValue" :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+										<el-form-item :label="beginLabel" prop="validateBeginValue">
+											<el-date-picker v-model="activeFiled.validateBeginValue" type="date" clearable format="yyyy-MM-dd" value-format="yyyy-MM-dd">
+											</el-date-picker>
+										</el-form-item>
+									</el-col>
+									<el-col v-if="isShowEndValue" :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+										<el-form-item :label="endLabel" prop="validateEndValue">
+											<el-date-picker v-model="activeFiled.validateEndValue" type="date" clearable format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+												</el-date-picker>
+										</el-form-item>
+									</el-col>
+								</el-row>
+						</el-form>
+					</div>
+				</el-tab-pane>
+				<el-tab-pane label="输入提示信息" name="third">
+					<div class="jas-flex-box is-vertical" style="padding: 15px 5px;box-sizing:border-box;">
+						<el-form ref="formData" :model="activeFiled" label-width="100px">
+							<el-row>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="输入提示信息" prop="excelInputMsg">
+										<el-input v-model="activeFiled.excelInputMsg" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form>
+					</div>
+				</el-tab-pane>
+				<el-tab-pane label="出错警告" name="forth">
+					<div class="jas-flex-box is-vertical" style="padding: 15px 5px;box-sizing:border-box;">
+						<el-form ref="formData" :model="activeFiled" label-width="100px">
+							<el-row>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="错误模式" prop="excelErrorMode">
+										<el-select v-model="activeFiled.excelErrorMode" placeholder="请选择" size="small" :disabled="!activeFiled.isShowed" clearable>
+											<el-option v-for="item in excelErrorModeList" :key="item.value" :label="item.label" :value="item.value">
+											</el-option>
+										</el-select>
+									</el-form-item>
+								</el-col>
+							</el-row>
+							<el-row>
+								<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+									<el-form-item label="错误提示信息" prop="excelErrorMsg">
+										<el-input v-model="activeFiled.excelErrorMsg" size="small" clearable>
+										</el-input>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form>
+					</div>
+				</el-tab-pane>
+			</el-tabs>
+
+			<div class="footer">
+				<el-button size="small" @click="cancel(1)">取 消</el-button>
+				<el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
+
+
+			</div>
+
+		</div>
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				isShowEndColumn: true,
+				loading: true,
+				fields: [],
+				activeFiled: {},
+				activeName: 'first',
+				inputTypeOptions: [{
+					label: '用户输入',
+					options: [{
+						value: 'input',
+						label: '输入'
+					}, {
+						value: 'select',
+						label: '选择'
+					}]
+				}, {
+					label: '系统自动提供',
+					options: [{
+						value: 'auto_userid',
+						label: '用户ID'
+					}, {
+						value: 'auto_userLoginName',
+						label: '登录名'
+					}, {
+						value: 'auto_userName',
+						label: '用户名'
+					}, {
+						value: 'auto_deptid',
+						label: '部门ID'
+					}, {
+						value: 'auto_systime',
+						label: '系统时间'
+					}, {
+						value: 'auto_active',
+						label: '有效字段'
+					}, {
+						value: 'auto_uuid',
+						label: '数据ID'
+					}, {
+						value: 'auto_sysadd',
+						label: '添加字段'
+					}],
+				}],
+				validateTypeList: [{
+					value: 0,
+					label: '任何值'
+					}, {
+					value: 1,
+					label: '整数'
+					}, {
+					value: 2,
+					label: '小数'
+					}, {
+					value: 4,
+					label: '日期'
+				}],
+				excelOperatorList: [{
+					value: 0,
+					label: '介于'
+					}, {
+					value: 1,
+					label: '未介于'
+					}, {
+					value: 2,
+					label: '等于'
+					}, {
+					value: 3,
+					label: '不等于'
+					}, {
+					value: 4,
+					label: '大于'
+					}, {
+					value: 5,
+					label: '小于'
+					}, {
+					value: 6,
+					label: '大于等于'
+					}, {
+					value: 7,
+					label: '小于等于'
+				}],
+				excelErrorModeList: [{
+					value: 0,
+					label: '停止'
+					}, {
+					value: 1,
+					label: '警告'
+					}, {
+					value: 2,
+					label: '信息'
+				}],
+				isShowValidateValue: false,
+				isShowValidateDate: false,
+				beginLabel: '最小值',
+				endLabel: '最大值',
+				isShowBeginValue: true,
+				isShowEndValue: true,
+
+			}
+		},
+		created: function () {
+			var that = this;
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.isShowEndColumn = param.formType=='2'?true:false;
+			this.oid = param.oid;
+			this.getDetailByObjectId(this.oid);
+		},
+		watch: {
+			'activeFiled.beginColumn': function(){
+				this.activeFiled.endColumn = this.activeFiled.beginColumn;
+			},
+			'activeFiled.validateType': function(){
+				if(this.activeFiled.validateType==0){
+					this.isShowValidateValue=false;
+					this.isShowValidateDate=false;
+					this.isShowBeginValue=false;
+					this.isShowEndValue=false;
+				}else if(this.activeFiled.validateType==1 || this.activeFiled.validateType==2){
+					this.isShowValidateValue=true;
+					this.isShowValidateDate=false;
+					this.isShowBeginValue=true;
+					this.isShowEndValue=true;
+					this.beginLabel = '最小值';
+					this.endLabel = '最大值';
+				}else{
+					this.isShowValidateValue=false;
+					this.isShowValidateDate=true;
+					this.isShowBeginValue=true;
+					this.isShowEndValue=true;
+					this.beginLabel = '开始日期';
+					this.endLabel = '结束日期';
+				}
+				if(!this.activeFiled.isShowed){
+					this.isShowValidateValue = false;
+					this.isShowValidateDate = false;
+				}
+			},
+			'activeFiled.excelOperator': function(){
+				if(this.activeFiled.validateType == 1 || this.activeFiled.validateType == 2){
+					this.isShowValidateValue=true;
+					this.isShowValidateDate=false;
+					if(this.activeFiled.excelOperator==0||this.activeFiled.excelOperator==1){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = true;
+						this.beginLabel = '最小值';
+						this.endLabel = '最大值';
+						this.activeFiled.validateBeginValue = "-4294967296";
+						this.activeFiled.validateEndValue = "4294967296";
+					}
+					if(this.activeFiled.excelOperator==2||this.activeFiled.excelOperator==3){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = false;
+						this.beginLabel = "数值";
+						this.endLabel = '最大值';
+						this.activeFiled.validateBeginValue = "0";
+					}
+					if(this.activeFiled.excelOperator==4||this.activeFiled.excelOperator==6){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = false;
+						this.beginLabel = "最小值";
+						this.endLabel = '最大值';
+						this.activeFiled.validateBeginValue = "-4294967296";
+					}
+					if(this.activeFiled.excelOperator==5||this.activeFiled.excelOperator==7){
+						this.isShowBeginValue = false;
+						this.isShowEndValue = true;
+						this.beginLabel = '最小值';
+						this.endLabel = '最大值';
+						this.activeFiled.validateEndValue = "4294967296";
+					}
+				}else if(this.activeFiled.validateType == 4) {
+					this.isShowValidateValue=false;
+					this.isShowValidateDate=true;
+					if(this.activeFiled.excelOperator==0||this.activeFiled.excelOperator==1){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = true;
+						this.beginLabel = '开始日期';
+						this.endLabel = '结束日期';
+						this.activeFiled.validateBeginValue = "1900-01-01";
+						this.activeFiled.validateEndValue = "9999-08-08";
+					}
+					if(this.activeFiled.excelOperator==2||this.activeFiled.excelOperator==3){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = false;
+						this.beginLabel = "日期";
+						this.endLabel = '结束日期';
+						this.activeFiled.validateBeginValue = "2000-01-01";
+					}
+					if(this.activeFiled.excelOperator==4||this.activeFiled.excelOperator==6){
+						this.isShowBeginValue = true;
+						this.isShowEndValue = false;
+						this.beginLabel = '开始日期';
+						this.endLabel = '结束日期';
+						this.activeFiled.validateBeginValue = "1900-01-01";
+					}
+					if(this.activeFiled.excelOperator==5||this.activeFiled.excelOperator==7){
+						this.isShowBeginValue = false;
+						this.isShowEndValue = true;
+						this.beginLabel = '开始日期';
+						this.endLabel = '结束日期';
+						this.activeFiled.validateEndValue = "9999-08-08";
+					}
+				}else {
+					this.isShowValidateValue=false;
+					this.isShowValidateDate=false;
+				}
+			}
+		},
+		methods: {
+			fieldstyle: function (item) {
+				var obj = {
+					background: '#999'
+				};
+				if (item.isShowed) {
+					obj.background = '#67c23a';
+					item.isMandatory && (obj.background = '#ff5656');
+				}
+				if (this.activeFiled == item) {
+					obj.border = '2px solid #3a8ee6';
+					obj.boxShadow = '#3a8ee6 0px 0px 4px';
+				}
+				return obj
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			},
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+						that.save();
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var data = [];
+				var param = window.jasTools.base.getParamsInUrl(location.href);
+				that.fields && that.fields.forEach(function (item) {
+					if(item.isShowed){
+						item.dataSource = item.dataSource ? item.dataSource : " ";
+						item.tableId = item.tableId ? item.tableId : param.oid;
+						data.push(item);
+					}
+				});
+				var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+				var url = jasTools.base.rootPath + "/jasframework/excel/saveColumnInfoList.do?loginUserName="+ loginUserName;
+				jasTools.ajax.postForm(url, {
+					tableId: param.oid,
+					data: JSON.stringify(data)
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: data.message
+					});
+					that.cancel(1);
+				});
+			},
+			getDetailByObjectId: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/excel/getExcelColumnInfoList.do";
+				jasTools.ajax.postForm(url, {
+					tableId: oid
+				}, function (data) {
+					var fields = [];
+					data.inDB && data.inDB.forEach(function (item) {
+						item.isShowed = true;
+						if(item.validateType == null){
+							item.validateType = 0;
+						}
+						fields.push(item);
+					});
+					data.notInDB && data.notInDB.forEach(function (item) {
+						item.isShowed = false;
+						if(item.validateType == null){
+							item.validateType = 0;
+						}
+						fields.push(item);
+					});
+					that.loading = false;
+					that.fields = fields;
+					that.activeFiled = fields[0];
+				});
+			},
+			beginRowChanged: function (value) {
+				var that = this;
+				that.activeFiled.endRow = that.activeFiled.beginRow;
+			}
+		},
+	});
+</script>
+
+</html>

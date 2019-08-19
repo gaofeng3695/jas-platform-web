@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>角色管理</title>
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		.searchWrapper {
+			overflow: unset !important;
+		}
+		.vue-treeselect__control {
+			height: 34px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="150px">
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="所属部门" prop="unitId" style="margin-bottom: 15px ">
+								<el-cascader :options="treeData" :props="treeProps" v-model="unitIdArr" :show-all-levels="false" change-on-select clearable
+							  		placeholder="请选择所属部门" size="small">
+								</el-cascader>
+							</el-form-item>
+						</el-col>	
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="角色名称" prop="roleName" style="margin-bottom: 15px ">
+								<el-input v-model="form.roleName" :placeholder="'请输入角色名称'" size="small" clearable></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="角色类型" prop="roleType" style="margin-bottom: 15px ">
+								<el-select v-model="form.roleType" clearable placeholder="请选择角色类型" size="small">
+								<el-option label="private" value="1"></el-option>
+								<el-option label="protect" value="2"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>				
+						<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+					<el-button @click="createNewRole" size="small" plain type="primary" icon="fa fa-plus">新建</el-button>
+					<el-button @click="deleteRoles" :disabled="selectedRowOids.length==0" size="small" plain type="primary" icon="fa fa-minus">删除</el-button>
+					<el-button @click="setRolePrivilege" size="small" plain type="primary" icon="fa fa-cog" :disabled="selectedRowOids.length!=1">角色权限分配</el-button>
+					<el-button @click="userAllocation" size="small" plain type="primary" icon="fa fa-cog" :disabled="selectedRowOids.length!=1">角色用户分配</el-button>
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="seeDetail" v-loading="loading" @row-click="checkRow"
+						height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%" stripe>
+						<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>											
+						<el-table-column label="角色名称" fixed prop="roleName" min-width="150px" show-overflow-tooltip align="center" header-align="center">
+						</el-table-column>						
+						<el-table-column label="所属部门" fixed prop="unitName" min-width="150px" show-overflow-tooltip align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="角色类型" prop="roleType" :formatter="formatRoletype"  min-width="150px" show-overflow-tooltip align="center" header-align="center">
+						</el-table-column>					
+						<el-table-column label="数据权限过滤规则" fixed prop="dataFilterRegulationName" min-width="200px" show-overflow-tooltip align="center" header-align="center">
+						</el-table-column>
+						<el-table-column label="描述" prop="description" min-width="200px" show-overflow-tooltip align="left" header-align="center">
+						</el-table-column>
+						<el-table-column label="操作" align="center" width="200" fixed="right">
+							<template slot-scope="scope">
+								<el-button @click="seeDetail(scope.row)" type="text" size="small">详情</el-button>
+								<el-button @click="editRole(scope.row)" type="text" size="small">修改</el-button>
+								<el-button @click="deleteRole(scope.row)" type="text" size="small">删除</el-button>
+							</template>
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+						:page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+
+		</jas-list-wrapper>
+
+
+
+	</div>
+</body>
+
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				isClosed: false,
+				tableData: [],
+				form: {
+
+				},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+				selectedRowOids: [],
+				selectedRows: [],
+				treeProps: {
+					value: 'id',
+					label: 'text',
+				},
+				treeData: [],
+			}
+		},		
+		computed: {
+			unitIdArr: {
+				get: function () {
+					if (!this.treeData || !this.form.unitId || !this.treeData.length) return [];
+					return jasTools.base.getIdArrFromTree(this.treeData, this.form.unitId);
+				},
+				set: function (newValue) {
+					this.form.unitId = newValue[newValue.length - 1];
+				}
+			}
+		},
+		watch: {		
+			selectedRows: function () {
+				var selects = [];
+				this.selectedRows.forEach(function (item) {
+					selects.push(item.oid);					
+				});
+				this.selectedRowOids = selects;
+			}
+		},
+		created: function () {
+			this.setFieldsPattern();
+			this.requestList(1);
+		},
+		mounted: function () {
+			this.requestUnitTree();
+		},
+		methods: {			
+			requestUnitTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true";
+				jasTools.ajax.get(url, {}, function (data) {
+					that.treeData = data;
+				});
+			},
+			setRolePrivilege: function(){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/set-role-privilege.html';
+				top.jasTools.dialog.show({
+					width: '40%',
+					height: '80%',
+					title: '角色权限分配',
+					src: baseSrc + '?roleId=' + that.selectedRowOids,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+			},
+			createNewRole: function(){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/add.html';
+				top.jasTools.dialog.show({
+					width: '50%',
+					height: '60%',
+					title: '新增角色',
+					src: baseSrc,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+			},
+			editRole: function(row){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/add.html';
+				top.jasTools.dialog.show({
+					width: '50%',
+					height: '60%',
+					title: '修改角色',
+					src: baseSrc + '?oid=' + row.oid,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+			},
+			seeDetail: function (row) {
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/detail.html';
+				var src = jasTools.base.setParamsToUrl(baseSrc, {
+					oid: row.oid
+				});
+				top.jasTools.dialog.show({
+					width: '50%',
+					height: '60%',
+					title: '角色详情',
+					src: src,
+				});
+			},
+			deleteRoles: function () {
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+					});
+					that.requestList();
+				};
+				window.top.Vue.prototype.$confirm('您确定要删除吗？', '删除角色', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							if (that.selectedRowOids.length >= 1) {
+								var url = jasTools.base.rootPath + "/jasframework/privilege/role/deleteRole.do?oids="+that.selectedRowOids;
+								jasTools.ajax.get(url, {
+								}, function (data) {
+									afterDelete();
+								});
+							} 
+						}
+					}
+				});
+			},
+			deleteRole: function (row) {
+				var that = this;
+				var afterDelete = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '删除成功'
+					});
+					that.requestList();
+				};
+				window.top.Vue.prototype.$confirm('您确定要删除吗？', '删除角色', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+								var url = jasTools.base.rootPath + "/jasframework/privilege/role/deleteRole.do?oids="+row.oid;
+								jasTools.ajax.get(url, {
+								}, function (data) {
+									afterDelete();
+								});
+						}
+					}
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasframework/privilege/role/getPage.do";
+				that.loading = true;
+				jasTools.ajax.postForm(url, {
+					roleName: this.form.roleName,
+					unitId: this.form.unitId,
+					roleType: this.form.roleType,
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			formatRoletype: function (row, column, cellValue, index) {
+				if (row.roleType == 1) return 'private';
+				if (row.roleType == 2) return 'protect';
+				else return "-";
+				return row.roleType;
+			},
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSelectionChange: function (selects) {
+				this.selectedRows = selects;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			},
+			setFieldsPattern: function () {
+				var nFields = 3;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+			checkRow: function (row, event, column) {
+				if (column.label == '操作') return;
+				this.$refs['mytable'].toggleRowSelection(row)
+			},
+			//角色人员分配页面
+			userAllocation: function () {
+				var that = this;
+				top.jasTools.dialog.show({
+				width: '600px',
+				height: '80%',
+				title: '人员分配',
+				src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/role-manage/single-project/dialogs/user-allocation.html?roleOid=' + that.selectedRowOids[0],
+				cbForClose: function (param) {
+					if (param == 1) {
+						that.requestList(0);
+					}
+				}
+				});
+			},
+
+		},
+	});
+</script>
+
+</html>

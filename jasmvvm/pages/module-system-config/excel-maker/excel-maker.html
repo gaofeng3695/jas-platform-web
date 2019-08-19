@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<jas-list-wrapper>
+			<jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig"
+			  @search="searchList"></jas-search-for-list>
+			<jas-table-for-list ref="table" slot="list" search-type="postForm" :privilege-code="privilegeCode" :fields="tableFields"
+			  :form="topSearch" :search-path="searchPath" :add-url="addUrl" :upcall-path="upcallPath" :class-name="className"  
+			  :template-code="templateCode" @deleterow="deleteRow" @clickrowbtn="clickrowbtn" :row-btns="['生成','下载','上传','导入数据']" btncolwidth="280px" :propconfig="{oid:'eventid'}">
+				<template slot="btns">
+					<el-button  type="primary" size="small" @click="deleteBatchItem" plain="plain" icon="fa fa-trash-o" >批量删除</el-button>
+				</template>
+			</jas-table-for-list>
+		</jas-list-wrapper>
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+	var pageConfig = {
+		privilegeCode: ['bt_add', 'bt_update', 'bt_delete'],
+		searchPath: '/jasframework/excel/getAllTemplateInfo.do?loginUserName='+ loginUserName,
+		deletePath: '/jasframework/excel/deleteTemplateInfo.do',
+		// detailPath: '/jdbc/commonData/engineering/get.do',
+		savePath: '/jasframework/excel/saveTemplateInfo.do',
+		updatePath: '/jasframework/excel/updateTemplateInfo.do',
+		searchFields: [
+			'templateName'
+		],
+		tableFields: [
+			'templateName',
+			'templateType',
+			'datasourceName',
+			'createdDate',
+			'createdBy',
+			'lastModified',
+			'modifiedBy',
+			'remark'
+		],
+		addFields: [{
+			title: '新增Excel模板信息',
+			fields: [
+			"templateName",
+			"templateType",
+			"functionName",
+			"datasourceName",
+			"templatePath",
+			'remark'
+			]
+		}],
+		fieldsConfig: {
+			templateName: {
+				name: '模板名称',
+				type: 'input',
+				isRequired: true
+			},
+			templateType: {		//1单表单sheet 2多表单sheet 3多表多sheet
+				name: '模板类型',
+				type: 'select', 
+				options: [{
+					key: '1',
+					value: "单表单sheet"
+				}, {
+					key: '2',
+					value: "多表单sheet"
+				}, {
+					key: '3',
+					value: "多表多sheet"
+				}],
+				formatter: function (a, b, c, d) {
+					if (c == '1') return "单表单sheet";
+					if (c == '2') return "多表单sheet";
+					if (c == '3') return "多表多sheet";
+				},
+				isRequired: true,
+				disabled: true
+			},
+			datasourceName: {
+				type: 'select',
+				name: '数据源',
+				disabled: true,
+				optionUrl: '/jasframework/excel/getDataSourceNamesList.do?loginUserName='+loginUserName,
+				props:{
+					value:'id',
+					label:'text',
+				},
+			},
+			functionName: {
+				type: 'input',
+				name: '功能名称'
+			},
+			templatePath: {
+				name: "input",
+				type: "项目中模板路径"
+			},
+			createdDate: {
+				type: 'input',
+				name: '创建时间'
+			},
+			createdBy: {
+				name: "创建人",
+				type: "input"
+			},
+			lastModified: {
+				type: 'input',
+				name: '修改时间'
+			},
+			modifiedBy: {
+				type: "input",
+				name: "修改人"
+			},
+			remark: {
+				name: '备注',
+				type: 'textarea'
+			},
+		},
+	};
+	var vm = new Vue({
+		el: '#app',
+        data: function () {
+            return {
+                className: '',
+                templateCode: '',
+                searchPath: '',
+                deletePath: '',
+                upcallPath: '',
+                addUrl: '',
+                detailUrl: '',
+                privilegeCode: '',
+                topSearch: {},
+                searchFields: [],
+                pageConfig: {},
+                fieldsConfig: [],
+                tableFields: [],
+            }
+        },
+        created: function () {
+            var that = this;
+            that.pageConfig = window.pageConfig;
+            var param = window.jasTools.base.getParamsInUrl(location.href);
+            that.privilegeCode = param.privilegeCode || pageConfig.privilegeCode;
+            that.templateCode = param.templateCode; // 导入导出模板
+            that.pageCode = param.pageCode;
+            that.className = param.className;
+
+
+            that.addUrl = jasTools.base.rootPath +
+                '/jasmvvm/pages/module-system-config/excel-maker/dialogs/add-template.html';
+                
+            that.searchPath = that.pageConfig.searchPath;
+            that.deletePath = that.pageConfig.deletePath;
+
+            that.fieldsConfig = that.pageConfig.fieldsConfig;
+            that.searchFields = that.formatFields(that.pageConfig.searchFields, that.fieldsConfig);
+            that.tableFields = that.formatFields(that.pageConfig.tableFields, that.fieldsConfig);
+
+
+
+        },
+        mounted: function () {
+
+        },
+        methods: {
+			formatFields: function (fields, fieldsConfig) {
+				return fields.map(function (item) {
+				return {
+					name: fieldsConfig[item].name,
+					field: item,
+					formatter: fieldsConfig[item].formatter,
+					width:fieldsConfig[item].width,
+					sortable:fieldsConfig[item].sortable,
+					tablehidden:fieldsConfig[item].tablehidden,
+				};
+				});
+			},
+			searchList: function () {
+				this.$refs.table.search();
+			},
+			deleteRow: function(row){
+				var that = this;
+				window.top.Vue.prototype.$confirm('您确定要删除本条数据吗？', '提示', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+							that._deleteItem(row,'singleDelete');
+						}
+					}
+				});
+				
+			},
+			_deleteItem: function (row,type) {
+				var that = this;
+				if (this.deletePath) {
+					var url = "";
+					if('singleDelete' == type){
+						url = jasTools.base.rootPath + this.deletePath + "?templateIds=" + row.eventid;
+					}else {
+						url = jasTools.base.rootPath + this.deletePath + "?templateIds=" + that.$refs.table.oids.join(',');
+					}
+					jasTools.ajax.get(url, {}, function (data) {
+						top.Vue.prototype.$message({
+							type: 'success',
+							message: '删除成功'
+						});
+						that.$refs.table.refresh();
+					});
+				} else {
+					that.$emit('deleterow', row);
+				}
+			},
+			deleteBatchItem: function(){
+				var that = this;
+				if(that.$refs.table.oids.length == 0){
+					top.Vue.prototype.$message({
+						type: 'warning',
+						message: '请选择要删除的数据'
+					});
+				}else{
+					window.top.Vue.prototype.$confirm('您确定要删除选中的数据吗？', '提示', {
+						type: 'warning',
+						callback: function (action) {
+							if (action === 'confirm') {
+								that._deleteItem(null,'batchDelete');
+							}
+						}
+					});
+				}
+			},
+			clickrowbtn: function(row,btnName){
+                var that = this;
+                var templateId = row.eventid;
+                if('生成' == btnName){
+                    that.createTemplate(templateId);
+                }else if('下载' == btnName){
+                    that.downloadTemplate(templateId);
+                }else if('上传' == btnName){
+                    var that = this;
+					top.jasTools.dialog.show({
+						width: '50%',
+						height: '50%',
+						title: '上传excel模板',
+						src: jasTools.base.rootPath + '/jasmvvm/pages/module-system-config/excel-maker/dialogs/upload-template.html?templateId='+ templateId,
+						cbForClose: function (param) {
+							if (param == 1) {
+								that.$refs.table.refresh();
+							}
+						}
+					});
+                }else if('导入数据' == btnName){
+                    var that = this;
+					top.jasTools.dialog.show({
+						width: '50%',
+						height: '50%',
+						title: '导入excel数据',
+						src: jasTools.base.rootPath + '/jasmvvm/pages/module-system-config/excel-maker/dialogs/import-data.html?templateId='+ templateId +"&tableName=&functionName=",
+						cbForClose: function (param) {
+							if (param == 1) {
+								that.$refs.table.refresh();
+							}
+						}
+					});
+                }
+                
+            },
+            createTemplate: function(templateId){
+                var that = this;
+                var loginUserName = JSON.parse(localStorage.getItem("user")).loginName;
+                var url = jasTools.base.rootPath + "/jasframework/excel/createExcelTemplate.do?templateId="+ templateId +"&loginUserName=" + loginUserName;
+                jasTools.ajax.post(url, {}, function (data) {
+                    top.Vue.prototype.$message({
+                        type: 'success',
+                        message: '生成模板成功'
+                    });
+                    that.$refs.table.refresh();
+                });
+            },
+            downloadTemplate:function(templateId){
+                var that = this;
+                var url = jasTools.base.rootPath + "/jasframework/excel/downloadTemplate.do";
+                var downloadUrl = jasTools.base.setParamsToUrl(url, {
+                    templateId: templateId
+                });
+                jasTools.ajax.downloadByIframe('POST', downloadUrl);
+            }
+        },
+	});
+</script>
+
+</html>

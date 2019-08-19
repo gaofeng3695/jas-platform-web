@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/main.css">
+	<style>
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+		<jas-list-wrapper ref="mylist">
+			<div slot="search">
+				<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="创建索引" prop="isCreateIndex" style="margin-bottom: 15px ">
+								<el-select v-model="form.isCreateIndex" placeholder="请选择是否创建索引" size="small" clearable style="width:100%;">
+									<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="生成预览" prop="isCreateSwf" style="margin-bottom: 15px ">
+								<el-select v-model="form.isCreateSwf" placeholder="请选择是否生成预览" size="small" clearable style="width:100%;">
+									<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+							<el-form-item label="添加水印" prop="isAddWaterMark" style="margin-bottom: 15px ">
+								<el-select v-model="form.isAddWaterMark" placeholder="请选择是否添加水印" size="small" clearable style="width:100%;">
+									<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
+							<el-form-item style="float:right;margin-bottom: 0px;">
+								<el-button size="small" @click="requestList(1)">重置</el-button>
+								<el-button size="small" type="primary" @click="requestList(2)">查询</el-button>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="list" class="jas-flex-box is-vertical is-grown">
+				<div style="padding: 15px 0;">
+
+					<el-button @click="requestCreateIndex" :disabled="selectedFiles.length==0" size="small" plain type="primary" icon="fa fa-sort-alpha-asc">添加索引</el-button>
+					<el-button @click="requestSwf" :disabled="selectedFiles.length==0" size="small" plain type="primary" icon="fa fa-eye">生成预览</el-button>
+					<el-button @click="requestWaterMark" :disabled="selectedFiles.length==0" size="small" plain type="primary" icon="fa fa-copyright">添加水印</el-button>
+
+
+					<span class="fr">
+						<el-tooltip class="item" content="刷新" placement="top">
+							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+						</el-tooltip>
+						<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+							<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+						</el-tooltip>
+					</span>
+				</div>
+				<div class="is-grown">
+					<el-table ref="mytable" @selection-change="handleSelectionChange" @row-click="checkRow" v-loading="loading" height="100%"
+					  :data="tableData" border :header-cell-style="headStyle" style="width: 100%" stripe>
+						<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column label="文档名称" fixed prop="filename" min-width="170px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="文档格式" prop="filetype" min-width="80px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="文档位置" prop="filelocation" min-width="140px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="关键词" prop="keyword" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="文档大小(kb)" prop="filesizeStr" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="上传人" prop="createusername" min-width="120px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="是否创建索引" prop="iscreateindex" :formatter="formatNum" min-width="80px" show-overflow-tooltip align="center">
+						</el-table-column>
+						<el-table-column label="是否生成预览" prop="ispreviewconversion" :formatter="formatNum" min-width="80px" show-overflow-tooltip
+						  align="center">
+						</el-table-column>
+						<el-table-column label="是否添加水印" prop="isaddwatermark" :formatter="formatNum" min-width="80px" show-overflow-tooltip align="center">
+						</el-table-column>
+					</el-table>
+				</div>
+				<div style="padding: 15px 0 0;" class="clearfix">
+					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+					  :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+					</el-pagination>
+				</div>
+			</div>
+
+		</jas-list-wrapper>
+
+
+
+	</div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+	/**
+	 * created by GF on 2018.12.14
+	 */
+	/**
+	 * 权限控制：
+	 * 20：查看
+	 * 30：
+	 * 60：
+	 * 90：
+	 */
+
+
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				isClosed: false,
+				tableData: [],
+				form: {},
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				loading: false,
+
+				options: [{
+					label: "是",
+					value: "1"
+				}, {
+					label: "否",
+					value: "0"
+				}],
+				selectedFiles: [],
+				selectedRows: [],
+			}
+		},
+		computed: {},
+		watch: {
+			selectedRows: function () {
+				var files = [];
+				this.selectedRows.forEach(function (item) {
+
+					files.push(item.eventid);
+				});
+				this.selectedFiles = files;
+			}
+		},
+		created: function () {
+			this.setFieldsPattern();
+			this.requestList(1);
+		},
+		mounted: function () {
+
+		},
+		methods: {
+
+			requestCreateIndex: function (param) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/search/addCreateIndex.do";
+				jasTools.ajax.postForm(url, {
+					docIds: this.selectedFiles.join(',')
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '操作成功'
+					});
+					that.requestList();
+				});
+			},
+			requestWaterMark: function (param) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/search/createWaterMark.do";
+				jasTools.ajax.postForm(url, {
+					docIds: this.selectedFiles.join(',')
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '操作成功'
+					});
+					that.requestList();
+				});
+			},
+			requestSwf: function (param) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/search/createSwf.do";
+				jasTools.ajax.postForm(url, {
+					docIds: this.selectedFiles.join(',')
+				}, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '操作成功'
+					});
+					that.requestList();
+				});
+			},
+			requestList: function (param) { // 0刷新  1重置  2搜索
+				var that = this;
+				if (param == 1) {
+					this.form = {};
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				if (param == 2) {
+					this.pageSize = 10;
+					this.currentPage = 1;
+				}
+				var url = jasTools.base.rootPath + "/jasdoc/search/queryUntreatedDocs.do";
+				that.loading = true;
+				jasTools.ajax.postForm(url, {
+					isCreateIndex: this.form.isCreateIndex,
+					isCreateSwf: this.form.isCreateSwf,
+					isAddWaterMark: this.form.isAddWaterMark,
+
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+
+				}, function (data) {
+					that.loading = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+
+			},
+			formatNum: function (row, column, cellValue, index) {
+				// console.log(row, column, cellValue, index)
+				return cellValue == 0 ? '否' : '是';
+			},
+
+
+
+
+
+
+
+
+
+
+			checkRow: function (row, event, column) {
+				if (column.label == '操作') return;
+				this.$refs['mytable'].toggleRowSelection(row)
+			},
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSelectionChange: function (selects) {
+				this.selectedRows = selects;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			},
+			setFieldsPattern: function () {
+				var nFields = 3;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+
+
+
+
+
+
+			// /jasframework-document/jasdoc/search/addCreateIndex.do
+			// docIds
+
+
+
+			// jasdoc/search/createWaterMark.do
+			// docIds
+
+
+
+
+
+		},
+	});
+</script>
+
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<style>
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #99c8f8;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.content {
+			height: 100%;
+			padding: 0 10px;
+		}
+
+		.subSearchWrapper {
+			/* padding-top: 0px !important; */
+		}
+
+		.searchWrapper {
+			overflow: unset !important;
+		}
+
+		.el-button+.el-button {
+			margin-left: 6px;
+		}
+
+		.vue-treeselect__control {
+			height: 34px;
+        }
+        .footer {
+			padding: 10px 0 0 0;
+			border-top: 1px solid #ececec;
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak class=" jas-flex-box is-vertical" v-loading="loading.allLoading">
+        <div class=" is-grown">
+            <jas-two-panel-resizer layout="vertical" length="240px">
+                <template slot="closePanel">
+                    <jas-base-module-title name="部门列表" style="margin-bottom: 10px;"></jas-base-module-title>
+    
+                    <el-tree class="is-grown" :data="orgnData" ref="orgtree"  node-key="id" :props="defaultProps"
+                     :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode" default-expand-all
+                     :expand-on-click-node="false">
+                    
+                    </el-tree>
+                </template>
+                <div class="content" slot="mainPanel">
+                    <div style="height:100%;">
+                        <div style="height:40px;border-bottom:1px solid #ececec;box-sizing: border-box;overflow: hidden">
+                            <div style="line-height:40px;float:left;padding-right:10px;">当前位置：</div>
+                            <el-breadcrumb separator-class="el-icon-arrow-right" style="line-height:40px;margin: 0 80px;">
+                                <el-breadcrumb-item :to="{}" @click.native="currentNodeId = item.id;" v-for="item in currentNodePath">{{formatNames(item.text)}}</el-breadcrumb-item>
+                            </el-breadcrumb>
+                            <el-button @click="currentNodeId = currentNodePath[currentNodePath.length-2].id;" :disabled="currentNodePath.length < 2"
+                             style="position: absolute;margin-top: 4px;top: 0;right: 10px;" type="text" size="small">返回上级</el-button>
+                        </div>
+                        <div style="height:calc(100% - 40px);">
+                            <jas-list-wrapper ref="mylist" style="padding:0;">
+                                <div slot="search">
+                                
+                                    <el-form class="jas-search-for-list"  :model="form" label-width="120px">
+    
+                                        <el-row v-show="!isClosed">
+                                            <el-col :xs="24" :sm="10" :md="8" :lg="8" :xl="6">
+                                                    <el-form-item label="用户名" prop="loginName" style="margin-bottom: 15px ">
+                                                        <el-input v-model="form.loginName" :placeholder="'请输入用户名'" style="width:200px" size="small" clearable></el-input>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :xs="24" :sm="10" :md="8" :lg="8" :xl="6">
+                                                    <el-form-item label="姓名" prop="userName" style="margin-bottom: 15px ">
+                                                        <el-input v-model="form.userName" :placeholder="'请输入姓名'" style="width:200px" size="small" clearable></el-input>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :xs="24" :sm="10" :md="8" :lg="8" :xl="6">
+                                                    <el-form-item style="float:right;margin-bottom: 0px;">
+                                                        <el-button size="small" @click="requestList(2)">重置</el-button>
+                                                        <el-button size="small" type="primary" @click="requestList(1)">查询</el-button>         
+                                                    </el-form-item>
+                                                </el-col>
+        
+                                        </el-row>
+                                    </el-form>
+                                </div>
+                                <div slot="list" class="jas-flex-box is-vertical is-grown">
+                                    <div style="padding: 15px 0;">
+                                        <span class="fr">
+                                            <el-checkbox :disabled="isSearchMode" v-model="isAllUnitUser" style="margin-right: 10px;">显示所有子部门用户</el-checkbox>
+                                            <el-tooltip class="item" content="刷新" placement="top">
+                                                <el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
+                                            </el-tooltip>
+                                            <el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+                                                <el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+                                            </el-tooltip>
+                                            <el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+                                                <el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+                                            </el-tooltip>
+                                        </span>
+                                    </div>
+                                    <div class="is-grown">
+                                        <el-table ref="mytable" @selection-change="handleSelectionChange" 
+                                         v-loading="loading.list" height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%"
+                                         stripe>
+                                            
+                                            <el-table-column label="用户名" prop="loginName" min-width="130px" show-overflow-tooltip align="center">
+                                            </el-table-column>
+                                            <el-table-column label="姓名" prop="userName" min-width="130px" show-overflow-tooltip align="center">
+                                            </el-table-column>
+                                        
+                                            <el-table-column label="操作" align="center" width="140" fixed="right">
+                                                <template slot-scope="scope">
+                                                    <el-button @click="chose(scope.row)"  type="text" size="small">选择</el-button>
+                                                    
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+                                    </div>
+                                    <div style="padding: 15px 0 ;" class="clearfix">
+                                        <el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+                                         :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+                                        </el-pagination>
+                                    </div>
+                                </div>
+    
+                            </jas-list-wrapper>
+                        </div>
+                    </div>
+    
+    
+    
+    
+                </div>
+            </jas-two-panel-resizer>
+        </div>
+        <el-form label-width="100px" style="padding-top:10px;border-top: 1px solid #ececec;">
+
+            <el-form-item label="已选择用户">
+                    <jas-base-el-multi-select-box ref="peopleSelect" v-model="toUsers" value-key="oid"
+                        label-key="userName" >
+                    </jas-base-el-multi-select-box>
+                </el-form-item>
+        </el-form>
+        <div class="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small"  type="primary" @click="confirmSelectUser">确 定</el-button>
+
+			</div>
+
+	</div>
+</body>
+
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js"></script>
+<script src="./../../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	/**
+	 * created by GF on 2018.12.14
+	 */
+	/**
+	 * 权限控制：
+	 * 20：查看
+	 * 30：
+	 * 60：
+	 * 90：
+	 */
+
+
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				userName: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).loginName,
+			
+				isSearchMode: false,
+				selectedRows: [],
+				selectedRowOids: [],
+			
+				pageSize: 10,
+				currentPage: 1,
+				total: 0,
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				tableData: [],
+				
+				isClosed: false,
+				btnSize: {
+					sm: 0,
+					md: 0,
+					lg: 0,
+					xl: 0,
+				},
+				form: {},
+                toUsers:[],
+				loading: {
+					allLoading: false,
+					list: false,
+					scopeTree: false,
+				},
+				currentNode: '',
+				currentNodeId: '',
+				currentNodePath: [],
+				isAllUnitUser: false,
+				orgnData: [],
+				defaultProps: {
+					label: 'text',
+					orgnData: 'orgnData'
+				},
+                unitIdArray:[],
+                unitIds:''
+			}
+		},
+		computed: {
+		
+		},
+		watch: {
+			currentNodeId: function () {
+                this.unitIdArray=[];
+                this.unitIds='';
+                this.requestList(2);
+				this.currentNodePath = this.$refs['orgtree'].getNodePath(this.currentNodeId);
+				this.currentNode = this.currentNodePath[this.currentNodePath.length - 1];
+				this.$refs.orgtree.setCurrentKey(this.currentNodeId);
+                this.getNodeChildrenIds();
+
+            },
+            isAllUnitUser: function(){
+                this.requestList();
+            }
+			
+		},
+		mounted: function () {
+            this.setFieldsPattern();
+            this.requestNode();
+			
+		},
+		methods: {
+			formatNames: function (name) {
+				if (name.length > 10) return name.slice(0, 10) + '..';
+				return name;
+			},
+			classifyTreeNormalizer: function (node) {
+				return {
+					id: node.id,
+					label: node.text,
+					children: node.children,
+					isDefaultExpanded: true
+				}
+			},
+		
+			requestList: function (type) { // 0刷新 1重置页数 2重置页数和关键字
+				// 全文查询 1
+				// 属性查询 1
+				
+				// 重置 2
+				// folderid的改变 2
+				// 显示所有文件 1
+				// 刷新 0
+				// 更改页数 0
+				var that = this;
+
+				if (type == 1) {
+					this.currentPage = 1;
+					this.pageSize = 10;
+				}
+                if (type == 2) {
+					this.currentPage = 1;
+					this.pageSize = 10;
+					this.form = {};
+				}
+
+				that.loading.list = true;
+                this.isSearchMode = false;
+               
+				return this.getAllUser();
+			},
+            getNodeChildrenIds: function(){
+			   var that=this;
+               var childrenNodes= this.$refs.orgtree.currentNode.node.data.children;
+               function getId(currentValue){
+                if(currentValue.children==null){
+                        that.unitIdArray.push(currentValue.id);
+                        return;
+                    }else{
+                        currentValue.children.map(getId);
+                        that.unitIdArray.push(currentValue.id);
+                        return ;
+                    }
+            };
+               childrenNodes.map(getId);
+               this.unitIdArray.push(this.currentNodeId);
+               this.unitIds="'"+ this.unitIdArray.join("','")+"'";
+            },
+			
+		    getAllUser: function(){
+                var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/getList.do";
+                if(this.isAllUnitUser){
+                    url=url+'?unitIdList='+this.unitIds;
+                }else{
+                    url=url+'?unitId='+this.currentNodeId;
+                }
+				jasTools.ajax.postForm(url, {
+                    loginName: this.form.loginName,
+                    userName:this.form.userName,
+					pageNo: this.currentPage,
+					pageSize: this.pageSize,
+					page: this.currentPage,
+					rows: this.pageSize,
+					
+				}, function (data) {
+					// console.log(data)
+					that.loading.list = false;
+					that.total = data.total;
+					that.tableData = data.rows;
+				});
+            },
+            
+			toggleSearch: function () {
+				this.$refs['mylist'].toggleSearch();
+				this.isClosed = this.$refs['mylist'].isClosed;
+			},
+			handleSelectionChange: function (selects) {
+				this.selectedRows = selects;
+			},
+			handleSizeChange: function (val) {
+				this.pageSize = val;
+				this.requestList();
+			},
+			handleCurrentChange: function (val) {
+				this.currentPage = val;
+				this.requestList();
+			},
+			setFieldsPattern: function () {
+				var nFields = 7;
+				this.btnSize.sm = 24 - (24 * nFields) % 24;
+				this.btnSize.md = 24 - (12 * nFields) % 24;
+				this.btnSize.lg = 24 - (8 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
+			},
+			requestNode: function () {
+				var that = this;
+                var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true" 
+                jasTools.ajax.get(url, {}, function (data) {
+                    that.orgnData=data;
+                    that.$nextTick(function () {
+                        if (!that.currentNodeId) {
+                            that.currentNodeId = data[0].id;
+                        }
+                    })
+                });				
+
+			},
+			clicknode: function (node, b, c) {
+                this.currentNodeId = node.id;
+                
+            },
+            chose: function(row){
+                if(this.toUsers.indexOf(row)>-1) return ;
+                this.toUsers.push(row);
+            },
+            cancel: function (param) {
+				window.top.jasTools.dialog.close(param);
+			},
+            confirmSelectUser:function(){
+                this.cancel(this.toUsers);
+            }
+		},
+	});
+</script>
+
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>数字化管线维护系统</title>
+
+	<link rel="stylesheet" href="../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../common/css/main.css">
+	<link rel="stylesheet" href="./index.css">
+	<style>
+		.allbg {
+			height: 100%;
+			background: url(../../common/images/bg.png) no-repeat center center;
+			background-size: cover;
+		}
+
+		.grouptitle {
+			font-size: 16px;
+			padding: 10px 0 4px;
+			font-weight: 600;
+			color: #666;
+		}
+
+		.iconwrap {
+			cursor: pointer;
+			float: left;
+			text-align: center;
+			padding: 8px 0 6px 0;
+		}
+
+		.iconwrap:hover .iconsubwrap {
+			transform: scale(1.1);
+			transition: all 0.1s;
+		}
+
+		.icontext {
+			padding-top: 4px;
+			width: 100px;
+		}
+
+		.iconsubwrap {
+			margin: 0 auto;
+			height: 70px;
+			width: 70px;
+			line-height: 70px;
+			font-size: 50px;
+			background: #f90;
+			color: #fff;
+			border-radius: 14px;
+			box-shadow: 1px 1px 5px #999;
+			position: relative;
+		}
+
+
+		.isclosed {
+			/* color: #ff002b;
+			font-size: 90px; */
+			width: 100%;
+			height: 100%;
+			background: #6d6c6bb3;
+			position: absolute;
+			top: 0;
+			right: 0;
+			border-radius: 14px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<el-container class="outerwrapper">
+
+			<el-header class="headerwrapper">
+				<!-- header 开始 -->
+				<div class="header">
+					<div class="logo item">
+					</div>
+					<div class="name item">
+						<div class="china">数字化管线维护系统</div>
+						<div class="english">Digital Pipeline Maintenance System</div>
+					</div>
+					<ul class="user-info">
+						<li class="items quit">
+							<a @click="_loginOut" style="display:block;padding:0px 10px">
+								<i class="fa fa-sign-out"></i> 退出
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items fullscreen">
+							<a @click="_goFullscreen" style="display:block;padding:0px 10px">
+								<i class="fa fa-arrows-alt"></i> 全屏
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items fullscreen">
+							<a @click="_editdesk" :style="iseditmode?'background: #1f2630;':''" style="display:block;padding:0px 10px">
+								<i class="fa fa-desktop"></i> 自定义桌面
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items">
+							<a style="display:block">
+								<el-dropdown class="dropdown-wrapper" trigger="click" @command="handleCommand">
+									<span class="el-dropdown-link">
+										<img class="user-logo" :src="userImg">
+										<div class="userInfo">
+											<div class="username">{{username}}</div>
+											<div class="userunit">{{userunit}}</div>
+										</div>
+									</span>
+									<el-dropdown-menu slot="dropdown">
+										<!--<el-dropdown-item command="fullscreen">切换全屏</el-dropdown-item>-->
+										<!-- <el-dropdown-item command="changeLayout">切换布局</el-dropdown-item> -->
+										<el-dropdown-item command="resetPassword">修改密码</el-dropdown-item>
+										<!--<el-dropdown-item command="loginout">退出登录</el-dropdown-item>-->
+									</el-dropdown-menu>
+								</el-dropdown>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- header 结束 -->
+			</el-header>
+
+			<el-container style="height: 0%;">
+				<el-main>
+					<el-container class="allbg">
+						<el-main v-loading="isloading" style="height:100%;width:100%;overflow:hidden">
+							<div style="width:76vw;height:100%;margin:0 auto; ">
+								<div v-show="iseditmode">
+									<!-- <el-alert  type="warning" description=""
+										show-icon>
+									</el-alert> -->
+									<el-alert center title="点击图标进行操作，灰色表示隐藏，亮色表示显示。" type="warning" show-icon>
+									</el-alert>
+									<div style="padding-top:10px;text-align: center;">
+										<el-button size="small" type="primary" @click="saveEditdesk">保 存
+										</el-button>
+										<el-button size="small" @click="cancelEdit">取 消</el-button>
+									</div>
+								</div>
+								<div v-for="item in items" style="margin-top:6px;">
+									<div>
+										<div class="grouptitle"><i class="fa fa-bookmark"
+												style="padding-right:6px;color:#5cafe6;"></i>{{item.name}}</div>
+									</div>
+									<div
+										style="overflow: hidden;background:#3098f926;padding:20px 10px 10px;border-radius: 6px">
+										<div v-for="icon,index in item.privilegeList" class="iconwrap"
+											@click="clickicon(icon,item.oid)">
+											<div class="iconsubwrap" :style="{background:randomcolor(index)}">
+												<i :class="icon.icon || 'fa fa-book'"></i>
+
+												<div v-show="openedIcons.indexOf(item.oid+'||'+icon.oid) < 0"
+													class="isclosed"></div>
+											</div>
+											<div class="icontext">{{icon.privilegeName}}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</el-main>
+					</el-container>
+				</el-main>
+			</el-container>
+
+		</el-container>
+
+	</div>
+
+</body>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="../../lib/screenfull/screenfull.min.js"></script>
+
+<script src="../../common/components/jas-components.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+
+<script src="./index.js"></script>
+<script>
+				// var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/approve-dialog.html?proInstId=27650&isEdit=1&taskId=27648&businessKey=6019ac90-f794-4911-9774-2d1a38818826&carbonId=';
+				// top.jasTools.dialog.show({
+				// 	width: '60%',
+				// 	height: '80%',
+				// 	title: '审批信息',
+				// 	src: baseSrc,
+				// });
+</script>
+</html>

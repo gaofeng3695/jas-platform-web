@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+  <style>
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+    <jas-approve-dialog>
+      <div>
+        <template v-for="item in detailFields">
+          <jas-base-group-title :name="item.title"></jas-base-group-title>
+          <jas-detail-table :titles="formatFields(item.fields, fieldsConfig)" :detail="detail">
+          </jas-detail-table>
+        </template>
+        <jas-base-group-title name="附件信息"></jas-base-group-title>
+        <jas-file-list :biz-id="oid"></jas-file-list>
+      </div>
+    </jas-approve-dialog>
+  </div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+  (function () { //加载配置未见
+    var param = window.jasTools.base.getParamsInUrl(location.href);
+    var pageCode = param.pageCode;
+    pageCode && $.getScript('./../config/' + pageCode + '.js', function (data, textStatus, jqxhr) {
+      window.app = new Vue(vueConfig);
+    });
+  })();
+
+  var vueConfig = {
+    el: "#app",
+    data: function () {
+      var that = this;
+      return {
+        detailFields: [],
+        detail: {},
+        detailPath: '',
+        columnNum: 2,
+        oid: '',
+      }
+    },
+    created: function () {
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.pageCode = param.pageCode;
+      this.pageConfig = window.pageConfig;
+      this.fieldsConfig = window.pageConfig.fieldsConfig;
+      this.detailFields = window.pageConfig.detailFields;
+      this.detailPath = window.pageConfig.detailPath;
+
+      if (param.oid) {
+        this.oid = param.oid;
+        this.params = param;
+        this.getDetailByObjectId();
+      };
+    },
+    methods: {
+      formatForm: function (fields) {
+        var obj = {};
+        fields.forEach(function (item) {
+          obj[item] = '';
+        });
+        obj.remarks = '';
+        return obj;
+      },
+      formatFields: function (fields, fieldsConfig) {
+        return fields.map(function (item) {
+          return {
+            name: fieldsConfig[item].name,
+            field: item,
+            formatter: fieldsConfig[item].formatter,
+          };
+        });
+      },
+      getDetailByObjectId: function () {
+        var that = this;
+        var url = jasTools.base.rootPath + this.detailPath;
+        var obj = {
+          oid: that.oid
+        }
+        jasTools.ajax.get(url, obj, function (data) {
+          that.detail = data.data;
+        });
+      },
+    },
+  };
+</script>
+
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+
+    <div class="jas-flex-box is-vertical">
+                <div class="is-grown" style="padding: 15px 20px;overflow: auto;">
+                
+                        <el-form ref="formData" :model="transferForm" label-width="150px">
+                          <el-form-item label="转办工作">
+                              <el-input v-model="transferForm.taskTransferTasks" size="small" ></el-input>
+                          </el-form-item>
+                          <el-form-item label="被转办用户">
+                                  <el-col :span="18">
+                                          <jas-base-el-multi-select-box ref="peopleSelect" v-model="transferForm.taskTransferUsers" value-key="oid"
+                                            label-key="userName" >
+                                          </jas-base-el-multi-select-box>
+                                  </el-col>
+                                  <el-col :span="6">
+                                  <el-button @click="choseTransferUser()" size="small" plain type="primary" style="margin-left:10px">选择</el-button><el-button  @click="clearTransferUser()" size="small" plain type="danger">清空</el-button>
+                                  </el-col>
+                              </el-form-item>
+                          <el-row>
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                              <el-form-item label="备注" prop="remarks">
+                                  <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="transferForm.remarks"></el-input>
+                              </el-form-item>
+                            </el-col>
+                          </el-row>
+                         
+                        </el-form>
+                </div>
+                <div style="text-align: center;padding-top:10px;margin: 0 20px;border-top: 1px solid #e4e7ed;">
+                    <el-button size="small" @click="cancel()">取 消</el-button>
+                    <el-button size="small" type="primary" @click="executeTransfer()">确 定</el-button>
+                </div>
+</div>
+
+  
+
+  </div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+
+  var vm = new Vue({
+    el: "#app",
+    data: function () {
+     
+      return {
+        transferForm:{
+					remark: '',
+					taskTransferUsers: [],
+					taskTransferTasks: '',
+        },
+        taskId:'',
+      }
+    },
+    created: function () {
+      
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.taskId=param.taskId;
+      this.transferForm.taskTransferTasks=decodeURI(param.processNamesAndTaskNames);
+
+    },
+    mounted: function () {
+ 
+    },
+    methods: {
+      choseTransferUser:function(){
+        var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/choseTransferUsers.html';
+				top.jasTools.dialog.show({
+					width: '54%',
+					height: '80%',
+					title: '选择转办人',
+					src: baseSrc ,
+					cbForClose: function (peoples) {
+						that.transferForm.taskTransferUsers = peoples;
+					}
+				});
+      },
+      clearTransferUser:function(){
+        this.transferForm.taskTransferUsers=[];
+      },
+      cancel: function (param) {
+        window.parent.jasTools.dialog.close(param);
+      },
+      executeTransfer:function(){
+        var that = this;
+				var cancelTransfer = function () {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '转办成功'
+          });
+          that.cancel();
+				};
+				window.top.Vue.prototype.$confirm('您确定要转办吗？', '', {
+					type: 'warning',
+					callback: function (action) {
+						if (action === 'confirm') {
+              var url = jasTools.base.rootPath + "/jasframework/workflow/task/transfer.do";
+              var toUserIds=[];
+              that.transferForm.taskTransferUsers.map(function(currentValue){
+                toUserIds.push(currentValue.oid);
+              });
+							jasTools.ajax.post(url, {
+                remark:that.transferForm.remark,
+                taskIds:[that.taskId],
+                toUsers:toUserIds,
+        
+							}, function (data) {
+								cancelTransfer();
+							});
+						}
+					}
+				});
+
+      }
+ 
+    },
+  });
+</script>
+
+</html>

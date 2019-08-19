@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.content {
+			height: calc(100% - 40px);
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.el-input-number,
+		.el-cascader,
+		.el-select {
+			width: 100%;
+		}
+
+		.dialog-footer {
+			padding-top: 8px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="120px">
+				<el-row :gutter="10">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="权限类型" prop="privilegeType">
+							<el-select v-model="tableFormData.privilegeType" placeholder="请选择权限类型" size="small" @change="privilegeTypeChange(tableFormData.privilegeType)">
+								<el-option label="菜单" value="1"></el-option>
+								<el-option label="功能点" value="2"></el-option>
+								<el-option label="表单" value="3"></el-option>
+								<el-option label="表单字段" value="4"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="权限名称" prop="privilegeName">
+							<el-input v-model="tableFormData.privilegeName" clearable placeholder="请输入权限名称" size="small"></el-input>
+						</el-form-item>
+					</el-col>					
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="权限编码" prop="privilegeCode">
+							<el-input v-model="tableFormData.privilegeCode" clearable placeholder="请输入权限编码" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="同级权限顺序号" prop="orderNum">
+							<el-input-number v-model="tableFormData.orderNum" size="small" :precision="1" clearable placeholder="请输入同级权限顺序号" controls-position="right"
+							  :min="1" :max="100"></el-input-number>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="ismenu">
+						<el-form-item label="菜单打开方式" prop="openType">
+							<el-select v-model="tableFormData.openType" placeholder="请选择菜单打开方式" size="small">
+								<el-option label="Tab方式" value="1"></el-option>
+								<el-option label="Html方式" value="2"></el-option>
+								<el-option label="弹窗方式" value="3"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>			
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="ismenu">
+						<el-form-item label="默认子权限" prop="childrenPrivilege">
+							<el-select v-model="tableFormData.childrenPrivilege" multiple placeholder="请选择默认子权限" size="small">
+								<el-option label="新增" value="01#新增#bt_add"></el-option>
+								<el-option label="修改" value="02#修改#bt_update"></el-option>
+								<el-option label="删除" value="03#删除#bt_delete"></el-option>
+								<el-option label="查看" value="04#查看#bt_select"></el-option>
+								<el-option label="导出" value="05#导出#bt_export"></el-option>
+								<el-option label="导入" value="06#导入#bt_import"></el-option>
+								<el-option label="定位" value="07#定位#bt_position"></el-option>
+							</el-select>													
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="ismenu">
+						<el-form-item label="菜单图标" prop="icon">
+							<el-input v-model="tableFormData.icon" size="small" ></el-input>
+						</el-form-item>
+					</el-col>					
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="isothers">
+						<el-form-item label="功能点类型" prop="functionType">
+							<el-select v-model="tableFormData.functionType" placeholder="请选择功能点类型" size="small">
+								<el-option label="新增" value="bt_add"></el-option>
+								<el-option label="修改" value="bt_update"></el-option>
+								<el-option label="删除" value="bt_delete"></el-option>
+								<el-option label="查看" value="bt_select"></el-option>
+								<el-option label="导出" value="bt_export"></el-option>
+								<el-option label="导入" value="bt_import"></el-option>
+								<el-option label="定位" value="bt_position"></el-option>								
+							</el-select>
+						</el-form-item>
+					</el-col>	
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="应用系统" prop="appId">
+							<el-select v-model="tableFormData.appId" clearable placeholder="请选择应用系统管理角色" size="small" :disabled="true">						
+								<el-option v-for="item in apps" :key="item.oid" :label="item.appName" :value="item.oid">
+								</el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>			
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="权限URL" prop="url">
+							<el-input v-model="tableFormData.url" clearable placeholder="请输入权限URL" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="query全路径" prop="queryName">
+							<el-input v-model="tableFormData.queryName" clearable placeholder="请输入query全路径" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+						<el-form-item label="权限描述" prop="description">
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" >
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			return {
+				but_disabled:false,
+				rules: {
+					privilegeType: [{
+						required: true,
+						message: '请选择权限类型',
+						trigger: 'blur'
+					}],
+					privilegeName: [{
+						required: true,
+						message: '请输入权限名称',
+						trigger: 'blur'
+					}],
+					privilegeCode: [{
+						required: true,
+						message: '请输入权限编码',
+						trigger: 'blur'
+					}],
+					orderNum: [{
+						required: true,
+						message: '请输入同级权限顺序号',
+						trigger: 'blur'
+					}],
+					appId: [{
+						required: true,
+						message: '请选择应用系统',
+						trigger: 'blur'
+					}],
+					functionType: [{
+						required: false,
+						message: '请选择功能点类型',
+						trigger: 'blur'
+					}]
+				},
+				tableFormData: {
+					"privilegeType": "",
+					"privilegeName": "",
+					"privilegeCode": "",
+					"orderNum": "",
+					"openType": "",
+					"childrenPrivilege": [],
+					"icon": "",
+					"appId": "",
+					"functionType": "",
+					"url": "",
+					"queryName": "",					
+					"description": "" //描述
+				},
+				apps:[],
+				ismenu: true,
+				isothers: false
+			}
+		},
+		computed: {
+		},
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			if (param.oid) {
+				this.isEdit = true;
+				this.tableFormData.oid = param.oid;
+				this._requestNodeDetail(param.oid);
+			}else{
+				this.tableFormData.appId = param.appId;
+				this.tableFormData.parentId = param.currentNodeId;
+			}
+			this.tableFormData.privilegeType = "1";
+			this.tableFormData.icon = "fa fa-bookmark";
+			this.initApplications();
+		},	
+		methods: {
+			initApplications: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getUserAppsystem.do";
+				jasTools.ajax.get(url, {}, function (data) {
+					data.forEach(function (item) {
+						that.apps.push(item);
+					});
+				});
+			},
+			privilegeTypeChange: function (value) {
+				var that = this;
+				if (value == "1") {
+					that.ismenu = true;
+					that.isothers = false;
+					that.rules.functionType[0].required = false;
+
+				} else {
+					that.ismenu = false;
+					that.isothers = true;
+					that.rules.functionType[0].required = true;
+				}
+			},
+			_requestNodeDetail: function (oid) {
+				var that = this;
+				that.loading = true;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/findPrivilegeById.do";
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					setTimeout(function () {
+						that.loading = false;
+					}, 300)
+					that.tableFormData = data;
+					// that.tableFormData.childrenPrivilege = data;
+				});
+			},
+			submit: function (formName) {
+				var that = this;
+				this.$refs[formName].validate(function (valid) {
+					if (valid) {
+ 						that.checkCodeExist(function () {
+							that.save();
+ 						});
+					}
+				});
+			},
+			save: function () {
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jasframework/privilege/privilege/save.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jasframework/privilege/privilege/update.do";
+				}
+				that.but_disabled = true;
+				jasTools.ajax.post(url, that.tableFormData, function (data) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: msg
+					});
+					that.cancel(1);
+				},function(data){
+					if(data.status==-1){
+						that.but_disabled = false;
+					}
+				});
+			},
+			checkCodeExist: function (cb) {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/privilege/privilege/checkPrivilegeCodeExist.do';
+				jasTools.ajax.postForm(url, {
+					privilegeCode:that.tableFormData.privilegeCode,
+					appId:that.tableFormData.appId,
+					oid:that.tableFormData.oid
+				}, function (data) {
+					cb && cb(data);
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>
