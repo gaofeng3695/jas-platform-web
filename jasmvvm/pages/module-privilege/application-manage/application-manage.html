@@ -24,6 +24,7 @@
 			<div style="padding: 0 10px 10px" class="jas-flex-box is-vertical is-grown">
 				<div style="padding: 15px 0;">
 					<el-button @click="createNewApplication" size="small" plain type="primary" icon="fa fa-plus">新建</el-button>
+					<el-button @click="sortNewApplication" size="small" plain type="primary" icon="fa fa-sort">排序</el-button>
 					<span class="fr">
 						<el-tooltip class="item" content="刷新" placement="top">
 							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
@@ -121,6 +122,19 @@
 					src: baseSrc,
 					cbForClose: function () {
 						that.requestList();
+					}
+				});
+			},
+			sortNewApplication: function(){
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/application-manage/dialogs/sort.html';
+				top.jasTools.dialog.show({
+					width: '800px',
+					height: '80%',
+					title: '排序',
+					src: baseSrc ,
+					cbForClose: function () {
+						// that.requestList();
 					}
 				});
 			},

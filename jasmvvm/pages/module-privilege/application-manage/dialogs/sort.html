@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- <link rel="stylesheet" href="./libelement-ui/element-#0E2B4A/src/index.css"> -->
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+</head>
+<style>
+	.drapwrap {
+		padding: 10px;
+	}
+
+	.list-group-item {
+		margin-bottom: -1px;
+		/* border: 1px solid #999; */
+		background: #ecf5ff;
+		margin: 5px 0;
+		padding: 6px 10px;
+		cursor: move;
+		overflow: hidden;
+	}
+
+	.list-group-item>.badge {
+		float: right;
+	}
+
+	.badge {
+		display: inline-block;
+		min-width: 10px;
+		padding: 3px 7px;
+		font-size: 12px;
+		font-weight: bold;
+		line-height: 1;
+		color: #fff;
+		text-align: center;
+		white-space: nowrap;
+		vertical-align: middle;
+		background-color: #777;
+		border-radius: 10px;
+	}
+
+	.panel-wrap-wrap {
+		width: 50%;
+		float: left;
+		box-sizing: border-box;
+		padding: 10px 10px 0 0;
+		height: 100%;
+	}
+
+	.panel-wrap {
+		border: 1px solid #ebeef5;
+		border-radius: 4px;
+		min-height: 100%;
+	}
+
+	.panel-title {
+		line-height: 40px;
+		background: #f5f7fa;
+		border-bottom: 1px solid #ebeef5;
+		text-align: center;
+	}
+</style>
+
+<body>
+	<div id="app" v-cloak v-loading="loading">
+		<div class="jas-flex-box is-vertical">
+
+			<div class="is-grown" style="height: 100%;">
+				<div style="overflow: hidden;width: 100%;height: 100%;padding: 10px 20px 20px;box-sizing: border-box;">
+					<div class="panel-wrap-wrap">
+						<div class="panel-wrap ">
+							<div class=" panel-title">业务应用</div>
+							<draggable v-model="buzyarr" class="drapwrap" :animation="150">
+								<transition-group type="transition">
+									<div class="list-group-item" v-for="element,index in buzyarr" :key="element.oid">
+										{{element.appName}}
+										<span class="badge">{{index+1}}</span>
+									</div>
+								</transition-group>
+							</draggable>
+						</div>
+					</div>
+					<div class="panel-wrap-wrap" style="padding:10px 0 0 10px;">
+						<div class="panel-wrap ">
+							<div class=" panel-title">平台应用</div>
+							<draggable v-model="sysarr" class="drapwrap" :animation="150">
+								<transition-group type="transition">
+									<div class="list-group-item" v-for="element,index in sysarr" :key="element.oid">
+										{{element.appName}}
+										<span class="badge">{{index+1}}</span>
+									</div>
+								</transition-group>
+							</draggable>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div style="text-align: center;padding-top:10px;margin: 0 20px;border-top: 1px solid #e4e7ed;">
+				<el-button size="small" @click="cancel()">取 消</el-button>
+				<el-button size="small" type="primary" @click="confirmSort('formData')">确 定</el-button>
+			</div>
+
+
+		</div>
+
+	</div>
+</body>
+
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-draggable/sortable.min.js"></script>
+<script src="./../../../../lib/vue-draggable-new/vuedraggable.umd.min.js"></script>
+
+<script src="./../../../../common/components/jas-components.js"></script>
+
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+
+</script>
+
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				loading: false,
+				myArray: [],
+				sysarr: [],
+				buzyarr: [],
+				oid: '',
+				dragOptions: {
+
+					animation: 200,
+					group: "description",
+					disabled: false,
+					ghostClass: "ghost"
+				}
+			}
+		},
+		computed: {
+			// dragOptions: function () {
+			// 	return {
+
+			// 		animation: 200,
+			// 		group: "description",
+			// 		disabled: false,
+			// 		ghostClass: "ghost"
+			// 	}
+			// }
+		},
+		watch: {},
+		created: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.parentId = param.parentId || '';
+			this.riskModelId = param.riskModelId;
+			this.currentNodeId = param.oid || '';
+		},
+		mounted: function () {
+			var that = this;
+			that.requestNodeDetail();
+
+		},
+		methods: {
+			formatApps: function (apps) {
+				var sys = [];
+				var buzy = [];
+				apps.forEach(function (item) {
+					if (item.appType == 1) { //平台
+						sys.push(item);
+					} else { //业务
+						buzy.push(item);
+					}
+				});
+				sys.sort(function (a, b) {
+					return a.appOrderNum - b.appOrderNum;
+				});
+				buzy.sort(function (a, b) {
+					return a.appOrderNum - b.appOrderNum;
+				});
+				this.sysarr = sys;
+				this.buzyarr = buzy;
+			},
+			requestNodeDetail: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getList.do";
+				jasTools.ajax.post(url, {
+					// oid: this.currentNodeId
+				}, function (data) {
+					that.formatApps(data);
+				});
+			},
+			confirmSort: function () {
+				var that = this;
+				var a1 = that.buzyarr.map(function (item, index) {
+					item.appOrderNum = index + 1;
+					return item;
+				});
+				var a2 = that.sysarr.map(function (item, index) {
+					item.appOrderNum = index + 1;
+					return item;
+				});
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/updateOrder.do";
+				jasTools.ajax.post(url, {
+					applicationList: a1.concat(a2)
+				}, function (data) {
+					// that.formatApps(data);
+					that.cancel();
+				});
+			},
+			cancel: function (param) {
+				(parent.jasTools || jasTools).dialog.close(param);
+			},
+		}
+	});
+</script>
+
+</html>
