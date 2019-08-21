@@ -36,15 +36,15 @@
 <body>
 	<div id="app" v-cloak>
 		<div class="jas-flex-box is-vertical">
-			<div class="is-grown">
-				<el-transfer style="text-align: left; " filterable :titles="titles" 
+			<div class="is-grown" style="padding-top:20px">
+				<el-transfer style="text-align: left; " filterable :titles="titles"
 					:data="noHasUser" v-model="hasUser" :props="defaultProps"/>
 			</div>
-			<div style="text-align: center;padding-top:40px">
+			<div style="text-align: center;padding-top:20px">
 				<el-button size="small" @click="cancel()">取 消</el-button>
 				<el-button size="small" type="primary" @click="save()">确 定</el-button>
 			</div>
-			
+
 		</div>
 	</div>
 </body>
@@ -93,7 +93,7 @@
 			save: function () {
 				var that = this;
 				var param = window.jasTools.base.getParamsInUrl(location.href);
-				
+
 				var url = jasTools.base.rootPath + "/jasframework/privilege/role/updateUser.do";
 				jasTools.ajax.post(url, {
 					roleOid: param.roleOid,

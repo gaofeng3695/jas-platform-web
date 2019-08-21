@@ -52,7 +52,7 @@
 						<el-form-item label="角色名称" prop="roleName">
 							<el-input v-model="tableFormData.roleName" clearable placeholder="请输入角色名称" size="small"></el-input>
 						</el-form-item>
-					</el-col>		
+					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="角色类型" prop="roleType" style="margin-bottom: 15px ">
 							<el-select v-model="tableFormData.roleType" clearable placeholder="请选择角色类型" size="small">
@@ -60,9 +60,9 @@
 								<el-option label="protect" value="2"></el-option>
 							</el-select>
 						</el-form-item>
-					</el-col>	
+					</el-col>
 				</el-row>
-				<el-row>	
+				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 					<el-form-item label="所属部门" prop="unitId" style="margin-bottom: 15px ">
 						<el-cascader :options="treeData" :props="treeProps" v-model="unitIdArr" :show-all-levels="false" change-on-select clearable
@@ -72,13 +72,13 @@
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="数据权限过滤规则" prop="dataFilterRegulationCode">
-							<el-select v-model="tableFormData.dataFilterRegulationCode" clearable placeholder="请选择数据权限过滤规则" size="small">						
+							<el-select v-model="tableFormData.dataFilterRegulationCode" clearable placeholder="请选择数据权限过滤规则" size="small">
 								<el-option v-for="item in dataFilterRegulations" :key="item.codeId" :label="item.codeName" :value="item.codeId">
 								</el-option>
 							</el-select>
 						</el-form-item>
 					</el-col>
-				</el-row>				
+				</el-row>
 				<jas-base-group-title name="其他信息"></jas-base-group-title>
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -108,11 +108,16 @@
 		data: function () {
 			var that = this;
 			return {
-				but_disabled:false,				
+				but_disabled:false,
 				rules: {
 					roleName: [{
 						required: true,
 						message: '请输入角色名称',
+						trigger: 'blur'
+					},{
+						min:0,
+						max:50,
+						message:"角色名称最多50个字",
 						trigger: 'blur'
 					}],
 					roleType: [{
@@ -127,9 +132,9 @@
 					}]
 				},
 				tableFormData: {
-					"roleName": "", 
-					"roleType": "", 
-					"unitId": "", 
+					"roleName": "",
+					"roleType": "",
+					"unitId": "",
 					"description": "", //描述
 				},
 				dataFilterRegulations: [],
@@ -141,7 +146,7 @@
 
 			}
 		},
-			
+
 		computed: {
 			unitIdArr: {
 				get: function () {
@@ -164,7 +169,7 @@
 			this.requestUnitTree();
 			this.requestDataFilterRegulations();
 		},
-		methods: {			
+		methods: {
 			requestUnitTree: function () {
 				var that = this;
 				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true";
@@ -208,7 +213,7 @@
 					msg = "修改成功";
 					url = jasTools.base.rootPath + "/jasframework/privilege/role/updateRole.do";
 				}
-				that.but_disabled = true;				
+				that.but_disabled = true;
 				jasTools.ajax.post(url, that.tableFormData, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',

@@ -129,6 +129,11 @@
 						required: true,
 						message: '请输入应用系统名称',
 						trigger: 'blur'
+					},{
+						min:0,
+						max:50,
+						message:"应用系统名称最多50个字",
+						trigger: 'blur'
 					}],
 					roleId: [{
 						required: true,
@@ -141,6 +146,11 @@
 						trigger: 'blur'
 					}, {
 						validator: validateAppNumber,
+						trigger: 'blur'
+					},{
+						min:0,
+						max:22,
+						message:"应用系统编号最多22位",
 						trigger: 'blur'
 					}],
 					appUrl: [{

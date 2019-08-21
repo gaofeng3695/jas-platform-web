@@ -45,62 +45,64 @@
 	<div id="app" v-cloak>
 
 		<jas-dialog-wrapper>
-			<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="120px">
-				<el-row :gutter="10">
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="上级组织机构" prop="parentId">
-							<el-cascader :options="treeData" :props="treeProps" v-model="parentIdArr" :show-all-levels="false" change-on-select clearable
-							  placeholder="请选择上级组织机构" size="small">
-							</el-cascader>
-						</el-form-item>
-					</el-col>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="组织机构名称" prop="unitName">
-							<el-input v-model="tableFormData.unitName" clearable placeholder="请输入组织机构名称" size="small"></el-input>
-						</el-form-item>
-					</el-col>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="组织机构编号" prop="unitCode">
-							<el-input v-model="tableFormData.unitCode" clearable placeholder="请输入组织机构编号" size="small"></el-input>
-						</el-form-item>
-					</el-col>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="组织机构类型" prop="unitType">
-							<el-select v-model="tableFormData.unitType" placeholder="请选择组织机构类型" size="small">
-								<el-option label="部门" value="1"></el-option>
-								<el-option label="单位" value="2"></el-option>
-							</el-select>
-						</el-form-item>
-					</el-col>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="顺序编号" prop="orderNum">
-							<!-- <el-input v-model="tableFormData.orderNum" clearable placeholder="请输入顺序编号" size="small"></el-input> -->
-							<el-input-number v-model="tableFormData.orderNum" size="small" :precision="1" clearable placeholder="请输入顺序编号" controls-position="right"
-							  :min="1" :max="100"></el-input-number>
-						</el-form-item>
-					</el-col>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="联系电话" prop="phone">
-							<el-input v-model="tableFormData.phone"  clearable placeholder="请输入联系电话" size="small"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<el-form-item label="地址" prop="address">
-							<el-input v-model="tableFormData.address" clearable placeholder="请输入地址" size="small"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<el-form-item label="描述" prop="description">
-							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-			</el-form>
-			<div slot="footer" >
+			<div style="padding-top:20px">
+				<el-form ref="tableFormData" :rules="rules" :model="tableFormData" label-width="120px">
+					<el-row :gutter="10">
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="上级组织机构" prop="parentId">
+								<el-cascader :options="treeData" :props="treeProps" v-model="parentIdArr" :show-all-levels="false" change-on-select clearable
+								 placeholder="请选择上级组织机构" size="small">
+								</el-cascader>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="组织机构名称" prop="unitName">
+								<el-input v-model="tableFormData.unitName" clearable placeholder="请输入组织机构名称" size="small"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="组织机构编号" prop="unitCode">
+								<el-input v-model="tableFormData.unitCode" clearable placeholder="请输入组织机构编号" size="small"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="组织机构类型" prop="unitType">
+								<el-select v-model="tableFormData.unitType" placeholder="请选择组织机构类型" size="small">
+									<el-option label="部门" value="1"></el-option>
+									<el-option label="单位" value="2"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="顺序编号" prop="orderNum">
+								<!-- <el-input v-model="tableFormData.orderNum" clearable placeholder="请输入顺序编号" size="small"></el-input> -->
+								<el-input-number v-model="tableFormData.orderNum" size="small" :precision="1" clearable placeholder="请输入顺序编号" controls-position="right"
+								 :min="1" :max="100"></el-input-number>
+							</el-form-item>
+						</el-col>
+						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+							<el-form-item label="联系电话" prop="phone">
+								<el-input v-model="tableFormData.phone" clearable placeholder="请输入联系电话" size="small"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+							<el-form-item label="地址" prop="address">
+								<el-input v-model="tableFormData.address" clearable placeholder="请输入地址" size="small"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+							<el-form-item label="描述" prop="description">
+								<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+				</el-form>
+			</div>
+			<div slot="footer">
 				<el-button size="small" @click="cancel()">取 消</el-button>
 				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
 			</div>
@@ -120,7 +122,7 @@
 		el: "#app",
 		data: function () {
 			var that = this;
-			var validatePhone= function (rule, value, callback) {
+			var validatePhone = function (rule, value, callback) {
 				let reg = /^1[3456789]\d{9}$/
 				if (!reg.test(value)) {
 					callback(new Error('联系电话格式错误'))
@@ -129,7 +131,7 @@
 				}
 			};//进行手机号码的正则验证
 			return {
-				but_disabled:false,
+				but_disabled: false,
 				treeProps: {
 					value: 'id',
 					label: 'text',
@@ -140,15 +142,25 @@
 						required: true,
 						message: '请输入组织机构名称',
 						trigger: 'blur'
+					},{
+						min:0,
+						max:50,
+						message:"组织机构名称最多50个字",
+						trigger: 'blur'
 					}],
 					unitCode: [{
 						required: true,
 						message: '请输入组织机构编号',
 						trigger: 'blur'
+					},{
+						min:0,
+						max:50,
+						message:"组织机构编码最多50个字",
+						trigger: 'blur'
 					}],
-					phone:[{
-						validator:validatePhone,
-						trigger:'blur'
+					phone: [{
+						validator: validatePhone,
+						trigger: 'blur'
 					}]
 				},
 				tableFormData: {
@@ -216,9 +228,9 @@
 				var that = this;
 				this.$refs[formName].validate(function (valid) {
 					if (valid) {
-// 						that.checkNameOrCodeExist(function () {
-							that.save();
-// 						});
+						// 						that.checkNameOrCodeExist(function () {
+						that.save();
+						// 						});
 					}
 				});
 			},
@@ -242,8 +254,8 @@
 						message: msg
 					});
 					that.cancel(1);
-				},function(data){
-					if(data.status==-1){
+				}, function (data) {
+					if (data.status == -1) {
 						that.but_disabled = false;
 					}
 				});
@@ -263,6 +275,7 @@
 			}
 		},
 	});
+
 </script>
 
 </html>
