@@ -62,8 +62,7 @@
 		<jas-two-panel-resizer layout="vertical" length="300px">
 			<template slot="closePanel">
 				<div class="filterapplication">
-					<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
-						@change="changeApplication(currentApplicationId)">
+					<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small" @change="changeApplication(currentApplicationId)">
 						<el-option v-for="item in applications" :key="item.oid" :label="item.appName" :value="item.oid">
 						</el-option>
 					</el-select>
@@ -73,9 +72,8 @@
 					<el-button type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
 					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId">删除</el-button>
 				</div>
-				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
-					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
-					:expand-on-click-node="false">
+				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id" :props="defaultProps" :default-expanded-keys="[currentNodeId]"
+				 highlight-current @node-click="clicknode" :expand-on-click-node="false">
 					<span class="custom-tree-node" slot-scope="{ node, data}">
 						<!--<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>-->
 						<span>{{ node.label }}</span>
@@ -153,7 +151,7 @@
 				}, {
 					name: '权限描述',
 					field: 'description',
-				}, ],
+				},],
 				loading: {
 					allLoading: false,
 					orgDetail: false,
@@ -175,7 +173,7 @@
 				},
 				isEditMode: false,
 				currentApplicationId: '',
-				appName:'',
+				appName: '',
 				applications: []
 			}
 		},
@@ -235,13 +233,13 @@
 					}, 300)
 					that.detail = data;
 					that.detail.appName = that.$refs.selectApp.selectedLabel;
-					if (that.detail.privilegeType=="1") {
+					if (that.detail.privilegeType == "1") {
 						that.detail.privilegeTypeName = "菜单";
-					} else if(that.detail.privilegeType=="2"){
+					} else if (that.detail.privilegeType == "2") {
 						that.detail.privilegeTypeName = "功能点";
-					}else if(that.detail.privilegeType=="3"){
+					} else if (that.detail.privilegeType == "3") {
 						that.detail.privilegeTypeName = "表单";
-					}else{
+					} else {
 						that.detail.privilegeTypeName = "表单字段";
 					}
 				});
@@ -260,15 +258,19 @@
 							})
 							resolve(data);
 							that.$nextTick(function () {
-								if (!that.currentNodeId&&data.length>0) {
+								if (!that.currentNodeId && data.length > 0) {
 									that.currentNodeId = data[0].id;
+									that.$nextTick(() => {
+										that.$refs.orgtree.setCurrentKey(that.currentNodeId); // 必须设定node-key
+										that._requestOrgDetail(that.currentNodeId);
+									});
 								}
 							})
 						});
 					}
 					if (node.level > 0 && !node.isLeaf) {
 						var url = jasTools.base.rootPath +
-						"/jasframework/privilege/privilege/getChildrenPrivilegeByappId.do";
+							"/jasframework/privilege/privilege/getChildrenPrivilegeByappId.do";
 						jasTools.ajax.postForm(url, {
 							appId: currentid,
 							id: node.data.id
@@ -287,7 +289,6 @@
 						getNodes(currentid)
 					});
 				}
-
 			},
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
@@ -300,7 +301,7 @@
 					height: '80%',
 					title: '新增权限',
 					src: jasTools.base.rootPath +
-						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?appId=' + that.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
+					'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?appId=' + that.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
 							that.refreshTree = false;
@@ -320,7 +321,7 @@
 					height: '80%',
 					title: '修改权限',
 					src: jasTools.base.rootPath +
-						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?oid=' + that.currentNodeId,
+					'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?oid=' + that.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
 							that.refreshTree = false;
@@ -357,9 +358,9 @@
 					callback: function (action) {
 						if (action === 'confirm') {
 							that.checkPrivilege(function (data) {
-								if(data.success==1){
+								if (data.success == 1) {
 									that._requestDeleteNode(that.currentNodeId);
-								}else{
+								} else {
 									top.Vue.prototype.$message({
 										type: 'error',
 										message: data.msg
@@ -374,7 +375,7 @@
 				var that = this;
 				var url = jasTools.base.rootPath + '/jasframework/privilege/privilege/checkPrivilegeByeventId.do';
 				jasTools.ajax.postForm(url, {
-					oid:that.currentNodeId
+					oid: that.currentNodeId
 				}, function (data) {
 					cb && cb(data);
 				});
@@ -425,6 +426,7 @@
 
 		},
 	});
+
 </script>
 
 </html>
