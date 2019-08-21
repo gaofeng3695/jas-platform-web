@@ -54,21 +54,37 @@
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="应用系统编号" prop="appNumber">
+							<el-input v-model="tableFormData.appNumber" clearable placeholder="请输入应用系统编号" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="应用系统管理角色" prop="roleId">
-							<el-select v-model="tableFormData.roleId" clearable placeholder="请选择应用系统管理角色" size="small">						
+							<el-select v-model="tableFormData.roleId" clearable placeholder="请选择应用系统管理角色" size="small">
 								<el-option v-for="item in roles" :key="item.oid" :label="item.roleName" :value="item.oid">
 								</el-option>
 							</el-select>
 						</el-form-item>
 					</el-col>
-				</el-row>
-				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="24" :xl="24">
-						<el-form-item label="应用系统前缀" prop="appUrl">
-							<el-input v-model="tableFormData.appUrl" clearable placeholder="请输入应用系统前缀" size="small"></el-input>
+						<el-form-item label="应用系统URL" prop="appUrl">
+							<el-input v-model="tableFormData.appUrl" clearable placeholder="请输入应用系统URL" size="small"></el-input>
 						</el-form-item>
 					</el-col>
-				</el-row>				
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="应用系统类型" prop="appType">
+							<el-select v-model="tableFormData.appType" clearable placeholder="请选择应用应用系统类型" size="small">
+								<el-option v-for="(item,index) in appTypes" :key="index" :label="item.value" :value="item.key">
+								</el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="24" :xl="24">
+						<el-form-item label="应用系统图标">
+							<el-input v-model="tableFormData.appIconUrl" clearable placeholder="请输入应用系统图标" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
 				<jas-base-group-title name="其他信息"></jas-base-group-title>
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -78,7 +94,7 @@
 					</el-col>
 				</el-row>
 			</el-form>
-			<div slot="footer" >
+			<div slot="footer">
 				<el-button size="small" @click="cancel()">取 消</el-button>
 				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit('tableFormData')">确 定</el-button>
 			</div>
@@ -97,8 +113,17 @@
 		el: "#app",
 		data: function () {
 			var that = this;
+			var validateAppNumber = function (rule, value, callback) {
+				let reg = /^[0-9]*$/
+				if (!reg.test(value)) {
+					callback(new Error('应用系统编号必须为纯数字'))
+				} else {
+					callback()
+				}
+			};
+
 			return {
-				but_disabled:false,				
+				but_disabled: false,
 				rules: {
 					appName: [{
 						required: true,
@@ -109,18 +134,46 @@
 						required: true,
 						message: '请选择应用系统管理角色',
 						trigger: 'blur'
+					}],
+					appNumber: [{
+						required: true,
+						message: '请输入应用系统编号',
+						trigger: 'blur'
+					}, {
+						validator: validateAppNumber,
+						trigger: 'blur'
+					}],
+					appUrl: [{
+						required: true,
+						message: '请输入应用系统Url',
+						trigger: 'blur'
+					}, {
+						type: 'url',
+						message: "请输入合法的url地址",
+						trigger: 'blur'
 					}]
 				},
 				tableFormData: {
-					"appName": "", 
-					"roleId": "", 
-					"appUrl": "", 
+					"appName": "",
+					"roleId": "",
+					"appUrl": "",
+					"appType":"1",
+					"appNumber": "",//应用系统编号
+					"appIconUrl": "",//应用系统图标
 					"description": "", //描述
+					"appOrderNum": 1,
 				},
-				roles: []
+				roles: [],
+				appTypes: [{
+					value: "平台系统",
+					key: "1"
+				}, {
+					value: "业务系统",
+					key: "2"
+				}]
 			}
 		},
-		
+
 		mounted: function () {
 			var param = window.jasTools.base.getParamsInUrl(location.href);
 			if (param.oid) {
@@ -141,7 +194,7 @@
 						that.roles.push(item);
 					});
 				});
-            },
+			},
 			submit: function (formName) {
 				var that = this;
 				this.$refs[formName].validate(function (valid) {
@@ -169,24 +222,29 @@
 					msg = "修改成功";
 					url = jasTools.base.rootPath + "/jasframework/privilege/application/update.do";
 				}
-				that.but_disabled = true;				
+				that.but_disabled = true;
 				jasTools.ajax.post(url, that.tableFormData, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',
 						message: msg
 					});
 					that.cancel(1);
-				},function(data){
-					if(data.status==-1){
+				}, function (data) {
+					if (data.status == -1) {
+						top.Vue.prototype.$message({
+							type: 'error',
+							message: data.detail
+						});
 						that.but_disabled = false;
 					}
 				});
 			},
 			cancel: function (param) {
 				window.parent.jasTools.dialog.close(param);
-			}
+			},
 		},
 	});
+
 </script>
 
 </html>
