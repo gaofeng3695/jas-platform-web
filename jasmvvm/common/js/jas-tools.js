@@ -195,7 +195,26 @@
 			return string.replace(/_([a-z])/g, function (all, letter) {
 				return letter.toUpperCase();
 			});
-		}
+		};
+		var systemGuard = function (appId) {
+			if (appId) {
+				var url = 'http://192.168.100.130:8888/jasframework-security/jasframework/privilege/application/userAppPermission.do';
+				var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
+				$.ajax({
+					type: "GET",
+					url: url,
+					async:false,
+					// contentType: 'application/json',
+					data: {
+						token: params.token,
+						appId: params.appId,						
+					},
+					success: function (data, status) {
+						console.log(111111111111)
+					}
+				})
+			}
+		};
 
 		return {
 			rootPath: getRootPath(),
@@ -206,6 +225,7 @@
 			setParamsToUrl: setParamsToUrl,
 			getIdArrFromTree: getIdArrFromTree,
 			switchToCamelCase: switchToCamelCase,
+			systemGuard: systemGuard,
 		};
 	})();
 
