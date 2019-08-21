@@ -100,6 +100,7 @@
 					oid: oid,
 				}, function (data) {
 					that.detail = data;
+					that.detail.appType=that.detail.appType=="1"?"平台系统":"业务系统"
 				});
 			}
 		},

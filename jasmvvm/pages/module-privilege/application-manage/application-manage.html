@@ -46,7 +46,7 @@
 					</el-table-column>
 					<el-table-column label="应用系统Url" prop="appUrl" min-width="120px" show-overflow-tooltip align="left" header-align="center">
 					</el-table-column>
-					<el-table-column label="应用系统类型" prop="appType" min-width="120px" show-overflow-tooltip align="left" header-align="center">
+					<el-table-column label="应用系统类型" prop="appTypeName" min-width="120px" show-overflow-tooltip align="left" header-align="center">
 					</el-table-column>
 					<el-table-column label="应用系统描述" prop="description" min-width="200px" show-overflow-tooltip align="left" header-align="center">
 					</el-table-column>
@@ -223,6 +223,7 @@
 					that.loading = false;
 					that.total = data.length;
 					that.tableData = data;
+					// that.tableData.appType = that.tableData.appType == "1" ? "平台系统" : "业务系统"
 				});
 
 			},
