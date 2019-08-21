@@ -13,6 +13,7 @@
 		.searchWrapper {
 			overflow: unset !important;
 		}
+
 		.vue-treeselect__control {
 			height: 34px;
 		}
@@ -21,45 +22,49 @@
 
 <body>
 	<div id="app" v-cloak v-loading="loading">
-			<div style="padding: 0 10px 10px" class="jas-flex-box is-vertical is-grown">
-				<div style="padding: 15px 0;">
-					<el-button @click="createNewApplication" size="small" plain type="primary" icon="fa fa-plus">新建</el-button>
-					<span class="fr">
+		<div style="padding: 0 10px 10px" class="jas-flex-box is-vertical is-grown">
+			<div style="padding: 15px 0;">
+				<el-button @click="createNewApplication" size="small" plain type="primary" icon="fa fa-plus">新建</el-button>
+				<span class="fr">
 						<el-tooltip class="item" content="刷新" placement="top">
 							<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
 						</el-tooltip>
 					</span>
-				</div>
-				<div class="is-grown">
-					<el-table ref="mytable" @row-dblclick="seeDetail" v-loading="loading"
-						height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%" stripe>
-						<el-table-column label="序号" type="index" align="center" width="50" fixed>
-						</el-table-column>											
-						<el-table-column label="应用系统ID" fixed prop="oid" min-width="170px" show-overflow-tooltip align="left" header-align="center">
-						</el-table-column>						
-						<el-table-column label="应用系统名称" fixed prop="appName" min-width="170px" show-overflow-tooltip align="left" header-align="center">
-						</el-table-column>
-						<el-table-column label="应用系统管理角色" prop="roleName" min-width="130px" show-overflow-tooltip align="left" header-align="center">
-						</el-table-column>
-						<el-table-column label="应用系统前缀" prop="appUrl" min-width="120px" show-overflow-tooltip align="left" header-align="center">
-						</el-table-column>
-						<el-table-column label="应用系统描述" prop="description" min-width="200px" show-overflow-tooltip align="left" header-align="center">
-						</el-table-column>
-						<el-table-column label="操作" align="center" width="200" fixed="right">
-							<template slot-scope="scope">
-								<el-button @click="seeDetail(scope.row)" type="text" size="small">详情</el-button>
-								<el-button @click="editApplication(scope.row)" type="text" size="small">修改</el-button>
-								<el-button @click="deleteApplycation(scope.row)" type="text" size="small">删除</el-button>
-							</template>
-						</el-table-column>
-					</el-table>
-				</div>
-				<div style="padding: 15px 0 0;" class="clearfix">
-					<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
-						:page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
-					</el-pagination>
-				</div>
 			</div>
+			<div class="is-grown">
+				<el-table ref="mytable" @row-dblclick="seeDetail" v-loading="loading" height="100%" :data="tableData" border :header-cell-style="headStyle"
+				 style="width: 100%" stripe>
+					<el-table-column label="序号" type="index" align="center" width="50" fixed>
+					</el-table-column>
+					<el-table-column label="应用系统ID" fixed prop="oid" min-width="170px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统名称" fixed prop="appName" min-width="170px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统编号" fixed prop="appNumber" min-width="170px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统管理角色" prop="roleName" min-width="130px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统Url" prop="appUrl" min-width="120px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统类型" prop="appType" min-width="120px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="应用系统描述" prop="description" min-width="200px" show-overflow-tooltip align="left" header-align="center">
+					</el-table-column>
+					<el-table-column label="操作" align="center" width="200" fixed="right">
+						<template slot-scope="scope">
+							<el-button @click="seeDetail(scope.row)" type="text" size="small">详情</el-button>
+							<el-button @click="editApplication(scope.row)" type="text" size="small">修改</el-button>
+							<el-button @click="deleteApplycation(scope.row)" type="text" size="small">删除</el-button>
+						</template>
+					</el-table-column>
+				</el-table>
+			</div>
+			<div style="padding: 15px 0 0;" class="clearfix">
+				<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+				 :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+				</el-pagination>
+			</div>
+		</div>
 	</div>
 </body>
 
@@ -94,11 +99,11 @@
 			}
 		},
 		computed: {},
-		watch: {		
+		watch: {
 			selectedRows: function () {
 				var selects = [];
 				this.selectedRows.forEach(function (item) {
-					selects.push(item.oid);					
+					selects.push(item.oid);
 				});
 				this.selectedRowOids = selects;
 			}
@@ -111,7 +116,7 @@
 
 		},
 		methods: {
-			createNewApplication: function(){
+			createNewApplication: function () {
 				var that = this;
 				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/application-manage/dialogs/add.html';
 				top.jasTools.dialog.show({
@@ -124,7 +129,7 @@
 					}
 				});
 			},
-			editApplication: function(row){
+			editApplication: function (row) {
 				var that = this;
 				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/application-manage/dialogs/add.html';
 				top.jasTools.dialog.show({
@@ -165,12 +170,12 @@
 					callback: function (action) {
 						if (action === 'confirm') {
 							if (that.selectedRowOids.length >= 1) {
-								var url = jasTools.base.rootPath + "/jasframework/privilege/application/deleteBeth.do?oids="+that.selectedRowOids;
+								var url = jasTools.base.rootPath + "/jasframework/privilege/application/deleteBeth.do?oids=" + that.selectedRowOids;
 								jasTools.ajax.get(url, {
 								}, function (data) {
 									afterDelete();
 								});
-							} 
+							}
 						}
 					}
 				});
@@ -188,11 +193,11 @@
 					type: 'warning',
 					callback: function (action) {
 						if (action === 'confirm') {
-								var url = jasTools.base.rootPath + "/jasframework/privilege/application/delete.do?oid="+row.oid;
-								jasTools.ajax.get(url, {
-								}, function (data) {
-									afterDelete();
-								});
+							var url = jasTools.base.rootPath + "/jasframework/privilege/application/delete.do?oid=" + row.oid;
+							jasTools.ajax.get(url, {
+							}, function (data) {
+								afterDelete();
+							});
 						}
 					}
 				});
@@ -221,7 +226,7 @@
 				});
 
 			},
-			
+
 			handleSizeChange: function (val) {
 				this.pageSize = val;
 				this.requestList();
@@ -239,6 +244,7 @@
 			},
 		},
 	});
+
 </script>
 
 </html>

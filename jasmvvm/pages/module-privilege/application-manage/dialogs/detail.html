@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="./../../../../common/css/main.css">
 	<style>
 		.jas-detail-table .table_wrap th {
-			width:112px;
+			width: 112px;
 		}
 	</style>
 </head>
@@ -46,11 +46,23 @@
 					field: 'appName',
 				},
 				{
+					name: '应用系统编号',
+					field: 'appNumber',
+				}, {
 					name: '应用系统管理角色',
 					field: 'roleName',
-				}, {
-					name: '应用系统前缀',
+				},
+				{
+					name: '应用系统Url',
 					field: 'appUrl',
+				},
+				{
+					name: '应用系统类型',
+					field: 'appType',
+				},
+				{
+					name: '应用系统图标',
+					field: 'appIcon',
 				}
 			],
 			field2: [{
@@ -59,6 +71,7 @@
 			}]
 		}
 	};
+
 </script>
 
 <script>
@@ -91,6 +104,7 @@
 			}
 		},
 	});
+
 </script>
 
 </html>

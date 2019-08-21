@@ -180,10 +180,10 @@
 			}
 		},
 		computed: {
-			
+
 		},
 		watch: {
-			
+
 		},
 		mounted: function () {
 			// this.initApplications();
@@ -211,7 +211,7 @@
 					cb && cb(that.currentApplicationId);
 				});
 			},
-			
+
 			changeApplication: function (cid) {
 				var that = this;
 				this.currentApplicationId = cid;
@@ -260,7 +260,7 @@
 							})
 							resolve(data);
 							that.$nextTick(function () {
-								if (!that.currentNodeId) {
+								if (!that.currentNodeId&&data.length>0) {
 									that.currentNodeId = data[0].id;
 								}
 							})
@@ -302,7 +302,7 @@
 					src: jasTools.base.rootPath +
 						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?appId=' + that.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
 					cbForClose: function (param) {
-						if (param == 1) {						
+						if (param == 1) {
 							that.refreshTree = false;
 							that.$nextTick(function () {
 								that.refreshTree = true;
@@ -356,7 +356,7 @@
 					type: 'warning',
 					callback: function (action) {
 						if (action === 'confirm') {
-							that.checkPrivilege(function (data) {	
+							that.checkPrivilege(function (data) {
 								if(data.success==1){
 									that._requestDeleteNode(that.currentNodeId);
 								}else{
@@ -364,7 +364,7 @@
 										type: 'error',
 										message: data.msg
 									});
-								}									
+								}
 							});
 						}
 					}

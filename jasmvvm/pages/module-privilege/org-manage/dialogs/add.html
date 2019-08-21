@@ -81,7 +81,7 @@
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="联系电话" prop="phone">
-							<el-input v-model="tableFormData.phone" clearable placeholder="请输入联系电话" size="small"></el-input>
+							<el-input v-model="tableFormData.phone"  clearable placeholder="请输入联系电话" size="small"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -120,6 +120,14 @@
 		el: "#app",
 		data: function () {
 			var that = this;
+			var validatePhone= function (rule, value, callback) {
+				let reg = /^1[3456789]\d{9}$/
+				if (!reg.test(value)) {
+					callback(new Error('联系电话格式错误'))
+				} else {
+					callback()
+				}
+			};//进行手机号码的正则验证
 			return {
 				but_disabled:false,
 				treeProps: {
@@ -137,6 +145,10 @@
 						required: true,
 						message: '请输入组织机构编号',
 						trigger: 'blur'
+					}],
+					phone:[{
+						validator:validatePhone,
+						trigger:'blur'
 					}]
 				},
 				tableFormData: {

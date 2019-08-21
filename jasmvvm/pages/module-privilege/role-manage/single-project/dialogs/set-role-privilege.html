@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="./../../../../../common/css/main.css">
 
 	<style>
-		html,
+		/*html,
 		body {
 			width: 100%;
 		}
@@ -21,60 +21,88 @@
 			height: 100%;
 			position: relative;
 			overflow: hidden;
+		}*/
+
+		.resizepanel {
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.orgtitle {
+			height: 40px;
+			color: #fff;
+			background: #409EFF;
+			line-height: 40px;
+			/* padding: 0 0 0 15px; */
+			text-align: center;
+		}
+
+		.orgtool {
+			height: 40px;
+			/* border-bottom:1px solid #e4e7ed; */
+			text-align: right;
+			padding: 0 10px;
+			overflow: hidden;
+		}
+
+		.filterapplication {
+			padding: 10px 10px 0px 10px;
+		}
+
+		.filterwrap {
+			padding: 10px 10px 0px 10px;
 		}
 
 		.content {
-			height: calc(100% - 40px);
-			overflow-y: auto;
-			overflow-x: hidden;
+			height: 100%;
+			padding: 0 10px;
 		}
 
-		.el-input-number,
-		.el-cascader,
-		.el-select {
+		.content .el-tabs__content {
 			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+			overflow: auto;
 		}
 
-		.dialog-footer {
-			padding-top: 8px;
+		.is-grown:first-child {
+			height: 100%
 		}
 	</style>
 </head>
 
 <body>
 	<div id="app" v-cloak>
-		<jas-dialog-wrapper>
-			<el-form ref="tableFormData" :model="tableFormData" label-width="100px" style="margin-top: 15px ">
-				<el-row :gutter="10">
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="12">
-						<el-form-item label="应用系统" prop="roleType" style="margin-bottom: 15px ">
-							<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
-								@change="changeApplication(currentApplicationId)">
-								<el-option v-for="item in applications" :key="item.oid" :label="item.appName" :value="item.oid">
-								</el-option>
-							</el-select>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<el-form-item label="权限分配" prop="roleType" style="margin-bottom: 15px ">		
-							<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" :props="defaultProps" show-checkbox :default-expanded-keys="[currentNodeId]"
-							 :default-checked-keys="checkedKeys" highlight-current @node-click="clicknode" :expand-on-click-node="false"  style="margin-top: 10px "></el-tree>					
-							</el-tree>
-						</el-form-item>						
-					</el-col>
-				</el-row>
-			</el-form>
-			<div slot="footer" >
-				<el-button size="small" @click="cancel()">取 消</el-button>
-				<el-button size="small" :disabled="but_disabled" type="primary" @click="submit()">确 定</el-button>
+		<!--<jas-dialog-wrapper>-->
+		<jas-two-panel-resizer layout="vertical" length="200px">
+			<template slot="closePanel">
+				<jas-base-module-title name="应用系统列表"></jas-base-module-title>
+				<el-tree class="is-grown" default-expand-all :data="applications" highlight-current @node-click="clickAppName">
+					<span class="custom-tree-node" slot-scope="{node, data }">
+								<i class="fa fa-user-circle-o" style="color:#99c8f8;" aria-hidden="true"></i>
+								<span>{{node.label}}</span>
+					</span>
+				</el-tree>
+			</template>
+			<div class="content" slot="mainPanel">
+				<jas-base-module-title name="系统权限分配"></jas-base-module-title>
+				<div style="border-bottom:1px solid #ececec;padding: 10px 0 10px 0;">
+					<el-button size="small" plain type="primary" icon="fa fa-refresh" @click="refreshCurrentAppTree">刷新</el-button>
+					<el-button size="small" type="primary" icon="fa fa-floppy-o" @click="saveAppPrival">保存</el-button>
+				</div>
+				<el-tree v-loading="loading" class="is-grown" ref="privaltree" :data="menuData" node-key="id" :props="defaultProps" show-checkbox
+				 :default-expanded-keys="[currentNodeId]" :default-checked-keys="checkedKeys" highlight-current @node-click="clicknode"
+				 :expand-on-click-node="false" style="margin-top: 10px "></el-tree>
+				</el-tree>
 			</div>
-		</jas-dialog-wrapper>
+		</jas-two-panel-resizer>
+		<!--</jas-dialog-wrapper>-->
 	</div>
 </body>
 <script src="./../../../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../../../lib/vue/vue.js"></script>
+<script src="./../../../../../lib/vue-multipane/vue-multipane.js"></script>
 <script src="./../../../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../../../common/components/jas-components.js "></script>
 <script src="./../../../../../common/js/jas-tools.js"></script>
@@ -84,20 +112,20 @@
 		data: function () {
 			var that = this;
 			return {
-				but_disabled:false,								
-				tableFormData: {
-				},
+				applications: [],//获取当前用户所拥有的系统列表
+				roleId: '',//用户角色Id
+				but_disabled: false,
+				loading: false,
+				// tableFormData: {
+				// },
 				currentApplicationId: '',
-				applications: [],
-				orgnData: [],
+				menuData: [],
 				defaultProps: {
 					label: 'text',
-					orgnData: 'orgnData'
+					menuData: 'menuData'
 				},
 				checkedKeys: [],
-				roleId:'',
-				currentApplicationId:'',
-				currentNodeId: '',
+				currentNodeId: '',//用于展开当前的节点
 
 			}
 		},
@@ -105,62 +133,72 @@
 			var param = window.jasTools.base.getParamsInUrl(location.href);
 			if (param.roleId) {
 				this.roleId = param.roleId;
-				this.tableFormData.roleId = param.roleId;
+				// this.tableFormData.roleId = param.roleId;
 			}
 			this.initApplications();
 		},
 		methods: {
 			initApplications: function () {
 				var that = this;
+				that.loading = true;
 				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getUserAppsystem.do";
 				jasTools.ajax.get(url, {}, function (data) {
 					data.forEach(function (item) {
-						that.applications.push(item);
+						var obj = {
+							oid: item.oid,
+							label: item.appName
+						}
+						that.applications.push(obj);
 					});
-					that.currentApplicationId = data[0].oid;	
-					that.requestUnitTree();
+					that.currentApplicationId = data[0].oid;
+					that.loading = false;
+					that.requestUnitTree();//获取当前系统下面的菜单树
 				});
 			},
-			changeApplication: function (cid) {
+			requestUnitTree: function () {//获取当前用户下针对系统的菜单权限
 				var that = this;
-				this.currentApplicationId = cid;
+				that.loading = true;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/getAllConfig.do";
+				jasTools.ajax.get(url, {
+					roleId: that.roleId,
+					appId: that.currentApplicationId
+				}, function (data) {
+					that.checkedKeys = that.getCheckedNodekeys(data);
+					that.menuData = data;
+					that.loading = false;
+					if (data.length > 0) that.currentNodeId = data[0].id;//用于展开根节点
+				});
+			},
+			refreshCurrentAppTree: function () {
+				var that = this;
 				that.requestUnitTree();
 			},
-			submit: function () {
+			clickAppName: function (node) {//点击选中当前的系统,并请求当前系统的菜单权限
+				this.currentApplicationId = node.oid;
+				this.requestUnitTree();
+			},
+			saveAppPrival: function () {
 				var that = this;
-				var	url = jasTools.base.rootPath + "/jasframework/privilege/privilege/setPrivilege.do";			
-				jasTools.ajax.postForm(url,{
-					appId:that.currentApplicationId,
-					roleId:that.roleId,
-					privilegeIds:that.$refs.orgtree.getCheckedKeys().join(",")
+				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/setPrivilege.do";
+				jasTools.ajax.postForm(url, {
+					appId: that.currentApplicationId,
+					roleId: that.roleId,
+					privilegeIds: that.$refs.privaltree.getCheckedKeys().join(",")
 				}, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',
 						message: "权限分配成功"
 					});
-					that.cancel(1);
-				},function(data){
-					if(data.status==-1){
+				//	that.cancel(1);
+				}, function (data) {
+					if (data.status == -1) {
 						that.but_disabled = false;
 					}
 				});
 			},
-			
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
 			},
-			requestUnitTree: function () {
-				var that = this;
-				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/getAllConfig.do";
-				jasTools.ajax.get(url, {
-					roleId:that.roleId,
-					appId:that.currentApplicationId
-				}, function (data) {
-					that.checkedKeys = that.getCheckedNodekeys(data);
-					that.orgnData = data;
-				});
-			},
-			
 			getCheckedNodekeys: function (treeData) {
 				var checkedKeys = [];
 				var getCheckedKeysFromArr = function (arr) {
@@ -181,6 +219,7 @@
 			}
 		},
 	});
+
 </script>
 
 </html>
