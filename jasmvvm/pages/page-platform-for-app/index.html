@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>数字化管线维护系统</title>
+
+	<link rel="stylesheet" href="../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../common/css/main.css">
+	<link rel="stylesheet" href="./index.css">
+	<style>
+		.allbg {
+			height: 100%;
+			background: url(../../common/images/bg.png) no-repeat center center;
+			background-size: cover;
+		}
+
+		.grouptitle {
+			font-size: 16px;
+			padding: 10px 0 4px;
+			font-weight: 600;
+			color: #666;
+		}
+
+		.iconwrap {
+			cursor: pointer;
+			float: left;
+			text-align: center;
+			padding: 8px 0 6px 0;
+		}
+
+		.iconwrap:hover .iconsubwrap {
+			transform: scale(1.1);
+			transition: all 0.1s;
+		}
+
+		.icontext {
+			padding-top: 4px;
+			width: 100px;
+		}
+
+		.iconsubwrap {
+			margin: 0 auto;
+			height: 70px;
+			width: 70px;
+			line-height: 70px;
+			font-size: 40px;
+			background: #f90;
+			color: #fff;
+			border-radius: 14px;
+			box-shadow: 1px 1px 5px #999;
+			position: relative;
+
+
+		}
+
+
+		.isclosed {
+			/* color: #ff002b;
+			font-size: 90px; */
+			width: 100%;
+			height: 100%;
+			background: #6d6c6bb3;
+			position: absolute;
+			top: 0;
+			right: 0;
+			border-radius: 14px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<el-container class="outerwrapper">
+
+			<el-header class="headerwrapper">
+				<!-- header 开始 -->
+				<div class="header">
+					<div class="logo item">
+					</div>
+					<div class="name item">
+						<div class="china">中盈安信管道完整性管理平台</div>
+						<div class="english">JAS Pipeline Integrity Management Platform</div>
+					</div>
+					<ul class="user-info">
+						<li class="items quit">
+							<a @click="_loginOut" style="display:block;padding:0px 10px">
+								<i class="fa fa-sign-out"></i> 退出
+							</a>
+						</li>
+						<li class="border"></li>
+						<li class="items fullscreen">
+							<a @click="_goFullscreen" style="display:block;padding:0px 10px">
+								<i class="fa fa-arrows-alt"></i> 全屏
+							</a>
+						</li>
+						<li class="border"></li>
+						<!-- <li class="items fullscreen">
+							<a @click="_editdesk" :style="iseditmode?'background: #1f2630;':''"
+								style="display:block;padding:0px 10px">
+								<i class="fa fa-desktop"></i> 自定义桌面
+							</a>
+						</li> -->
+						<li class="border"></li>
+						<li class="items">
+							<a style="display:block">
+								<el-dropdown class="dropdown-wrapper" trigger="click" @command="handleCommand">
+									<span class="el-dropdown-link">
+										<img class="user-logo" :src="userImg">
+										<div class="userInfo">
+											<div class="username">{{username}}</div>
+											<div class="userunit">{{userunit}}</div>
+										</div>
+									</span>
+									<el-dropdown-menu slot="dropdown">
+										<!--<el-dropdown-item command="fullscreen">切换全屏</el-dropdown-item>-->
+										<!-- <el-dropdown-item command="changeLayout">切换布局</el-dropdown-item> -->
+										<el-dropdown-item command="resetPassword">修改密码</el-dropdown-item>
+										<!--<el-dropdown-item command="loginout">退出登录</el-dropdown-item>-->
+									</el-dropdown-menu>
+								</el-dropdown>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- header 结束 -->
+			</el-header>
+
+			<el-container style="height: 0%;">
+				<el-main>
+					<el-container class="allbg">
+						<el-main v-loading="isloading" style="height:100%;width:100%;overflow:hidden">
+							<div style="width:76vw;height:100%;margin:0 auto; ">
+								<div v-show="iseditmode">
+									<!-- <el-alert  type="warning" description=""
+										show-icon>
+									</el-alert> -->
+									<el-alert center title="点击图标进行操作，灰色表示隐藏，亮色表示显示。" type="warning" show-icon>
+									</el-alert>
+									<div style="padding-top:10px;text-align: center;">
+										<el-button size="small" type="primary" @click="saveEditdesk">保 存
+										</el-button>
+										<el-button size="small" @click="cancelEdit">取 消</el-button>
+									</div>
+								</div>
+								<div v-for="item in items" v-show="item.privilegeList&&item.privilegeList.length>0"
+									style="margin-top:6px;">
+									<div>
+										<div class="grouptitle"><i class="fa fa-bookmark"
+												style="padding-right:6px;color:#5cafe6;"></i>{{item.name}}</div>
+									</div>
+									<div style="overflow: hidden;background:#3098f926;padding:20px 10px 10px;border-radius: 6px">
+										<div v-for="icon,index in item.privilegeList" class="iconwrap" @click="clickicon(icon,item.oid)">
+											<div class="iconsubwrap" :style="iconStyle(icon,index)">
+												<span v-show="!icon.appIconUrl">{{icon.appName[0]}}</span>
+												<!-- <i :class="icon.icon || 'fa fa-desktop'"></i> -->
+												<!-- <div v-show="openedIcons.indexOf(item.oid+'||'+icon.oid) < 0" class="isclosed"></div> -->
+											</div>
+											<div class="icontext">{{icon.appName}}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</el-main>
+					</el-container>
+				</el-main>
+			</el-container>
+
+		</el-container>
+
+	</div>
+
+</body>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="../../lib/screenfull/screenfull.min.js"></script>
+
+<script src="../../common/components/jas-components.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+
+<script>
+	window.app = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				username: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).userName,
+				userunit: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).unitName,
+				userImg: '../../common/images/enterlogo.png',
+				items: [], //菜单数组
+				openedIcons: [],
+				iseditmode: false,
+				isloading: true,
+
+			}
+		},
+		computed: {},
+		watch: {},
+
+		mounted: function () {
+			this._queryMenuData();
+		},
+		methods: {
+			clickicon: function (icon, foid) {
+				var that = this;
+				console.log(icon, url)
+				// return
+				var url = jasTools.base.setParamsToUrl(icon.appUrl, {
+					token: localStorage.getItem('token'),
+					roleId: icon.roleId
+				});
+				if (url.indexOf('http') > -1) {
+					location.href = url;
+				} else {
+					location.href = jasTools.base.rootPath + url;
+				}
+
+				// jasTools.ajax.post(url, {
+				// 	projectOid: foid,
+				// }, function (data) {
+				// 	sessionStorage.setItem('projectOid', icon.oid)
+				// 	location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
+				// 	// that.getChildrenMenu(icon.oid)
+				// });
+			},
+			getChildrenMenu: function (fid) {
+				var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getChildrenMenuList.do';
+				jasTools.ajax.get(url, {
+					id: fid,
+					appId: '402894a152681ba30152681e8b320003',
+				}, function (data) {
+					console.log(data)
+
+				});
+			},
+			iconStyle: function (icon, index) {
+				var background = this.randomcolor(index);
+				if (icon.appIconUrl) {
+					background = 'url(' + (icon.appIconUrl || 'https://cn.vuejs.org/images/logo.png') +
+						') no-repeat center center';
+				}
+				return {
+					background: background,
+					backgroundSize: 'cover',
+				}
+				// background:  !important;
+
+			},
+			randomcolor: function (index) {
+				var colors = ['#65c8e8', '#607dbf', '#7ccc5d', '#eac53d', '#ae88d3'];
+				var n = index % 5;
+				if (index) {
+					return colors[n]
+				}
+				return colors[0]
+			},
+			formatApps: function (apps) {
+				var sys = [];
+				var buzy = [];
+				apps.forEach(function (item) {
+					if (item.appType == 1) { //平台
+						sys.push(item);
+					} else { //业务
+						buzy.push(item);
+					}
+				});
+				sys.sort(function (a, b) {
+					return a.appOrderNum - b.appOrderNum;
+				});
+				buzy.sort(function (a, b) {
+					return a.appOrderNum - b.appOrderNum;
+				});
+				return [{
+					name: '平台应用',
+					privilegeList: sys
+				}, {
+					name: '业务应用',
+					privilegeList: buzy
+				}]
+			},
+			_queryMenuData: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getList.do";
+				jasTools.ajax.post(url, {
+					// oid: this.currentNodeId
+				}, function (data) {
+					that.isloading = false;
+					that.iseditmode = false;
+					that.items = that.formatApps(data);
+				});
+			},
+			// _queryMenuData: function () {
+			// 	var that = this; // 获取左侧菜单
+			// 	var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getProject.do';
+			// 	jasTools.ajax.postForm(url, {
+			// 		"menutype": "0",
+			// 		"appnumber": "402894a152681ba30152681e8b320003",
+			// 		"language": "zh_CN"
+			// 	}, function (data) {
+			// 		that.isloading = false;
+			// 		that.iseditmode = false;
+			// 		that.items = data.rows;
+			// 		that.openedIcons = [];
+			// 		data.rows.forEach(function (item) {
+			// 			item.privilegeList.forEach(function (icon) {
+			// 				that.openedIcons.push(item.oid + '||' + icon.oid);
+			// 			})
+			// 		})
+			// 	});
+			// },
+			selectMenu: function (index) {
+				var that = this;
+				var newTap = '';
+				this.tabs.forEach(function (item) { //循环打开的标签页，判断选中的菜单是否带开过
+					if (item.name === index) {
+						newTap = index;
+					}
+				});
+				if (!newTap) {
+					// var aTab = this._createTabsArr([index], this.items);
+					this.tabs.push(aTab[0]);
+				}
+				this.currentTap = index;
+			},
+
+
+			_loginOut: function () {
+				var url = jasTools.base.rootPath + '/jasframework/login/logout.do';
+
+				jasTools.ajax.get(url, {}, function (data) {
+					localStorage.removeItem('token');
+					localStorage.removeItem('user');
+					location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-login/login.html";
+				}, function () {
+					localStorage.removeItem('token');
+					localStorage.removeItem('user');
+					location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-login/login.html";
+				});
+			},
+
+			handleCommand: function (command) {
+				if (command === 'loginout') {
+					this._loginOut();
+				} else if (command === 'fullscreen') {
+					this._goFullscreen();
+				} else if (command === 'resetPassword') {
+					this._resetPassword();
+				} else if (command === 'changeLayout') {
+					this.changeLayout();
+				}
+			},
+
+			_goFullscreen: function () {
+				if (screenfull.enabled) {
+					// screenfull.toggle($('.tabswrapper .el-tabs__content')[0]);
+					screenfull.toggle();
+				} else {
+					window.top.Vue.prototype.$message({
+						message: '您的浏览器不支持全屏',
+						type: 'error'
+					});
+					// Ignore or do something else
+				}
+			},
+			saveEditdesk: function () {
+				var that = this;
+				that.isloading = true;
+				var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/editCustomDesktop.do';
+				jasTools.ajax.post(url, {
+					customDesktopList: this.openedIcons.map(function (item) {
+						return {
+							projectOid: item.split('||')[0],
+							privilegeOid: item.split('||')[1],
+						}
+					}),
+				}, function (data) {
+					that._queryMenuData();
+				});
+			},
+			cancelEdit: function () {
+				this.isloading = true;
+				this._queryMenuData();
+			},
+			_editdesk: function () {
+				var that = this;
+				if (this.iseditmode) return;
+				that.isloading = true;
+
+				var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getProject.do';
+				jasTools.ajax.postForm(url, {
+					"menutype": "0",
+					"appnumber": "402894a152681ba30152681e8b320003",
+					"language": "zh_CN",
+					queryType: 1
+				}, function (data) {
+					that.isloading = false;
+
+					that.iseditmode = true;
+					that.items = data.rows;
+				});
+			},
+			_resetPassword: function () {
+				var that = this;
+				jasTools.dialog.show({
+					title: '修改密码',
+					width: '530px',
+					height: '530px',
+					src: '../page-password/resetword.html',
+					cbForClose: function (param) {
+						if (param === 1) {
+							that._loginOut();
+						}
+					}
+				});
+			},
+			_requestLoginInfo: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + '/jasframework/log/login/getUserStatisticsInfo.do';
+
+				jasTools.ajax.get(url, {}, function (data) {
+					var obj = data.data;
+					that.$notify({
+						type: 'success',
+						title: '登录成功',
+						position: 'bottom-right',
+						dangerouslyUseHTMLString: true,
+						message: [
+							'<div style="font-size:12px;">',
+							'	<div><span style="color:#409EFF;font-weight: 700;">' + obj.userName +
+							'</span>,您好！</div>',
+							'	<div>登录次数：<span style="color:#409EFF;">' + obj.loginCount + '</span></div>',
+							'	<div>累计在线时长：<span style="color:#409EFF;">' + obj.totalLoginDate + '</span></div>',
+							'	<div>上次登录IP：<span style="color:#409EFF;">' + obj.clientIp + '</span></div>',
+							'	<div>上次登录时间：<span style="color:#409EFF;">' + obj.lastLoginDate + '</span></div>',
+							'</div>'
+						].join('')
+					});
+				}, function () {
+
+				});
+
+
+			},
+		},
+	})
+</script>
+
+</html>

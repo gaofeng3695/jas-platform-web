@@ -15,7 +15,7 @@
 
 <body>
 	<div class="login-wrap">
-		<div class="applink" @click="centerDialogVisible = true">APP下载</div>
+		<!-- <div class="applink" @click="centerDialogVisible = true">APP下载</div>
 		<el-dialog v-cloak title="APP下载" :visible.sync="centerDialogVisible" width="350px" center>
 			<div style="width:300px;height:300px;background: #00b7ff url(src/images/wecode.png) no-repeat center center">
 			</div>
@@ -23,7 +23,7 @@
 				<el-button size="small" @click="centerDialogVisible = false">取 消</el-button>
 				<el-button size="small" type="primary" @click="downloadApp">直接下载</el-button>
 			</span>
-		</el-dialog>
+		</el-dialog> -->
 		<div class="content">
 			<div class="content-bg">
 				<div class="start">
@@ -32,7 +32,7 @@
 					<div class="logo">
 					</div>
 					<div class="title">
-						施工数据采集
+						管道完整性管理平台
 					</div>
 					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" v-if="!logined" class="form">
 						<el-form-item prop="userid">
@@ -136,6 +136,8 @@
 						userBo.unitName = unitName;
 						localStorage.setItem("user", JSON.stringify(userBo));
 						// location.href = "../page-index/index.html";
+							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-platform-for-app/index.html";
+							return
 						if(data.multiProject ){
 							sessionStorage.setItem("multiProject", 1);
 							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-plateform/index.html";
