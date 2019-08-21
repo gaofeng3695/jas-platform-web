@@ -39,8 +39,10 @@
 		}
 
 		.icontext {
-			padding-top: 4px;
+			padding: 8px 5px 0 5px;
 			width: 100px;
+			box-sizing: border-box;
+			line-height: 1.2;	
 		}
 
 		.iconsubwrap {
@@ -211,7 +213,7 @@
 				// return
 				var url = jasTools.base.setParamsToUrl(icon.appUrl, {
 					token: localStorage.getItem('token'),
-					roleId: icon.roleId
+					appId: icon.oid
 				});
 				if (url.indexOf('http') > -1) {
 					location.href = url;
@@ -245,7 +247,7 @@
 				}
 				return {
 					background: background,
-					backgroundSize: 'cover',
+					backgroundSize: 'contain',
 				}
 				// background:  !important;
 
