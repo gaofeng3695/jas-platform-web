@@ -106,7 +106,7 @@
 			var that = this;
 			var validatePhone = function (rule, value, callback) {
 				let reg = /^1[3456789]\d{9}$/
-				if (!reg.test(value)) {
+				if (value&&!reg.test(value)) {
 					callback(new Error('联系电话格式错误'))
 				} else {
 					callback()
@@ -114,7 +114,7 @@
 			};//进行手机号码的正则验证
 			var validateEmail = function (rule, value, callback) {
 				let reg =  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-				if (!reg.test(value)) {
+				if (value&&!reg.test(value)) {
 					callback(new Error('邮箱格式错误'))
 				} else {
 					callback()
