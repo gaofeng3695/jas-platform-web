@@ -1,13 +1,14 @@
 var ConfigOfHome = {
-	isShowMapFirst : false,  // true false
-	mapIframeSrc : jasTools.base.rootPath + '/jasmvvm/pages/module-gis/index.html',
-	menuWith : 200, // 数字
+	isShowMapFirst: false, // true false
+	mapIframeSrc: jasTools.base.rootPath + '/jasmvvm/pages/module-gis/index.html',
+	menuWith: 200, // 数字
 };
 
 window.app = new Vue({
 	el: '#app',
 	data: function () {
 		return {
+			appId:'',
 			projectOid: sessionStorage.getItem('projectOid') || '',
 			gisUrl: '',
 			username: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).userName,
@@ -25,12 +26,6 @@ window.app = new Vue({
 			panelLayout: 'horizontal' //地图未初始化
 		}
 	},
-	created: function () {
-		console.log(location.hash)
-		this.currentTap = (location.hash && location.hash.slice(1)) || '';
-		this.currentTap && (this.menusOpened = [this.currentTap]);
-		// this.initJasMap();
-	},
 	computed: {
 		menuStyle: function () {
 			return {
@@ -41,20 +36,30 @@ window.app = new Vue({
 			return !this.isExpend;
 		},
 	},
-	watch: {
-		currentTap: function (val) {
-			val && (location.hash = val);
-		}
-	},
-
-	mounted: function () {
+	created: function () {
+		console.log(location.hash)
+		this.currentTap = (location.hash && location.hash.slice(1)) || '';
+		this.currentTap && (this.menusOpened = [this.currentTap]);
+		var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
+		this.appId = params.appId || '402894a152681ba30152681e8b320003';
+		// this.appId = '402894a152681ba30152681e8b320003';
 		this._queryMenuData();
+	},
+	mounted: function () {
 		this._setWindowResizeEventToCloseMenu();
 		// this._requestLoginInfo();
 		this.bindHashEvent();
 		this.bindTabsMenuEvent();
 		this.statuschanged(this.panelShowed); // 加载地图
 	},
+
+	watch: {
+		currentTap: function (val) {
+			val && (location.hash = val);
+		}
+	},
+
+
 	methods: {
 		backToDesk: function () {
 			location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-plateform/index.html";
@@ -118,7 +123,7 @@ window.app = new Vue({
 				var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getChildrenMenuList.do';
 				jasTools.ajax.get(url, {
 					id: this.projectOid,
-					appId: '402894a152681ba30152681e8b320003',
+					appId: that.appId,
 				}, function (data) {
 					console.log(data)
 					if (typeof data === 'object' && data.length > 0) {
@@ -138,7 +143,7 @@ window.app = new Vue({
 					async: true,
 					data: {
 						"menutype": "0",
-						"appId": "402894a152681ba30152681e8b320003",
+						"appId":  that.appId,
 						"language": "zh_CN"
 					},
 					success: function (data, xhr, param) {
