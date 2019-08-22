@@ -196,17 +196,17 @@
 				return letter.toUpperCase();
 			});
 		};
-		var systemGuard = function (appId, cb) {
+		var systemGuard = function (config, cb) {
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 			var isAppRight = function () {
-				if ((appId == params.appId) || !appId) {
+				if ((config.appId == params.appId) || !appId) {
 					return true;
 				}
 				return false;
 			};
 			var isAppAccessable = function () {
 				var result = false;
-				var url = 'http://192.168.100.130:8888/jasframework-security/jasframework/privilege/application/userAppPermission.do';
+				var url = config.accessHost + '/jasframework/privilege/application/userAppPermission.do';
 				$.ajax({
 					type: "GET",
 					url: url,
@@ -223,8 +223,8 @@
 				});
 				return result;
 			};
-			var loginByToken = function () {
-				var url = 'http://192.168.100.130:8888/jasframework-security/jasframework/login/loginByTokenAndAppId.do';
+			var loginByToken = function () { //http://192.168.100.130:8888/
+				var url = config.loginHost + '/jasframework/login/loginByTokenAndAppId.do';
 				$.ajax({
 					type: "GET",
 					url: url,
