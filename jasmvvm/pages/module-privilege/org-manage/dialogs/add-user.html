@@ -72,7 +72,7 @@
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<el-form-item label="密码到期时间" prop="passwordExpiredDate">
-							<el-date-picker v-model="tableFormData.passwordExpiredDate" type="date" placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
+							<el-date-picker v-model="tableFormData.passwordExpiredDate" :picker-options="disabledToday"  type="date" placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -106,15 +106,15 @@
 			var that = this;
 			var validatePhone = function (rule, value, callback) {
 				let reg = /^1[3456789]\d{9}$/
-				if (value&&!reg.test(value)) {
+				if (value && !reg.test(value)) {
 					callback(new Error('联系电话格式错误'))
 				} else {
 					callback()
 				}
 			};//进行手机号码的正则验证
 			var validateEmail = function (rule, value, callback) {
-				let reg =  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-				if (value&&!reg.test(value)) {
+				let reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+				if (value && !reg.test(value)) {
 					callback(new Error('邮箱格式错误'))
 				} else {
 					callback()
@@ -122,34 +122,39 @@
 			};//进行邮箱的正则验证
 			return {
 				but_disabled: false,
+				disabledToday: {
+					disabledDate: function (time) {
+						return time.getTime() < new Date().getTime()
+					}
+				},
 				rules: {
 					loginName: [{
 						required: true,
 						message: '请输入用户名',
 						trigger: 'blur'
-					},{
-						min:0,
-						max:50,
-						message:"用户名最多50个字",
+					}, {
+						min: 0,
+						max: 50,
+						message: "用户名最多50个字",
 						trigger: 'blur'
 					}],
 					userName: [{
 						required: true,
 						message: '请输入姓名',
 						trigger: 'blur'
-					},{
-						min:0,
-						max:50,
-						message:"姓名最多50个字",
+					}, {
+						min: 0,
+						max: 50,
+						message: "姓名最多50个字",
 						trigger: 'blur'
 					}],
 					phone: [{
 						validator: validatePhone,
 						trigger: 'blur'
 					}],
-					email:[{
-						validator:validateEmail,
-						trigger:'blur'
+					email: [{
+						validator: validateEmail,
+						trigger: 'blur'
 					}]
 				},
 				tableFormData: {

@@ -226,7 +226,8 @@
 					this.pageSize = 10;
 					this.currentPage = 1;
 				}
-				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getList.do";
+				// var url = jasTools.base.rootPath + "/jasframework/privilege/application/getList.do";
+				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getAppPage.do";
 				that.loading = true;
 				jasTools.ajax.postForm(url, {
 					pageNo: this.currentPage,
@@ -235,8 +236,8 @@
 					rows: this.pageSize,
 				}, function (data) {
 					that.loading = false;
-					that.total = data.length;
-					that.tableData = data;
+					that.total = data.total;
+					that.tableData = data.rows;
 					// that.tableData.appType = that.tableData.appType == "1" ? "平台系统" : "业务系统"
 				});
 
