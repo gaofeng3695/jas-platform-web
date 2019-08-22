@@ -196,24 +196,63 @@
 				return letter.toUpperCase();
 			});
 		};
-		var systemGuard = function (appId) {
-			if (appId) {
+		var systemGuard = function (appId, cb) {
+			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
+			var isAppRight = function () {
+				if ((appId == params.appId) || !appId) {
+					return true;
+				}
+				return false;
+			};
+			var isAppAccessable = function () {
+				var result = false;
 				var url = 'http://192.168.100.130:8888/jasframework-security/jasframework/privilege/application/userAppPermission.do';
-				var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 				$.ajax({
 					type: "GET",
 					url: url,
-					async:false,
-					// contentType: 'application/json',
+					async: false,
 					data: {
 						token: params.token,
-						appId: params.appId,						
+						appId: params.appId,
 					},
 					success: function (data, status) {
-						console.log(111111111111)
+						if (data.data == true) {
+							result = true;
+						}
 					}
-				})
+				});
+				return result;
+			};
+			var loginByToken = function () {
+				var url = 'http://192.168.100.130:8888/jasframework-security/jasframework/login/loginByTokenAndAppId.do';
+				$.ajax({
+					type: "GET",
+					url: url,
+					async: false,
+					data: {
+						token: params.token,
+						appId: params.appId,
+					},
+					success: function (data, status) {
+						var userBo = data.user;
+						var unitName = userBo.unitName;
+						unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
+						userBo.unitName = unitName;
+						localStorage.setItem("user", JSON.stringify(userBo));
+						cb && cb(data);
+					}
+				});
+			};
+
+			if(!params.token || !params.appId){
+				return; //不做任何验证
 			}
+			if (isAppRight()) {
+				if (isAppAccessable()) {
+					return loginByToken();
+				}
+			}
+			alert('无进入权限')
 		};
 
 		return {

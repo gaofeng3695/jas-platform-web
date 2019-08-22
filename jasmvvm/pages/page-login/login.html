@@ -36,11 +36,12 @@
 					</div>
 					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" v-if="!logined" class="form">
 						<el-form-item prop="userid">
-							<el-input prefix-icon="fa fa-user" clearable v-model.number="ruleForm.userid" placeholder="请输入用户名称"></el-input>
+							<el-input prefix-icon="fa fa-user" clearable v-model.number="ruleForm.userid" placeholder="请输入用户名称">
+							</el-input>
 						</el-form-item>
 						<el-form-item prop="pass">
 							<el-input prefix-icon="fa fa-lock" clearable type="password" placeholder="请输入密码" v-model="ruleForm.pass"
-							 @keyup.enter.native="submitForm('ruleForm')"></el-input>
+								@keyup.enter.native="submitForm('ruleForm')"></el-input>
 						</el-form-item>
 						<div class="login-btn">
 							<el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
@@ -102,7 +103,15 @@
 			};
 		},
 		created: function () {
-			// jasTools.base.systemGuard('appid');
+			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
+			jasTools.base.systemGuard('',function(result){
+				var myApps = ['88f05573-82df-41d0-8570-e98885bdd721','98e649f8-51b6-447e-a96f-6c2ec8ef3de1','4406840d-5a66-4d15-b8e8-5e9e9f837ea9','0ef16403-540a-4cf1-b52c-88b1d3e87c0a','afbba156-3822-454c-acaf-dd16b1936dcb'] //个人中心 文档中心 权限管理  工作流管理 日志管理
+				if(myApps.indexOf(params.appId) >-1 ){
+					var href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
+					location.href = jasTools.base.setParamsToUrl(href,params);
+				}
+			});
+
 		},
 		mounted: function () {
 
@@ -136,12 +145,12 @@
 						userBo.unitName = unitName;
 						localStorage.setItem("user", JSON.stringify(userBo));
 						// location.href = "../page-index/index.html";
-							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-platform-for-app/index.html";
-							return
-						if(data.multiProject ){
+						location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-platform-for-app/index.html";
+						return
+						if (data.multiProject) {
 							sessionStorage.setItem("multiProject", 1);
 							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-plateform/index.html";
-						}else{
+						} else {
 							sessionStorage.setItem("multiProject", 0);
 							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
 						}
@@ -174,4 +183,3 @@
 </script>
 
 </html>
-
