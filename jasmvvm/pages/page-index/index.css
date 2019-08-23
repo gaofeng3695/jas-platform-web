@@ -33,9 +33,9 @@ body,
 }
 
 .logo {
-	width: 150px;
-	background: url(../../common/images/lng.png) no-repeat center center;
-	background-size: 120px;
+	width: 60px;
+	background: url(../../common/images/logo2.png) no-repeat center center;
+	background-size: 30px;
 	margin: 0 0px 0 10px;
 }
 
@@ -44,7 +44,7 @@ body,
 	font-size: 20px;
 	font-weight: 600;
 	line-height: 48px;
-	letter-spacing: 8px;
+	letter-spacing: 1px;
 	text-align: center;
 }
 

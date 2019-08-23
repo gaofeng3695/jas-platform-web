@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="renderer" content="webkit">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>数字化管线维护系统</title>
+	<title>中盈安信基础服务一体化平台</title>
 
 	<!-- 老框架的样式依赖 -->
 	<!-- <link rel="stylesheet" href="../../../jasframework/common/css/jasframework-layout.css" />
@@ -32,8 +32,8 @@
 					<div class="logo item">
 					</div>
 					<div class="name item">
-						<div class="china">数字化管线维护系统</div>
-						<div class="english">Digital Pipeline Maintenance System</div>
+						<div class="china">中盈安信基础服务一体化平台</div>
+						<div class="english">JAS Basic Service Integration Platform</div>
 					</div>
 					<ul class="user-info">
 						<li class="items quit">
@@ -91,7 +91,8 @@
 						<div>
 
 
-							<el-menu unique-opened :default-active="currentTap" class="el-menu-vertical-demo" @select="selectMenu" :collapse="isCollapse">
+							<el-menu unique-opened :default-active="currentTap" class="el-menu-vertical-demo" @select="selectMenu"
+								:collapse="isCollapse">
 								<!-- 第一层菜单开始 -->
 								<!-- tip:为什么不用递归渲染？因为vue组件递归的方式跟elementui提供的可收缩菜单插件相冲突，若要使用递归，就必须取消菜单可收缩的功能 -->
 								<template v-for="item in items">
@@ -190,20 +191,21 @@
 					<el-container style="height:100%">
 						<el-main style="height:100%;width:100%;overflow:hidden">
 
-							<jas-two-panel-resizer :showed="panelShowed" ref="resizer" :layout="panelLayout" length="40%" @paneresize="paneresize"
-							 @statuschanged="statuschanged">
+							<jas-two-panel-resizer :showed="panelShowed" ref="resizer" :layout="panelLayout" length="40%"
+								@paneresize="paneresize" @statuschanged="statuschanged">
 								<div slot="closePanel" id="jasMap" class="jasmap" style="height:100%;background-color: #ececec;">
 									<iframe name="gisWindow" class="iframe" :src="gisUrl" frameborder="0" height="100%"></iframe>
 								</div>
-								<el-tabs id="tabs" style="position:relative" slot="mainPanel" class="tabswrapper jas-flex-box" v-model="currentTap"
-								 type="card" @tab-remove="removeTab">
+								<el-tabs id="tabs" style="position:relative" slot="mainPanel" class="tabswrapper jas-flex-box"
+									v-model="currentTap" type="card" @tab-remove="removeTab">
 									<el-popover ref="popover" placement="bottom" trigger="hover">
 										<el-dropdown-item @click.native="handleTabsOptions(1)">刷新当前选项卡</el-dropdown-item>
 										<el-dropdown-item @click.native="handleTabsOptions(2)">关闭当前选项卡</el-dropdown-item>
 										<el-dropdown-item @click.native="handleTabsOptions(3)">关闭其他选项卡</el-dropdown-item>
 										<el-dropdown-item @click.native="handleTabsOptions(4)">关闭所有选项卡</el-dropdown-item>
 									</el-popover>
-									<el-tab-pane v-for="(item, index) in tabs" :key="item.link" :name="item.name" :closable="item.closable">
+									<el-tab-pane v-for="(item, index) in tabs" :key="item.link" :name="item.name"
+										:closable="item.closable">
 										<span slot="label">
 											<i v-show="currentTap == item.name" :class="item.icon||'fa fa-bookmark'"></i> {{item.title}}
 										</span>
