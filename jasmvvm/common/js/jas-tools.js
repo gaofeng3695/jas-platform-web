@@ -199,7 +199,7 @@
 		var systemGuard = function (config, cb) {
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 			var isAppRight = function () {
-				if ((config.appId == params.appId) || !appId) {
+				if ((config.appId == params.appId) || !config.appId) {
 					return true;
 				}
 				return false;
