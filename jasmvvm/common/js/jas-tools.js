@@ -196,7 +196,7 @@
 				return letter.toUpperCase();
 			});
 		};
-		var systemGuard = function (config, cb) {
+		var systemGuard = function (config, cb, failcb) {
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 			var isAppRight = function () {
 				if ((config.appId == params.appId) || !config.appId) {
@@ -244,13 +244,17 @@
 				});
 			};
 
-			if(!params.token || !params.appId){
+			if (!params.token || !params.appId) {
+				console.error('未在url中发现token或者appId')
 				return; //不做任何验证
 			}
 			if (isAppRight()) {
 				if (isAppAccessable()) {
 					return loginByToken();
 				}
+			}
+			if (typeof failcb == 'function') {
+				return failcb();
 			}
 			alert('无进入权限')
 		};
