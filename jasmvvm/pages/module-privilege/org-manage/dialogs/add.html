@@ -124,7 +124,7 @@
 			var that = this;
 			var validatePhone = function (rule, value, callback) {
 				let reg = /^1[3456789]\d{9}$/
-				if (!reg.test(value)) {
+				if (value&&!reg.test(value)) {
 					callback(new Error('联系电话格式错误'))
 				} else {
 					callback()
