@@ -234,11 +234,11 @@
 						appId: params.appId,
 					},
 					success: function (data, status) {
-						var userBo = data.user;
-						var unitName = userBo.unitName;
-						unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
-						userBo.unitName = unitName;
-						localStorage.setItem("user", JSON.stringify(userBo));
+						// var userBo = data.user;
+						// var unitName = userBo.unitName;
+						// unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
+						// userBo.unitName = unitName;
+						// localStorage.setItem("user", JSON.stringify(userBo));
 						cb && cb(data);
 					}
 				});

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片预览</title>
+  <!-- <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css">
+  <!-- <link rel="stylesheet" href="./../../../common/css/main.css"> -->
+
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+  </div>
+</body>
+
+<!-- <script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script> -->
+<script src="./../../../lib/viewer/viewer.min.js"></script>
+<!-- <script src="./../../../common/js/jas-tools.js"></script> -->
+<script>
+
+  function viewImage(src) {
+    var image = new Image();
+    image.src = src;
+    var viewer = new Viewer(image, {
+      hidden: function () {
+        viewer.destroy();
+      },
+    });
+    viewer.show();
+  }
+
+
+  var src = 'https://fengyuanchen.github.io/viewerjs/images/thumbnails/tibet-4.jpg';
+  viewImage(src)
+
+
+  // window.vm = new Vue({
+  //   el: '#app',
+  //   data: function () {
+  //     return {
+  //       className: '',
+
+  //     }
+  //   },
+  //   created: function () {
+  //     var that = this;
+  //   },
+  //   mounted: function () {
+  //   },
+  //   methods: {
+  //     formatForm: function (fields) {
+  //       var obj = {};
+  //       fields.forEach(function (item) {
+  //         obj[item] = '';
+  //       });
+  //       return obj;
+  //     },
+  //   },
+  // });
+</script>
+<script>
+
+</script>
+
+
+</html>
