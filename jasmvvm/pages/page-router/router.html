@@ -13,7 +13,7 @@
 
 <body>
 	<div id="app" v-loading="isloading" style="height:100%;">
-		
+
 	</div>
 </body>
 
@@ -25,8 +25,8 @@
 <script>
 	new Vue({
 		el: '#app',
-		data:{
-			isloading : true
+		data: {
+			isloading: true
 		},
 		created: function () {
 			var that = this;
@@ -36,6 +36,14 @@
 				accessHost: jasTools.base.rootPath, // 'http://192.168.100.130:8081/jasframework-platform',
 				loginHost: jasTools.base.rootPath, //'http://192.168.100.130:8081/jasframework-platform',
 			}, function (result) {
+
+				localStorage.setItem("token", data.token);
+				var userBo = data.user;
+				var unitName = userBo.unitName;
+				unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
+				userBo.unitName = unitName;
+				localStorage.setItem("user", JSON.stringify(userBo));
+
 				var myApps = ['88f05573-82df-41d0-8570-e98885bdd721', '98e649f8-51b6-447e-a96f-6c2ec8ef3de1',
 					'4406840d-5a66-4d15-b8e8-5e9e9f837ea9', '0ef16403-540a-4cf1-b52c-88b1d3e87c0a',
 					'afbba156-3822-454c-acaf-dd16b1936dcb'
