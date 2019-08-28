@@ -124,7 +124,7 @@
 			var that = this;
 			var validatePhone = function (rule, value, callback) {
 				let reg = /^1[3456789]\d{9}$/
-				if (value&&!reg.test(value)) {
+				if (!reg.test(value)) {
 					callback(new Error('联系电话格式错误'))
 				} else {
 					callback()
@@ -167,7 +167,7 @@
 					"address": "", //地址
 					"description": "", //描述
 					"orderNum": "1", //序号
-					"parentId": "f4b587f5-4f84-4e51-9ae7-529a7f16b2f6", //父节点oid
+					"parentId": null, //父节点oid
 					"phone": "", //电话
 					"unitCode": "", //组织机构编号
 					"unitName": "", //组织机构名称
@@ -246,7 +246,7 @@
 				}
 				that.but_disabled = true;
 				if (!that.tableFormData.parentId) {
-					that.tableFormData.parentId = 'f4b587f5-4f84-4e51-9ae7-529a7f16b2f6';
+					//that.tableFormData.parentId = 'f4b587f5-4f84-4e51-9ae7-529a7f16b2f6';
 				}
 				jasTools.ajax.post(url, that.tableFormData, function (data) {
 					top.Vue.prototype.$message({
