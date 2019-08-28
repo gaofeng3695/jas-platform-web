@@ -67,8 +67,13 @@
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="24" :xl="24">
-						<el-form-item label="应用系统URL" prop="appUrl">
-							<el-input v-model="tableFormData.appUrl" clearable placeholder="请输入应用系统URL" size="small"></el-input>
+						<el-form-item label="应用系统内网URL" prop="appUrl">
+							<el-input v-model="tableFormData.appUrl" clearable placeholder="请输入应用系统内网URL" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="24" :xl="24">
+						<el-form-item label="应用系统外网URL" prop="extranetUrl">
+							<el-input v-model="tableFormData.extranetUrl" clearable placeholder="请输入应用系统外网URL" size="small"></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
@@ -161,12 +166,18 @@
 						type: 'url',
 						message: "请输入合法的url地址",
 						trigger: 'blur'
+					}],
+					extranetUrl:[{
+						type: 'url',
+						message: "请输入合法的url地址",
+						trigger: 'blur'
 					}]
 				},
 				tableFormData: {
 					"appName": "",
 					"roleId": "",
 					"appUrl": "",
+					"extranetUrl":"",//外网地址
 					"appType":"1",
 					"appNumber": "",//应用系统编号
 					"appIconUrl": "",//应用系统图标
