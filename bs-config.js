@@ -10,11 +10,11 @@ var apiProxy = proxy(function (pathname, req) {
     if (pathname.match('^/jasproxy/jasmvvm')) return false;
     return pathname.match('^/jasproxy');
 }, {
-    target: 'http://192.168.100.130:8088/',
+    target: 'http://192.168.100.130:8888/',
     changeOrigin: true,
     ws: true,
     pathRewrite: {
-        '^/jasproxy': '/jasframework-demo',
+        '^/jasproxy': '/jasframework-platform',
     }
 });
 var iframeProxy = proxy(function (pathname, req) {
