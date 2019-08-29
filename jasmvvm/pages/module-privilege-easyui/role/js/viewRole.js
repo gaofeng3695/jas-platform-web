@@ -22,7 +22,7 @@ $(function() {
  * @desc 描述：关闭查看页面
  */
 function closeRole() {
-	top. closeDlg("view");
+	window.closeDlg("view");
 }
 
 

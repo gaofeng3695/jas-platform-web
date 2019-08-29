@@ -248,7 +248,7 @@ function radiusCompatible() {
  * @desc 加载输入框提示信息
  */
 function loadBlankTextJs() {
-	var path = rootPath + "jasframework/common/lib/other/jquery.inputDefault.js";
+	var path = rootPath + "jasmvvm/pages/module-privilege-easyui/common/lib/other/jquery.inputDefault.js";
 	$.getScript(path, function() {
 		$('[blankText]').inputDefault();
 	});

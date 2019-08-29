@@ -15,7 +15,7 @@ var url;
  * @desc 新增按钮事件
  */
 function newRole(){
-	top.getDlg(rootPath+"jasframework/privilege/role/addRole.htm?r="+new Date().getTime(),"saveiframe",getLanguageValue("add"),700,300,false,true,true);
+	window.getDlg("addRole.htm?r="+new Date().getTime(),"saveiframe",getLanguageValue("add"),700,300,false,true,true);
 }
 
 /**
@@ -29,11 +29,11 @@ function editRole(oid){
 	}else if(rows.length == 1){
 		eventID = rows[0].oid;
 	} else {
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		window.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 		return;
 	}
 	if(!isNull(eventID)){
-		top.getDlg(rootPath+"jasframework/privilege/role/addRole.htm?oid="+eventID+"&r="+new Date().getTime(),"saveiframe",getLanguageValue("edit"),700,300,false,true,true);
+		window.getDlg("addRole.htm?oid="+eventID+"&r="+new Date().getTime(),"saveiframe",getLanguageValue("edit"),700,300,false,true,true);
 	}
 }
 
@@ -51,7 +51,7 @@ function removeRole(oids){
 			}
 			oids.substring(0,oids.length-1);
 		}else{
-			top.showAlert( getLanguageValue("tip"),getLanguageValue("chooserecord"),"info");
+			window.showAlert( getLanguageValue("tip"),getLanguageValue("chooserecord"),"info");
 			return;
 		}
 	}
@@ -64,14 +64,14 @@ function removeRole(oids){
 				dataType:"json",
 				success : function(data) {
 					if(data.status == 1){
-						top.showAlert(getLanguageValue("tip"),getLanguageValue("deletesuccess"),'ok',function(){
+						window.showAlert(getLanguageValue("tip"),getLanguageValue("deletesuccess"),'ok',function(){
 							$('#dg').datagrid('reload');	// reload the user data
 							$('#dg').datagrid('clearSelections'); //clear selected options
 						});
 					}else if(data.status == 2){
-						top.showAlert(getLanguageValue("tip"),getLanguageValue("role.inUse"), 'info');
+						window.showAlert(getLanguageValue("tip"),getLanguageValue("role.inUse"), 'info');
 					}else{
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("deleteFailed"), 'info');
+						window.showAlert(getLanguageValue("tip"), getLanguageValue("deleteFailed"), 'info');
 					}
 				}
 			});
@@ -110,11 +110,11 @@ function viewUsersOfRole(){
 				}
 				$("#viewUserSel").append(hasUserHtml);
 			} else {
-				top.showAlert(getLanguageValue("error"),result.msg,'error');
+				window.showAlert(getLanguageValue("error"),result.msg,'error');
 			}
 		},'json');
 	}else{
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		window.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
 
@@ -131,11 +131,11 @@ function showInfo(evtID){
 	}else if(rows.length == 1){
 		eventID = rows[0].oid;
 	} else {
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		window.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 		return;
 	}
 	if(!isNull(eventID)){
-		top.getDlg(rootPath+"jasframework/privilege/role/viewRole.htm?oid="+ eventID +"&r="+new Date().getTime(),'view',getLanguageValue("role.viewRole"),700,250,false,true,true);
+		window.getDlg("viewRole.htm?oid="+ eventID +"&r="+new Date().getTime(),'view',getLanguageValue("role.viewRole"),700,250,false,true,true);
 	}
 }
 
@@ -188,7 +188,7 @@ $(document).ready(function(){
 //				}}
 			]],
 		onDblClickRow:function(index,indexData){
-			top.getDlg("viewRole.htm?hidden=&oid="+indexData.oid+"&r="+new Date().getTime(),'view',getLanguageValue("view"),700,240,false,true,true);			
+			window.getDlg("viewRole.htm?hidden=&oid="+indexData.oid+"&r="+new Date().getTime(),'view',getLanguageValue("view"),700,240,false,true,true);			
 		},
 		onCheck:function(rowIndex,rowData){
 		},
