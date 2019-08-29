@@ -1,5 +1,5 @@
 	var url = "";
-	
+
 	/**
 	 * 描述：初始化数据
 	 */
@@ -42,7 +42,7 @@
 	 * 描述：关闭添加页面
 	 */
 	function closePanel() {
-		top.closeDlg("saveiframe");
+		(top.closeDlg||closeDlg)("saveiframe");
 	}
 
 	/**
@@ -54,7 +54,7 @@
 		var validateResault = $('#saveappForm').form("validate");
 		var fromData = JSON.stringify($("#saveappForm").serializeToJson());//获取表单中的json,
 		if(validateResault == false){
-			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
 			enableButtion("saveButton");
 			return validateResault;
 		}else{
@@ -66,14 +66,14 @@
 			    data:fromData,
 			    success: function(data){
 					if(data != null){
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("savesuccess"), 'info', function() {
+						(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("savesuccess"), 'info', function() {
 							//重新加载表格数据
 							reloadData('queryapplication.htm', '#dg');
 							//关闭弹出框
 						    closePanel();
 						});
 					} else {
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("saveFailed"), 'error');
+						(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("saveFailed"), 'error');
 						enableButtion("saveButton");
 					}
 			    }
@@ -87,15 +87,15 @@
 				if(data){
 					save();
 				}else{
-					top.showAlert(getLanguageValue("error"), getLanguageValue("app.appNameExists"), 'error');
+					(top.showAlert||showAlert)(getLanguageValue("error"), getLanguageValue("app.appNameExists"), 'error');
 				}
 			});
 		}else{
 			return bool;
 		}
 	}
-	
-	
+
+
 	function loadrole(){
 		$.getJSON(rootPath+"jasframework/privilege/role/getList.do",function(data){
 			$("#roleselect").combobox({
@@ -105,7 +105,7 @@
 				panelHeight:100
 			});
 			$("#roleselect").combobox("setValue",data[0].oid);
-			
+
 		});
 	}
 	//初始化

@@ -6,20 +6,20 @@
 <meta name="keywords" content="gis,web">
 <meta name="description" content="">
 <title></title>
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
 
-<link rel="stylesheet" type="text/css" href="../../common/css/common.css"></link>
-<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
+<link rel="stylesheet" type="text/css" href="../common/css/common.css"></link>
+<link rel="stylesheet" href="../common/css/add.css" type="text/css"></link>
 
-<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
-<script type="text/javascript" src="../../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../common/js/common.js"></script>
 <script type="text/javascript" src="js/addUnit.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
-<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="../common/i18n/i18n.js"></script>
 </head>
 <body>
 <div id="contentArea" class="content-area">
@@ -29,7 +29,7 @@
 		<form id="addunit" method="post">
 			<input type="hidden" name="eventid" id="eventid"/>
 			<input type="hidden" name="businessrange" id="businessrange" value="1"/>
-			<table align="center" class="edit-table" >	
+			<table align="center" class="edit-table" >
 				<tr>
 					<td width="20%"><span key="unit.parentid" class="paltform-i18n">上级组织机构：</span></td>
 					<td width="30%"><input id="parentId" name="parentId" class="easyui-combotree" panelHeight="auto" style="width: 230px"></td>
@@ -61,7 +61,7 @@
 				    <td><span key="descriptioninfo" class="paltform-i18n">组织机构描述：</span></td>
 					<td colspan="3"><textarea id="description" class="easyui-validatebox" validType="maxLength[300]"  name="description" style="height: 60px;"></textarea></td>
 			</table>
-			
+
 		</form>
 	<!-- </div> -->
 </div>
@@ -74,8 +74,7 @@
 				 <a href="#" class="easyui-linkbutton cancel" onclick="closeUnit()"><span key="cancel" class="paltform-i18n">取消</span></a>
 			 </td>
 		</tr>
-	</table>	
-</div> 
-</body>	
+	</table>
+</div>
+</body>
 </html>
-	

@@ -3,7 +3,7 @@ var url;
 	 * 描述：新增按钮事件
 	 */
 function newApplication(){
-	top.getDlg("addapplication.htm?r="+new Date().getTime(),"saveiframe", getLanguageValue("add"),750,300);
+   (getDlg||top.getDlg)("addapplication.htm?r="+new Date().getTime(),"saveiframe", getLanguageValue("add"),750,400);
 }
 /**
  * 描述：修改按钮事件
@@ -12,9 +12,9 @@ function editRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
 //				var row = $('#dg').datagrid('getSelected');
-		top.getDlg("updateapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),"updateiframe", getLanguageValue("edit"),700,300);
+    (getDlg||top.getDlg)("updateapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),"updateiframe", getLanguageValue("edit"),700,400);
 	}else{
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		(showAlert||top.showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
 /**
@@ -24,34 +24,34 @@ function removeRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
 		var row = $('#dg').datagrid('getSelected');
-		top.$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
+		(top.$.messager||$.messager).confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
 			if (r){
 				$.getJSON(rootPath+"jasframework/privilege/application/IsInUse.do?oid="+row.oid,function(check) {
 					if (check){
-						top.showAlert(getLanguageValue("tip"),getLanguageValue("app.hasPrivilege"));
+						(showAlert||top.showAlert)(getLanguageValue("tip"),getLanguageValue("app.hasPrivilege"));
 					} else{
 					 	var postUrl = rootPath+"jasframework/privilege/application/delete.do?oid="+row.oid;
 						$.post(postUrl,function(result){
 							if (result){
-								top.showAlert(getLanguageValue("success"),getLanguageValue("deletesuccess"),'ok',function(){
+								(showAlert||top.showAlert)(getLanguageValue("success"),getLanguageValue("deletesuccess"),'ok',function(){
 									$('#dg').datagrid('reload');	// reload the user data
 									$('#dg').datagrid('clearSelections'); //clear selected options
 									reloadDataTree('queryPrivilege.htm','#appnumber1');
 								});
 							} else {
-								top.showAlert(getLanguageValue("error"),result.msg,'error');
+								(showAlert||top.showAlert)(getLanguageValue("error"),result.msg,'error');
 							}
 						},'json');
 					}
 				});
-				
+
 			}
 		});
 	}else{
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
-	
+
 function viewUsersOfRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
@@ -68,11 +68,11 @@ function viewUsersOfRole(){
 				}
 				$("#viewUserSel").append(hasUserHtml);
 			} else {
-				top.showAlert(getLanguageValue("error"),result.msg,'error');
+				(showAlert||top.showAlert)(getLanguageValue("error"),result.msg,'error');
 			}
 		},'json');
 	}else{
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		(showAlert||top.showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
 
@@ -82,29 +82,35 @@ function viewUsersOfRole(){
 function showInfo(){
 	var rows = $("#dg").datagrid("getSelections");
 	if(rows.length == 1) {
-		top.getDlg("viewapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),'view', getLanguageValue("view"),800,260);
+		(getDlg||top.getDlg)("viewapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),'view', getLanguageValue("view"),800,400);
 	} else {
-		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
+		(showAlert||top.showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
 
 /**
  * 页面初始化
  */
+var size=10;
+var page=1;
 $(document).ready(function(){
 	$('#dg').datagrid({
 		width:'100%',
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:rootPath+'jasframework/privilege/application/getList.do',
+		url:rootPath+'jasframework/privilege/application/getAppPage.do',
 		remoteSort: true,
 		idField:'oid',
 		pagination:true,
 		singleSelect:true,
-		columns : [ [ 
+		queryParams:{
+			size:size,
+			page:page
+		},
+		columns : [ [
              {
-            	 field : 'ck',
+          field : 'ck',
      		 	title : getLanguageValue('ck'),
      			checkbox : true
  		    },
@@ -115,19 +121,34 @@ $(document).ready(function(){
 		    },
 		    {
 				field : 'appName',
-				title : getLanguageValue('app.appName'), 
+				title : getLanguageValue('app.appName'),
 				width : 200
-		   }, 
+			 },
+			 {
+				field : 'appNumber',
+				title : getLanguageValue('app.appNumber'),
+				width : 200
+		   },
 		   {
 				field : 'roleName',
 				title : getLanguageValue('app.roleName'),
 				width : 200
-		   }, 
-		   {
+			 },
+			 {
 				field : 'appUrl',
 				title : getLanguageValue('app.appUrl'),
+				width : 200
+		   },
+		   {
+				field : 'extranetUrl',
+				title : getLanguageValue('app.extranetUrl'),
 				width : 300
-			}, 
+			},
+			{
+				field : 'appType',
+				title : getLanguageValue('app.appType'),
+				width : 300
+			},
 			{
 				field : 'description',
 				title : getLanguageValue('app.description'),
@@ -135,6 +156,10 @@ $(document).ready(function(){
 			}
 		] ],
 		rownumbers:true,
+		onBeforeLoad:function(param){
+				size=param.rows;
+				page=param.page;
+		},
 		onDblClickRow:function(index,indexData){
 			showInfo();
 		},

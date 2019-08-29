@@ -11,9 +11,9 @@ function getappsystem(){
 				selecthtm += "<option value=\""+result[i].oid+"\">"+result[i].appName+"</option>";
 			}
 			$("#appId").html(selecthtm);
-			$('#appId1').combobox({   
+			$('#appId1').combobox({
 				 data:result,
-				 valueField:'oid',   
+				 valueField:'oid',
 				 textField:'appName'  ,
 				 onSelect:function(record){
 					 initzTree(record.oid);
@@ -24,14 +24,14 @@ function getappsystem(){
 						 $(this).combobox('select',data[0].oid);
 					 }
 				 }
-			}); 
+			});
 		},
 		dataType:"json",
 		 	async: false,
 		 	error:function(){
 		}
 	});
-	
+
 }
 
 
@@ -42,7 +42,7 @@ function getappsystem(){
 	 */
 	var clientWidth = document.documentElement.clientWidth;
 	var clientHeight = document.documentElement.clientHeight;
-	
+
 	$(document).ready(function(){
 		getappsystem();
 		//左侧div宽度
@@ -61,9 +61,9 @@ function getappsystem(){
 			//$("#cc").layout('resize',{height:clientHeight,width:clientWidth});
 			$('#left').panel('resize',{height:clientHeight,width:div_left_width});
 			$('#right').panel('resize',{height:clientHeight,width:clientWidth - panelWidth});
-			
+
 		}
-	
+
 		$(".layout-button-left").hide();
 		$(".layout-button-left").bind("click",function(){
 			my_resize(div_left_width-21);
@@ -75,7 +75,7 @@ function getappsystem(){
 			});
 		});
 	//	selectappsystem();
-		
+
 	});
 	function initzTree(appId){
 		$.ajax({
@@ -92,7 +92,7 @@ function getappsystem(){
 						display:true
 					},data: {
 						simpleData: {
-							enable: true, 
+							enable: true,
 							idKey: 'id'
 						}
 					},callback: {
@@ -122,7 +122,7 @@ function getappsystem(){
 					}
 				},result);
 			}
-			
+
 		});
 	}
 	/**
@@ -222,7 +222,7 @@ function getappsystem(){
 			type:"post",
 			async:false,
 			success:function(result){
-				
+
 			}
 		});
 	};
@@ -295,7 +295,7 @@ function getappsystem(){
 					async:false,
 					dataType:"json"
 					});
-				
+
 				return isUpdate;
 			},
 			onDrop:function(targetNode, sourceNode, point){
@@ -306,7 +306,7 @@ function getappsystem(){
 				//alert(JSON.stringify(target));
 				//var source = $(this).tree("getNode",sourceNode);
 				var url=rootPath+"jasframework/privilege/privilege/updatePrivilegeHierarchy.do";
-				$.post(url, 
+				$.post(url,
 						{"targetId":targetId,
 						"sourceId":sourceId,
 						"appNumber":appNumber,"point":point},
@@ -315,7 +315,7 @@ function getappsystem(){
 				);
 			}
 		});
-		
+
 	}
 	/**
 	 * 描述：判断节点是否为根节点
@@ -339,11 +339,11 @@ function getappsystem(){
 		if (nodes != "") {
 			parentId = nodes[0].id;
 			url = "addPrivilege.htm?appId="+appId+"&parentId=" + parentId;
-			top.getDlg(url, "saveiframe", getLanguageValue("add"), 700, 420);
+			(top.getDlg||getDlg)(url, "saveiframe", getLanguageValue("add"), 700, 420);
 		} else {
-			top.getDlg("addPrivilege.htm?appId="+appId, "saveiframe", getLanguageValue("add"), 700, 370);
+			(top.getDlg||getDlg)("addPrivilege.htm?appId="+appId, "saveiframe", getLanguageValue("add"), 700, 370);
 		}
-	
+
 	}
 	/**
 	 * 描述：修改按钮事件
@@ -357,13 +357,13 @@ function getappsystem(){
 		if (nodes != "") {
 			oid = nodes[0].id;
 			url = "updatePrivilege.htm?oid=" + oid;
-			top.getDlg(url, "saveiframe",getLanguageValue("edit"), 700, 370);
+			(top.getDlg||getDlg)(url, "saveiframe",getLanguageValue("edit"), 700, 370);
 		} else {
-			top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
 			return;
 		}
 	}
-	
+
 	/**
 	 * 描述：检查权限是否被分配
 	 */
@@ -382,13 +382,13 @@ function getappsystem(){
 					}
 				});
 			} else if(check.success=='-2'){
-				top.showAlert(getLanguageValue("pri.deletepri"), check.msg, 'error');
+				(top.showAlert||showAlert)(getLanguageValue("pri.deletepri"), check.msg, 'error');
 			}else{
 				removeUnit();
 			}
 		});
 		} else {
-			top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
 			return;
 		}
 	}
@@ -407,10 +407,10 @@ function getappsystem(){
 					var url = rootPath+'jasframework/privilege/privilege/deletePrivilegeById.do?oid=' + nodes[0].id;
 					$.post(url, function(result) {
 						if (result.status == 1) {
-							top.showAlert(getLanguageValue("pri.deletepri"), getLanguageValue("deletesuccess"), 'ok', function() {
-							
+							(top.showAlert||showAlert)(getLanguageValue("pri.deletepri"), getLanguageValue("deletesuccess"), 'ok', function() {
+
 //								var parent11=$('#tt').tree('getParent',$('#tt').tree('getSelected').target);
-//							
+//
 //								$('#tt').tree('remove',$('#tt').tree('getSelected').target);
 //								if(parent11!=null){
 //									loadRight(parent11.id);
@@ -421,18 +421,18 @@ function getappsystem(){
 //								}
 								reloadZtreeNode(nodes[0].id);
 							});
-									 	
-	
+
+
 						} else {
-							top.showAlert(getLanguageValue("pri.deletepri"),result.msg + '', 'error');
+							(top.showAlert||showAlert)(getLanguageValue("pri.deletepri"),result.msg + '', 'error');
 							return;
 						}
 					}, 'json');
-	
+
 				}
 			});
 		} else {
-			top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
 			return;
 		}
 	}
@@ -458,7 +458,7 @@ function getappsystem(){
 		var parentNode=node.getParentNode();
 		treeObj.reAsyncChildNodes(parentNode, "refresh");
 	}
-	
+
 	function reloadZtree(){
 		var treeObj = $.fn.zTree.getZTreeObj("tt");
 		treeObj.refresh();
@@ -473,7 +473,7 @@ function getappsystem(){
 		initzTree(appId);
 	}
 	/**
-	 * 
+	 *
 	 * 描述：拖动改变布局大小的监听方法
 	 */
 	function resizeLayout(){
@@ -481,7 +481,7 @@ function getappsystem(){
 			clientWidth = document.documentElement.clientWidth;
 			$('#appId1').combobox('resize', $('#left').width());
 		}catch(e){
-			
+
 		}
 	}
 	function loadRight(id){
@@ -490,4 +490,4 @@ function getappsystem(){
 			$('#right').form('load', bo);
 		}, 'json');
 	}
-	
+

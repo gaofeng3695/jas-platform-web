@@ -8,18 +8,19 @@
 <meta name="keywords" content="gis,web">
 <meta name="description" content="">
 <title></title>
-<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="./../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="./../common/lib/easyui/themes/icon.css">
 
-<link rel="stylesheet"  type="text/css" href="../common/css/common.css"></link>
-<link rel="stylesheet" href="../common/css/detail.css" type="text/css"></link>
+<link rel="stylesheet"  type="text/css" href="./../common/css/common.css"></link>
+<link rel="stylesheet" href="./../common/css/detail.css" type="text/css"></link>
 
-<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../common/js/common.js"></script>
-<script type="text/javascript" src="js/viewapplication.js"></script>
+<script type="text/javascript" src="./../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="./../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="./../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
-<script type="text/javascript" src="../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="./../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="js/viewapplication.js"></script>
+
 </head>
 <body>
 <div id="contentArea" class="content-area">
@@ -33,12 +34,22 @@
 			<td><span id="appName"></span></td>
 		</tr>
 		<tr>
-		   <th><span key="app.roleName" class="paltform-i18n">管理角色：</span></th>
-			<td colspan="3"><span id="roleName"></span></td>
+				<th><span key="app.appNumber" class="paltform-i18n">应用系统编号：</span></th>
+			<td><span id="appNumber"></span></td>
+		   <th><span key="app.roleName" class="paltform-i18n">应用系统管理角色：</span></th>
+			<td><span id="roleName"></span></td>
 		</tr>
 		<tr>
-			<th><span key="app.appUrl" class="paltform">应用系统前缀：</span></th>
-			<td colspan="3"><span id="appUrl"></span></td>
+				<th><span key="app.appUrl" class="paltform-i18n">应用系统内网URL：</span></th>
+			<td><span id="appUrl"></span></td>
+		   <th><span key="app.extranetUrl" class="paltform-i18n">应用系统外网URL：</span></th>
+			<td><span id="extranetUrl"></span></td>
+		</tr>
+		<tr>
+			<th><span key="app.appType" class="paltform">应用系统类型：</span></th>
+			<td ><span id="appType"></span></td>
+			<th><span key="app.appIconUrl" class="paltform">应用系统图标：</span></th>
+			<td ><span id="appIconUrl"></span></td>
 		</tr>
 		<tr>
 		    <th><span key="app.description" class="paltform-i18n">描述：</span></th>
