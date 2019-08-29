@@ -27,7 +27,26 @@ var iframeProxy = proxy(function (pathname, req) {
         '^/jasproxy/jasmvvm': '/jasmvvm',
     }
 });
-
+var iframeProxy2 = proxy(function (pathname, req) {
+    return pathname.match('^/jasframework/jasframework');
+}, {
+    target: 'http://localhost:3030/',
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: {
+        '^/jasframework/jasframework': '/jasframework',
+    }
+});
+var iframeProxy3 = proxy(function (pathname, req) {
+    return pathname.match('^/jasframework/jasmvvm');
+}, {
+    target: 'http://localhost:3030/',
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: {
+        '^/jasframework/jasmvvm': '/jasmvvm',
+    }
+});
 module.exports = {
     port: 3030,
     startPath: "/jasmvvm/pages/page-login/login.html",
@@ -36,6 +55,8 @@ module.exports = {
         // index: "index.html",
         middleware: [
             apiProxy,
+            iframeProxy2,
+            iframeProxy3,
             iframeProxy
         ]
     },
