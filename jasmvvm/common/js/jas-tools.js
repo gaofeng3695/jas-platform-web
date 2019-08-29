@@ -152,7 +152,7 @@
 			// 获取带"/"的项目名，如：/uimcardprj
 			var projectName = pathName.substring(0, pathName.substring(1).indexOf('/') + 1);
 			// 判断是否是前端项目，则设定代理前缀
-			if (!projectName || projectName === '/jasmvvm' || projectName === '/pages') {
+			if (!projectName || projectName === '/jasmvvm' ||projectName === '/jasframework' || projectName === '/pages') {
 				return '/jasproxy'
 			}
 			return projectName; // /uimcardprj

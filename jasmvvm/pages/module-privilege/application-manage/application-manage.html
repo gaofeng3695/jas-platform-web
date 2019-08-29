@@ -122,7 +122,7 @@
 			createNewApplication: function () {
 				var that = this;
 				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/application-manage/dialogs/add.html';
-				top.jasTools.dialog.show({
+				(top.jasTools 	|| jasTools).dialog.show({
 					width: '50%',
 					height: '60%',
 					title: '新增应用系统',
