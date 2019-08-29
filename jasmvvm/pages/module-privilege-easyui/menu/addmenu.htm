@@ -6,18 +6,18 @@
 <meta name="keywords" content="gis,web">
 <meta name="description" content="">
 <title></title>
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
 
-<link rel="stylesheet" type="text/css" href="../../common/css/common.css"></link>
-<link rel="stylesheet" type="text/css" href="../../common/css/add.css">
+<link rel="stylesheet" type="text/css" href="../common/css/common.css"></link>
+<link rel="stylesheet" type="text/css" href="../common/css/add.css">
 
-<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
-<script type="text/javascript" src="../../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
-<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../common/js/common.js"></script>
+<script type="text/javascript" src="../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="js/addmenu.js"></script>
 </head>
 <body>
@@ -27,13 +27,13 @@
 	<input type="hidden" id="menuid" value="P-PRI-0060"/>
 	<!-- 	<div id="dlg"> -->
 			<form id="addMenu" method="post">
-				<table align="center" class="edit-table" >	
+				<table align="center" class="edit-table" >
 					<tr>
 						<td width="20%"><span key="menu.menuName"  class="paltform-i18n">菜单名称：</span></td>
 						<td width="30%"><input id="menuName" name="menuName" class="easyui-validatebox input_bg" missingMessage="不能为空" required="true" validType="general" maxlength="25"></td>
 						<!-- <td width="20%"><span key="primenu_parentmenu"   class="paltform-i18n">父菜单：</span></td>
 						<td width="30%"><input id="parentId"  name="parentId" class="input_bg" missingMessage="不能为空"  validType="general" ></td> -->
-					
+
 						<td width="20%"><span key="menu.privilegeAppId" class="paltform-i18n">权限所属系统：</span></td>
 						<td width="30%">
 							<select id="appId1" name="appId1" class="easyui-combobox" editable="false" panelHeight="auto"  required="true" >
@@ -48,15 +48,15 @@
 						<td width="20%"><span key="menu.orderNum" class="paltform-i18n">顺序编号：</span></td>
 						<td width="30%"><input id="orderNum" name="orderNum" class="easyui-validatebox input_bg" missingMessage="不能为空"  required="true"  validType="integer">
 										<input id="privilegeCode" name="privilegeCode" type="hidden"></td>
-					
-						
+
+
 					</tr>
-					<tr>	
+					<tr>
 						<td width="20%"><span key="menu.icon" class="paltform-i18n">菜单图标：</span></td>
 						<td width="80%" align="left">
 							<input id="icon" name="icon" class="easyui-validatebox input_bg"   maxlength="300" />
 						</td>
-						
+
 						 <td width="20%"><span key="menu.background" class="paltform-i18n">菜单背景色：</span></td>
 						<td width="80%"  align="left">
 							<input id="background" name="background" class="easyui-validatebox input_bg"  maxlength="300" />
@@ -91,7 +91,7 @@
 <!-- 			  	  	 <td align="center" colspan="4"><span key="primenu_explain" style="color: red" class="paltform-i18n">说明：菜单编号为父权限编号+两位数字，不可重复</span></td> -->
 			  	   </tr>
 			</table>
-			
+
 		</form>
 		<!-- </div> -->
 		</div>
@@ -103,8 +103,7 @@
 							<a href="#" class="easyui-linkbutton cancel"  onclick="closePrivilege()"><span key="cancel" class="paltform-i18n">取消</span></a>
 						 </td>
 		  			</tr>
-		   	</table>	 
+		   	</table>
 		</div>
-	</body>	
+	</body>
 </html>
-	

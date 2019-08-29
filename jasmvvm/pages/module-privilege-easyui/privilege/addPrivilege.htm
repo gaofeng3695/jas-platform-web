@@ -6,20 +6,20 @@
 <meta name="keywords" content="gis,web">
 <meta name="description" content="">
 <title></title>
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
 
 
-<link rel="stylesheet" type="text/css" href="../../common/css/common.css"></link>
-<link rel="stylesheet" type="text/css" href="../../common/css/add.css">
+<link rel="stylesheet" type="text/css" href="../common/css/common.css"></link>
+<link rel="stylesheet" type="text/css" href="../common/css/add.css">
 
-<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
-<script type="text/javascript" src="../../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
-<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="js/addPrivilege.js"></script>
 </head>
 <body>
@@ -29,7 +29,7 @@
 	<input type="hidden" id="menuid" value="P-PRI-0040"/>
 		<!-- <div id="dlg"> -->
 			<form id="addPrivilege" method="post">
-				<table align="left" class="edit-table" >	
+				<table align="left" class="edit-table" >
 					<tr>
 						<td width="20%"><span key="pri.privilegeType" class="paltform-i18n">权限类型：</span></td>
 						<td width="30%">
@@ -69,13 +69,13 @@
 								<option value="05#导出#bt_export">导出</option>
 								<option value="06#导入#bt_import">导入</option>
 								<option value="07#定位#bt_position">定位</option>
-							</select>  
+							</select>
 						</td>
 					</tr>
 					<tr>
 						<td width="20%" id="iconName"><span key="pri.icon" class="paltform-i18n">菜单图标：</span></td>
 						<td width="30%" id="iconValue"><input id="icon" name="icon" class="easyui-validatebox input_bg" value="fa fa-bookmark" maxlength="50"></td>
-						
+
 						<td width="20%" id="functionTypeName" style="display: none;"><span key="pri.functionType" class="paltform-i18n">功能点了类型：</span></td>
 						<td width="30%" id="functionTypeValue" style="display: none;" align="left">
 							<select id="functionType" name="functionType" class="easyui-combobox select" editable="false" required="true" panelHeight="140" multiple=true>
@@ -86,9 +86,9 @@
 								<option value="bt_export">导出</option>
 								<option value="bt_import">导入</option>
 								<option value="bt_position">定位</option>
-							</select>  
+							</select>
 						</td>
-						
+
 						<td width="20%"><span key="pri.appId" class="paltform-i18n">应用系统：</span></td>
 						<td width="30%">
 							<select id="appId" name="appId" class="easyui-combobox" editable="false" panelHeight="auto"  required="true" >
@@ -107,7 +107,7 @@
 					    <td width="20%"><span key="pri.description" class="paltform-i18n">权限描述：</span></td>
 						<td width="80%" colspan="3"><textarea id="description"  name="description" class="easyui-validatebox" validType="maxLength[300]" style="height: 60px;"></textarea></td>
 			  	   </tr>
-			  	   
+
 <!-- 				 <tr> -->
 <!-- 			  	  	 <td align="center" colspan="4"><span key="" style="color: red" class="paltform-i18n">提示：权限编号一般为父权限编号+两位数字，不可重复</span></td> -->
 <!-- 			  	   </tr> -->
@@ -123,8 +123,7 @@
 						<a href="#" class="easyui-linkbutton cancel"  onclick="closePrivilege()"><span key="cancel" class="paltform-i18n">取消</span></a>
        				 </td>
          			</tr>
-         	</table>	 
+         	</table>
 		</div>
-	</body>	
+	</body>
 </html>
-	

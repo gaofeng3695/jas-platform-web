@@ -8,7 +8,7 @@ $(function() {
  * 描述：关闭查看页面
  */
 function closeRole() {
-	top. closeDlg("view");
+	closeDlg("view");
 }
 /**
  * 描述：初始化数据

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * 文件描述: 国际化功能js。
  *
  * @author zhangcf
@@ -7,13 +7,13 @@
  * 创建时间： 2012-08-30 上午17:46:07
  *********************************更新记录******************************
  * 版本：  1.0       修改日期：   2013-10-12       修改人： yanght
- * 修改内容： 
+ * 修改内容：
  **********************************************************************
  */
 
 var controller;
 /**
- * 
+ *
  * 功能描述：国际化主调函数
  *
  */
@@ -61,19 +61,20 @@ function LanguageController(lang, titless) {
 }
 
 /**
- * 
+ *
  * 功能描述：根据国际化key 获取当前客户端所使用语言的页面元素text
- * 
+ *
  * @param key
  *            国际化key，即：页面元素标签中定义的key属性；
  * @returns
  */
 function getLanguageValue(key,defaultval) {
+	console.log("国际化")
 	if (controller) {
 		var value = controller.language.titles[key];
 		if (value == null || value == "") {
 			if(defaultval){
-			  return defaultval;	
+			  return defaultval;
 			}
 			return key;
 		}
@@ -81,20 +82,20 @@ function getLanguageValue(key,defaultval) {
 
 	} else {
 		if(defaultval){
-			  return defaultval;	
+			  return defaultval;
 		}
 		return key;
 	}
 }
 
 /**
- * 
+ *
  * 功能描述：easyUI国际化函数,获取easyui国际化文件
- * 
+ *
  */
 function easyUI_i18n() {
 	var language = top.currentLanguage;
-	var path = rootPath + "jasframework/common/lib/easyui/locale/easyui-lang-" + language + ".js";
+	var path = rootPath + "jasmvvm/pages/module-privilege-easyui/common/lib/easyui/locale/easyui-lang-" + language + ".js";
 	$.ajax({
 		url : path,
 		dataType : "script",

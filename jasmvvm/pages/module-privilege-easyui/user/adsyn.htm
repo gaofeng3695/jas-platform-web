@@ -3,14 +3,14 @@
 <head>
 <title>配置权限</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
 <link type="text/css" rel="stylesheet" href="../style/blue/pageCommon.css" />
 <link rel="stylesheet" href="../style/css/zTreeStyle/zTreeStyle.css" type="text/css">
-<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
-<script language="javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script language="javascript" src="../common/js/common.js"></script>
 <script type="text/javascript">
 	function sync() {
 		var syncValue;
@@ -32,7 +32,7 @@
 		}
 		$.getJSON(rootPath+"/jasframework/advalidate/syncoperation.do", {
 			"syncValue" : syncValue
-		}, function(jso) {			
+		}, function(jso) {
 			if (jso.success==1) {
 				alert("同步成功");
 			}else{
@@ -45,8 +45,8 @@
 </head>
 <body>
 	<form action="">
-		<input id="syncUser" type="checkbox" name="syncUser" /> 同步用户 
-		<input id="syncUnit" type="checkbox" name="syncUnit" /> 同步部门<br> 
+		<input id="syncUser" type="checkbox" name="syncUser" /> 同步用户
+		<input id="syncUnit" type="checkbox" name="syncUnit" /> 同步部门<br>
 		<a	href="#" id="savebutton" class="easyui-linkbutton" iconCls="icon-ok" onclick="sync()">同步</a>
 	</form>
 </body>

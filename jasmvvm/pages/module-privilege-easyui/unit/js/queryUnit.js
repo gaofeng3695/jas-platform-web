@@ -1,4 +1,4 @@
-	
+
 /**
  * 初始化
  */
@@ -15,7 +15,7 @@ $(function() {
 				}, 'json');
 //				$("#delbtn").attr("disabled", "disabled");
 				$('#delbtn').linkbutton('disable');
-				$('#editbtn').linkbutton('disable'); 
+				$('#editbtn').linkbutton('disable');
 			},
 			onBeforeExpand : function(node,param){
 			},
@@ -28,11 +28,11 @@ $(function() {
 				if (node.attributes.type==0) {
 //					$("#delbtn").attr("disabled", "disabled");
 					$('#delbtn').linkbutton('disable');
-					$('#editbtn').linkbutton('disable'); 
+					$('#editbtn').linkbutton('disable');
 				} else {
-					$('#addbtn').linkbutton('enable'); 
-					$('#editbtn').linkbutton('enable'); 
-					$('#delbtn').linkbutton('enable'); 
+					$('#addbtn').linkbutton('enable');
+					$('#editbtn').linkbutton('enable');
+					$('#delbtn').linkbutton('enable');
 //					$("#addbtn").removeAttr("disabled");
 //					$("#editbtn").removeAttr("disabled");
 //					$("#delbtn").removeAttr("disabled");
@@ -41,8 +41,8 @@ $(function() {
 		});
 	});
 
-	
-	
+
+
 	/**
 	 * 描述：增加新部门
 	 */
@@ -51,13 +51,13 @@ $(function() {
 		var eventID;
 		if (row != null) {
 			eventID = row.id;
-			url = rootPath+"jasframework/privilege/unit/addUnit.htm?parentid=" + eventID;
-			top.getDlg(url, "saveiframe", getLanguageValue("unit.xinzengbumen"), 750, 350);
+			url = rootPath+"addUnit.htm?parentid=" + eventID;
+			(top.getDlg||getDlg)(url, "saveiframe", getLanguageValue("unit.xinzengbumen"), 750, 350);
 		} else {
-			top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
 			return;
 		}
-	
+
 	}
 	/**
 	 * 描述：修改按钮事件
@@ -79,7 +79,7 @@ $(function() {
 			return;
 		}
 	}
-	
+
 	/* //检查部门是否存在用户
 	function checkunituser(){
 		var unitid=$('#tt').tree('getSelected').id;
@@ -89,14 +89,14 @@ $(function() {
 				if(r){
 				 removeUnit();
 				}
-				
+
 				});
 			} else{
 			 	removeUnit();
 			}
 		});
 	} */
-	
+
 	/**
 	 * 描述：删除部门
 	 */
@@ -115,25 +115,25 @@ $(function() {
 					$.post(url, function(result) {
 						if (result.status == 1) {
 							top.showAlert(getLanguageValue("unit.deleteunit"), result.msg, 'msg', function() {
-							
+
 								var parent11=$('#tt').tree('getParent',$('#tt').tree('getSelected').target);
-							
+
 								$('#tt').tree('remove',$('#tt').tree('getSelected').target);
-								
+
 					 			url = rootPath+'jasframework/privilege/unit/findUnitById.do?oid='+parent11.id;
 								$.post(url, function(bo) {
 									$('#right').form('load', bo);
 								}, 'json');
 								$('#tt').tree('select',$('#tt').tree('getRoot').target);
 							});
-									 	
-	
+
+
 						} else {
 							top.showAlert(getLanguageValue("unit.deleteunit"), result.msg , 'error');
 							return;
 						}
 					}, 'json');
-	
+
 				}
 			});
 		} else {
@@ -141,7 +141,7 @@ $(function() {
 			return;
 		}
 	}
-	
+
 	var clientWidth = document.documentElement.clientWidth;
 	var clientHeight = document.documentElement.clientHeight;
 	$(document).ready(function(){
@@ -161,7 +161,7 @@ $(function() {
 			//$("#cc").layout('resize',{height:clientHeight,width:clientWidth});
 			$('#left').panel('resize',{height:clientHeight,width:div_left_width});
 			$('#right').panel('resize',{height:clientHeight,width:clientWidth - panelWidth});
-			
+
 //			if(top.$("#area_map_north").height() > 10 ){
 //		 		$("#left").css("height",clientHeight-panel_header_height);
 //				$("#right").css("height",clientHeight+15);
@@ -170,7 +170,7 @@ $(function() {
 //				$("#right").css("height",clientHeight);
 //			}
 		}
-	
+
 		$(".layout-button-left").hide();
 		$(".layout-button-left").bind("click",function(){
 			my_resize(div_left_width-21);

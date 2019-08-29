@@ -6,18 +6,18 @@
 <meta name="keywords" content="gis,web">
 <meta name="description" content="">
 <title></title>
-<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../common/lib/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="./../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="./../common/lib/easyui/themes/icon.css">
 
-<link rel="stylesheet"  type="text/css" href="../common/css/common.css"></link>
-<link rel="stylesheet" type="text/css" href="../common/css/add.css">
+<link rel="stylesheet"  type="text/css" href="./../common/css/common.css"></link>
+<link rel="stylesheet" type="text/css" href="./../common/css/add.css">
 
-<script type="text/javascript" src="../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../common/js/common.js"></script>
+<script type="text/javascript" src="./../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="./../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="./../common/js/validate_class.js"></script>
+<script type="text/javascript" src="./../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
-<script type="text/javascript" src="../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="./../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="js/addapplication.js"></script>
 </head>
 <body>
@@ -28,24 +28,47 @@
 	<!-- 数据eventid -->
 		<table align="center" class="edit-table">
 			<tr>
-				<td  width="20%"><span key="app.appName" class="paltform-i18n">系统名称：</span></td>
+				<td  width="20%"><span key="app.appName" class="paltform-i18n">应用系统名称：</span></td>
 				<td  width="30%"><input name="appName" class="easyui-validatebox input_bg"
-					required="true" id='appName' validType="general" maxLength=25 /></td>
+					required="true" id='appName' validType="general" maxLength=50 /></td>
 
-
-				<td  width="20%"><span key="app.roleName" class="paltform-i18n">管理角色：</span></td>
+        <td  width="20%"><span key="app.appNumber" class="paltform-i18n">应用系统编号：</span></td>
+				<td  width="30%"><input name="appNumber" class="easyui-validatebox input_bg"
+					required="true" id='appNumber' validType="number"  /></td>
+			</tr>
+			<tr>
+				<td  width="20%"><span key="app.roleName" class="paltform-i18n">应用系统管理角色：</span></td>
 				<td  width="30%"><select id="roleselect" name="roleId"
 					required="true" editable=false class="easyui-combobox input_bg"
 					style="width: 200px">
 				</select></td>
+				<td  width="20%"><span key="app.appUrl" class="paltform-i18n">应用系统内网URL：</span></td>
+				<td  width="30%"><input name="appUrl" class="easyui-validatebox input_bg"
+					required="true" id='appUrl' validType="url"  /></td>
 			</tr>
 			<tr>
-				<td width="20%"><span key="app.appUrl" class="paltform-i18n">系统前缀</span></td>
-				<td><input name="appUrl" id="systemurl" class="easyui-validatebox input_bg"  validType="priUrl"/></td>
+				<td  width="20%"><span key="app.extranetUrl" class="paltform-i18n">应用系统外网URL：</span></td>
+				<td  width="30%"><input name="extranetUrl" class="easyui-validatebox input_bg"
+					 id='extranetUrl' validType="url"  /></td>
+				<td width="20%"><span key="app.appType" class="paltform-i18n">应用系统类型</span></td>
+				<td>
+						<select id="typeSelect" name="appType"
+						required="true" editable=false class="easyui-combobox input_bg"
+						style="width: 200px">
+						<option value="1">平台系统</option>
+						<option value="2">业务系统</option>
+					</select>
+					<!-- <input name="appType" id="appType" class="easyui-validatebox input_bg"  /> -->
+				</td>
+			</tr>
+			<tr>
+					<td  width="20%"><span key="app.appIconUrl" class="paltform-i18n">应用系统图标：</span></td>
+					<td  width="30%"><input name="appIconUrl" class="easyui-validatebox input_bg"
+						 id='appIconUrl' validType="general" /></td>
 			</tr>
 			<tr>
 				<td colspan="1"><span key="app.description"
-					class="paltform-i18n">描述：</span></td>
+					class="paltform-i18n">应用系统描述：</span></td>
 				<td colspan="3"><textarea name="description" cols="25" rows="5"
 						id="description" class="easyui-validatebox"
 						validType="maxLength[300]"></textarea></td>

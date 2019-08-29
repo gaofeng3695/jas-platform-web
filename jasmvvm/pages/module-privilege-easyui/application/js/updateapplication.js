@@ -1,5 +1,5 @@
 	var url = "";
-	
+
 	/**
 	 * 描述：初始化数据
 	 */
@@ -26,7 +26,7 @@
 	 * 描述：关闭添加页面
 	 */
 	function closePanel() {
-		top. closeDlg("updateiframe"); 
+		(top. closeDlg||closeDlg)("updateiframe");
 	}
 
 	function updatecheck(){
@@ -36,14 +36,14 @@
 				if(data){
 					updatedata();
 				}else{
-					top.showAlert(getLanguageValue("error"), getLanguageValue("applicationnameexists"), 'error');
+					(top.showAlert||showAlert)(getLanguageValue("error"), getLanguageValue("applicationnameexists"), 'error');
 				}
 			});
 		}else{
 			return bool;
 		}
 	}
-	
+
 	/**
 	 * 描述：修改应用系统
 	 */
@@ -53,7 +53,7 @@
 		var validateResault = $('#updateappForm').form("validate");
 		var fromData = JSON.stringify($("#updateappForm").serializeToJson());//获取表单中的json,
 		if(validateResault == false){
-			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
+			(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
 			enableButtion("savebutton");
 			return validateResault;
 		}else{
@@ -65,14 +65,14 @@
 			    data:fromData,
 			    success: function(data){
 					if(data.success==1){
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("updatesuccess"), 'info', function() {
+						(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("updatesuccess"), 'info', function() {
 							//重新加载表格数据
 							reloadData('queryapplication.htm', '#dg');
 							//关闭弹出框
 						    closePanel();
 						});
 					} else {
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("updateFailed"), 'error');
+						(top.showAlert||showAlert)(getLanguageValue("tip"), getLanguageValue("updateFailed"), 'error');
 						enableButtion("saveButton");
 					}
 			    }
@@ -95,4 +95,4 @@
 	$(function() {
 		loadrole();
 	});
-	
+
