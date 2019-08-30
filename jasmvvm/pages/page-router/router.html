@@ -33,32 +33,43 @@
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 			jasTools.base.systemGuard({
 				appId: '',
-				accessHost: jasTools.base.rootPath, // 'http://192.168.100.130:8081/jasframework-platform',
-				loginHost: jasTools.base.rootPath, //'http://192.168.100.130:8081/jasframework-platform',
-			}, function (result) {
+			}, function () {
+				var url = jasTools.base.rootPath + "/jasframework/login/loginByTokenAndAppId.do";
+				$.ajax({
+					type: "GET",
+					url: url,
+					async: false,
+					data: {
+						token: params.token,
+						appId: params.appId,
+					},
+					success: function (data, status) {
+						localStorage.setItem("token", data.token);
+						var userBo = data.user;
+						var unitName = userBo.unitName;
+						unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
+						userBo.unitName = unitName;
+						localStorage.setItem("user", JSON.stringify(userBo));
+						var myApps = ['88f05573-82df-41d0-8570-e98885bdd721', '98e649f8-51b6-447e-a96f-6c2ec8ef3de1',
+							'4406840d-5a66-4d15-b8e8-5e9e9f837ea9', '0ef16403-540a-4cf1-b52c-88b1d3e87c0a',
+							'afbba156-3822-454c-acaf-dd16b1936dcb'
+						] //个人中心 文档中心 权限管理  工作流管理 日志管理
+						if (myApps.indexOf(params.appId) > -1) {
+							var href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
+							location.href = jasTools.base.setParamsToUrl(href, params);
+						}
+						that.isloading = false;
+					}
+				});
 
-				localStorage.setItem("token", data.token);
-				var userBo = data.user;
-				var unitName = userBo.unitName;
-				unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
-				userBo.unitName = unitName;
-				localStorage.setItem("user", JSON.stringify(userBo));
-
-				var myApps = ['88f05573-82df-41d0-8570-e98885bdd721', '98e649f8-51b6-447e-a96f-6c2ec8ef3de1',
-					'4406840d-5a66-4d15-b8e8-5e9e9f837ea9', '0ef16403-540a-4cf1-b52c-88b1d3e87c0a',
-					'afbba156-3822-454c-acaf-dd16b1936dcb'
-				] //个人中心 文档中心 权限管理  工作流管理 日志管理
-				if (myApps.indexOf(params.appId) > -1) {
-					var href = jasTools.base.rootPath + "/jasmvvm/pages/page-index/index.html";
-					location.href = jasTools.base.setParamsToUrl(href, params);
-				}
-				that.isloading = false;
 			}, function () {
 				top.Vue.prototype.$message({
 					message: '没有登入权限',
 					type: 'error'
 				});
 				that.isloading = false;
+				// location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-login/login.html";
+
 			});
 		}
 	})
