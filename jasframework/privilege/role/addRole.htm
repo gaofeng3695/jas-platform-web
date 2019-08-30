@@ -15,6 +15,7 @@
 <script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
 <script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
@@ -23,7 +24,7 @@
 <body>
 <!-- 权限编号 -->
 	<input type="hidden" id="menuid" value="P-PRI-0220" />
-		
+
 <!-- 主体内容展示区域 -->
 	<div id="contentArea" class="content-area">
 		<form id="roleForm" class="content-area-main" method="post">
@@ -32,12 +33,12 @@
 					<td width="15%">
 						<span key="role.roleName" class="paltform-i18n">角色名称：</span>
 					</td>
-					<td width="35%"><input 
+					<td width="35%"><input
 						class="easyui-validatebox input_bg" id='roleName'  name="roleName" missingmessage="不能为空"
 						required="true"  validType="general" maxLength=25>
 					</td>
 					<td  width="15%"><span key="role.unitId" class="paltform-i18n">所属部门：</span></td>
-					<td  width="35%"><input type="text" id="unitId"  class="easyui-combotree" 
+					<td  width="35%"><input type="text" id="unitId"  class="easyui-combotree"
 						name="unitId" panelHeight="auto"
 						style="width: 230px"  missingmessage="不能为空" required="true" /></td>
 				</tr>
@@ -49,8 +50,6 @@
 							<option value="1">private</option>
 						</select>
 					</td>
-				</tr>
-				<tr>
 					<td width="15%">
 						<span>数据权限过滤规则：</span>
 					</td>

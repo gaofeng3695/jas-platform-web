@@ -17,7 +17,7 @@ var columns = [[
           				}
           			}
                  },
-                 {field:'geometryType',title:'表类型',width:60,
+                 {field:'geometryType',title:'表类型',width:150,
                 	 formatter: function(value,row,index){
           				if (row.geometryType){
           					if(row.geometryType=="Point"){
@@ -26,6 +26,12 @@ var columns = [[
           						return "线空间表";
           					}else if(row.geometryType=="Polygon"){
           						return "面空间表";
+          					}else if(row.geometryType=="MultiPoint"){
+          						return "多点空间表";
+          					}else if(row.geometryType=="MultiPolyline"){
+          						return "多线空间表";
+          					}else if(row.geometryType=="MultiPolygon"){
+          						return "多面空间表";
           					}else{
           						return "属性表";
           					}

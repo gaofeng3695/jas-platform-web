@@ -15,77 +15,35 @@
 		<link rel="stylesheet" type="text/css" href="../../common/css/query.css" ></link>
 		<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
 		<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+		<script type="text/javascript" src="../../common/js/validate_class.js"></script>
 		<script type="text/javascript" src="../../common/js/common.js"></script>
-		<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
 		<script type="text/javascript" src="js/person.js"></script>
 		<script>
 		$(function(){
 			//初始化组织机构树
-			var isFirstLoad = 0;//是否是第一次加载树
-			var oidList =[];//根节点
-			var params = {"treeViewCode":"unitTreeUserListView"};
-			var user = JSON.parse(localStorage.getItem("user"));
-			if(user!=null){
-				if(user.projectOid=="platform"){
-					params = {"treeViewCode":"platformOffice"};
-				}else{
-					var params = {"treeViewCode":"projectOffice"};
-				}
-			}
 			$('#unittree').tree({
-				  	url:rootPath+'treeView/getRootData.do',
-				    queryParams:params,
-				    onBeforeExpand:function(node,param){
-				    	//重置请求参数
-			            $('#unittree').tree('options').queryParams = {
-			            	"parentTreeNodeId":node.attributes.treeNodeId,
-			            	"parentOid":node.id
-			            }
-				    	//重置请求地址
-			            $('#unittree').tree('options').url = rootPath+'treeView/getChildData.do';
-			            return true;
-				    },
-				    onLoadSuccess:function(node,data){
-				    	if(isFirstLoad == 0){
-				    		//动态修改左侧树的title
-				    		$('#main').layout('panel', 'west').panel({ title: data[0].attributes.treeNodeName});
-				    		//加载成功后默认选中第一个节点
-					    	$('#unittree').tree('select', $('#unittree').tree('getRoots')[0].target);
-					    	isFirstLoad++;
-				    	}
-				    	if(isReload == true){
-				    		$('#unittree').tree('select', $('#unittree').tree('getRoots')[0].target);
-				    		isReload = false;
-				    	}
-				    	//$('#dataTree').tree('expandAll');
-				    },
-	//			    onSelect:function(node){
-	//			    	currentSelectNode = node.id;
-	//			    	loadJsList(node.attributes.treeNodeId);
-	//			    	loadButtons(node.attributes.treeNodeId);
-	//			    	loadTabs(node.attributes.treeNodeId,node.id);
-	//			    },
-				    onClick:function(node){
-						$("#10060201").datagrid('clearSelections');
-						queryUser();
-					},
-					onDblClick:function(e,node){
-						$(this).tree('toggle', node.target);
-					},
-				    loader:function(param,success,error){
-				    	var opts = $('#unittree').tree('options');
-				    	$.ajax({  
-			                type : opts.method,  
-			                url : opts.url,  
-			                dataType : 'json',  
-			                contentType : 'application/json;charset=utf-8', // 设置请求头信息  
-			                data : JSON.stringify(param),  
-			                success : function(data) { 
-			                    success(data.rows);                  
-			                }  
-			            });  
-				    }
-				});
+				url: '../../privilege/unit/getLeftTree.do?isroot=true',
+				onLoadSuccess:function(node,data) {//组织机构树加载完毕时，选中树的根节点，并根据根节点的id加载改组织机构下的用户列表
+					var rootNode = $('#unittree').tree('getRoot');
+					var rootId = rootNode.id;
+					$('#unittree').tree('select',rootNode.target);
+					var url = "../../privilege/user/getList.do?unitId="+rootId;
+					$("#10060201").datagrid("options").url = url;
+					$("#10060201").datagrid('load'); 
+				},
+				onClick:function(node){
+					$("#10060201").datagrid('clearSelections');
+					queryUser();
+				},
+				onDblClick:function(e,node){
+					$(this).tree('toggle', node.target);
+				},
+				onContextMenu: function(e, node){
+					e.preventDefault();
+					$('#unittree').tree('select', node.target);
+				}
+			});
 			
 			//初始化用户列表
 			$('#10060201').datagrid({
@@ -101,8 +59,7 @@
 				columns:[[ 
 					{field:"ck",title:"全选",checkbox:true},
 					{field:"loginName",title:"用户名",width:100},
-					{field:"name",title:"姓名",width:100},
-					{field:'roleList',title:'角色',resizable:true,align:"center",width:300}
+					{field:"userName",title:"姓名",width:100}
 				]]
 			});
 			
@@ -136,8 +93,8 @@
 				var userIds= new Array;
 				var userNames = new Array();
 				for(var i=0;i<rows.length;i++){
-					userIds.push(rows[i].eventid);
-					userNames.push(rows[i].name)
+					userIds.push(rows[i].oid);
+					userNames.push(rows[i].userName)
 				}
 				//通过页面的url来获取调用选人控件的页面，并在该页面展示所选择的用户
 				var pagelocation = getParamter("pagelocation",window.document.location.href);
@@ -183,16 +140,10 @@
 			var url;
 			if (row != null ){
 				if(userrange=="1"){
-					
 			 		var unitidList = getChildren();
-					url = "../../privilege/user/getAllUserByUnitid.do?unitidList=" + unitidList;
+					url = "../../privilege/user/getList.do?unitidList=" + unitidList;
 				}else{
-					var user = JSON.parse(localStorage.getItem("user"));
-					if(user.projectOid=="platform"){
-						url = "../../jasframework/privilege/user/getAllUserByUnitidAndRoleNames.do?unitEventid=" + row.id+"&roleNames=122,111,111";
-					}else{
-						url = "../../jasframework/privilege/user/getProjectAllUserByUnitidAndRoleNames.do?unitEventid=" + row.id+"&roleNames=122,111,111";
-					}
+					url = "../../privilege/user/getList.do?unitId=" + row.id;
 				}	
 				$("#10060201").datagrid("options").url = url;
 				$("#10060201").datagrid('options').queryParams=query;
@@ -237,7 +188,7 @@
 			<div region="center" id="centerDiv" title="" style="background:#eee;overflow: hidden;">
 				<div class="easyui-panel" id="queryDiv" title="查询" collapsed="true" collapsible="true">
 					<form method="post" id="approvalQueryForm">
-					<table align="center" class="query-table" id="queryDiv">
+					<table align="center" class="querytable" id="queryDiv">
 						<tr>
 							<td width="15%"><span key="user.loginname" class="paltform-i18n">用户名：</span></td>
 							<td width="35%"><input type="text" id="loginName" name="loginName" class="easyui-validatebox input_bg"/></td>

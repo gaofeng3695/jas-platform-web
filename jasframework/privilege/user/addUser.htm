@@ -19,6 +19,7 @@
 <script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
 <script type="text/javascript" src="../../common/lib/date/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
 <script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
@@ -37,41 +38,41 @@
 			<table align="center" class="edit-table" >
 				<!-- eventid隐藏域	 -->
 				<tr>
-				    <td width="20%"><span key="user.loginname" class="paltform-i18n">用户名：0000000000000</span></td>
+				    <td width="20%"><span key="user.loginname" class="paltform-i18n">用户名：</span></td>
 					<td width="30%"><input type="text" id="loginName" name='loginName' validtype="username" required="true" class="easyui-validatebox input_bg"
 									missingmessage="不能为空" maxlength="25"></td>
-					<td width="20%"><span key="user.username" class="paltform-i18n">姓名：000000000</span></td>
+					<td width="20%"><span key="user.username" class="paltform-i18n">姓名：</span></td>
 					<td width="30%"><input id="userName" name="userName" class="easyui-validatebox input_bg"
 									validType="general" required="true" missingmessage="不能为空" maxlength="25"></td>
 				</tr>
 				<tr>
-					<td ><span key="user.phone" class="paltform-i18n">电话00000000：</span></td>
+					<td ><span key="user.phone" class="paltform-i18n">电话：</span></td>
 					<td ><input id="phone" name="phone" class="easyui-validatebox input_bg" validType="mobileAndPhone" maxlength="18"></td>
-					<td ><span key="user.email" class="paltform-i18n">Email：0000000000</span></td>
+					<td ><span key="user.email" class="paltform-i18n">Email：</span></td>
 					<td ><input id="email" name="email"  class="easyui-validatebox input_bg" validType="email" maxlength="40"></td>
 				</tr>
 				<tr>
-					<td ><span key="user.passwordexpireddate" class="paltform-i18n">密码过期时间：0000000</span></td>
+					<td ><span key="user.passwordexpireddate" class="paltform-i18n">密码过期时间：</span></td>
 					<td ><input id="passwordExpiredDate" name="passwordExpiredDate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate easyui-validatebox input_bg"  /></td>
-				</tr> 
+				</tr>
 				<tr>
-				    <td><span key="user.description" class="paltform-i18n">描述：00000</span></td>
+				    <td><span key="user.description" class="paltform-i18n">描述：</span></td>
 					<td colspan="3"><textarea id="description" name="description" style="height: 60px;" class="easyui-validatebox" validType="maxLength[300]"></textarea></td>
 				</tr>
 			</table>
 		</form>
 	</div>
-	
+
 	<!-- 按钮区域 -->
 	<div class="button-area">
        <table width="100%">
 			<tr>
 				 <td >
-				    <a href="#" id="saveButton" class="easyui-linkbutton save-btn"  onclick="save()"><span key="save" class="paltform-i18n">保存000000000</span></a>
-					<a href="#" class="easyui-linkbutton cancel-btn"  onclick="closePanel()"><span key="cancel" class="paltform-i18n">取消000000</span></a>
+				    <a href="#" id="saveButton" class="easyui-linkbutton save-btn"  onclick="save()"><span key="save" class="paltform-i18n">保存</span></a>
+					<a href="#" class="easyui-linkbutton cancel-btn"  onclick="closePanel()"><span key="cancel" class="paltform-i18n">取消</span></a>
 				 </td>
 			</tr>
-		</table>	 
+		</table>
 	</div>
 </body>
 </html>

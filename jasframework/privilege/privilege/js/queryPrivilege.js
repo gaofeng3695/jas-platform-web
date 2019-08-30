@@ -341,7 +341,7 @@ function getappsystem(){
 			url = "addPrivilege.htm?appId="+appId+"&parentId=" + parentId;
 			top.getDlg(url, "saveiframe", getLanguageValue("add"), 700, 420);
 		} else {
-			top.getDlg("addPrivilege.htm?appId="+appId, "saveiframe", getLanguageValue("add"), 700, 370);
+			top.getDlg("addPrivilege.htm?appId="+appId, "saveiframe", getLanguageValue("add"), 700, 400);
 		}
 	
 	}
@@ -357,7 +357,7 @@ function getappsystem(){
 		if (nodes != "") {
 			oid = nodes[0].id;
 			url = "updatePrivilege.htm?oid=" + oid;
-			top.getDlg(url, "saveiframe",getLanguageValue("edit"), 700, 370);
+			top.getDlg(url, "saveiframe",getLanguageValue("edit"), 700, 400);
 		} else {
 			top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), 'info');
 			return;

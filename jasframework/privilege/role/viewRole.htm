@@ -16,6 +16,7 @@
 
 <script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
 <script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="js/viewRole.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
@@ -24,7 +25,7 @@
 <body>
 <!-- 权限编号 -->
 		<input type="hidden" id="menuid" value="P-PRI-0220"/>
-		
+
 <!-- 主体内容块 -->
 	<div id="contentArea" class="content-area">
 		<form class="content-area-main">
@@ -36,23 +37,17 @@
 					<td><span id="unitName"></span></td>
 				</tr>
 				<tr>
-				   <th><span  key="role.roleType" class="paltform-i18n">角色类型</span></th>
-					<td colspan="3"><span id="roleType"></span></td>
-				</tr>
-				<tr>
-					<td width="15%">
-						<span>数据权限过滤规则：</span>
-					</td>
-					<td width="35%">
-						<input id="dataFilterRegulationCode" name="dataFilterRegulationCode"  class="easyui-validatebox easyui-combobox" style="width:100%;">
-					</td>
+				   	<th><span  key="role.roleType" class="paltform-i18n">角色类型</span></th>
+					<td><span id="roleType"></span></td>
+					<th><span  key="role. dataFilterRegulationName" class="paltform-i18n">数据权限过滤规则</span></th>
+					<td><span id="dataFilterRegulationName"></span></td>
 				</tr>
 				<tr>
 				    <th><span  key="role.description" class="paltform-i18n">描述</span></th>
 				    <td colspan="3"><span id="description"></span></td>
 				</tr>
 			</table>
-		</form>	
+		</form>
 	</div>
 
 <!-- 按钮区域 -->

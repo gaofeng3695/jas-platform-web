@@ -74,7 +74,7 @@ function loadSelect(jsonData){
 	    	if (!isNull(oid)) {
 	    		$('#dataFilterRegulationCode').combobox('setValue', jsonData.dataFilterRegulationCode);
 	    	}else{
-	    		$('#dataFilterRegulationCode').combobox('setValue', data[0].codeid);
+	    		$('#dataFilterRegulationCode').combobox('setValue', data[0].codeId);
 	    	}
 	    }
 	});
@@ -103,7 +103,7 @@ function save() {
 	var fromData = JSON.stringify(formData);//获取表单中的json,
 	
 	if(validateResault == false){
-		top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
+		top.showAlert(getLanguageValue("tip"), getLanguageValue("必填项不能为空"), 'info');
 		enableButtion("saveButton");
 		return validateResault;
 	}else{

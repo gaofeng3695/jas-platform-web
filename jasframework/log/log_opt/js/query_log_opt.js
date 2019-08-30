@@ -61,7 +61,7 @@ $(document).ready(function(){
 
             {
                 field:"optType",
-                title:"动作",
+                title:"操作类型",
                 width:"80",
                 resizable:true,
                 align:'center'

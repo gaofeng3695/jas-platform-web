@@ -52,19 +52,6 @@ function getFileListInfo(oid,viewOrUpdate,moduleCode,picAndFileSort,fileId,busin
 	    				for(var i = 0; i < fileList.length; i++){
 	    					var desc = fileList[i].fileDescription?fileList[i].fileDescription:"",
 	    					    size = (fileList[i].fileSize/1024).toFixed(2);
-	    					// // 允许修改文件名称的
-			    			// var $tr = $('<tr id="'+ fileList[i].eventid+'" class="items-tr update-items">\
-							// 			<td><input type="text" class="file-name" value="'+ fileList[i].fileName +'" /></td>\
-							// 			<td>'+ fileList[i].fileSize +'</td>\
-							// 			<td><input type="text"  class="file-description" value="'+ desc +'"/></td>\
-							// 			<td  class="file-operate">\
-							// 				<span class="delete" title="删除"></span>\
-							// 				<a href="'+rootPath+'attachment/download.do?eventid='+ fileList[i].eventid +'">\
-							// 				<span class="download" title="下载"></span></a>\
-	    					//				<span class="preview" title="预览"></span>\
-							// 			</td>\
-							// 		</tr>');
-	    					// 不允许修改文件名称
 	    					var $tr = $('<tr id="'+ fileList[i].oid+'" class="items-tr update-items">\
 									<td class="file-name" title="'+ fileList[i].fileName +'">'+ fileList[i].fileName +'</td>\
 									<td>'+ size +'</td>\
@@ -145,8 +132,8 @@ function getFileListInfo(oid,viewOrUpdate,moduleCode,picAndFileSort,fileId,busin
 function downloadAll(businessId,zipFileName,businessType){
 	if(isNull(zipFileName)){
 		zipFileName = "文件"
-		//zipFileName = "file"
 	}
+	zipFileName = encodeURI(zipFileName);
 	const a = document.createElement('a');
     a.href = rootPath+"attachment/downLoadMultiFile.do?businessId="+businessId+"&businessType="+businessType+"&fileType=file&token="+localStorage.getItem("token")+"&zipFileName="+zipFileName;
     document.body.appendChild(a);

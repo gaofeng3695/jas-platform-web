@@ -51,8 +51,8 @@ body.viewer-open{
     line-height:20px
 }
 .viewWindow .viewLeft,.viewWindow .viewRight{
-    width:80px;
-    height:80px;
+    width:44px;
+    height:44px;
     position:absolute;
 
     -webkit-border-radius: 50%;
@@ -68,14 +68,14 @@ body.viewer-open{
     color:#fff;
     font-size:30px;
     text-align:center;
-    line-height:80px;
+    line-height:44px;
     cursor:pointer
 }
 .viewWindow .viewLeft{
-    left:30px
+    left:20px
 }
 .viewWindow .viewRight{
-    right:30px
+    right:20px
 }
 .viewWindow .viewMain{
     width:100%;

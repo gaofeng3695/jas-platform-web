@@ -73,9 +73,10 @@ function getappsystem() {
 						url : rootPath
 								+ "jasframework/privilege/privilege/getAllPrivilegeZTreebyappId.do?appId="
 								+ data.oid,
+//						 valueField: "id",
+//					     textField: "name",
 						onClick : function(
 								node) {
-							// alert(JSON.stringify(node));
 							// $('#orderNum').val(node.attributes.privilegeCode);
 							$('#privilegeCode').val(node.attributes.privilegeCode);
 							// var

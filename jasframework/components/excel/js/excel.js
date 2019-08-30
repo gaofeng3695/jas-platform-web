@@ -20,6 +20,12 @@ var geometryTypeList = [{
 	id:"Polyline",text:"线空间表"
 },{
 	id:"Polygon",text:"面空间表"
+},{
+	id:"MultiPoint",text:"多点空间表"
+},{
+	id:"MultiPolyline",text:"多线空间表"
+},{
+	id:"MultiPolygon",text:"多面空间表"
 }];
 
 var isMainTableList = [{

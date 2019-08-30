@@ -75,7 +75,7 @@ function getappsystem() {
 					onChange : function() {
 						$("#privilegeId").combotree(
 							{
-								url : rootPath+ "jasframework/privilege/privilege/getAllPrivilegeZTreebyappId.do?appId="+ $('#appId1').combobox("getValue"),
+								url : rootPath+ "jasframework/privilege/privilege/getAllPrivilegeZTreebyappnumber.do?appId="+ $('#appId1').combobox("getValue"),
 								onLoadSuccess : function(node,data) {
 									var node = $("#privilegeId").combotree("tree").tree('find',privilegeId);
 									if (node == null) {

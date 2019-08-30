@@ -20,8 +20,8 @@
 <script type="text/javascript" src="../../common/lib/other/jquery.inputDefault.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+<script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="../../privilege/js/privilege.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
@@ -30,7 +30,7 @@
 </head>
 <body>
 	<input type="hidden" id="menuid" value="P-PRI-0220"/>
-		
+
 <!-- 	查询区域 -->
 	<div class="query-conditions" id="queryDiv">
 		<form method="post" id="approvalQueryForm">
@@ -59,7 +59,7 @@
 						<a>M3直流干扰</a>
 						<a>M4套管检测</a>
 						<a>M5交叉平行</a>
-						<a>M6阴保有效性</a>	
+						<a>M6阴保有效性</a>
 						<a>M7专项监测</a>
 						<a>M8绝缘检测</a>
 						<a>M9恒电位仪</a>
@@ -68,25 +68,24 @@
 				</tr> -->
 				<tr>
 					<td ><span key="role.roleType" class="paltform-i18n">角色类型：</span></td>
-					<td colspan="3"><select class="select easyui-combobox" id="roleType" name="roleType" ><option value="">select</option><option value="1">private</option><option value="2">protect</option></select></td>
-			   </tr>
-				<tr>
-					<td ><span key="role.unitId" class="paltform-i18n">所属部门：</span></td>
+					<td colspan="3"><select class="select easyui-combobox" id="roleType" name="roleType" ><option value="">请选择</option><option value="1">private</option><option value="2">protect</option></select></td>
+					<td ><span key="role.unitName" class="paltform-i18n">所属部门：</span></td>
 					<td colspan="3"><input type="text" editable="false"  class="easyui-combotree select" id="roleUnitid" name="roleId"  /></td>
 				</tr>
-			</table>	
+			</table>
 		</form>
 	</div>
-		
+
 <!-- 	datagrid列表  -->
 	<table id="dg"></table>
-	
+
 <!-- 	datagrid工具栏 -->
 	<div id="toolbar">
 		<a href="#" id="P-PRI-0221" class="easyui-linkbutton fa fa-eye"   onclick="showInfo()"><span key="view" class="paltform-i18n">查看</span></a>
 		<a href="#" id="P-PRI-0222" class="easyui-linkbutton fa fa-plus"  onclick="newRole()"><span key="add" class="paltform-i18n">新增</span></a>
 		<a href="#" id="P-PRI-0223" class="easyui-linkbutton fa fa-edit"  onclick="editRole()"><span key="edit" class="paltform-i18n">修改</span></a>
 		<a href="#" id="P-PRI-0224" class="easyui-linkbutton fa fa-minus" onclick="removeRole()"><span key="delete" class="paltform-i18n">删除</span></a>
+		<a href="#" id="P-PRI-0225" class="easyui-linkbutton fa fa-cog" plain="true" onclick="setUserRow()"><span key="role.renyuanshezhi" class="paltform-i18n">人员设置</span></a>
 	</div>
 
 	<!-- <div id="dlg_user" class="easyui-dialog" style="width:440px;height:400px;padding:10px"
@@ -95,7 +94,7 @@
 			<select name="a" id="viewUserSel" size="18" style="width: 100%;"></select>
 		</div>
 	</div>
-	
+
 	<div id="dlg-buttons-role">
 		<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_user').dialog('close')">取消</a>
 	</div> -->

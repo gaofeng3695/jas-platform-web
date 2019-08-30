@@ -1,5 +1,5 @@
 	var url = "";
-	
+
 	/**
 	 * 描述：初始化数据
 	 */
@@ -26,28 +26,28 @@
 	 * 描述：关闭添加页面
 	 */
 	function closePanel() {
-		top. closeDlg("updateiframe"); 
+		top. closeDlg("updateiframe");
 	}
 
-	function updatecheck(){
-		var bool= $('#updateappForm').form('validate');
-		if(bool){
-			jQuery.getJSON(rootPath+"/jasframework/privilege/application/checkAppName.do?r="+new Date().getTime(),{"oid":$("#oid").val(),"appName":$("#appName").val()},function (data){
-				if(data){
-					updatedata();
-				}else{
-					top.showAlert(getLanguageValue("error"), getLanguageValue("applicationnameexists"), 'error');
-				}
-			});
-		}else{
-			return bool;
-		}
-	}
-	
+	// function updatecheck(){
+	// 	var bool= $('#updateappForm').form('validate');
+	// 	if(bool){
+	// 		jQuery.getJSON(rootPath+"/jasframework/privilege/application/checkAppName.do?r="+new Date().getTime(),{"oid":$("#oid").val(),"appName":$("#appName").val()},function (data){
+	// 			if(data){
+	// 				updatedata();
+	// 			}else{
+	// 				top.showAlert(getLanguageValue("error"), getLanguageValue("applicationnameexists"), 'error');
+	// 			}
+	// 		});
+	// 	}else{
+	// 		return bool;
+	// 	}
+	// }
+
 	/**
 	 * 描述：修改应用系统
 	 */
-	function updatedata() {
+	function updatecheck() {
 		disableButtion("savebutton");
 		var url =rootPath+"jasframework/privilege/application/update.do";
 		var validateResault = $('#updateappForm').form("validate");
@@ -95,4 +95,4 @@
 	$(function() {
 		loadrole();
 	});
-	
+

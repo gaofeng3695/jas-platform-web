@@ -36,7 +36,7 @@ function reloadtree(shortUrl,parentEventid){
 	 */
 	function getappsystem(){
 		$.ajax({
-			url:rootPath+"jasframework/privilege/application/getList.do",
+			url:rootPath+"jasframework/privilege/application/getUserAppsystem.do",
 			type:"post",
 			success:function(result){
 				$('#appId').combobox({ 

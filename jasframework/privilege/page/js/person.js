@@ -10,7 +10,7 @@ personchoose = {
 	showPersonWindow : function(text, hidden) {
 		this.text = document.getElementById(text);
 		this.hidden = document.getElementById(hidden);
-		top.getDlg(rootPath + "privilege/page/person.htm?r="+new Date().getTime()+"&pagelocation="
+		top.getDlg(rootPath + "/jasframework/privilege/page/person.htm?r="+new Date().getTime()+"&pagelocation="
 				+ window.document.location.href, "personChooseWindow", "选人", 700, 500, true);
 	},
 	setUser : function(text, hidden) {

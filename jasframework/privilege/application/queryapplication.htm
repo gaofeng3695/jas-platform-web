@@ -12,13 +12,13 @@
 <link rel="stylesheet"  type="text/css" href="../../common/css/font-awesome.css" >
 <link rel="stylesheet" href="../../common/css/common.css" type="text/css"></link>
 <link rel="stylesheet" href="../../common/css/query.css" type="text/css"></link>
-
-<script type="text/javascript" src="../../common/lib/other/jquery.inputDefault.js"></script>
 <script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+<script type="text/javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="../../common/lib/other/jquery.inputDefault.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="" id="i18nEasyui"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="js/queryapplication.js"></script>
@@ -26,7 +26,7 @@
 <body>
 	<input type="hidden" id="menuid" value="P-PRI-0020"/>
 	<!-- datagrid列表  -->
-	<table id="dg" toolbar="#toolbar"  key="priapp_applist" 
+	<table id="dg" toolbar="#toolbar"  key="priapp_applist"
 		 width="98%" singleSelect="false">
 	</table>
 <!-- 	datagrid工具栏 -->
@@ -36,14 +36,14 @@
 		<a href="#" id="userupdate" class="easyui-linkbutton fa fa-edit"  plain="true" onclick="editRole()"><span key="edit" class="paltform-i18n">修改</span></a>
 		<a href="#" id="userdelete" class="easyui-linkbutton fa fa-minus"  plain="true" onclick="removeRole()"><span key="delete" class="paltform-i18n">删除</span></a>
 	</div>
-	
+
 	<div id="dlg_user" class="easyui-dialog" style="width:440px;height:400px;padding:10px"
 		 closed="true"  buttons="#dlg-buttons-role">
 		<div>
 			<select name="a" id="viewUserSel" size="18" style="width: 100%;"></select>
 		</div>
 	</div>
-	
+
 	<div id="dlg-buttons-role">
 		<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_user').dialog('close')">取消</a>
 	</div>
