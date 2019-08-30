@@ -10,6 +10,7 @@
  * ------ jasTools.base.setParamsToUrl 向url里添加参数
  * ------ jasTools.base.getIdArrFromTree 在树形结构内获取id
  * ------ jasTools.base.switchToCamelCase 下划线转驼峰
+ * ------ jasTools.base.systemGuard 用户的应用权限验证
  *
  * ---- jasTools.dialog 弹出框
  * ------ jasTools.dialog.open 打开弹出框
@@ -152,7 +153,7 @@
 			// 获取带"/"的项目名，如：/uimcardprj
 			var projectName = pathName.substring(0, pathName.substring(1).indexOf('/') + 1);
 			// 判断是否是前端项目，则设定代理前缀
-			if (!projectName || projectName === '/jasmvvm' ||projectName === '/jasframework' || projectName === '/pages') {
+			if (!projectName || projectName === '/jasmvvm' || projectName === '/jasframework' || projectName === '/pages') {
 				return '/jasproxy'
 			}
 			return projectName; // /uimcardprj
@@ -196,7 +197,7 @@
 				return letter.toUpperCase();
 			});
 		};
-		var systemGuard = function (config, cb, failcb) {
+		var systemGuard = function (config, successcb, failcb) {
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
 			var isAppRight = function () {
 				if ((config.appId == params.appId) || !config.appId) {
@@ -204,9 +205,29 @@
 				}
 				return false;
 			};
+			var getPlatRoot = function () {
+				var rootPath = '';
+				var url = jasTools.base.rootPath + '/jasframework/privilege/application/getPlatformContext.do';
+				$.ajax({
+					type: "GET",
+					url: url,
+					async: false,
+					data: {
+						token: params.token,
+						appId: config.appId,
+					},
+					success: function (data, status) {
+						rootPath = data.data;
+					}
+				});
+				return rootPath;
+			};
+
 			var isAppAccessable = function () {
 				var result = false;
-				var url = config.accessHost + '/jasframework/privilege/application/userAppPermission.do';
+				var myRootPath = getPlatRoot();
+				if (!myRootPath) return result;
+				var url = myRootPath + '/jasframework/privilege/application/userAppPermission.do';
 				$.ajax({
 					type: "GET",
 					url: url,
@@ -239,7 +260,7 @@
 						// unitName = unitName.substr(unitName.lastIndexOf(">") + 1, unitName.length);
 						// userBo.unitName = unitName;
 						// localStorage.setItem("user", JSON.stringify(userBo));
-						cb && cb(data);
+						successcb && successcb(data);
 					}
 				});
 			};
@@ -250,7 +271,8 @@
 			}
 			if (isAppRight()) {
 				if (isAppAccessable()) {
-					return loginByToken();
+					successcb && successcb();
+					return;
 				}
 			}
 			if (typeof failcb == 'function') {
