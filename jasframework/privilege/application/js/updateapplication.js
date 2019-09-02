@@ -64,7 +64,7 @@
 			    dataType: "json",
 			    data:fromData,
 			    success: function(data){
-					if(data.success==1){
+					if(data.status==1){
 						top.showAlert(getLanguageValue("tip"), getLanguageValue("updatesuccess"), 'info', function() {
 							//重新加载表格数据
 							reloadData('queryapplication.htm', '#dg');
@@ -72,8 +72,16 @@
 						    closePanel();
 						});
 					} else {
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("updateFailed"), 'error');
-						enableButtion("saveButton");
+						if(data.code=="400"){
+							top.showAlert(getLanguageValue("tip"), data.msg, 'error',function(){
+								enableButtion("savebutton");
+							});
+						}else{
+							top.showAlert(getLanguageValue("tip"), getLanguageValue("savefailure"), 'error',function(){
+								enableButtion("savebutton");
+							});	
+						}
+						
 					}
 			    }
 			 });

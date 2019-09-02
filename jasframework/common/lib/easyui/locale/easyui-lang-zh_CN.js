@@ -1,3 +1,4 @@
+$.messager.defaults = { ok: "确定", cancel: "关闭" };
 if ($.fn.pagination){
 	$.fn.pagination.defaults.beforePageText = '第';
 	$.fn.pagination.defaults.afterPageText = '共{pages}页';

@@ -142,6 +142,7 @@ function savemenu() {
 		async : false
 	});
 	if (flag) {
+		console.log($("#addMenu").serializeToJson())
 		var validateResault = $("#addMenu").form("validate");
 		if(validateResault == false){
 			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');

@@ -73,7 +73,12 @@
 						    closePanel();
 						});
 					} else {
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("saveFailed"), 'error');
+						if(data.code=="400"){
+							top.showAlert(getLanguageValue("tip"), data.msg, 'error');
+						}else{
+							top.showAlert(getLanguageValue("tip"), getLanguageValue("savefailure"), 'error');	
+						}
+						
 						enableButtion("saveButton");
 					}
 			    }

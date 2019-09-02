@@ -238,7 +238,7 @@ function viewUser(userId){
 //删除用户
 function removeUserRow() {
 	var rows = $("#"+userDatagridID).datagrid("getSelections");
-	if (rows.length != 1) {
+	if (rows.length ==0) {
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), "info");
 		return;
 	}
@@ -251,13 +251,12 @@ function removeUserRow() {
 }
 function removeUser(userIds){
 	var str = JSON.stringify({"oids" : userIds});
-	alert(str);
 	$.messager.confirm(getLanguageValue("delete"),getLanguageValue("user.deletecomfirm"),function(r){
 		if (r){
 			$.ajax({
 					// url: rootPath+"jdbc/commonData/user/deleteBatch.do",//调用新增接口
 					url: rootPath+"jasframework/privilege/user/deleteUser.do",//用户批量删除
-				   data: str,
+				   data: {oids:userIds},
 				   type: "POST",
 				   dataType:"json",
 				   async:false,

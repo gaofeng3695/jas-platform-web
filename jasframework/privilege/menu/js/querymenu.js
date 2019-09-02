@@ -205,6 +205,11 @@ function getappsystem(){
 	}
 	
 	function reloadchildren(nodeid){
+			if(!nodeid){
+				var appId=$("#appId1").combobox("getValue")
+				inittree(appId)
+			return ;	
+			}
 			var node=$('#tt').tree("find",nodeid);
 			var isLeaf = $('#tt').tree("isLeaf",node.target);
 			if( isLeaf ){
@@ -241,7 +246,7 @@ function getappsystem(){
 			$.getJSON(checkurl,function(data){
 				if(data.success==1){
 					var url= rootPath+"jasframework/privilege/menu/deleteById.do?oid="+row.id;
-					top.$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
+					$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
 						if(r){
 							$.getJSON(url, function(data){
 								if(data.status==1){

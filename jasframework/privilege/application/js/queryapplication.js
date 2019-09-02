@@ -24,7 +24,8 @@ function removeRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
 		var row = $('#dg').datagrid('getSelected');
-		top.$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
+		
+		$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
 			if (r){
 				$.getJSON(rootPath+"jasframework/privilege/application/IsInUse.do?oid="+row.oid,function(check) {
 					if (check){
@@ -102,6 +103,15 @@ $(document).ready(function(){
 		idField:'oid',
 		pagination:true,
 		singleSelect:true,
+		queryParams: {
+			"page" : function(){
+				console.log()
+				return $("#dg" ).datagrid("getPager").data("pagination").options.pageNumber;
+			},
+			"size" : function(){
+				return $("#dg" ).datagrid("getPager").data("pagination").options.pageSize;
+			}
+		},
 		columns : [ [
              {
             	 field : 'ck',

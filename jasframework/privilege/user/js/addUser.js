@@ -7,8 +7,9 @@
 		disableButtion("saveButton");
 		var validateResault = $('#userForm').form("validate");
 		if(validateResault == false){
-			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
-			enableButtion("saveButton");
+			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info',function(){
+				enableButtion("saveButton");
+			});
 			return validateResault;
 		}
 		var unitId =getParamter("unitId");

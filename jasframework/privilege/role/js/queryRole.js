@@ -79,7 +79,12 @@ function removeRole(oids){
 	})
 
 }
-
+//	/**
+//	 * @desc 查询角色
+//	 */
+//	 function  clearQueryForm(){
+//		 queryRole();
+//	 }
 /**
  * @desc 查询角色
  */

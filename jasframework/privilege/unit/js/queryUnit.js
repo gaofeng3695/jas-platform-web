@@ -103,7 +103,7 @@ $(function() {
 	function removeUnit() {
 		var row = $('#tt').tree('getSelected');
 		if(row.id== $('#tt').tree('getRoot').id){
-			alert(getLanguageValue("unit.topunitnotdelete"));
+			top.showAlert(getLanguageValue("unit.deleteunit"),getLanguageValue("unit.topunitnotdelete"),'error');
 			return;
 		}
 		if (row != null) {
