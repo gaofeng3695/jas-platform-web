@@ -6,18 +6,18 @@
 	<meta name="keywords" content="gis,web">
 	<meta name="description" content="">
 	<title></title>
-	
+
 	<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css"></link>
 	<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css"></link>
-	
+
 	<link rel="stylesheet" type="text/css" href="../../common/css/font-awesome.css"  ></link>
 	<link rel="stylesheet" type="text/css" href="../../common/css/common.css" ></link>
 	<link rel="stylesheet" type="text/css" href="../../common/css/query.css" ></link>
-	
+
 	<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
 	<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-	<script type="text/javascript" src="../../common/js/common.js"></script>
 	<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+	<script type="text/javascript" src="../../common/js/common.js"></script>
 	<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
 	<script type="text/javascript" src="js/queryUser.js" ></script>
 <script type="text/javascript" src="../../privilege/js/privilege.js"></script>
@@ -36,7 +36,7 @@
 
 <!-- 权限编号 -->
 	<input type="hidden" id="menuid" value="P-PRI-0100"/>
-	
+
 <!-- 页面主体布局 -->
 	<div id="cc" class="easyui-layout" fit="true">
 		<!-- 左侧树 -->
@@ -46,16 +46,16 @@
 			<ul id="tt"  animate="false">
 			</ul>
 		</div>
-		
+
 		<!-- 右侧数据展示区域 -->
 		<div id="right" class="right" scroll="no" data-options="region:'center',onResize:function(){resizeLayout()}">
 			<!-- 查询条件区域 -->
-			<div class="query-conditions"  id="userQuery"  > 
+			<div class="query-conditions"  id="userQuery"  >
 				<form method="post" id="approvalQueryForm" >
 					<!-- 简单查询区域 -->
 					<table class="query-table" id="queryDiv">
 						<tr>
-							<td width="7%"> <span key="user.loginName" class="paltform-i18n">用户名：</span></td>
+							<td width="7%"> <span key="user.loginName" class="paltform-i18n">登录名：</span></td>
 							<td width="26%"><input type="text" id="loginName" name="loginName" class="easyui-validatebox input_bg"/></td>
 							<td width="7%"><span key="user.userName" class="paltform-i18n">用户名：</span></td>
 						    <td width="26%"><input type="text" id="userName" class="easyui-validatebox input_bg"/></td>
@@ -66,7 +66,7 @@
 							</td>
 						</tr>
 					</table>
-					
+
 					<!-- 高级查询区域 -->
 					<table class="more-query-table" id="moreTable">
 						<tr class="table-arrow"><td><img src="../../common/image/triangle.png" /></td></tr>
@@ -78,13 +78,13 @@
 							</td>
 <!-- 							<td colspan="3"><input id="userrange" editable=false name="userrange" /></td> -->
 						</tr>
-					</table>	
+					</table>
 				</form>
 			</div>
-			
+
 			<!-- datagrid数据列表-->
 			<table id="10060201" width="98%" idField="eventid" key="user_userlist"></table>
-			
+
 			<!-- 	datagrid工具栏 -->
 			<div id="toolbar">
 				<a href="#" id="P-PRI-0103" class="easyui-linkbutton fa fa-eye" plain="true" onclick="viewUserRow()"><label><span key="view" class="paltform-i18n">查看</span></label></a>

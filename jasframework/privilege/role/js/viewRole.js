@@ -50,5 +50,6 @@ function loadData(obj) {
 	$("#unitName").html(obj.unitName);
 	$("#roleType").html(obj.roleType);
 	$("#description").html(obj.description);
+	$("#dataFilterRegulationName ").html(obj.dataFilterRegulationName);
 }
 

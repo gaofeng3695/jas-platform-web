@@ -73,9 +73,10 @@ function getappsystem() {
 						url : rootPath
 								+ "jasframework/privilege/privilege/getAllPrivilegeZTreebyappId.do?appId="
 								+ data.oid,
+//						 valueField: "id",
+//					     textField: "name",
 						onClick : function(
 								node) {
-							// alert(JSON.stringify(node));
 							// $('#orderNum').val(node.attributes.privilegeCode);
 							$('#privilegeCode').val(node.attributes.privilegeCode);
 							// var
@@ -141,6 +142,7 @@ function savemenu() {
 		async : false
 	});
 	if (flag) {
+		console.log($("#addMenu").serializeToJson())
 		var validateResault = $("#addMenu").form("validate");
 		if(validateResault == false){
 			top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');

@@ -45,7 +45,7 @@ var viewPicObj = (function() {
     var imgW = null;
     
     var flag = null;
-    var srcLoad = rootPath+'common/image/webuploader/loading.gif';
+    var srcLoad = rootPath+'jasframework/common/image/webuploader/loading.gif';
     
 
     //打开视图窗口
@@ -84,6 +84,7 @@ var viewPicObj = (function() {
         $(window).on("resize",function(){
   
 //        	alert("dkdkdkdk");
+        	console.log(111222);
         	var viewH1 = view.height();
             var viewW1 = view.width();
             var h1 = img.height();
@@ -96,12 +97,22 @@ var viewPicObj = (function() {
                 img.width('auto');
                 h1 = viewH1;
                 w1 = img.width();
+            }else{
+            	img.height(imgH);
+                img.width('auto');
+                h1 = imgH;
+                w1 = img.width();
             }
             if (imgW > viewW1) {
 //            	alert("2222");
                 img.width(viewW1);
                 img.height('auto');
                 w1 = viewW1;
+                h1 = img.height();
+            }else{
+            	img.width(imgW);
+                img.height('auto');
+                w1 = imgW;
                 h1 = img.height();
             }
             
@@ -218,8 +229,14 @@ var viewPicObj = (function() {
         index = $(e).closest("li").index();
         container = $(e).closest("ul");
         totalLeng = container.find("li").length;
-
-      
+        var totalLeng_temp = totalLeng;
+        for(var index_temp=0; index_temp < totalLeng_temp;index_temp++){
+        	var src_index = container.find("li").eq(index_temp).find(".items-img").attr("data-original");
+        	if(!src_index){
+        		totalLeng--;
+        	}
+        }
+        
         src = $(e).attr("data-original");
         img.attr("src", srcLoad);
 

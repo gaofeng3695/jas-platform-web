@@ -68,9 +68,9 @@ function getPicListInfo(oid,viewOrUpdate,addDesc,moduleCode,picAndFileSort,picId
 	   
 		    		// 绑定点击全图预览
 		    		$("#" + picId+" .pic-list .list-items").on("click",".items-img",function(e){
-	                    /*viewPicObj.viewPic(this)*/
-		    			var eid = $(this).attr("data-eid");
-		    			previewPic(eid);
+	                    viewPicObj.viewPic(this);
+		    			/*var eid = $(this).attr("data-eid");
+		    			previewPic(eid);*/
 	                })
 		    		
 	                // 绑定删除事件
@@ -125,7 +125,7 @@ function getPicListInfo(oid,viewOrUpdate,addDesc,moduleCode,picAndFileSort,picId
 
 function previewPic(eId){
 	/*window.open(rootPath+'attachment/getPreviewFile.do?eventid='+ eId);*/
-	top.getDlg(rootPath+'jasframework/common/js/webuploader/preview/pdfjs_1.10.88/web/viewer.html?oid='+ eId,"preview","预览",800,600,false,true,true);
+	top.getDlg(rootPath+'common/js/webuploader/preview/pdfjs_1.10.88/web/viewer.html?eventid='+ eId,"preview","预览",800,600,false,true,true);
 }
 
 /**
@@ -140,7 +140,7 @@ function previewPic(eId){
 
 function getImageItemsInfo(eventid,fileName,fileDescription,viewOrUpdate,addDesc,moduleCode,picId){
 	// var itemsUrl = rootPath+"attachment/getImageBySize.do?eventid="+eventid+"&width=400&height=340&rate=0"; //业务唯一性验证
-	var itemsUrl = rootPath+"attachment/getImageBySize.do?eventid="+eventid+'&width=400&height=340&token='+localStorage.getItem("token");
+	var itemsUrl = rootPath+"attachment/getImageBySize.do?eventid="+eventid+"&token="+localStorage.getItem("token");
 	var desc = fileDescription?fileDescription:"";
 	var descNum = 200;
 
@@ -161,7 +161,7 @@ function getImageItemsInfo(eventid,fileName,fileDescription,viewOrUpdate,addDesc
 		</div>\
 	</li>');
 	var lisViewDesc =  $('<li class="list-items  list-items-desc list-items-view">\
-			<a class="opt-btn" href="'+rootPath+'attachment/download.do?oid='+ eventid +'">\
+			<a class="opt-btn" href="'+rootPath+'attachment/download.do?oid='+ eventid +'&token='+localStorage.getItem("token")+'">\
 			<span class="download" title="下载"></span></a>\
 			<div class="items-img" data-eid="'+ eventid +'"\
 			data-original="'+ itemsUrl +'" \
@@ -404,9 +404,12 @@ function againAddFun(oid,FileObj,picAndFileSort,picId,businessType,callbackFunn)
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
-				updateFileFun(updateSuccessFun);
+				updateFileFun(function(errorNumObj){
+					// 使用匿名函数解决 高价函数传参立即执行的问题    
+					updateSuccessFun(errorNumObj)
+				});
 			}
 		})
 	}else if(!isNull(picAndFileSort)) {
@@ -428,9 +431,9 @@ function againAddFun(oid,FileObj,picAndFileSort,picId,businessType,callbackFunn)
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
-				updateSuccessFun();
+				updateSuccessFun(errorNumObj);
 			}
 		})
 	}else {
@@ -449,13 +452,13 @@ function againAddFun(oid,FileObj,picAndFileSort,picId,businessType,callbackFunn)
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
 //				updateSuccessFun();
 				if(callbackFunn){
-					callbackFunn();
+					callbackFunn(errorNumObj);
 				}else{
-					updateSuccessFun();
+					updateSuccessFun(errorNumObj);
 				}
 			}
 		})
@@ -516,9 +519,12 @@ function againAddDescFun(oid,FileObj,picAndFileSort,picId,businessType,callbackF
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
-				updateFileFun(updateSuccessFun);
+				updateFileFun(function(errorNumObj){
+					// 使用匿名函数解决 高价函数传参立即执行的问题    
+					updateSuccessFun(errorNumObj)
+				});
 			}
 		})
 	}else if(!isNull(picAndFileSort)){
@@ -538,9 +544,9 @@ function againAddDescFun(oid,FileObj,picAndFileSort,picId,businessType,callbackF
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
-				updateSuccessFun();
+				updateSuccessFun(errorNumObj);
 			}
 		})
 	}else{
@@ -560,12 +566,12 @@ function againAddDescFun(oid,FileObj,picAndFileSort,picId,businessType,callbackF
 			uploadBeforeFun:function(){
 				return oid;
 			},
-			uploadSuccessFun:function(){
+			uploadSuccessFun:function(errorNumObj){
 				// 文件上传成功之后执行的
 				if(callbackFunn){
-					callbackFunn();
+					callbackFunn(errorNumObj);
 				}else{
-					updateSuccessFun();
+					updateSuccessFun(errorNumObj);
 				}
 			}
 		})

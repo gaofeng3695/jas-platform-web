@@ -3,7 +3,7 @@ var url;
 	 * 描述：新增按钮事件
 	 */
 function newApplication(){
-	top.getDlg("addapplication.htm?r="+new Date().getTime(),"saveiframe", getLanguageValue("add"),750,300);
+	top.getDlg("addapplication.htm?r="+new Date().getTime(),"saveiframe", getLanguageValue("add"),750,400);
 }
 /**
  * 描述：修改按钮事件
@@ -12,7 +12,7 @@ function editRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
 //				var row = $('#dg').datagrid('getSelected');
-		top.getDlg("updateapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),"updateiframe", getLanguageValue("edit"),700,300);
+		top.getDlg("updateapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),"updateiframe", getLanguageValue("edit"),700,400);
 	}else{
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
@@ -24,7 +24,8 @@ function removeRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
 		var row = $('#dg').datagrid('getSelected');
-		top.$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
+		
+		$.messager.confirm(getLanguageValue("delete"),getLanguageValue("deleteconfirm"),function(r){
 			if (r){
 				$.getJSON(rootPath+"jasframework/privilege/application/IsInUse.do?oid="+row.oid,function(check) {
 					if (check){
@@ -44,14 +45,14 @@ function removeRole(){
 						},'json');
 					}
 				});
-				
+
 			}
 		});
 	}else{
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
 }
-	
+
 function viewUsersOfRole(){
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length == 1){
@@ -82,7 +83,7 @@ function viewUsersOfRole(){
 function showInfo(){
 	var rows = $("#dg").datagrid("getSelections");
 	if(rows.length == 1) {
-		top.getDlg("viewapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),'view', getLanguageValue("view"),800,260);
+		top.getDlg("viewapplication.htm?oid="+rows[0].oid+"&r="+new Date().getTime(),'view', getLanguageValue("view"),800,400);
 	} else {
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
 	}
@@ -97,42 +98,70 @@ $(document).ready(function(){
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:rootPath+'jasframework/privilege/application/getList.do',
+		url:rootPath+'jasframework/privilege/application/getAppPage.do',
 		remoteSort: true,
 		idField:'oid',
 		pagination:true,
 		singleSelect:true,
-		columns : [ [ 
+		queryParams: {
+			"page" : function(){
+				console.log()
+				return $("#dg" ).datagrid("getPager").data("pagination").options.pageNumber;
+			},
+			"size" : function(){
+				return $("#dg" ).datagrid("getPager").data("pagination").options.pageSize;
+			}
+		},
+		columns : [ [
              {
             	 field : 'ck',
      		 	title : getLanguageValue('ck'),
      			checkbox : true
  		    },
-		    {
-				field : 'oid',
-				title : getLanguageValue('app.appId'),
-				width : 300
-		    },
-		    {
-				field : 'appName',
-				title : getLanguageValue('app.appName'), 
-				width : 200
-		   }, 
-		   {
-				field : 'roleName',
-				title : getLanguageValue('app.roleName'),
-				width : 200
-		   }, 
-		   {
-				field : 'appUrl',
-				title : getLanguageValue('app.appUrl'),
-				width : 300
-			}, 
-			{
-				field : 'description',
-				title : getLanguageValue('app.description'),
-				width : 300
-			}
+		     {
+					field : 'oid',
+					title : getLanguageValue('app.appId'),
+					width : 300
+					},
+					{
+					field : 'appName',
+					title : getLanguageValue('app.appName'),
+					width : 200
+				 },
+				 {
+					field : 'appNumber',
+					title : getLanguageValue('app.appNumber'),
+					width : 200
+				 },
+				 {
+					field : 'roleName',
+					title : getLanguageValue('app.roleName'),
+					width : 200
+				 },
+				 {
+					field : 'appUrl',
+					title : getLanguageValue('app.appUrl'),
+					width : 200
+				 },
+				 {
+					field : 'extranetUrl',
+					title : getLanguageValue('app.extranetUrl'),
+					width : 300
+				},
+				{
+					field : 'appType',
+					title : getLanguageValue('app.appType'),
+					width : 300,
+					formatter:function(value){
+						if(value==2) return "业务系统";
+						return "平台系统"
+					}
+				},
+				{
+					field : 'description',
+					title : getLanguageValue('app.description'),
+					width : 300
+				}
 		] ],
 		rownumbers:true,
 		onDblClickRow:function(index,indexData){

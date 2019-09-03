@@ -20,19 +20,20 @@
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
 <script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="js/queryUnit.js"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="../../privilege/js/privilege.js"></script>
 <script type="text/javascript">
-	
+
 </script>
 </head>
 <body style="overflow: hidden">
 	<form id="viewSiteForm" method="post">
 		<input type="hidden" id="menuid" value="P-PRI-0080" />
-		<div id="cc" class="easyui-layout" style="width: 100%; height: 700px;">
-			<div id="left" region="west" maxWidth=200 scroll="no"
+		<div id="cc" fit="true" class="easyui-layout" style="width: 100%; height: 700px;">
+			<div id="left" region="west"  scroll="no"
 				class="easyui-panel" collapsible="false" key="unit.zuzhijigouguanli"
 				split="true" title="部门结构" style="width: 200px; height: 90%;">
 				<div>
@@ -123,7 +124,7 @@
 							</table>
 							<iframe id="exprotExcelIframe" style="display: none;"></iframe>
 						</tr>
-					</table> 
+					</table>
 				</div>
 			</div>
 		</div>

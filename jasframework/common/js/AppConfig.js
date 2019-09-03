@@ -155,3 +155,10 @@ var defaultOpenTabArray = [{id:"docCenter",title:"文档中心",url:"../../jasdo
 //支持预览的文档格式
 var previewFileType = "doc,docx,txt,xls,xlsx,ppt,pptx,gif,png,jpeg,jpg,bpm,pdf";
 /*****	文档管理系统-结束	*****/
+
+
+
+
+/**权限管理  调用外部接口配置 */
+var ipConfig="http://192.168.100.130:8888";//例如：http://192.169.100.130:8081
+var projectNameConfig="jasframework-platform";//项目名称

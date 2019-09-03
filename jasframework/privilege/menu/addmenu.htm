@@ -16,6 +16,7 @@
 <script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="../../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
 <script type="text/javascript" src="../../common/js/common.js"></script>
 <script type="text/javascript" src="../../common/i18n/i18n.js"></script>
 <script type="text/javascript" src="js/addmenu.js"></script>
@@ -27,12 +28,10 @@
 	<input type="hidden" id="menuid" value="P-PRI-0060"/>
 	<!-- 	<div id="dlg"> -->
 			<form id="addMenu" method="post">
-				<table align="center" class="edit-table" >	
+				<table align="center" class="edit-table" >
 					<tr>
 						<td width="20%"><span key="menu.menuName"  class="paltform-i18n">菜单名称：</span></td>
-						<td width="30%"><input id="menuName" name="menuName" class="easyui-validatebox input_bg" missingMessage="不能为空" required="true" validType="general" maxlength="25"></td>
-						<!-- <td width="20%"><span key="primenu_parentmenu"   class="paltform-i18n">父菜单：</span></td>
-						<td width="30%"><input id="parentId"  name="parentId" class="input_bg" missingMessage="不能为空"  validType="general" ></td> -->
+						<td width="30%"><input id="menuName" name="menuName" class="easyui-validatebox input_bg" missingMessage="不能为空" required="true"  maxlength="25"></td>
 					
 						<td width="20%"><span key="menu.privilegeAppId" class="paltform-i18n">权限所属系统：</span></td>
 						<td width="30%">
@@ -43,28 +42,29 @@
 					<tr>
 						<td width="20%"><span key="menu.privilegeId" class="paltform-i18n">对应权限：</span></td>
 						<td width="30%">
-							<input id="privilegeId" name="privilegeId" class="input_bg" missingMessage="不能为空" required="true" validType="general">
-						</td>
-						<td width="20%"><span key="menu.orderNum" class="paltform-i18n">顺序编号：</span></td>
-						<td width="30%"><input id="orderNum" name="orderNum" class="easyui-validatebox input_bg" missingMessage="不能为空"  required="true"  validType="integer">
-										<input id="privilegeCode" name="privilegeCode" type="hidden"></td>
-					
+							 <input id="privilegeId"  name="privilegeId" class="input_bg" missingMessage="不能为空" required="true" > 
 						
+						</td>
+						<td width="20%"><span key="menu.orderNum" class="paltform-i18n">菜单顺序号：</span></td>
+						<td width="30%"><input id="orderNum" name="orderNum" class="easyui-validatebox input_bg" missingMessage="不能为空"  required="true" >
+										<input id="privilegeCode" name="privilegeCode" type="hidden"></td>
+
+
 					</tr>
-					<tr>	
+					<tr>
 						<td width="20%"><span key="menu.icon" class="paltform-i18n">菜单图标：</span></td>
 						<td width="80%" align="left">
 							<input id="icon" name="icon" class="easyui-validatebox input_bg"   maxlength="300" />
 						</td>
-						
+
 						 <td width="20%"><span key="menu.background" class="paltform-i18n">菜单背景色：</span></td>
 						<td width="80%"  align="left">
 							<input id="background" name="background" class="easyui-validatebox input_bg"  maxlength="300" />
 						</td>
 					</tr>
 					<tr>
-						<td width="20%"  style="display: none;"><span key="menu.appId" class="paltform-i18n">应用系统：</span></td>
-						<td width="30%"  style="display: none;">
+						<td width="20%"  ><span key="menu.appId" class="paltform-i18n">应用系统：</span></td>
+						<td width="30%" >
 							<select id="appId" name="appId" class="easyui-combobox" editable="false" panelHeight="auto"  required="true" >
 							</select>
 						</td>
@@ -73,12 +73,7 @@
 							<input id="attributes" name="attributes" class="easyui-validatebox input_bg"  maxlength="300" />
 						</td>
 					</tr>
-						<tr>
-<!-- 						<td width="20%"><span key="primenu_otherattribute" class="paltform-i18n">菜单其他属性：</span></td> -->
-<!-- 						<td width="80%" colspan="1" align="left"> -->
-<!-- 							<input id="attributes" name="attributes" class="easyui-validatebox input_bg"  maxlength="300" /> -->
-<!-- 						</td> -->
-					</tr>
+
 					<tr>
 					<td width="20%"><span key="menu.url" class="paltform-i18n">URL：</span></td>
 						<td width="30%"  colspan="3"><input id="url" style="color: #A0A0A0;" readonly="readonly" name="url" class="easyui-validatebox input_bg" validType="priUrl"  maxlength="300"></td>
@@ -91,7 +86,7 @@
 <!-- 			  	  	 <td align="center" colspan="4"><span key="primenu_explain" style="color: red" class="paltform-i18n">说明：菜单编号为父权限编号+两位数字，不可重复</span></td> -->
 			  	   </tr>
 			</table>
-			
+
 		</form>
 		<!-- </div> -->
 		</div>
@@ -103,8 +98,7 @@
 							<a href="#" class="easyui-linkbutton cancel"  onclick="closePrivilege()"><span key="cancel" class="paltform-i18n">取消</span></a>
 						 </td>
 		  			</tr>
-		   	</table>	 
+		   	</table>
 		</div>
-	</body>	
+	</body>
 </html>
-	

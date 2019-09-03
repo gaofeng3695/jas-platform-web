@@ -94,7 +94,7 @@ function getLanguageValue(key,defaultval) {
  */
 function easyUI_i18n() {
 	var language = top.currentLanguage;
-	var path = rootPath + "jasframework/common/lib/easyui/locale/easyui-lang-" + language + ".js";
+	var path = "../../common/lib/easyui/locale/easyui-lang-" + language + ".js";
 	$.ajax({
 		url : path,
 		dataType : "script",

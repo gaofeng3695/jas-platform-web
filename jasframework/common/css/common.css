@@ -415,6 +415,17 @@ html {
 	margin-left:80px;
 	word-wrap:break-word
 }
+.messager-window{
+	width:298px !important;
+}
+
+.messager-window .messager-button{
+	width:288px !important;
+}
+.messager-window .window-header,
+.messager-window .window-body{
+	width:278px !important;
+}
 .dialog-button a:first-child,
 .dialog-button .l-btn:last-child,
 .messager-button a:first-child,

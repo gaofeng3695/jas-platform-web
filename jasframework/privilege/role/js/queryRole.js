@@ -1,9 +1,9 @@
-/** 
+/**
  * @file
  * @author  xxx
- * @version 1.0 
+ * @version 1.0
  * @desc  查询页面js
- * @date  2012-08-30 上午17:46:07 
+ * @date  2012-08-30 上午17:46:07
  * @last modified by lizz
  * @last modified time  2017-08-17
  */
@@ -15,7 +15,7 @@ var url;
  * @desc 新增按钮事件
  */
 function newRole(){
-	top.getDlg(rootPath+"jasframework/privilege/role/addRole.htm?r="+new Date().getTime(),"saveiframe",getLanguageValue("add"),700,300,false,true,true);
+	top.getDlg("addRole.htm?r="+new Date().getTime(),"saveiframe",getLanguageValue("add"),700,300,false,true,true);
 }
 
 /**
@@ -33,7 +33,7 @@ function editRole(oid){
 		return;
 	}
 	if(!isNull(eventID)){
-		top.getDlg(rootPath+"jasframework/privilege/role/addRole.htm?oid="+eventID+"&r="+new Date().getTime(),"saveiframe",getLanguageValue("edit"),700,300,false,true,true);
+		top.getDlg("addRole.htm?oid="+eventID+"&r="+new Date().getTime(),"saveiframe",getLanguageValue("edit"),700,300,false,true,true);
 	}
 }
 
@@ -77,9 +77,14 @@ function removeRole(oids){
 			});
 		}
 	})
-	
-}
 
+}
+//	/**
+//	 * @desc 查询角色
+//	 */
+//	 function  clearQueryForm(){
+//		 queryRole();
+//	 }
 /**
  * @desc 查询角色
  */
@@ -118,6 +123,20 @@ function viewUsersOfRole(){
 	}
 }
 
+function setUserRow(){
+	var rows = $("#dg").datagrid("getSelections");
+	if (rows.length != 1) {
+		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"), "info");
+		return;
+	}
+	var row = rows[0];
+	setUser(row.oid);
+}
+function setUser(roleId){
+	if(!isNull(roleId)){
+		top.getDlg("roleUser.htm?roleId="+roleId,"config",getLanguageValue('role.renyuanshezhi'),550,440,false,true,true);
+	}
+}
 
 
 /**
@@ -135,18 +154,18 @@ function showInfo(evtID){
 		return;
 	}
 	if(!isNull(eventID)){
-		top.getDlg(rootPath+"jasframework/privilege/role/viewRole.htm?oid="+ eventID +"&r="+new Date().getTime(),'view',getLanguageValue("role.viewRole"),700,250,false,true,true);
+		top.getDlg("viewRole.htm?oid="+ eventID +"&r="+new Date().getTime(),'view',getLanguageValue("role.viewRole"),700,250,false,true,true);
 	}
 }
 
 /**
  * @desc 生成随机数
  */
-function GetRandomNum(Min,Max){   
-	var Range = Max - Min;   
-	var Rand = Math.random();   
-	return(Min + Math.round(Rand * Range));   
-}   
+function GetRandomNum(Min,Max){
+	var Range = Max - Min;
+	var Rand = Math.random();
+	return(Min + Math.round(Rand * Range));
+}
 
 /**
  * @desc 页面初始化
@@ -161,9 +180,9 @@ $(document).ready(function(){
 		remoteSort: true,
 		idField:'oid',
 		nowrap:true,
-		columns:[[{field:'ck',title:getLanguageValue('ck'),checkbox:true},   
-			  {field:'roleName',title:getLanguageValue('role.roleName'),align:"center",width:300},   
-			  {field:'unitName',title:getLanguageValue('role.unitName'),align:"center",width:300}, 
+		columns:[[{field:'ck',title:getLanguageValue('ck'),checkbox:true},
+			  {field:'roleName',title:getLanguageValue('role.roleName'),align:"center",width:300},
+			  {field:'unitName',title:getLanguageValue('所属部门'),align:"center",width:300},
 			  {field:'roleType',title:getLanguageValue('role.roleType'),align:"center",width:250,
 					formatter: function(value,row,index){
 						if (value == "2"){
@@ -188,30 +207,30 @@ $(document).ready(function(){
 //				}}
 			]],
 		onDblClickRow:function(index,indexData){
-			top.getDlg("viewRole.htm?hidden=&oid="+indexData.oid+"&r="+new Date().getTime(),'view',getLanguageValue("view"),700,240,false,true,true);			
+			top.getDlg("viewRole.htm?hidden=&oid="+indexData.oid+"&r="+new Date().getTime(),'view',getLanguageValue("view"),700,240,false,true,true);
 		},
 		onCheck:function(rowIndex,rowData){
 		},
 		onSelect:function(rowIndex,rowData){
 		}
 	});
-	
-	
-	$('#roleType').combobox({   
-		 valueField:'id',   
-		 textField:'text'  
-	});  
+
+
+	$('#roleType').combobox({
+		 valueField:'id',
+		 textField:'text'
+	});
 	$("#roleUnitid").combotree({
 		url: rootPath+'/jasframework/privilege/unit/getLeftTree.do'
 	});
-	
+
 	//设置组合框的宽度
 	setComboObjWidth('roleType',0.30,'combobox');
 	setComboObjWidth('roleUnitid',0.30,'combotree');
-	
+
 	//自适应数据网格高度
 	initDatagrigHeight('dg','queryDiv',64);
-	
+
 	//高级搜索
 	$("#moreQuery").click(function(){
 		$(this).toggleClass("active");
@@ -225,7 +244,7 @@ $(document).ready(function(){
 			initDatagrigHeight('dg','queryDiv',64);
 		}
 	});
-	
+
 	// 高级搜索的查询条件选择
 	$("#moreTable .more-conditions").on("click","a",function(){
 		$(this).siblings().removeClass("selected");

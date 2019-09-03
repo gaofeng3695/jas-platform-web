@@ -1,5 +1,5 @@
 	var url = "";
-	
+
 	/**
 	 * 描述：初始化数据
 	 */
@@ -48,7 +48,7 @@
 	/**
 	 * 描述：添加系统
 	 */
-	function save() {
+	function savecheck() {
 		disableButtion("saveButton");
 		 var url = rootPath+"jasframework/privilege/application/saveApp.do";
 		var validateResault = $('#saveappForm').form("validate");
@@ -65,7 +65,7 @@
 			    dataType: "json",
 			    data:fromData,
 			    success: function(data){
-					if(data != null){
+					if(data.status != -1){
 						top.showAlert(getLanguageValue("tip"), getLanguageValue("savesuccess"), 'info', function() {
 							//重新加载表格数据
 							reloadData('queryapplication.htm', '#dg');
@@ -73,29 +73,34 @@
 						    closePanel();
 						});
 					} else {
-						top.showAlert(getLanguageValue("tip"), getLanguageValue("saveFailed"), 'error');
+						if(data.code=="400"){
+							top.showAlert(getLanguageValue("tip"), data.msg, 'error');
+						}else{
+							top.showAlert(getLanguageValue("tip"), getLanguageValue("savefailure"), 'error');	
+						}
+						
 						enableButtion("saveButton");
 					}
 			    }
 			 });
 		}
 	}
-	function savecheck(){
-		var bool= $('#saveappForm').form('validate');
-		if(bool){
-			jQuery.getJSON(rootPath+"/jasframework/privilege/application/checkAppName.do?r="+new Date().getTime(),{"oid":$("#oid").val(),"appName":$("#appName").val()},function (data){
-				if(data){
-					save();
-				}else{
-					top.showAlert(getLanguageValue("error"), getLanguageValue("app.appNameExists"), 'error');
-				}
-			});
-		}else{
-			return bool;
-		}
-	}
-	
-	
+	// function savecheck(){
+	// 	var bool= $('#saveappForm').form('validate');
+	// 	if(bool){
+	// 		jQuery.getJSON(rootPath+"/jasframework/privilege/application/checkAppName.do?r="+new Date().getTime(),{"oid":$("#oid").val(),"appName":$("#appName").val()},function (data){
+	// 			if(data){
+	// 				save();
+	// 			}else{
+	// 				top.showAlert(getLanguageValue("error"), getLanguageValue("app.appNameExists"), 'error');
+	// 			}
+	// 		});
+	// 	}else{
+	// 		return bool;
+	// 	}
+	// }
+
+
 	function loadrole(){
 		$.getJSON(rootPath+"jasframework/privilege/role/getList.do",function(data){
 			$("#roleselect").combobox({
@@ -105,7 +110,7 @@
 				panelHeight:100
 			});
 			$("#roleselect").combobox("setValue",data[0].oid);
-			
+
 		});
 	}
 	//初始化

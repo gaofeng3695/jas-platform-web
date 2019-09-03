@@ -118,10 +118,12 @@ function executeAction(outflowId,outflowName,pass,chooseUser){
 		}
 	}
 	//设置流程变量
+	var rejectData = ["585514e2-116c-427f-b992-b85e36976634","576e6c35-e36b-4ae0-9e59-d74a555125e4"];
 	flowVars={
 		"outflowId":outflowId,
 		"outflowName":outflowName,
-		"pass":pass
+		"pass":pass,
+		"rejectData":rejectData
 	};
 	if(outflowId=="returnToStart"){  //驳回至发起人节点
 		flowVars.returnToStart="true";

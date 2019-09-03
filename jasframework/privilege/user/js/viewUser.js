@@ -15,19 +15,22 @@ var pkfield="";
  */
 $(document).ready(function(){
 	pkfield=getParamter("id");
-	getUserById();
+	getUserById(pkfield);
 	//加载数据变更记录
 	addBusinessHistoryRecords(pkfield,"histroryRecordContainer");
 });
-
-/**
- * @desc 获取用户信息
+/**jdbc/commonData/user/get.do
+ * @desc 获取用户信息url: 
  */
-function getUserById(){
+/**
+ * 根据用户id获取用户信息
+ * @returns
+ */
+function getUserById(pkfield){
 	$.ajax({
 		url: rootPath+"jdbc/commonData/user/get.do",//调用新增接口
 		data :{"oid" : pkfield},
-		method : 'GET',
+		type : 'GET',
 		dataType:"json",
 		success : function(data) {
 			loadData(data.data);
@@ -37,6 +40,7 @@ function getUserById(){
 		}
 	});
 }
+
 
 /**
  * @desc 载入数据

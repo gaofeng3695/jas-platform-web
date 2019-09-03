@@ -71,8 +71,10 @@ function updateUser() {
 	disableButtion("saveButton");
 	var validateResault=$("#"+userFormID).form('validate');
 	if(validateResault == false){
-		top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info');
-		enableButtion("savebutton");
+		top.showAlert(getLanguageValue("tip"), getLanguageValue("formVailidateFailed"), 'info',function(){
+			enableButtion("saveButton");
+		});
+		
 		return validateResault;
 	}else{
 		$.ajax({
