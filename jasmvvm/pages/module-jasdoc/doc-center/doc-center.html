@@ -179,8 +179,8 @@
 									<el-button size="small" plain type="primary" icon="fa fa-hand-o-up" :disabled="selectedFiles.length==0" @click="moveFiles">移动</el-button>
 									<el-button size="small" plain type="primary" icon="fa fa-star" :disabled="selectedFiles.length==0" @click="collectFiles">收藏</el-button>
 									<el-button size="small" plain type="warning" icon="fa fa-trash-o" :disabled="selectedRowOids.length==0" @click="deleteFile">删除</el-button>
-									<!-- <el-button size="small" plain type="warning" icon="fa fa-trash" :disabled="selectedRowOids.length==0" @click="deleteFileTrue">彻底删除</el-button> -->
-									<span class="fr">
+									<el-button size="small" plain type="primary" icon="fa fa-file-text"	 @click="uploadDocFolder">文件夹上传</el-button>
+										<span class="fr">
 										<el-checkbox :disabled="isSearchMode" v-model="isALLFile" style="margin-right: 10px;">显示所有文件</el-checkbox>
 										<el-tooltip class="item" content="刷新" placement="top">
 											<el-button size="small" icon="el-icon-refresh" @click="requestList"></el-button>
@@ -757,7 +757,7 @@
 				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-center/dialogs/folder-edit.html';
 				top.jasTools.dialog.show({
 					width: '600px',
-					height: '600px',
+					height: '50%',
 					title: '创建文件夹',
 					src: baseSrc + '?parentid=' + this.currentNodeId,
 					cbForClose: function () {
@@ -784,6 +784,22 @@
 					}
 				});
 			},
+			uploadDocFolder:function(){//文件夹上传
+				var that = this;
+				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-center/dialogs/docFolder-upload.html';
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '600px',
+					title: '上传文件',
+					src: baseSrc + '?oid=' + this.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.requestList();
+						}
+						// that.$refs.orgtree.updateKeyChildren();
+					}
+				});
+			},
 			editRow: function (row) {
 				var that = this;
 
@@ -791,7 +807,7 @@
 					var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-center/dialogs/folder-edit.html';
 					top.jasTools.dialog.show({
 						width: '600px',
-						height: '600px',
+						height: '50%',
 						title: '文件夹修改',
 						src: baseSrc + '?oid=' + row.folderid,
 						cbForClose: function () {

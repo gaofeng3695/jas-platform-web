@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta name="keywords" content="gis,web">
+	<meta name="description" content="">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/css/queryStyle.css"></link>
+    <link rel="stylesheet" href="../../../jasframework/common/css/addAndUpdateStyle.css" type="text/css"></link>
+	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
+	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../../../jasframework/common/js/validate_class.js"></script>
+	<script type="text/javascript" src="../../../jasframework/common/thirdparty/date/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
+    <script type="text/javascript" src="../../../jasframework/i18n/i18n.js" ></script>
+	<script type="text/javascript" src="js/queryDocCenter.js"></script>
+    <style type="text/css">
+	  input{ vertical-align:middle; margin:0; padding:0}
+	  .file{ position:absolute; top:35px; right:52.5%; height:28px;width:65px; filter:alpha(opacity:0);}
+	  input[type=text]{margin: 0px 0;}
+      </style>
+</head>
+<body>
+	<input type="hidden" id="menuid" value="103001"/>
+	<div>
+		<form id="addImportForm" method="post" enctype="multipart/form-data">
+			<table align="center" class="querytable">
+				<tr>
+					<td width="25%">
+						<span id="files.id1" key="selectthefile" class="paltform-i18n">选择文件：</span>
+					</td>
+					<td width="75%" align="center">
+						<input type="file"  id="file" name="file" class="Wdate easyui-validatebox input_bg"/>
+					</td>
+				</tr>
+			    <tr>
+				     <td colspan="4" align="center" id="testRegionDiv" style="display:none;">
+	  					<div ><span  class="paltform-i18n" key="loadWait">正在加载...请稍等</span></div>
+	  				</td>
+  				</tr>
+			</table>
+			<div class="button_area_absolute">
+				<table width="100%">
+					<tr>
+						<td align="center">
+						    <a href="#" id="btn_save" class="easyui-linkbutton save-btn" onclick="UploadFile()">
+								<span key="import" class="paltform-i18n">导入</span> </a> 
+							<a href="#"class="easyui-linkbutton cancel-btn" onclick="closePag()"> 
+							    <span key="cancel" class="paltform-i18n">取消</span>
+						    </a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript">
+	function getRealPath(){
+		var file_upl = document.getElementById('file');
+		file_upl.select();
+		document.getElementById('button_b').focus();
+		var realpath = document.selection.createRange().text;
+		return realpath;
+	}
+	</script>
+</body>
+</html>
