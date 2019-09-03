@@ -68,14 +68,13 @@
 								<el-input v-model="tableFormData.privilegeCode" clearable placeholder="请输入权限编码" size="small"></el-input>
 							</el-form-item>
 						</el-col>
-						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<!-- <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 							<el-form-item label="同级权限顺序号" prop="orderNum">
 								<el-input-number v-model="tableFormData.orderNum" size="small" :precision="1" clearable placeholder="请输入同级权限顺序号" controls-position="right"
 								 :min="1" :max="100"></el-input-number>
 							</el-form-item>
-						</el-col>
-					</el-row>
-					<el-row>
+						</el-col> -->
+	
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="ismenu">
 							<el-form-item label="菜单打开方式" prop="openType">
 								<el-select v-model="tableFormData.openType" placeholder="请选择菜单打开方式" size="small">
