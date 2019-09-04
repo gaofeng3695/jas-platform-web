@@ -1,6 +1,6 @@
 	/**
 	 * 修改与新增
-	 * 
+	 *
 	 */
 
 
@@ -22,14 +22,14 @@ function save() {
 				parent.reloadDataTree(result.data,1);
 				closeFavorite();
 			} else {
-				top.showAlert('提示',result.message , 'info');	
+				top.showAlert('提示',result.message , 'info');
 			}
 		}
 	});
 }
 /**
  * 方法描述： 关闭界面
- */	
+ */
 function closeFavorite(){
 	parent.closeDlg('addFavorite');
-}	
+}

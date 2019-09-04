@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/validate_class.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/date/My97DatePicker/WdatePicker.js"></script>
-	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>	
+	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
 	<script type="text/javascript" src="js/docCenter.js"></script>
 	<script type="text/javascript" src="js/queryDocCenter.js"></script>
@@ -65,7 +65,7 @@
 				<input  id="fileclass" name="fileclass" type='hidden' value=''/>
 				<input  id="userId" name="userId" type='hidden' value=''/>
 				<input  id="language" name="language" type='hidden' value=''/>
-				<table align="center" class="querytable" >	
+				<table align="center" class="querytable" >
 					<tr>
 						<td width="35%"><span class="paltform-i18n">文档名称：</span></td>
 						<td width="65%">
@@ -103,7 +103,7 @@
 					<tr>
 						<td width="35%"><span  class="paltform-i18n">到：</span></td>
 						<td width="65%"><input id="uploadtimeEnd" name="uploadtimeEnd"onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="Wdate easyui-validatebox input_bg"  /></td>
-					</tr> 
+					</tr>
 					 <tr>
 						<td width="35%"><span class="paltform-i18n">文档分类：</span></td>
 						<td width="65%">
@@ -127,26 +127,26 @@
 										<a href="#"   class="easyui-linkbutton"    plain="true"  iconCls="icon-clear" onclick="clean()"><span  class="paltform-i18n">清空</span></a>
 		         					 </td>
 		         				</tr>
-		         			</table>	 
+		         			</table>
 				        </td>
-				    </tr>		
-			    </table>		
+				    </tr>
+			    </table>
 			</form>
 		</div>
 
 		<table id="dg"></table>
 		<div id="toolbar">
 			<a id="44" name="44" href="#" style="display: none" class="easyui-linkbutton" iconCls="icon-upload" plain="true" onclick="uploadDoc()"><span key="file.up" class="paltform-i18ni">上传</span></a>
-			
+
 			<a id="80" name="80" style="display: none" href="#"  class="easyui-linkbutton" iconCls="icon-createfolder"  plain="true" onclick="createFolder()">
 				<span key="file.createFolder" class="paltform-i18ni">创建文件夹</span></a>
-		
+
 			<a id="30" name ="30" style="display: none" href="#" class="easyui-linkbutton" iconCls="icon-download" plain="true" onclick="downloadDocs()"><span key="" class="paltform-i18n">下载</span></a>
 			<a id="15" name ="15" style="display: none" href="#" class="easyui-linkbutton" iconCls="icon-preview" plain="true" onclick="previewDoc()"><span key="" class="paltform-i18n">预览</span></a>
 			<a href="#" class="easyui-linkbutton" iconCls="icon-alloronly" plain="true" onclick="showAllFile()"><span key="" class="paltform-i18n">显示所有文档</span></a>
 			<a id="operation" name="operation" href="#" iconCls="icon-operation" plain="true">
 				<span key="file.operation" class="paltform-i18ni">操作</span></a>
-				
+
 			<a id="10185201" name ="-1"  href="#" class="easyui-linkbutton" iconCls="icon-history" plain="true" onclick="documentImport()"><span key="file.classify" class="paltform-i18n">文档导入</span></a>
 			<!-- 文档查询输入框 -->
 			<div id="platformlocalcon" style="margin:0px;padding:0px;width: 34%;float: right;" >

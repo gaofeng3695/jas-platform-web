@@ -5,30 +5,36 @@ var oldFolderName = "";		//用于记录文件夹原名称（修改时  若名称
 var currentEditNode = null; //记录当前正在编辑的节点对象
 //文档中心根目录层次编号
 var docCenterRootFolderHierarchy = top.docCenterRootFolderHierarchy;
-$(document).ready(function(){ 
-	$('#favoriteTree').tree({		
+$(document).ready(function(){
+	$('#favoriteTree').tree({
 		url: rootPath+"jasdoc/folder/favorite/queryFavoriteFolderAsync.do",
 		onLoadSuccess:function(node,data) {
 			if(node==null){
 				var root = $('#favoriteTree').tree('getRoot');
 				$('#favoriteTree').tree("expand",root.target);
-				var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
-				url=url+"?folderId="+root.id+"&folderLocationName="+root.attributes.folderLocationName;
+				// var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
+				var url="queryFavorite.htm";
+				var folderLocationName	=encodeURIComponent(encodeURIComponent(root.attributes.folderLocationName));
+				url=url+"?folderId="+root.id+"&folderLocationName="+folderLocationName;
 				$("#content").attr("src",url);
 			}else{
 				$("#favoriteTree").tree("select",node.target);
-				var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
-				url=url+"?folderId="+node.id+"&folderLocationName="+node.attributes.folderLocationName;
+					// var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
+					var url="queryFavorite.htm";
+					var folderLocationName	=encodeURIComponent(encodeURIComponent(node.attributes.folderLocationName));
+				url=url+"?folderId="+node.id+"&folderLocationName="+folderLocationName;
 				$("#content").attr("src",url);
 			}
-			
+
 		},
 		onClick:function(node){
 			if(currentEditNode!=null){
 				$(this).tree('endEdit',currentEditNode.target);
 			}
-			var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
-			url=url+"?folderId="+node.id+"&folderLocationName="+node.attributes.folderLocationName;
+					// var url=rootPath+"jasdoc/folder/favorite/queryFavorite.htm";
+					var url="queryFavorite.htm";
+					var folderLocationName	=encodeURIComponent(encodeURIComponent(node.attributes.folderLocationName));
+			url=url+"?folderId="+node.id+"&folderLocationName="+folderLocationName;
 			$("#content").attr("src",url);
 		},
 		onBeforeExpand:function(node){
@@ -61,7 +67,7 @@ $(document).ready(function(){
 				if(updateResult){
 					var parentNode = $(this).tree("getParent",node.target);
 					$(this).tree("reload",parentNode.target);
-					
+
 				}
 			}
 		},
@@ -75,7 +81,7 @@ $(document).ready(function(){
 			}else{
 				contextMenuObject =  $('#favoriteParentDiv');
 			}
-			
+
 			if(toShowContextMenu){
 				contextMenuObject.menu({
 	                onClick:function(item){
@@ -94,17 +100,17 @@ $(document).ready(function(){
 	                	}else if(item.name == '005'){
 	                		downLoadFolder(node);
 	                	}
-	                } 
+	                }
               });
 			  contextMenuObject.menu('show', {
 	              left: e.pageX,
 	              top: e.pageY
 			  });
 			}
-			
+
 		}
 	});
-	
+
 });
 
 /**
@@ -125,7 +131,7 @@ function updateFolderName(node,treeObj){
 	   		var result = eval('(' + data + ')');
 	   		if(result.success=="1"){
 	   			resultBool= true;
-	   		}else{			   	
+	   		}else{
 	   			resultBool= false;
 	   			$.messager.alert('提示', result.message, 'info',function (){
 					node.text = oldFolderName;
@@ -144,7 +150,7 @@ function updateFolderName(node,treeObj){
  * @param treeObj 节点所在树
  */
 function addFolder(node,treeObj){
-	var folderLocationName	=node.attributes.folderLocationName;
+	var folderLocationName	=encodeURIComponent(encodeURIComponent(node.attributes.folderLocationName));
 	getDlg("addFavorite.htm?parentid="+node.id+"&folderLocationName="+folderLocationName,'addFavorite',"新增收藏夹",400,160);
 }
 
@@ -156,7 +162,8 @@ function addFolder(node,treeObj){
 function deleteFolder(node,treeObj){
 	var root =$('#favoriteTree').tree("getParent",node.target);
 	var deleteUrl = rootPath+"jasdoc/folder/favorite/deleteFavoriteFolder.do";
-	var queryurl="queryFavorite.htm"+"?folderId="+root.id+"&folderLocationName="+root.attributes.folderLocationName;
+	var folderLocationName	=encodeURIComponent(encodeURIComponent(root.attributes.folderLocationName));
+	var queryurl="queryFavorite.htm"+"?folderId="+root.id+"&folderLocationName="+folderLocationName;
 	$.messager.confirm('提示', '删除收藏夹后，收藏夹将放入回收站，您可以通过回收站功能中的还原按钮进行还原，您确定要删除吗？',function(r){
 		if(r){
 			$.ajax({
@@ -169,15 +176,15 @@ function deleteFolder(node,treeObj){
 					var childrenNode=$('#favoriteTree').tree('getChildren', parentNode.target);
 					if(childrenNode==""){
 						parentNode.iconCls="icon-tree-favorite-node-close";
-						$('#favoriteTree').tree('update',parentNode); 
+						$('#favoriteTree').tree('update',parentNode);
 					}
 					$("#content").attr("src",queryurl);
 				},
 				dataType:"json",
 				error : function(data) {
-					$.messager.alert('提示', '删除失败', 'error');	
+					$.messager.alert('提示', '删除失败', 'error');
 				}
-			});	
+			});
 		}
 	});
 }
@@ -201,7 +208,7 @@ function reloadDataTree(data,operation){
 		}
 		currentSelectedTreeObj.tree("reload",currentSelectedTreeNodeObj.target);
 	}
-	
+
 }
 
 //新增文件夹时 动态添加节点
@@ -218,7 +225,7 @@ function appendNode(treeData) {
 	}
 	//展开父节点
 	currentSelectedTreeNodeObj.iconCls="icon-tree-favorite-node-open";
-	
+
 	currentSelectedTreeObj.tree('update', currentSelectedTreeNodeObj);
 	currentSelectedTreeObj.tree("expand",currentSelectedTreeNodeObj.target);
 }

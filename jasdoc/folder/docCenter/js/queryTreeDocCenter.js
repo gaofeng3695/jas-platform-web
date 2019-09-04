@@ -6,7 +6,7 @@ var currentEditNode = null; //记录当前正在编辑的节点对象
 $(document).ready(function(){
 	init();
 	//同步加载文档中心树
-	/*$('#docCenterTree').tree({		
+	/*$('#docCenterTree').tree({
 		url: rootPath+"jasdoc/folder/doccenter/queryDocCenterFolder.do?isPrivilege="+isPrivilege+"&token="+localStorage.getItem("token"),
 		dnd: true,
 		onLoadSuccess:function(node,data) {
@@ -21,7 +21,7 @@ $(document).ready(function(){
 			if(currentEditNode!=null){
 				$(this).tree('endEdit',currentEditNode.target);
 			}
-			
+
 			var url=rootPath+"jasdoc/folder/docCenter/queryDocCenter.htm";
 //			url=url+"?folderId="+node.id+"&folderLocationName="+node.attributes.folderLocationName;
 			url=url+"?folderId="+node.id;
@@ -79,7 +79,7 @@ $(document).ready(function(){
 			var contextMenuObject = null ;
 			var createuser = "";
 			var role = node.attributes.role;
-			$.ajax({ 
+			$.ajax({
 				url: rootPath+"jasdoc/folder/folder/getFolderBoById.do?folderId="+node.id+"&isPrivilege="+isPrivilege,
 				success: function(result){
 		        	createuser=result.createuser;
@@ -127,14 +127,14 @@ $(document).ready(function(){
 	                		var roleforshare = node.attributes.role;
 	                		openPageByTab(node.id+"gx","共享详情","../../jasdoc/folder/file/queryFoderShareDetails.htm?eventid="+node.id+"&createuser="+createuser+"&role="+roleforshare);
 	                	}
-	                } 
+	                }
               });
 			  contextMenuObject.menu('show', {
 	              left: e.pageX,
 	              top: e.pageY
 			  });
 			}
-			
+
 		},
 		onBeforeDrop:function(target, source, point){
 			//拖拽之前，如果源文件夹和目标文件夹具有文件夹维护权限，则运行拖动，否则不允许
@@ -150,7 +150,7 @@ $(document).ready(function(){
 				return false;
 			}
 			return true;
-		
+
 		},
 		onDrop : function(targetNode, source, point){
 			var targetId = $("#docCenterTree").tree('getNode', targetNode).id;
@@ -164,7 +164,7 @@ $(document).ready(function(){
 	                point: point
 	            },
 	        	success : function(result) {
-	        		var data = jQuery.parseJSON( result ); 
+	        		var data = jQuery.parseJSON( result );
 					if(data.success=="-1"){
 						$.messager.alert('提示', data.message, 'info');
 						reloadDocCenterFolder();
@@ -173,7 +173,7 @@ $(document).ready(function(){
 	        });
 		}
 	});*/
-	
+
 });
 var ztreeObj,folderId,folderLocationName,folderType,folderNo;
 var setting;
@@ -207,7 +207,8 @@ function init(){
 			folderType=result[0].attributes.foldertype;
 			folderId = result[0].id;
 			folderNo = result[0].folderno;
-			var url=rootPath+"jasdoc/folder/docCenter/queryDocCenter.htm";
+			// var url=rootPath+"jasdoc/folder/docCenter/queryDocCenter.htm";
+			var url="queryDocCenter.htm";
 			$("#content").attr("src",url);
 			ztreeObj=$.fn.zTree.getZTreeObj("docCenterTree");
 			var rootNode = ztreeObj.getNodeByParam("id",result[0].id,null);
@@ -275,7 +276,7 @@ function updateFolderName(node,treeObj){
 	   		var result = eval('(' + data + ')');
 	   		if(result.success=="1"){
 	   			resultBool= true;
-	   		}else{			   	
+	   		}else{
 	   			resultBool= false;
 	   			$.messager.alert('提示', result.message, 'info',function (){
 					node.text = oldFolderName;
@@ -283,7 +284,7 @@ function updateFolderName(node,treeObj){
 					treeObj.tree('beginEdit',node.target);
 				});
 	   		}
-	   		
+
 	   	}
 	});
 	return resultBool;
@@ -293,12 +294,12 @@ function updateFolderName(node,treeObj){
  * @param node 选中节点
  */
 function downLoadFolder(node){
-	
+
 	$("<iframe id=\"folderDownload\" style=\"display: none;\"></iframe>").appendTo("body");
 	var url=rootPath+"jasdoc/folder/doccenter/downloadDocs.do?folderIds="+node.id+"&folderName="+encodeURI(encodeURI(node.text))+"&token="+ localStorage.getItem("token");
 	$("#folderDownload").attr("src",url);
-	
-	
+
+
 }
 
 /**
@@ -331,9 +332,9 @@ function deleteFolder(node,treeObj){
 				},
 				dataType:"json",
 				error : function(data) {
-					$.messager.alert('提示', '删除失败', 'error');	
+					$.messager.alert('提示', '删除失败', 'error');
 				}
-			});	
+			});
 		}
 	});
 }

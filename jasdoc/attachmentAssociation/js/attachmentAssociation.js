@@ -5,9 +5,9 @@ var oldFolderName = "";		//用于记录文件夹原名称（修改时  若名称
 var currentEditNode = null; //记录当前正在编辑的节点对象
 var businessId = getParamter("businessId");
 var folderId;
-$(document).ready(function(){ 
+$(document).ready(function(){
 	//同步加载文档中心树
-	$('#docCenterTree').tree({		
+	$('#docCenterTree').tree({
 		url: rootPath+"jasdoc/folder/doccenter/queryDocCenterFolder.do?isPrivilege="+isPrivilege+"&token="+localStorage.getItem("token"),
 		onLoadSuccess:function(node,data) {
 			if(node==null){
@@ -40,7 +40,7 @@ $(document).ready(function(){
 			folderId = node.id;
 		}
 	});
-	
+
 });
 
 

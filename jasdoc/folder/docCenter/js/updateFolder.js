@@ -1,4 +1,4 @@
-	
+
 var folderId = getParamter("folderId");
 $(function(){
 	$('#id').val(folderId);
@@ -7,7 +7,7 @@ $(function(){
 
 function save(){
 	$('#updateFolderForm').form('submit', {
-		url : "../doccenter/updateFolder.do?token="+localStorage.getItem("token"),
+		url : rootPath+"jasdoc/folder/doccenter/updateFolder.do?token="+localStorage.getItem("token"),
 		onSubmit : function() {
 			return $(this).form('validate');
 		},
@@ -19,11 +19,11 @@ function save(){
 					var id = $("#id").val();
 					parent.reloadDataTree({"name":folderName,"id":id},2);
 					closeFolder();
-				});	
+				});
 			}else{
 				$.messager.alert('提示',result.message, 'info');
 			}
-			
+
 		}
   });
 }
@@ -34,7 +34,7 @@ function save(){
  */
 function getFolderById(folderId){
 	$.ajax({
-		url:"../doccenter/getFolderById.do?folderId="+folderId,
+		url:rootPath+"jasdoc/folder/doccenter/getFolderById.do?folderId="+folderId,
 		type:"POST",
 		success:function(result){
 			if(result!=null){
@@ -51,10 +51,10 @@ function getFolderById(folderId){
 		}
 	});
 }
-	
+
 /**
  * 方法描述： 关闭界面
- */	
+ */
 function closeFolder(){
 	parent.closeDlg('updateFolder');
 }

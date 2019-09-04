@@ -1,6 +1,6 @@
 /**
  * 方法描述： 加载左侧角色树形菜单
- */	
+ */
 var folderUserValues = new Array();	//用户勾选的 文件夹权限数据
 var initUserValues = new Array();	//该角色以拥有的文件夹权限数据
 var parentValues = new Array();		//文件夹的父节点数据
@@ -18,13 +18,13 @@ $(function(){
 	doc.style.width=$("#search").width()+"px";
 	/***end 定位部门树面板的位置***/
 	/***begin 获取部门树***/
-	var deptUrl = "../../../jasdoc/privilege/privilege/getUnitAndChildrenTree.do?r="+new Date().getTime();
+	var deptUrl =rootPath+ "/jasdoc/privilege/privilege/getUnitAndChildrenTree.do?r="+new Date().getTime();
 	$('#deptprivilegeEventId').tree( {
 		url : deptUrl,
 		checkbox:true,
 		cascadeCheck:false,
 		onSelect:function(node){
-			
+
 		},onLoadSuccess:function(node,data){
 			$('#deptprivilegeEventId').tree('check',data[0].target);
 		},onBeforeCheck:function(node,checked){
@@ -54,11 +54,11 @@ $(function(){
 		});
 	});
 	/***begin 部门树面板折叠与展开***/
-	
+
 	$('#searchUnit').bind('keyup', function(event) {
 		search(event);
 	});
-	$('#user').searchbox({ 
+	$('#user').searchbox({
 		searcher:function(value,name){
 			var data=$("#rolePrivilegeEventId").tree("getRoots");
 			positionUser(value,data);
@@ -76,7 +76,7 @@ function positionUser(value,data){
 		if(data[j].text.indexOf(value)!=-1){
 			if(nodeUser==null){
 				var node=$("#rolePrivilegeEventId").tree('find',data[j].id);
-				
+
 				$("#rolePrivilegeEventId").tree('scrollTo',node.target);
 				$("#rolePrivilegeEventId").tree('select',node.target);
 				nodeUser=node.attributes;
@@ -105,7 +105,7 @@ function positionUser(value,data){
 					}
 					continue;
 				}
-				
+
 			}
 		}
 	}
@@ -122,7 +122,7 @@ function search(event){
 			positionUnit(keyWord,"deptprivilegeEventId",data);
 		}
 	}
-	
+
 }
 /******
  * 部门的查询并定位
@@ -173,9 +173,9 @@ function positionUnit(value,elementid,data){
 			return;
 		}
 	}
-	
-	
-	
+
+
+
 }
 /***
  * 关闭其他节点
@@ -208,7 +208,7 @@ function setUnitInfo(node,checked){
 			unitName=node.text;
 		}
 		$("#searchUnit").attr('value',unitName);
-		
+
 		var unitId=$("#unitId").val();
 		if(unitId!=""){
 			unitId+=","+node.id;
@@ -228,7 +228,7 @@ function setUnitInfo(node,checked){
 			}
 		}
 		$("#searchUnit").attr('value',newNuitName);
-		
+
 		var unitId=$("#unitId").val();
 		var newNuitId="";
 		var unitIds=unitId.split(',');
@@ -248,7 +248,7 @@ function setUnitInfo(node,checked){
  */
 function crateUserTree(){
 	var unitId=$("#unitId").val();
-	var roleUrl = "getUserListByUnitId.do?unitIds="+unitId;
+	var roleUrl = rootPath+"/jasdoc/privilege/privilege/getUserListByUnitId.do?unitIds="+unitId;
 	$('#rolePrivilegeEventId').tree({
 		url : roleUrl,
 		onLoadSuccess:function(node,data) {
@@ -259,12 +259,12 @@ function crateUserTree(){
 //			createPrivilegeTree();
 			init();
 		}
-		
-	});	
+
+	});
 }
 function init(){
 	$.ajax({
-		url: "../../../jasdoc/privilege/privilege/queryUserPivilegeForFolder.do?",
+		url: rootPath+"/jasdoc/privilege/privilege/queryUserPivilegeForFolder.do?",
 		dataType:"json",
 		type:'post',
 		data:{'userId':userId},
@@ -358,13 +358,13 @@ function setRoleCheck( markNumber , roleValue , id,folderId ){
 	$("input[type='checkbox'][name='check_"+markNumber+"']").each(function(){
 		if( roleCheck ){
 			 if( $(this).val() < roleValue ){
-				$(this).attr("checked",true); 
+				$(this).attr("checked",true);
 			}else if ( $(this).val() == roleValue ) {
 				role = $(this).val();
 			}
 		}else{
 			if( $(this).val() >= roleValue ){
-				$(this).attr("checked",false ); 
+				$(this).attr("checked",false );
 			}else if( $(this).val() < roleValue ){
 				role = $(this).val();
 			}
@@ -404,7 +404,7 @@ function setChildrensCheck(folderId,roleValue,roleCheck){
         				role=roleVal;
         			}
     			}
-    			
+
 			}
 			childrenNode[i].folderprivilegetype=role;
 			treeObj.updateNode(childrenNode[i]);
@@ -418,7 +418,7 @@ function setChildrensCheck(folderId,roleValue,roleCheck){
 
 /**
  * 方法描述：设置 隐藏域 值、将页面用于存储 文件夹选择的权限数据对象  整理成字符串组 传递给后台
- * 
+ *
  */
 var folderUserValuesStr = "";
 
@@ -434,7 +434,7 @@ function saveConfig(folderUserValuesStr){
 //	alert(folderUserValuesStr);
 	$.ajax({
 		type: "POST",
-	   	url: '../../../jasdoc/privilege/privilege/saveUserFolderPrivilege.do',
+	   	url:rootPath+'/jasdoc/privilege/privilege/saveUserFolderPrivilege.do',
    		data: { "userId":userId,"folderUserValuesStr":folderUserValuesStr},
 	   	success: function(check){
      		if (check.error=='-1'){
@@ -461,7 +461,7 @@ function cancel(){
 /***
  * 方法描述：在勾选或取消勾选时，改变对应节点的勾选状态
  * 同时设置该节点的权限
- * 
+ *
  * nodeId Ztree节点id
  * privilegeValue 权限值
  * roleCheck 勾选状态

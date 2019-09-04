@@ -7,7 +7,7 @@ $(function(){
 function save() {
 	var parentId=$("#parentid").val();
 	$('#addClassifyFrom').form('submit', {
-		url : "../classify/createDocClassify.do?token="+localStorage.getItem("token"),
+		url : rootPath+"jasdoc/folder/classify/createDocClassify.do?token="+localStorage.getItem("token"),
 		onSubmit : function() {
 			return $(this).form('validate');
 		},
@@ -18,14 +18,14 @@ function save() {
 				parent.reloadDataTree(parentId,'add');
 				closeFolder();
 			} else {
-				top.showAlert('提示',result.message , 'info');	
+				top.showAlert('提示',result.message , 'info');
 			}
 		}
 	});
 }
 /**
  * 方法描述： 关闭界面
- */	
+ */
 function closeFolder(){
 	parent.closeDlg("addDocClassify");
 }

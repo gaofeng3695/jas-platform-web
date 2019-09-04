@@ -78,7 +78,7 @@ module.exports = {
         forms: false,
         scroll: false
     },
-    codeSync: true,
+    codeSync: false,
     // proxy: {
     //     target: "localhost:3030",
     //     // middleware: iframeProxy

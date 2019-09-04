@@ -95,7 +95,7 @@ function initMessage(menuUrl,allOrOnlyDocFile) {
 	backFolderLocationName = folderLocationName;
 	backFolderId = folderId;
 	datagridTitle = "<div style='float:left;'>当前位置：</div>" + getTitle(folderLocationName);
-	var queryDocUrl = "../doccenter/getAllDoc.do?folderId=" + folderId;
+	var queryDocUrl = rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId;
 	if (menuUrl != null && "" != menuUrl) {
 		var p = menuUrl.substr(0).split("&");
 		$.each(p, function(i, item) {
@@ -140,20 +140,20 @@ function initMessage(menuUrl,allOrOnlyDocFile) {
 	var queryParams=null;
 	if (selectType == 1) { //allOrOnlyDocFile
 		if(allOrOnlyDocFile){
-			queryDocUrl = "../doccenter/getAllDoc.do?folderId=" + folderId+"&allOrOnlyDocFile="+allOrOnlyDocFile+"&isPrivilege="+isPrivilege;
+			queryDocUrl =  rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId+"&allOrOnlyDocFile="+allOrOnlyDocFile+"&isPrivilege="+isPrivilege;
 		}else{
-			queryDocUrl = "../doccenter/getAllDoc.do?folderId=" + folderId+"&isPrivilege="+isPrivilege;
+			queryDocUrl =  rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId+"&isPrivilege="+isPrivilege;
 		}
 	} else if (selectType == 4) {
-		queryDocUrl = "../../search/queryFolderByAttribute.do?";
+		queryDocUrl = rootPath+"/jasdoc/search/queryFolderByAttribute.do?";
 		queryParams={"filename":decodeURI(decodeURI(filename)),"fileno":decodeURI(decodeURI(fileno)),
 				"keyword":decodeURI(decodeURI(keyword)),"summary":decodeURI(decodeURI(summary)),"remark":decodeURI(decodeURI(remark)),
 				"fileclassifs":fileclassifys,"uploadtimeStart":uploadtimeStart,"uploadtimeEnd":uploadtimeEnd,
 				"filepath":decodeURI(decodeURI(filepath)),"folderId":folderId,"isPrivilege":isPrivilege};
 	} else if (selectType == 5) {
-		queryDocUrl = "../../search/querySearchByIndex.do?searchstring="+ encodeURI(encodeURI(searchstring))+"&folderId="+folderId;
+		queryDocUrl = rootPath+"jasdoc/search/querySearchByIndex.do?searchstring="+ encodeURI(encodeURI(searchstring))+"&folderId="+folderId;
 	}else{
-		queryDocUrl = "../doccenter/getAllDoc.do?folderId=" + folderId +"&allOrOnlyDocFile="+allOrOnlyDocFile;
+		queryDocUrl = rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId +"&allOrOnlyDocFile="+allOrOnlyDocFile;
 	}
 	var width = $('body').width();
 	if(queryParams!=null){
@@ -344,7 +344,7 @@ function queryDocByConditions(){
 	var keyword = $("#keyword").val();
 	 var query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,
 			 "uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":true};
-	var url= "../doccenter/getAllDoc.do?folderId=" + folderId;
+	var url=rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid('options').queryParams=query;
 	$("#dg").datagrid('load');
@@ -384,6 +384,7 @@ function documentImport(){
  * 创建文档中心下的文件夹
  */
 function createFolder(){
+	alert("xxx")
 	if(folderType == 1){
 		getDlg("addFolder.htm?parentid="+folderId+"&folderType="+folderType+"&folderNo="+folderNo,'addFolder',"新增文件夹",450,185);
 	}else {
@@ -607,10 +608,10 @@ function updateFile(eventid){
  * @param shiftDeleteFlag 是否彻底删除标识
  */
 function deleteDoc(shiftDeleteFlag,eventid){
-	var deleteUrl =  '../doccenter/deleteFile.do';
+	var deleteUrl = rootPath+ 'jasdoc/folder/doccenter/deleteFile.do';
 	var deleteTip = "文档将放入回收站，您可以通过回收站功能中的还原按钮进行还原，您确定要删除吗？\n\t";
 	if(shiftDeleteFlag){
-		deleteUrl='../doccenter/shiftDeleteFile.do';
+		deleteUrl=rootPath+'jasdoc/folder/doccenter/shiftDeleteFile.do';
 		deleteTip="将会彻底删除所选择的文档，不可还原，是否确定删除?\n\t";
 	}
 	var docId = eventid;
@@ -648,10 +649,10 @@ function deleteDoc(shiftDeleteFlag,eventid){
  * @param shiftDeleteFlag 是否彻底删除标识
  */
 function deleteFolderAndDocs(shiftDeleteFlag){
-	var deleteUrl =  '../doccenter/deleteFolderAndFile.do';
+	var deleteUrl = rootPath+'jasdoc/folder/doccenter/deleteFolderAndFile.do';
 	var deleteTip = "所选的文档和文件夹将放入回收站，您可以通过回收站功能中的还原按钮进行还原，您确定要删除吗？\n\t";
 	if(shiftDeleteFlag){
-		deleteUrl='../doccenter/shiftDeleteFolderAndFile.do';
+		deleteUrl=rootPath+'jasdoc/folder/doccenter/shiftDeleteFolderAndFile.do';
 		deleteTip="将会彻底删除所选择的文档和文件夹，不可还原，是否确定删除?\n\t";
 	}
 	var rows = $('#dg').datagrid('getSelections');
@@ -876,7 +877,7 @@ function openFolder(eventid,folderLocation){
 			return;
 		}
 	}
-	var url= "../doccenter/getAllDoc.do?folderId=" + folderEventId;
+	var url=rootPath+"jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderEventId;
 	folderLocationName = location;
 	folderId = folderEventId;
 	folderType = folderType;
@@ -927,10 +928,10 @@ function updateFolder(folderId){
  * @param folderId 文件夹ID
  */
 function deleteFolder(shiftDeleteFlag,eventid){
-	var deleteUrl =  '../doccenter/deleteFolder.do';
+	var deleteUrl =rootPath+'jasdoc/folder/doccenter/deleteFolder.do';
 	var deleteTip = "删除文件夹后，文件夹将放入回收站，您可以通过回收站功能中的还原按钮进行还原，您确定要删除吗？\n\t";
 	if(shiftDeleteFlag){
-		deleteUrl='../doccenter/shiftDeleteFolder.do';
+		deleteUrl=rootPath+'jasdoc/folder/doccenter/shiftDeleteFolder.do';
 		deleteTip="将会彻底删除该文件夹及所有的子文件夹、文档，不可还原，是否确定删除?\n\t";
 	}
 	var folderEventid = eventid;

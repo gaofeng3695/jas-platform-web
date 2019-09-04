@@ -8,7 +8,7 @@ window.app = new Vue({
 	el: '#app',
 	data: function () {
 		return {
-			appId:'',
+			appId: '',
 			projectOid: sessionStorage.getItem('projectOid') || '',
 			gisUrl: '',
 			username: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).userName,
@@ -143,7 +143,7 @@ window.app = new Vue({
 					async: true,
 					data: {
 						"menutype": "0",
-						"appId":  that.appId,
+						"appId": that.appId,
 						"language": "zh_CN"
 					},
 					success: function (data, xhr, param) {
@@ -174,7 +174,11 @@ window.app = new Vue({
 						}
 
 						if (item.attributes && item.attributes.URL) {
-							item.link = jasTools.base.rootPath + '/' + item.attributes.URL;
+							if (item.attributes.URL.indexOf('http') > -1) {
+								item.link = item.attributes.URL;
+							} else {
+								item.link = jasTools.base.rootPath + '/' + item.attributes.URL;
+							}
 						}
 						item.subs = item.children;
 						if (item.subs) {
@@ -286,6 +290,7 @@ window.app = new Vue({
 
 			return aIndex.map(function (index) {
 				var info = that._getMenuInfoByIndex(index, aMenu);
+
 				return {
 					title: info.title,
 					name: index,
@@ -364,10 +369,12 @@ window.app = new Vue({
 
 		},
 		paneresize: function () {
+			console.log(ConfigOfHome.mapIframeSrc);
 			!this.gisUrl && (this.gisUrl = ConfigOfHome.mapIframeSrc);
 		},
 		statuschanged: function (val) {
 			if (val) {
+				console.log(ConfigOfHome.mapIframeSrc);
 				!this.gisUrl && (this.gisUrl = ConfigOfHome.mapIframeSrc);
 			}
 		},

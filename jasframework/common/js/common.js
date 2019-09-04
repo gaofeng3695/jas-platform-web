@@ -1,9 +1,9 @@
-/** 
+/**
  * @file
  * @author  zhanggf
- * @version 1.0 
+ * @version 1.0
  * @desc  系统中公有的js方法
- * @date  2012-08-30 上午17:46:07 
+ * @date  2012-08-30 上午17:46:07
  * @last modified by lizz
  * @last modified time  2017-08-17
  */
@@ -24,9 +24,9 @@ $(window).bind("load", function() {
 	// 给html元素添加获取焦点时的样式
 	// setTimeout('addFocusCssToHtmlElement()', 200);
 	// setTimeout('addFocusCssToHtmlElement()', 500);
-	
+
 	changeDatagridHeaderInputCheckedStyle();
-	
+
 });
 $(window).bind("resize", function() {
 	setMain_areaHeight();// 设置页面contentArea区域高度
@@ -41,7 +41,7 @@ $(document).ready(function() {
 
 	setMain_areaHeight();// 设置页面contentArea区域高度
 
-	radiusCompatible();//圆角效果ie兼容性问题
+
 
 	addFocusCssToHtmlElement();// 给html元素添加获取焦点时的样式
 
@@ -92,7 +92,7 @@ $(document).ready(function() {
 				}
 			}
 		}
-		
+
 	});
 });
 
@@ -138,7 +138,7 @@ function getRootPath() {
 		return (localhostPaht + '/jasproxy' + "/");
 	}
 	console.log(localhostPaht+projectName)
-	
+
 	return (localhostPaht + projectName + "/");
 }
 
@@ -172,21 +172,6 @@ function comboBackspaceDisabled() {
 /**
  * @desc 圆角效果ie兼容性问题
  */
-function radiusCompatible() {
-	var browser = $.browser;
-	var documentMode = checkDocumentMode();
-	if (browser.msie && documentMode == '9') {
-		// 9.0 使用1.CSS
-	} else {
-		// 动态添加一个.css 文件
-		/*var path = rootPath + "common/css/radius_htc.css";
-		loadjscssfile(path, "css");
-		
-		// 动态添加一个.js 文件
-		var path1 = rootPath + "common/js/PIEv1.js";
-		loadjscssfile(path1, "js");*/
-	}
-}
 
 /**
  * @desc 加载输入框提示信息
@@ -249,7 +234,7 @@ function addFocusCssToHtmlElement() {
 
 /**
  * @desc 设置easyui Combo对象的宽度，解决宽度总小于其他input宽度问题
- * 
+ *
  * @param comboObjId easyui Combo组件对象id
  * @param width easyui Combo组件对象宽度，相对于页面的百分比宽度，用小数表示，例如0.35表示宽度为页面宽度的35%
  * @param comboObjType easyui Combo组件对象类型，（'combobox'||'combotree'||datetimebox）
@@ -266,7 +251,7 @@ function setComboObjWidth(comboObjId, width, comboObjType, containerObjId) {
 
 /**
  * @desc 设置easyui Combo对象的宽度，解决宽度总小于其他input宽度问题， 仅供common.js内部调用，页面请使用setComboObjWidth(comboObjId,width,comboObjType)
- * 
+ *
  * @param comboObjId easyui Combo组件对象id
  * @param width easyui Combo组件对象宽度，相对于页面的百分比宽度，用小数表示，例如0.35表示宽度为页面宽度的35%
  * @param comboObjType easyui Combo组件对象类型，（'combobox'||'combotree'||datetimebox）
@@ -276,7 +261,7 @@ function setComboObjWidth_private(comboObjId, width, comboObjType, containerObjI
 	var containerObjWidth; // Combo对象所在容器的宽度(table)
 	if (containerObjId && containerObjId != '') {
 		containerObjWidth = $('#' + containerObjId).width();
-	
+
 	} else {
 		containerObjWidth = document.documentElement.clientWidth;
 	}
@@ -311,7 +296,7 @@ function setSelectObjWidth() {
 
 /**
  * @desc 通过脚本动态添加css和js 文件到页面
- * 
+ *
  * @param filename 文件名称（路径）
  * @param filetype 文件类型（css\js）
  */
@@ -354,7 +339,7 @@ function setMain_areaHeight() {
 }
 /**
  * @desc 清空表单
- * 
+ *
  * @author:zhanggf
  * @param formId 表单id
  * @param text true为清空文本框。false为不清空文本框
@@ -400,13 +385,13 @@ function clearQueryForm(formId, text, hidden, select, textarea,tableId) {
 	}
 	if(tableId){
 		$("#"+tableId).datagrid('options').queryParams=null;
-		$("#"+tableId).datagrid('load'); 
+		$("#"+tableId).datagrid('load');
 	}
 }
 
 /**
  * @desc 为添加了required=true的地方添加span
- * 
+ *
  */
 function createSpan() {
 	$(":input").each(function() {
@@ -425,7 +410,7 @@ function createSpan() {
 		} else {
 			$(this).parent().prev().find("span:first").before(reSpan);
 		}
-		
+
 	});
 }
 
@@ -437,7 +422,7 @@ var containerId = '';
 
 /**
  * @desc 初始化datagrid的高度，datagrid高度自适应处理
- * 
+ *
  * @param datagridObjId datagrid的id
  * @param queryPanelObjId 查群面板的id 如果没有查询面板 则改id赋值为''
  * @param queryPanelH 查询区域的高度，如果没有查询区域，则改值赋值为'0'
@@ -451,12 +436,12 @@ function initDatagrigHeight(datagridObjId, queryPanelObjId, queryPanelH, contain
 	try {
 		var containerHeight = $(window).height();
 		var containerWidth = $(window).width();
-		
+
 		if (containerId && containerId != '') {
 			containerHeight = $("#" + containerId).height();
 			containerWidth = $("#" + containerId).width();
 		}
-		
+
 		if (queryPanelId && queryPanelId != '') {
 			$('#' + queryPanelId).panel({
 				onOpen:changeDatagrigHeight,
@@ -475,7 +460,7 @@ function initDatagrigHeight(datagridObjId, queryPanelObjId, queryPanelH, contain
 				});
 			},500)
 		}
-	
+
 		document.body.onresize = changeDatagrigHeight;// 只能用js原生的方法，不能使用jquery的resize方法：$('body').bind('resize',function(){})
 	} catch (e) {
 	}
@@ -488,14 +473,14 @@ function changeDatagrigHeight() {
 	try {
 		var containerHeight = $(window).height();
 		var containerWidth = $(window).width();
-		
+
 		if (containerId && containerId != '') {
 			containerHeight = $("#" + containerId).height();
 			containerWidth = $("#" + containerId).width();
 		}
 		var gridWidth = containerWidth;
 		var gridHeight = containerHeight;
-		
+
 		if (queryPanelId && queryPanelId != '') {
 
 			$('#' + queryPanelId).panel('resize', {
@@ -518,7 +503,7 @@ function changeDatagrigHeight() {
 
 /**
  * @desc 获取访问路径中某个参数
- * 
+ *
  * @param paramName 参数名
  * @param url 指定要截取参数的url（可以为空，如果为空url指向当前页面）
  */
@@ -611,7 +596,7 @@ var onWindowResize = function() {
 
 /**
  * @desc 重新加载数据
- * 
+ *
  * @param url 网格所在页面url
  * @param elementId 网格id
  */
@@ -642,7 +627,7 @@ function reloadData(url, elementId) {
 
 /**
  * @desc 查看页面赋值方法
- * 
+ *
  * @param url 查看页面加载数据请求路径 如：action.do?id=id
  * @param formid 查看页面表格表单id
  */
@@ -662,7 +647,7 @@ function businessView(url, formid) {
 
 /**
  * @desc 将按钮状态置为可用
- * 
+ *
  * @param buttonid 按钮id
  */
 function enableButtion(buttonid) {
@@ -671,7 +656,7 @@ function enableButtion(buttonid) {
 
 /**
  * @desc 将按钮状态置为不可用
- * 
+ *
  * @param buttonid 按钮id
  */
 function disableButtion(buttonid) {
@@ -680,7 +665,7 @@ function disableButtion(buttonid) {
 
 /**
  * @desc 判断浏览器类型及版本
- * 
+ *
  * @return 浏览器类型和版本号，中间空格隔开，各浏览器命名成请参考方法内部返回值
  */
 function checkBrowser() {
@@ -709,7 +694,7 @@ function checkBrowser() {
 
 /**
  * @desc 判断文档模式，只对IE有效，其他浏览器不支持documentMode属性
- * 
+ *
  * @return 文档模式，5||6||7||8||9||10
  */
 function checkDocumentMode() {
@@ -723,21 +708,21 @@ var dlgNumber = 1; // 弹出窗口序号1到5
 var isMove = false;
 
 /**
- * @desc 页面弹出窗口方法 
- * 
- * param url 弹出窗口要显示的页面（相对路径） 
- * param dialogid 弹出窗口关闭时需要的id 
- * param title 窗口title 
- * param w 窗口宽度 
- * param h 窗口高度 
- * param modal是否为模式窗口，true为是，false为不是 
- * param closable 默认窗口是否处于关闭状态。true 为关闭 
- * 
+ * @desc 页面弹出窗口方法
+ *
+ * param url 弹出窗口要显示的页面（相对路径）
+ * param dialogid 弹出窗口关闭时需要的id
+ * param title 窗口title
+ * param w 窗口宽度
+ * param h 窗口高度
+ * param modal是否为模式窗口，true为是，false为不是
+ * param closable 默认窗口是否处于关闭状态。true 为关闭
+ *
  * 一般调用方式：parent.getDlg("url","iframeId","title",宽度,高度)
  */
 
 function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizable) {
-	
+
 	/*console.log(url, dialogid, title, w, h, modal, closable,maximizable,resizable);*/
 	if (!modal) {
 		modal = false;
@@ -751,7 +736,7 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 	if (resizable == null) {
 		resizable = false;
 	}
-	
+
 	if (dlgNumber > 5) {
 		$.messager.alert('提示', '最多只能同时存在五个弹出窗口！', 'info');
 		dlgNumber == 5;
@@ -787,7 +772,7 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 		window_mask.appendTo("body");
 		dlgNumber++;
 	}
-	
+
 	// 初始化窗口
 	$('#' + dlgid).dialog({
 		title : title,
@@ -933,22 +918,22 @@ function showDlg(dialogid) {
 /** ---------------------弹出窗口定义结束--------------------------- */
 
 /**
- * @desc 提示信息窗口 
- * @param title 提示信息窗口标题 
+ * @desc 提示信息窗口
+ * @param title 提示信息窗口标题
  * @param msg 提示信息内容
  * @param type 提示窗口类型（error,info,question,warning），一般操作错误信息使用error，操作结果提示信息使用info，页面校验错误信息可以使用warning
  * @param callbackFn 提示窗口关闭时的回调函数。
  */
 function showAlert(title, msg, type, callbackFn) {
 	$.messager.alert(title, msg, type, callbackFn);
-	
+
 }
 
 
 
 /**
  * @desc datagrid选择属性下拉菜单
- * 
+ *
  * @param datagrid datagrid的jquery对象
  */
 function createColumnMenu(datagrid) {
@@ -988,7 +973,7 @@ function createColumnMenu(datagrid) {
 
 /**
  * @desc 显示正在加载数据提示，页面要进行异步提交数据请求之前调用
- * 
+ *
  * @param message 提示信息内容，可以为空，如果为空则取默认值为“正在处理，请稍候。。。”
  */
 function showLoadingMessage(message) {
@@ -1026,7 +1011,7 @@ function hiddenLoadingMessage() {
 
 function queryDatagrid(queryformID,datagridID){
 	querySerialize =$('#'+queryformID).serializeToJson();
-	
+
 	encodeURI(querySerialize);
 	querySerialize.pageNumber = 1;
 	$('#'+datagridID).datagrid('options').queryParams= querySerialize;
@@ -1038,20 +1023,20 @@ function queryDatagrid(queryformID,datagridID){
  *  转化成json后，按照正常post数据提交。
  */
 
-$.fn.serializeToJson = function () {  
-    var o = {};  
-    var a = this.serializeArray();  
-    $.each(a, function () {  
-        if (o[this.name]) {  
-            if (!o[this.name].push) {  
-                o[this.name] = [o[this.name]];  
-            }  
-            o[this.name].push(this.value.trim() || '');  
-        } else {  
-            o[this.name] = this.value.trim() || '';  
-        }  
-    });  
-    return o;  
+$.fn.serializeToJson = function () {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function () {
+        if (o[this.name]) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value.trim() || '');
+        } else {
+            o[this.name] = this.value.trim() || '';
+        }
+    });
+    return o;
 };
 
 
@@ -1059,13 +1044,13 @@ $.fn.serializeToJson = function () {
  * @desc 获取主子表tab切换的内容元素高度
  */
 function masterTableChildHeight(){
-	
+
 	if (document.getElementById('tabContainer') != null) {
 		$("#tabContainer").tabs("resize",{
 			width:document.documentElement.clientWidth,
 			height:document.documentElement.clientHeight
 		});
-	
+
 		var tabsPanelsHeight = $(".master-table .easyui-tabs").height()-$(".master-table .tabs-header").outerHeight(),
 			tabsPanelsPaddingTop = parseInt($(".tabs-panels").css("padding-top")),
 			tabsPanelsPaddingBottom = parseInt($(".tabs-panels").css("padding-bottom"));
@@ -1078,7 +1063,7 @@ function masterTableChildHeight(){
 
 /**
  * @desc  判断是否非空
- * @param {String} param 
+ * @param {String} param
  */
 function isNull(param) {
     if (param == "" || param == null || param == undefined) {
@@ -1129,14 +1114,14 @@ var getApiByIframeId = function(fId ,apiName){
 /**
  * @desc JS日期格式化转换方法
  * @param fmt 日期时间的格式
- * 
+ *
  * 调用方法
  * 	  获取当前时间  var time1 = new Date().format("yyyy-MM-dd hh:mm:ss");  console.log(time1);  // 2017-12-08  11:55:30
- *    将指定的日期转换为"年月日"的格式  
+ *    将指定的日期转换为"年月日"的格式
      		var oldTime = (new Date("2012/12/25 20:11:11")).getTime();
     		var curTime = new Date(oldTime).format("yyyy-MM-dd");
     		console.log(curTime);  // 2012-12-25
- *    将 "时间戳" 转换为 "年月日" 的格式	
+ *    将 "时间戳" 转换为 "年月日" 的格式
  			var da = 1402233166999;
     			da = new Date(da);
     		var year = da.getFullYear()+'年';
@@ -1145,25 +1130,25 @@ var getApiByIframeId = function(fId ,apiName){
     		console.log([year,month,date].join('-'));  // 2014年-6月-8日
  * 详情参考  https://www.cnblogs.com/tugenhua0707/p/3776808.html
  */
-Date.prototype.format = function(fmt) { 
-    var o = { 
-       "M+" : this.getMonth()+1,                 //月份 
-       "d+" : this.getDate(),                    //日 
-       "h+" : this.getHours(),                   //小时 
-       "m+" : this.getMinutes(),                 //分 
-       "s+" : this.getSeconds(),                 //秒 
-       "q+" : Math.floor((this.getMonth()+3)/3), //季度 
-       "S"  : this.getMilliseconds()             //毫秒 
-   }; 
+Date.prototype.format = function(fmt) {
+    var o = {
+       "M+" : this.getMonth()+1,                 //月份
+       "d+" : this.getDate(),                    //日
+       "h+" : this.getHours(),                   //小时
+       "m+" : this.getMinutes(),                 //分
+       "s+" : this.getSeconds(),                 //秒
+       "q+" : Math.floor((this.getMonth()+3)/3), //季度
+       "S"  : this.getMilliseconds()             //毫秒
+   };
    if(/(y+)/.test(fmt)) {
-           fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+           fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
    }
     for(var k in o) {
        if(new RegExp("("+ k +")").test(fmt)){
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
         }
     }
-   return fmt; 
+   return fmt;
 };
 
 
@@ -1197,7 +1182,7 @@ Date.prototype.format = function(fmt) {
 				e.preventDefault();
 				var menuid=$(this)[0].id+"_menu";
 				if (!$('#'+menuid).length) {
-					
+
 					createColumnMenu($(this));
 				}
 				$('#'+menuid).menu('show', {
@@ -1214,7 +1199,7 @@ Date.prototype.format = function(fmt) {
 
 /**
  * @desc 参照input 设置easyui Combo对象的宽度
- * 
+ *
  * @param comboObjId easyui Combo组件对象id
  * @param referenceObjId 参照对象id
  * @param comboObjType easyui Combo组件对象类型，（'combobox'||'combotree'||datetimebox）
@@ -1268,7 +1253,7 @@ function changeDatagridHeaderInputCheckedStyle(){
 				$(this).removeClass("datagrid-header-check-check")
 			}
 		})
-		
+
 	}
 }
 
@@ -1319,7 +1304,7 @@ function addBusinessHistoryRecords(businessid,containerId){
 					var detailItem = detail[j];
 					content+='修改了 <strong><i>'+detailItem.dataItemName+'</i></strong>，旧值为 "'+(detailItem.oldValue||"")+'"，新值为 "'+(detailItem.newValue||"")+'"。<br>';
 				}
-				
+
 			}catch(e){
 				content+=item.detail;
 			}
@@ -1378,16 +1363,16 @@ function datagridBeforeSend(param, success, error,opts){
 	}
 	delete param.page;
 	delete param.rows;
-    $.ajax({  
-        type :opts.method,  
-        url : opts.url,  
-        dataType : 'json',  
-        contentType : 'application/json;charset=utf-8', // 设置请求头信息  
-        data : JSON.stringify(param),  
-        success : function(result) {         
-             success(result);                  
-        }  
-     });  
+    $.ajax({
+        type :opts.method,
+        url : opts.url,
+        dataType : 'json',
+        contentType : 'application/json;charset=utf-8', // 设置请求头信息
+        data : JSON.stringify(param),
+        success : function(result) {
+             success(result);
+        }
+     });
 }
 
 /**
@@ -1440,7 +1425,7 @@ function commonImport(templateCode, callerPageUrl, datagridElementId){
 		top.showAlert("提示", "数据网格Id为空", 'info');
 		return;
 	}
-	top.getDlg(rootPath + "jasframework/components/importexcel/import_excel.htm?templateCode=" + templateCode + 
+	top.getDlg(rootPath + "jasframework/components/importexcel/import_excel.htm?templateCode=" + templateCode +
 			"&callerPageUrl=" + callerPageUrl +"&datagridElementId=" + datagridElementId, "importExcel",
 			"导入", 700, 400, false, true, false);
 }

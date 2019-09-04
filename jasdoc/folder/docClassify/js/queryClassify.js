@@ -78,7 +78,7 @@ function initDataGrid(folderLocation){
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:"../classify/getAllClassifyAndFiles.do?folderId="+folderId+"&hierarchy="+hierarchy,
+		url:rootPath+"jasdoc/folder/classify/getAllClassifyAndFiles.do?folderId="+folderId+"&hierarchy="+hierarchy,
 		remoteSort: true,
 		idField:'eventid',
 		pagination:true,
@@ -86,11 +86,11 @@ function initDataGrid(folderLocation){
 		toolbar:'#toolbar',
 		title:datagridTitle,
 	 	columns:[[
-	           {field:'ck',title:'全选',checkbox:true}, 
+	           {field:'ck',title:'全选',checkbox:true},
 	           {field : 'favorite',title:'文档名称',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 	        	   return getFileNameField(rowData);
-	           }}, 
-//	           {field:'filename',title:'文档名称',width:0.2*width}, 
+	           }},
+//	           {field:'filename',title:'文档名称',width:0.2*width},
 	           {field : 'filetype',title : '格式',width : 0.07 * width,formatter:function(value,rowData,rowIndex){
 					 var typeFlag = rowData.typeFlag;
 					 if(typeFlag==1){
@@ -99,10 +99,10 @@ function initDataGrid(folderLocation){
 						 return rowData.filetype;
 					 }
 				 }},
-				 {field : 'createusername',title : '创建人',width : 0.07 * width},  
-				 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},  
-				 {field : 'updateuser',title : '修改人',width : 0.07 * width},  
-				 {field : 'updatetime',title : '修改时间',width : 0.1 * width},  
+				 {field : 'createusername',title : '创建人',width : 0.07 * width},
+				 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},
+				 {field : 'updateuser',title : '修改人',width : 0.07 * width},
+				 {field : 'updatetime',title : '修改时间',width : 0.1 * width},
 				 {field : 'filesizeStr',title : '大小(kb)',width : 0.07 * width},
 	            {field : 'filelocation',title : '文档位置',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 	            	 var typeFlag = rowData.typeFlag;
@@ -111,13 +111,13 @@ function initDataGrid(folderLocation){
 	            	 }else{
 	            		 return rowData.filelocation;
 	            	 }
-	            }}, 
+	            }},
 	           {field:'privilege',title:'我的权限',width:0.09*width,formatter:function(value,rowData,rowIndex){
 	        	   return getPrivilegeFieldClassfiy(rowData);
 				  }},
 				  {field : 'eventid',title:"eventid",hidden:true},
 					{field : 'folderid',title:"folderid",hidden:true}] ],
-		    
+
 		onDblClickRow:function(index,indexData){
 			if(indexData.typeFlag==1){
 				onExpandNode(indexData.eventid);
@@ -138,14 +138,14 @@ function initDataGrid(folderLocation){
 							$(this).css("display", "");
 						}
 					});
-					
+
 					if( hierarchy == docCenterRootFolderHierarchy ){
 						$("#40").css("display", "none");
 					}
 				}else if( foldertype == 4  || foldertype == 5 ){ //搜索出的数据只具有移动的权限
 					$.each(data.role, function(i, item) {
 						if( item==7 ){
-							//控制移动 
+							//控制移动
 							$("#"+item).css("display", "");
 						}
 					});
@@ -234,9 +234,9 @@ function addToFavorite(){
 			}
 			eventids += rows[rows.length-1].eventid;
 			filenames += rows[rows.length-1].filename;
-			
+
 			getDlg("../favorite/addToFavorite.htm?eventids="+eventids+"&filenames="+filenames+"&foldertype="+foldertype+"&folderid="+folderId+"&r="+new Date().getTime(),'favorite','添加收藏',580,162);
-			
+
 		}else{
 			$.messager.alert('提示','请选择记录','info');
 		}
@@ -245,10 +245,10 @@ function addToFavorite(){
 
 /**
  * 方法描述：删除文档的分类信息
- * 
+ *
  */
 function deleteDocFromClassify(){
-		deleteDocUrl = '../classify/deletefilereffromclassify.do';
+		deleteDocUrl =rootPath+'jasdoc/folder/classifyclassify/deletefilereffromclassify.do';
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length > 0){
 		var ids="";
@@ -290,14 +290,14 @@ function updateFileClassifyInfo(){
 }
 /**
  * 方法描述：添加到默认收藏夹
- * 
+ *
  * @param eventid
  * @param state
  */
 function addfavorite(eventid,state){
 	if(state=="2"){
 		$.ajax({
-			url : '../favorite/addDocToFavorite.do',
+			url : rootPath+'jasdoc/folder/favorite/addDocToFavorite.do',
 			type : 'POST',
 			data:"docids="+eventid,
 			success : function(data) {
@@ -306,9 +306,9 @@ function addfavorite(eventid,state){
 			},
 			dataType:"json",
 			error : function(data) {
-				$.messager.alert('提示', '添加默认收藏夹失败', 'error');	
+				$.messager.alert('提示', '添加默认收藏夹失败', 'error');
 			}
-		});	
+		});
 	}else{
 		$.ajax({
 				url : '../favorite/deleteFilerefFromFavorite.do',
@@ -320,11 +320,11 @@ function addfavorite(eventid,state){
 				},
  				dataType:"json",
  				error : function(data) {
- 					$.messager.alert('提示', '从默认收藏夹删除失败', 'error');	
+ 					$.messager.alert('提示', '从默认收藏夹删除失败', 'error');
  				}
- 			});	
+ 			});
 	}
-	
+
 }
 
 
@@ -333,7 +333,7 @@ function addfavorite(eventid,state){
  */
 function queryDocByConditions(){
 	$("#dg").datagrid('clearSelections'); // clear
-	var filename = $("#filename").val();	
+	var filename = $("#filename").val();
 	var filetype = $("#filetype").val();
 	var uploadtime_start = $("#uploadtime_start").val();
 	var uploadtime_end = $("#uploadtime_end").val();
@@ -344,7 +344,7 @@ function queryDocByConditions(){
 	var url= "../classify/getAllClassify.do?folderid=" + folderId + "&hierarchy=" + hierarchy;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid('options').queryParams=query;
-	$("#dg").datagrid('load');	
+	$("#dg").datagrid('load');
 	$("#dg").datagrid('options').queryParams=null;
 }
 /**

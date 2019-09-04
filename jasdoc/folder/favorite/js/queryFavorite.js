@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * 文件描述: 我的收藏夹
  * create by Shenjie 2015-6-10 15:13
  */
@@ -13,7 +13,7 @@ var folderLocationName = "";
  * 页面初始化
  */
 $(function(){
-	folderLocationName = getParamter("folderLocationName");
+	folderLocationName = decodeURIComponent(decodeURIComponent(getParamter("folderLocationName")));
 	folderId = getParamter("folderId");
 	datagridTitle = "当前位置："+folderLocationName;
 	var width=$('body').width();
@@ -22,17 +22,17 @@ $(function(){
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:"../favorite/getAllFavorite.do?folderId="+folderId,
+		url:rootPath+"jasdoc/folder/favorite/getAllFavorite.do?folderId="+folderId,
 		remoteSort: true,
 		idField:'eventid',
 		pagination:true,
 		rownumbers:true,
 		toolbar:'#toolbar',
 		title:datagridTitle,
-		columns : [[{field : 'ck',title : '全选',checkbox : true}, 		        					
+		columns : [[{field : 'ck',title : '全选',checkbox : true},
 		            {field : 'filename',title : '名称',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 						return getFileNameField(rowData);
-					 }}, 
+					 }},
 					 {field : 'filetype',title : '格式',width : 0.07 * width,formatter:function(value,rowData,rowIndex){
 						 var typeFlag = rowData.typeFlag;
 						 if(typeFlag==1){
@@ -41,10 +41,10 @@ $(function(){
 							 return rowData.filetype;
 						 }
 					 }},
-					 {field : 'createusername',title : '创建人',width : 0.07 * width},  
-					 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},  
-					 {field : 'updateuser',title : '修改人',width : 0.07 * width},  
-					 {field : 'updatetime',title : '修改时间',width : 0.1 * width},  
+					 {field : 'createusername',title : '创建人',width : 0.07 * width},
+					 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},
+					 {field : 'updateuser',title : '修改人',width : 0.07 * width},
+					 {field : 'updatetime',title : '修改时间',width : 0.1 * width},
 					 {field : 'filesizeStr',title : '大小(kb)',width : 0.07 * width},
 		            {field : 'filelocation',title : '文档位置',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 		            	 var typeFlag = rowData.typeFlag;
@@ -53,12 +53,12 @@ $(function(){
 		            	 }else{
 		            		 return rowData.filelocation;
 		            	 }
-		            }}, 
+		            }},
 					{field : 'privilege',title : '我的权限',width : 0.09 * width,formatter:function(value,rowData,rowIndex){
 						return getPrivilegeField(rowData);
 					  }},
 				{field : 'eventid',title:"eventid",hidden:true} ] ],
-		    
+
 		onDblClickRow:function(index,indexData){
 			var typeFlag = indexData.typeFlag;
 			if(typeFlag==1){
@@ -98,7 +98,7 @@ $(function(){
 				$('#39').attr('disabled', true);
 				var role = rowData.hierarchyRole;
 				$('#fileManager div').each(function() {
-					
+
 					if (role >= $(this).attr('id')) {
 						$(this).attr('disabled', false);
 					}
@@ -121,16 +121,16 @@ $(function(){
 			}
 	    	$('#dg').datagrid('clearSelections'); //clear selected options
 	    }
-	});	
+	});
 	initDatagrigHeight('dg','',0);
 
-	
+
 });
 
 
 /**
  * 方法描述：移动文档
- * 
+ *
  */
 function moveFile(){
 	var rows = $('#dg').datagrid('getSelections');
@@ -156,11 +156,11 @@ function moveFile(){
 	}else{
 		$.messager.alert('提示','请选择记录','info');
 	}
-}		
-		
+}
+
 /**
  * 方法描述：删除文档
- * 
+ *
  */
 function deleteDoc(eventid,typeFlag){
 	if(arguments.length==2){
@@ -222,7 +222,7 @@ function deleteDoc(eventid,typeFlag){
 			$.messager.alert('提示','请选择记录','info');
 		}
 	}
-	
+
 }
 /**
  * 方法描述：打开文件夹
@@ -246,7 +246,7 @@ function openFolder(eventid,folderLocation){
 	datagridTitle = "当前位置："+folderLocationName;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid({title:datagridTitle});
-	$("#dg").datagrid('load');	
+	$("#dg").datagrid('load');
 }
 /**
  * 方法描述：为文件夹右键菜单添加响应事件
@@ -263,9 +263,9 @@ function operationFolderContextMenu(rowData){
 			} else if (item.name == 'updateSingleFolder') {
 				updateFolder(rowData.eventid);
 			} else if (item.name == 'deleteSingleFolder') {
-				deleteFolder(rowData.eventid);  
+				deleteFolder(rowData.eventid);
 			}else if (item.name == 'shiftDeleteSingleFolder') {
-				shiftDeleteFolder(rowData.eventid);  
+				shiftDeleteFolder(rowData.eventid);
 			} else if (item.name == 'viewSingleFolder') {
 				viewDetailInfo(rowData.eventid,1);
 			}
@@ -335,7 +335,7 @@ function updateFolder(folderId){
 		}
 	}
 	getDlg("updateFavorite.htm?folderId="+folderEventId,'updateFolder',"收藏夹修改",450,180);
-}	
+}
 /**
  * 方法描述：删除文件夹
  */
@@ -359,7 +359,7 @@ function deleteFolder(folderId){
 				success : function(data) {
 					reloadDataTree(folderEventid,3);
 				}
-			});	
+			});
 		}
 	});
 }
@@ -386,13 +386,13 @@ function shiftDeleteFolder(folderId){
 				success : function(data) {
 					reloadDataTree(folderEventid,3);
 				}
-			});	
+			});
 		}
 	});
 }
 /**
  * 方法描述：查看文件或文件夹详情
- */	
+ */
 function viewDetailInfo(eventid,typeFlag){
 	var eventId = eventid;
 	var flag = typeFlag;
@@ -423,7 +423,7 @@ function updateInfo(eventid){
 	getDlg("../file/updateFile.htm?eventid="+eventid,'updateFile',"文档修改",700,350);
 }
 
-/** 
+/**
  *	方法描述：预览
  *	@param eventid	选中记录的eventid
  */
@@ -439,19 +439,19 @@ function Preview(eventid,versionid){
 				var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ docId +"&versionid="+versionid;
 				top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
 			}else if(result.success==0){
-				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');	
+				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');
 			}else if(result.success==-1){
 				parent.showAlert("提示",result.msg,"info");
 			}
 		}
 	});
-	
+
 }
 function reloadDataTree(data,operation){
 	if(operation==0){
 		//文档移动页面
 		$("#dg").datagrid('reload');
-		$('#dg').datagrid('clearSelections'); 
+		$('#dg').datagrid('clearSelections');
 	}else if(operation==1){
 		//新增页面刷新父页面
 		try{
@@ -480,7 +480,7 @@ function reloadDataTree(data,operation){
 		}catch(e){
 			$("#dg").datagrid('reload');
 		}
-		
+
 	}else if(operation==3){
 		//删除操作刷新父页面
 		try{
@@ -492,10 +492,10 @@ function reloadDataTree(data,operation){
 			var childrenNode=tree.tree('getChildren', nodeParent.target);
 			if(childrenNode==""){
 				nodeParent.iconCls="icon-tree-favorite-node-close";
-				tree.tree('update',nodeParent); 
+				tree.tree('update',nodeParent);
 			}
 			$("#dg").datagrid('reload');
-			
+
 		}catch(e){
 			$("#dg").datagrid('reload');
 		}
