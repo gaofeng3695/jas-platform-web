@@ -13,33 +13,40 @@
 </head>
 
 <body>
-	<div id="app" v-cloak>
-		<jas-dialog-wrapper>
-			<jas-base-group-title name="文件夹信息"></jas-base-group-title>
+<div id="app" v-cloak>
+	<jas-dialog-wrapper>
+		<jas-base-group-title name="文件夹信息"></jas-base-group-title>
 
-			<el-form ref="formData" :model="form" :rules="rules" label-width="120px">
-				<el-row>
-					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
-						<el-form-item label="文件夹名称" prop="foldername">
-							<el-input v-model="form.foldername" placeholder="请输入文件夹名称" size="small" clearable></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<el-form-item label="文件夹描述" prop="description">
-							<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.description"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-			</el-form>
-			<div slot="footer">
-				<el-button size="small" @click="cancel()">取 消</el-button>
-				<el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
-			</div>
-		</jas-dialog-wrapper>
+		<el-form ref="formData" :model="form" :rules="rules" label-width="120px">
+			<el-row>
+				<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+					<el-form-item label="文件夹名称" prop="foldername">
+						<el-input v-model="form.foldername" placeholder="请输入文件夹名称" size="small" clearable></el-input>
+					</el-form-item>
+				</el-col>
+			</el-row>
+			<el-row v-show="folderType == 1">
+				<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+					<el-form-item label="文件夹编号" prop="folderno">
+						<el-input v-model="form.folderno" placeholder="请输入文件夹编号" size="small" clearable></el-input>
+					</el-form-item>
+				</el-col>
+			</el-row>
+			<el-row>
+				<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+					<el-form-item label="文件夹描述" prop="description">
+						<el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.description"></el-input>
+					</el-form-item>
+				</el-col>
+			</el-row>
+		</el-form>
+		<div slot="footer">
+			<el-button size="small" @click="cancel()">取 消</el-button>
+			<el-button size="small" type="primary" @click="submit('formData')">确 定</el-button>
+		</div>
+	</jas-dialog-wrapper>
 
-	</div>
+</div>
 </body>
 <script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../../lib/vue/vue.js"></script>
@@ -56,10 +63,10 @@
 			return {
 				rules: {
 					foldername: [{
-							required: true,
-							message: '该字段为必填项',
-							trigger: 'blur'
-						},
+						required: true,
+						message: '该字段为必填项',
+						trigger: 'blur'
+					},
 						{
 							min: 0,
 							max: 100,
@@ -67,6 +74,17 @@
 							trigger: 'blur'
 						}
 					],
+					folderno:[{
+						required: true,
+						message: '该字段为必填项',
+						trigger: 'blur'
+					},
+						{
+							min: 0,
+							max: 100,
+							message: '长度在 0 到 100 个字符',
+							trigger: 'blur'
+						}],
 					description: [{
 						min: 0,
 						max: 200,
@@ -78,7 +96,10 @@
 				form: {
 					foldername: '',
 					description: '',
+					folderno:'',
 				},
+				parentFolderData:{},
+				folderType:'',
 			}
 		},
 		created: function () {
@@ -87,9 +108,12 @@
 			if (param.oid) {
 				this.oid = param.oid;
 				this.getDetailByObjectId(param.oid);
+
 			};
 			if (param.parentid) {
 				this.parentid = param.parentid;
+				this.getParentFolderByObjectId(param.parentid);
+
 			};
 		},
 		methods: {
@@ -116,6 +140,8 @@
 					parentid: this.form.parentid,
 					foldername: this.form.foldername,
 					description: this.form.description,
+					folderno: this.form.folderno,
+					foldertype: this.form.foldertype
 				}, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',
@@ -131,7 +157,8 @@
 					parentid: this.parentid,
 					foldername: this.form.foldername,
 					description: this.form.description,
-					foldertype: 1
+					foldertype: this.folderType,
+					folderno: this.form.folderno
 
 				}, function (data) {
 					top.Vue.prototype.$message({
@@ -148,6 +175,18 @@
 					folderId: oid
 				}, function (data) {
 					that.form = data;
+					that.folderType = data.foldertype;
+				});
+			},
+			getParentFolderByObjectId: function (oid) {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/getFolderById.do";
+				jasTools.ajax.postForm(url, {
+					folderId: oid
+				}, function (data) {
+					that.parentFolderData = data;
+					that.folderType = data.foldertype;
+					that.form.folderno = data.folderno;
 				});
 			},
 		},

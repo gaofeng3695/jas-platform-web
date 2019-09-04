@@ -47,6 +47,18 @@ var iframeProxy3 = proxy(function (pathname, req) {
         '^/jasframework/jasmvvm': '/jasmvvm',
     }
 });
+
+
+var iframeProxy4= proxy(function (pathname, req) {
+    return pathname.match('^/jasframework/jasdoc');
+}, {
+    target: 'http://localhost:3030/',
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: {
+        '^/jasframework/jasdoc': '/jasdoc',
+    }
+});
 module.exports = {
     port: 3030,
     startPath: "/jasmvvm/pages/page-login/login.html",
@@ -57,6 +69,7 @@ module.exports = {
             apiProxy,
             iframeProxy2,
             iframeProxy3,
+            iframeProxy4,
             iframeProxy
         ]
     },
@@ -65,7 +78,7 @@ module.exports = {
         forms: false,
         scroll: false
     },
-    codeSync: true,
+    codeSync: false,
     // proxy: {
     //     target: "localhost:3030",
     //     // middleware: iframeProxy
