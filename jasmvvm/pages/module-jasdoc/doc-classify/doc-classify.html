@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
 	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css">
 	<link rel="stylesheet" href="./../../../common/css/main.css">
 	<style>
 		.resizepanel {
@@ -65,7 +66,8 @@
 				<jas-base-module-title name="文档分类列表" style="margin-bottom: 10px;"></jas-base-module-title>
 
 				<el-tree class="is-grown" ref="orgtree" node-key="id" :data="classifyTreeList" :props="defaultProps"
-				 highlight-current @node-click="clicknode" icon-class="fa fa-file" :expand-on-click-node="false" default-expand-all>
+					highlight-current @node-click="clicknode" icon-class="fa fa-file" :expand-on-click-node="false"
+					default-expand-all>
 					<span class="custom-tree-node" slot-scope="{ node, data }">
 						<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
 						<span>{{ node.label }}</span>
@@ -78,10 +80,12 @@
 					<div style="height:40px;border-bottom:1px solid #ececec;box-sizing: border-box;overflow: hidden">
 						<div style="line-height:40px;float:left;padding-right:10px;">当前位置：</div>
 						<el-breadcrumb separator-class="el-icon-arrow-right" style="line-height:40px;;margin: 0 80px;">
-							<el-breadcrumb-item :to="{}" @click.native="currentNodeId = item.id;" v-for="item in currentNodePath">{{formatNames(item.text)}}</el-breadcrumb-item>
+							<el-breadcrumb-item :to="{}" @click.native="currentNodeId = item.id;" v-for="item in currentNodePath">
+								{{formatNames(item.text)}}</el-breadcrumb-item>
 						</el-breadcrumb>
-						<el-button @click="currentNodeId = currentNodePath[currentNodePath.length-2].id;" :disabled="currentNodePath.length < 2"
-						 style="position: absolute;margin-top: 4px;top: 0;right: 10px;" type="text" size="small">返回上级</el-button>
+						<el-button @click="currentNodeId = currentNodePath[currentNodePath.length-2].id;"
+							:disabled="currentNodePath.length < 2" style="position: absolute;margin-top: 4px;top: 0;right: 10px;"
+							type="text" size="small">返回上级</el-button>
 					</div>
 					<div style="height:calc(100% - 40px);">
 						<jas-list-wrapper ref="mylist" style="padding:0;">
@@ -103,9 +107,9 @@
 												<!-- <el-date-picker size="small" v-model="form.uploadtime" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期"
 												  end-placeholder="结束日期" style="width:100%;">
 												</el-date-picker> -->
-												<el-date-picker size="small" v-model="form.uploadtime" type="daterange" value-format="yyyy-MM-dd HH:mm:ss"
-												 range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00','23:59:59']"
-												 style="width:100%;">
+												<el-date-picker size="small" v-model="form.uploadtime" type="daterange"
+													value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+													end-placeholder="结束日期" :default-time="['00:00:00','23:59:59']" style="width:100%;">
 												</el-date-picker>
 											</el-form-item>
 										</el-col>
@@ -131,11 +135,12 @@
 							<div slot="list" class="jas-flex-box is-vertical is-grown">
 								<div style="padding: 15px 0;">
 
-									<el-button @click="createNewFolder" v-if="isEditMode" size="small" plain type="primary" icon="fa fa-plus">新建分类</el-button>
-									<el-button @click="deleteFile" v-if="isEditMode" :disabled="selectedFiles.length==0" size="small" plain type="primary"
-									 icon="fa fa-minus">移除文档</el-button>
-									<el-button @click="collectFiles" v-if="!isEditMode" :disabled="selectedFiles.length==0" size="small" plain
-									 type="primary" icon="fa fa-star">收藏</el-button>
+									<el-button @click="createNewFolder" v-if="isEditMode" size="small" plain type="primary"
+										icon="fa fa-plus">新建分类</el-button>
+									<el-button @click="deleteFile" v-if="isEditMode" :disabled="selectedFiles.length==0" size="small"
+										plain type="primary" icon="fa fa-minus">移除文档</el-button>
+									<el-button @click="collectFiles" v-if="!isEditMode" :disabled="selectedFiles.length==0" size="small"
+										plain type="primary" icon="fa fa-star">收藏</el-button>
 
 									<span class="fr">
 										<el-tooltip class="item" content="刷新" placement="top">
@@ -150,59 +155,75 @@
 									</span>
 								</div>
 								<div class="is-grown">
-									<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="openFile" @row-click="checkRow"
-									 v-loading="loading" height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%"
-									 stripe>
+									<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="openFile"
+										@row-click="checkRow" v-loading="loading" height="100%" :data="tableData" border
+										:header-cell-style="headStyle" style="width: 100%" stripe>
 										<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
 										<el-table-column label="序号" type="index" align="center" width="50" fixed>
 										</el-table-column>
-										<el-table-column label="名称" fixed prop="filename" min-width="170px" show-overflow-tooltip align="left"
-										 header-align="center">
+										<el-table-column label="名称" fixed prop="filename" min-width="170px" show-overflow-tooltip
+											align="left" header-align="center">
 											<template slot-scope="scope">
-												<i v-if="scope.row.typeFlag == 1" class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
+												<i v-if="scope.row.typeFlag == 1" class="fa fa-folder" style="color:#f5cd09;"
+													aria-hidden="true"></i>
 												<!-- <i v-else class="fa fa-file" aria-hidden="true"></i> -->
 												<span>{{scope.row.filename}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column label="格式" prop="filetype" :formatter="formatFiletype" min-width="80px"
-										 show-overflow-tooltip align="center">
+											show-overflow-tooltip align="center">
 										</el-table-column>
-										<el-table-column label="创建人" prop="createusername" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="创建人" prop="createusername" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
-										<el-table-column label="创建时间" prop="createtime" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="创建时间" prop="createtime" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
-										<el-table-column label="修改人" prop="updateuser" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="修改人" prop="updateuser" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
-										<el-table-column label="修改时间" prop="updatetime" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="修改时间" prop="updatetime" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
-										<el-table-column label="大小(kb)" prop="filesizeStr" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="大小(kb)" prop="filesizeStr" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
-										<el-table-column label="文档位置" prop="filelocation" min-width="130px" show-overflow-tooltip align="center">
+										<el-table-column label="文档位置" prop="filelocation" min-width="130px" show-overflow-tooltip
+											align="center">
 										</el-table-column>
 										<el-table-column label="我的权限" prop="hierarchyRole" :formatter="formatPrivilege" min-width="130px"
-										 show-overflow-tooltip align="center">
+											show-overflow-tooltip align="center">
 										</el-table-column>
 										<el-table-column label="操作" align="center" width="180" fixed="right">
 											<template slot-scope="scope">
-												<el-button @click="openFile(scope.row)" v-show="scope.row.typeFlag == 1" type="text" size="small">打开</el-button>
-												<el-button @click="preview(scope.row.eventid)" v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1"
-												 type="text" size="small">预览</el-button>
-												<el-button @click="seeDetail(scope.row)" v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1" type="text"
-												 size="small">详情</el-button>
-												<el-button @click="seeDetail(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1" type="text" size="small">详情</el-button>
-												<el-button @click="editRow(scope.row)" v-if="scope.row.hierarchyRole>=60&&scope.row.typeFlag !== 1" type="text"
-												 size="small">修改</el-button>
-												<el-button @click="editRow(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1" type="text" size="small">修改</el-button>
-												<el-button @click="deleteClassify(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1" type="text" size="small">删除</el-button>
-												<el-button @click="downloadFile(scope.row)" v-if="scope.row.hierarchyRole>=30&&scope.row.typeFlag !== 1"
-												 type="text" size="small">下载</el-button>
+												<el-button @click="openFile(scope.row)" v-show="scope.row.typeFlag == 1" type="text"
+													size="small">打开</el-button>
+												<el-button @click="preview(scope.row.eventid,scope.row)"
+													v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1" type="text" size="small">预览
+												</el-button>
+												<el-button @click="seeDetail(scope.row)"
+													v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1" type="text" size="small">详情
+												</el-button>
+												<el-button @click="seeDetail(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1" type="text"
+													size="small">详情</el-button>
+												<el-button @click="editRow(scope.row)"
+													v-if="scope.row.hierarchyRole>=60&&scope.row.typeFlag !== 1" type="text" size="small">修改
+												</el-button>
+												<el-button @click="editRow(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1" type="text"
+													size="small">修改</el-button>
+												<el-button @click="deleteClassify(scope.row)" v-if="isEditMode&&scope.row.typeFlag == 1"
+													type="text" size="small">删除</el-button>
+												<el-button @click="downloadFile(scope.row)"
+													v-if="scope.row.hierarchyRole>=30&&scope.row.typeFlag !== 1" type="text" size="small">下载
+												</el-button>
 											</template>
 										</el-table-column>
 									</el-table>
 								</div>
 								<div style="padding: 15px 0 ;" class="clearfix">
-									<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
-									 :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+									<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+										:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+										layout="total, sizes, prev, pager, next, jumper" :total="total">
 									</el-pagination>
 								</div>
 							</div>
@@ -230,6 +251,8 @@
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
 <script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../lib/viewer/viewer.min.js"></script>
+
 <script src="./../../../common/js/jas-tools.js"></script>
 <script>
 	/**
@@ -287,7 +310,8 @@
 		},
 		computed: {
 			filePath: function () {
-				if (this.currentNode.attributes) return this.currentNode.attributes.folderLocationName.slice(1).split('\\');
+				if (this.currentNode.attributes) return this.currentNode.attributes.folderLocationName.slice(1).split(
+				'\\');
 				if (this.currentNode.absolutepath) return this.currentNode.absolutepath.slice(1).split('\\');
 				return [''];
 			},
@@ -407,8 +431,16 @@
 				});
 
 			},
-			preview: function (oid) {
+			preview: function (oid,row) {
 				var that = this;
+				if (['jpg', 'png', 'gif'].indexOf(row.filetype) > -1) {
+					var src = jasTools.base.setParamsToUrl(jasTools.base.rootPath +
+						'/jasdoc/folder/doccenter/downloadDoc.do', {
+							docId: oid,
+							token: localStorage.getItem('token'),
+						});
+					return jasTools.base.viewImg(src);
+				}
 				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/isExistPdfFile.do";
 				jasTools.ajax.postForm(url, {
 					docId: oid,
@@ -462,14 +494,15 @@
 					this.currentNodeId = row.folderid;
 				} else { //文件
 					// console.log(row)
-					this.preview(row.eventid);
+					this.preview(row.eventid,row);
 				}
 			},
 			editRow: function (row) {
 				var that = this;
 
 				if (row.typeFlag == 1) { //文件夹
-					var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-classify/dialogs/folder-edit.html';
+					var baseSrc = jasTools.base.rootPath +
+						'/jasmvvm/pages/module-jasdoc/doc-classify/dialogs/folder-edit.html';
 					top.jasTools.dialog.show({
 						width: '600px',
 						height: '600px',
@@ -498,7 +531,8 @@
 			createNewFolder: function () {
 				var that = this;
 				//console.log(this.currentNodeId)
-				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-jasdoc/doc-classify/dialogs/folder-edit.html';
+				var baseSrc = jasTools.base.rootPath +
+				'/jasmvvm/pages/module-jasdoc/doc-classify/dialogs/folder-edit.html';
 				top.jasTools.dialog.show({
 					width: '600px',
 					height: '600px',
