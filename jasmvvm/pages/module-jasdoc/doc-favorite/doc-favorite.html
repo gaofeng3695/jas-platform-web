@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
 	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css">
 	<link rel="stylesheet" href="./../../../common/css/main.css">
 	<style>
 		.resizepanel {
@@ -129,7 +130,7 @@
 								</el-table-column>
 								<el-table-column label="操作" align="center" width="180" fixed="right">
 									<template slot-scope="scope">
-										<el-button @click="preview(scope.row.eventid)" v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1"
+										<el-button @click="preview(scope.row.eventid,scope.row)" v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1"
 										 type="text" size="small">预览</el-button>
 										<el-button @click="seeDetail(scope.row)" v-if="scope.row.hierarchyRole>=20&&scope.row.typeFlag !== 1" type="text"
 										 size="small">详情</el-button>
@@ -169,6 +170,8 @@
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
 <script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
+<script src="./../../../lib/viewer/viewer.min.js"></script>
+
 <script src="./../../../common/js/jas-tools.js"></script>
 <script>
 	/**
@@ -358,8 +361,16 @@
 					that.tableData = data.rows;
 				});
 			},
-			preview: function (oid) {
+			preview: function (oid,row) {
 				var that = this;
+				if (['jpg', 'png', 'gif'].indexOf(row.filetype) > -1) {
+					var src = jasTools.base.setParamsToUrl(jasTools.base.rootPath +
+						'/jasdoc/folder/doccenter/downloadDoc.do', {
+							docId: oid,
+							token: localStorage.getItem('token'),
+						});
+					return jasTools.base.viewImg(src);
+				}				
 				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/isExistPdfFile.do";
 				jasTools.ajax.postForm(url, {
 					docId: oid,
@@ -413,7 +424,7 @@
 					this.currentNodeId = row.folderid;
 				} else { //文件
 					// console.log(row)
-					this.preview(row.eventid);
+					this.preview(row.eventid,row);
 				}
 			},
 			deleteFolder: function (row) {
