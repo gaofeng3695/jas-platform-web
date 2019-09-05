@@ -1,9 +1,9 @@
 /**
  * 方法描述： 加载左侧角色树形菜单
- */	
+ */
 var folderId = getParamter("folderId");
-$(function(){	
-	var roleUrl = "getRoleListByUserId.do?r="+new Date();
+$(function(){
+	var roleUrl = rootPath+"jasdoc/privilege/privilege/getRoleListByUserId.do?r="+new Date();
 	$('#rolePrivilegeEventId').tree({
 		url : roleUrl,
 		checkbox:false,
@@ -14,7 +14,7 @@ $(function(){
 		onClick:function(node){
 			getPrivilegeByRoleIdAndFolderId(folderId,node.id);
 		}
-	});	
+	});
 	viewFolderById(folderId);
 });
 
@@ -23,19 +23,19 @@ function clickBox(type){
 	if($("#"+type).find(":checkbox").attr('checked')){
 		$('#privelegetype div').each(function() {
 			if (type >= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",true); 
+				$(this).find(":checkbox").attr("checked",true);
 			}
 		});
 	}else{
 		$('#privelegetype div').each(function() {
 			if (type <= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
 			}
 		});
 	}
 }
-	
-	
+
+
 //保存方法
 function saveFolderRole(){
 	var roleSelect = $('#rolePrivilegeEventId').tree('getSelected');
@@ -59,7 +59,7 @@ function saveFolderRole(){
 	var folderRoleValuesStr = "[{ folderId : '"+folderId+"',roleValue : "+role+"}]";
 	$.ajax({
 		type: "POST",
-	   	url: 'saveRolePrivilege.do',
+	   	url: rootPath+'jasdoc/privilege/privilege/saveRolePrivilege.do',
    		data: {
    			    "rolePrivilegeEventIds":roleSelect.id,
    			 	"saveType":1,
@@ -68,7 +68,7 @@ function saveFolderRole(){
 	   	success: function(check){
      		if (check.error=='-1'){
 				$.messager.alert('错误',check.msg,'error');
-				
+
 			} else{
 				$.messager.alert('提示',check.ok,'ok',function(){
 					getPrivilegeByRoleIdAndFolderId(folderId,roleSelect.id);
@@ -82,14 +82,14 @@ function saveFolderRole(){
 function getPrivilegeByRoleIdAndFolderId(folderId,roleId){
 	$.ajax({
 		type: "POST",
-	   	url: 'getPrivilegeByRoleIdAndFolderId.do',
+	   	url: rootPath+'jasdoc/privilege/privilege/getPrivilegeByRoleIdAndFolderId.do',
    		data: {
    			    "folderEventId":folderId,
    			    "rolePrivilegeEventId":roleId
 		  },
 	   	success: function(data){
 	   		$('#privelegetype div').each(function() {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
     		});
    			$("#folderRoleRefId").val("");
 	   		if(data!=null&&data.length>0){
@@ -97,12 +97,12 @@ function getPrivilegeByRoleIdAndFolderId(folderId,roleId){
 	   			var type=result.folderprivilegetype;
 	     		$('#privelegetype div').each(function() {
 	    			if (type >= $(this).attr('id')) {
-	    				$(this).find(":checkbox").attr("checked",true); 
+	    				$(this).find(":checkbox").attr("checked",true);
 	    			}
 	    		});
 	     		$("#folderRoleRefId").val(result.id);
 	   		}
-	   		
+
 		},
 	   	dataType:"json"
 	});
@@ -120,7 +120,7 @@ function deleteFolderRole(){
 	}
 	$.ajax({
 		type: "POST",
-	   	url: 'deleteRolePrivilege.do',
+	   	url:  rootPath+'jasdoc/privilege/privilege/deleteRolePrivilege.do',
    		data: {
    			    "eventids":id
    			  },
@@ -130,16 +130,16 @@ function deleteFolderRole(){
 			} else{
 				$.messager.alert('提示',check.ok,'ok',function(){
 					$('#privelegetype div').each(function() {
-	    				$(this).find(":checkbox").attr("checked",false); 
+	    				$(this).find(":checkbox").attr("checked",false);
 		    		});
 				});
 			}
-     		
+
 		},
 	   	dataType:"json"
 	});
 }
-	
+
 function viewFolderById(folderId){
 	$.ajax({
 		type: "POST",

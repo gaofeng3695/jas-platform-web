@@ -7,18 +7,18 @@ var folderid="";
 /**
  * 方法描述：查看
  * @param sid
- */	
+ */
 function showInfo(versionid){
 	top.getDlg("viewFile.htm?hidden=&versionid="+versionid+"&r="+new Date().getTime(),'viewfile',"文档详细",700,290);
 }
 
 /**
  * 方法描述：设置当前版本
- * 
+ *
  */
 function setVersion(versionid){
 	$.ajax({
-		url : '../../version/setVersion.do',
+		url : rootPath+'jasdoc/version/setVersion.do',
  		type : 'POST',
  		data:"versionid="+versionid,
  			success : function(data) {
@@ -32,9 +32,9 @@ function setVersion(versionid){
 			},
  			dataType:"json",
  			error : function(data) {
- 					
+
  			}
- 	});	
+ 	});
 }
 function reloaddata(){
 	$('#dg').datagrid('reload');	// reload the user data
@@ -51,7 +51,7 @@ function reloadData(shortUrl, elementId) {
 }
 /**
  * 方法描述：删除共享
- * 
+ *
  */
 function deleteShare(){
 	var rows = $('#dg').datagrid('getSelections');
@@ -63,7 +63,7 @@ if (rows.length > 0){
 	ids += rows[rows.length-1].id;
 	$.messager.confirm("删除文档分享","您确定要删除选择的分享记录吗？\n\t",function(r){
 		if (r){
-			$.post("../../share/deleteFileShareById.do",
+			$.post(rootPath+"jasdoc/share/deleteFileShareById.do",
 				{"ids":ids,"rd":Math.random()},
 				function(result){
 				if (result.success){
@@ -80,9 +80,9 @@ if (rows.length > 0){
 	}
 }
 
-$(document).ready(function(){ 
+$(document).ready(function(){
 	initMessage();
-}); 
+});
 
 /**
  * 方法描述：加载文档列表
@@ -96,12 +96,12 @@ function initMessage(){
 		width:'100%',
 		nowrap: false,
 		collapsible:false,
-		url:"../../version/getfilehistory.do?fileid="+fileid,
+		url:rootPath+"jasdoc/version/getfilehistory.do?fileid="+fileid,
 		remoteSort: true,
 		idField:'id',
 		title:'历史版本列表',
 	 	columns : [[
-	 	       {field : 'ck',title : '全选',checkbox : true},  
+	 	       {field : 'ck',title : '全选',checkbox : true},
 	 	            {
 			field : 'filename',
 			title : '文档名称',
@@ -142,16 +142,16 @@ function initMessage(){
 		{field:'createuser',title:'上传者id',width:0.07*width,hidden:true},
 		{field : 'manager',title : '操作',width : 0.1 * width,formatter:function(value,rowData,rowIndex){
 			var managerField="<img src='../../common/images/tip.png' title='查看'  style='cursor:hand' onclick='showInfo(\""
-				+rowData.versionid + "\")'>	"; 
+				+rowData.versionid + "\")'>	";
 			managerField+="<img src='../../common/images/preview.png' title='预览'style='cursor:hand' onclick='previewHistory(\""
 					+ rowData.versionid+ "\")'>	";
 			if(top.loginUser.eventid==rowData.createuser){
 				managerField+="<img src='../../common/images/version.png' title='设置当前版本'style='cursor:hand' onclick='setVersion(\""
-				+ rowData.versionid+ "\")'>      "	
+				+ rowData.versionid+ "\")'>      "
 			}
 			return managerField;
 		}} ] ],
-		  
+
 		onDblClickRow:function(index,rowData){
 			var versionid = rowData.versionid;
 			if (rowData.preview == 1) {
@@ -189,7 +189,7 @@ function initMessage(){
 						$('#9999').attr('disabled',false);
 					}
 		}
-	});	
+	});
 	initDatagrigHeight('dg','',0);
 }
 

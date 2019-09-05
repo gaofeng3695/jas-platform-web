@@ -2,8 +2,8 @@ var eventids = "";
 var	filenames = "";
 var foldertype = "1";
 var oldfolderid = "";
-var url = "../doccenter/queryFolderComboTree.do";
-var param = this.location.search;	
+var url = rootPth+"jasdoc/folder/folder/queryFolderComboTree.do";
+var param = this.location.search;
 var favoriteNodeid;
 
 /**
@@ -11,7 +11,7 @@ var favoriteNodeid;
  */
 $(function() {
 	//设置审核状态宽度
-	setComboObjWidth('auditstate', '0.60', 'combobox'); 
+	setComboObjWidth('auditstate', '0.60', 'combobox');
 	//初始化查询条件中的审核状态下拉选
 	initAuditStateSelect();
 	//初始化数据列表
@@ -47,7 +47,7 @@ $(function() {
  */
 function initAuditStateSelect() {
 	$.ajax({
-		url : "../docaudit/getDocumentAuditstateList.do",
+		url : rootPath+"jasdoc/folder/docaudit/getDocumentAuditstateList.do",
 		type : "post",
 		dataType : "json",
 		success : function(result) {
@@ -65,9 +65,9 @@ function initAuditStateSelect() {
  * 描述：初始化列表信息
  */
 function initDatagrid() {
-	var queryDocUrl = "../docaudit/getDocumentList.do";
+	var queryDocUrl =  rootPath+"jasdoc/folder/docaudit/getDocumentList.do";
 	var width = $('body').width();
-	
+
 	$('#dg').datagrid({
 		width : '100%',
 		nowrap : false,
@@ -79,14 +79,14 @@ function initDatagrid() {
 		title : '文档审核列表',
 		toolbar : "#toolbar",
 		columns : [[
-		            {field : 'ck',title : '全选',checkbox : true}, 
-		            {field : 'filename',title : '文档名称',width : 0.18 * width}, 
-		            {field : 'fileno',title : '文档编号',width : 0.07 * width,hidden:true},  
-		            {field : 'author',title : '文档作者',width : 0.08 * width,hidden:true}, 
-		            {field : 'createusername',title : '上传人',width : 0.08 * width}, 
-		            {field : 'keyword',title : '关键词',width : 0.07 * width,hidden:true}, 
+		            {field : 'ck',title : '全选',checkbox : true},
+		            {field : 'filename',title : '文档名称',width : 0.18 * width},
+		            {field : 'fileno',title : '文档编号',width : 0.07 * width,hidden:true},
+		            {field : 'author',title : '文档作者',width : 0.08 * width,hidden:true},
+		            {field : 'createusername',title : '上传人',width : 0.08 * width},
+		            {field : 'keyword',title : '关键词',width : 0.07 * width,hidden:true},
 		            {field : 'filetype',title : '文档格式',width : 0.06 * width},
-		            {field : 'filelocation',title : '文档位置',width : 0.195 * width}, 
+		            {field : 'filelocation',title : '文档位置',width : 0.195 * width},
 		            {field : 'filesize',title : '文档大小(kb)',width : 0.09 * width},
 		            {field : 'versionnumber',title : '版本号',width : 0.05 * width},
 		            {field : 'auditstateName',title : '审核状态',width : 0.09 * width},
@@ -103,19 +103,19 @@ function initDatagrid() {
 			} else {
 //				$.messager.alert('提示', '对不起，您没有预览权限！', 'info');
 			}
-		},		
+		},
 		onLoadSuccess : function(data) {
-			
+
 		}
 	});
 }
 
-/**	
+/**
  * 方法描述：加载初始化树
  */
 function queryTree(){
 	$('#foldreeventid').combotree({
-		url:rootPath+"jasdoc/folder/doccenter/queryDocCenterFolder.do?token="+localStorage.getItem("token"),  
+		url:rootPath+"jasdoc/folder/doccenter/queryDocCenterFolder.do?token="+localStorage.getItem("token"),
 		onBeforeExpand:function(node){
 			var url=rootPath+"jasdoc/folder/doccenter/getChildren.do";
 		 	$('#foldreeventid').combotree("tree").tree("options").url= url+"?folderId="+node.id;
@@ -141,9 +141,9 @@ function queryTree(){
 			$('#foldreeventid').combotree("tree").tree('update', node);
 		},
 		onLoadSuccess:function(node, data){
-			
+
 		}
-	}); 
+	});
 	}
 
 /**

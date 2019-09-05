@@ -175,6 +175,7 @@ function initMessage(menuUrl,allOrOnlyDocFile) {
 		            {field : 'filename',title : '名称',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 						return getFileNameField(rowData);
 					 }},
+					 {field : 'fileno',title : '编码',width : 0.11 * width},
 					 {field : 'filetype',title : '格式',width : 0.07 * width,formatter:function(value,rowData,rowIndex){
 						 var typeFlag = rowData.typeFlag;
 						 if(typeFlag==1){
@@ -186,7 +187,6 @@ function initMessage(menuUrl,allOrOnlyDocFile) {
 					 {field : 'createusername',title : '创建人',width : 0.07 * width},
 					 {field : 'uploadtime',title : '创建时间',width : 0.11 * width},
 					 {field : 'updateuser',title : '修改人',width : 0.07 * width},
-					 {field : 'updatetime',title : '修改时间',width : 0.11 * width},
 
 					 {field : 'filesizeStr',title : '大小(kb)',width : 0.07 * width},
 		            {field : 'docactualLocation',title : '文档位置',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
@@ -384,7 +384,6 @@ function documentImport(){
  * 创建文档中心下的文件夹
  */
 function createFolder(){
-	alert("xxx")
 	if(folderType == 1){
 		getDlg("addFolder.htm?parentid="+folderId+"&folderType="+folderType+"&folderNo="+folderNo,'addFolder',"新增文件夹",450,185);
 	}else {
@@ -709,7 +708,7 @@ function deleteFolderAndDocs(shiftDeleteFlag){
 function moveFile(eventid,fileName){
 	if(arguments.length==2){
 		//移动单个文档（右键）
-		getDlg("../file/moveFile.htm?docIds="+eventid+"&fileNames="+fileName,'moveFile','移动文档',580,162);
+		getDlg("../file/moveFile.htm?docIds="+eventid+"&fileNames="+encodeURIComponent(encodeURIComponent(fileName)),'moveFile','移动文档',580,162);
 	}else{
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0){
@@ -735,7 +734,7 @@ function moveFile(eventid,fileName){
 			filenames = filenames.substring(0, filenames.length-1);;
 
 			if( eventids != "" ){
-				getDlg("../file/moveFile.htm?docIds="+eventids+"&fileNames="+filenames,'moveFile','移动文档',580,162);
+				getDlg("../file/moveFile.htm?docIds="+eventids+"&fileNames="+encodeURIComponent(encodeURIComponent(filenames)),'moveFile','移动文档',580,162);
 			}else{
 				$.messager.alert('提示','请选择有移动权限的记录','info');
 			}
@@ -800,7 +799,7 @@ function addtoDocClassify(){
 		}
 		eventids += rows[rows.length-1].eventid;
 		filenames += rows[rows.length-1].filename;
-		top.getDlg("../docClassify/addtoDocClassify.htm?eventids="+eventids+"&filenames="+filenames+"&foldertype="+foldertype+"&folderid="+folderId+"&r="+new Date().getTime(),'classify','设置文档分类',580,165);
+		top.getDlg("../docClassify/addtoDocClassify.htm?eventids="+eventids+"&filenames="+encodeURIComponent(encodeURIComponent(filenames))+"&foldertype="+foldertype+"&folderid="+folderId+"&r="+new Date().getTime(),'classify','设置文档分类',580,165);
 	}else{
 		$.messager.alert('提示','请选择记录','info');
 	}
@@ -836,7 +835,7 @@ function associateFile(fileId,role,createuser){
  */
 function addToFavorite(eventid,filename){
 	if(arguments.length==2){
-		getDlg("../favorite/addToFavorite.htm?docIds="+eventid+"&fileNames="+filename+"&folderId="+folderId,'favorite','添加收藏',580,164);
+		getDlg("../favorite/addToFavorite.htm?docIds="+eventid+"&fileNames="+encodeURIComponent(encodeURIComponent(filename))+"&folderId="+folderId,'favorite','添加收藏',580,164);
 	}else{
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0){
@@ -853,7 +852,7 @@ function addToFavorite(eventid,filename){
 			}
 			eventids = eventids.substring(0,eventids.length-1);
 			filenames = filenames.substring(0,filenames.length-1);
-			getDlg("../favorite/addToFavorite.htm?docIds="+eventids+"&fileNames="+filenames+"&folderId="+folderId,'favorite','添加收藏',580,164);
+			getDlg("../favorite/addToFavorite.htm?docIds="+eventids+"&fileNames="+encodeURIComponent(encodeURIComponent(filenames))+"&folderId="+folderId,'favorite','添加收藏',580,164);
 
 		}else{
 			$.messager.alert('提示','请选择记录','info');

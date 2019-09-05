@@ -1,11 +1,11 @@
 	/**
 	 * 修改与新增
-	 * 
+	 *
 	 */
 	function save() {
 		var foldername = $('#foldername').val();
 		$.ajax({
-		    url : "../folder/isExistAddFolder.do?t="+new Date(),
+		    url :rootPath+"jasdoc/folder/folder/isExistAddFolder.do?t="+new Date(),
 		    type : 'POST',
 		    data:{"foldername":foldername,
 		    "parentid":parentid,
@@ -14,7 +14,7 @@
 		    success : function(result){
 		    	if(result==true){
 				    	$('#addfolderfrom').form('submit', {
-							url : "../folder/createFolder.do?r="+new Date().getTime()+"&token="+localStorage.getItem("token"),
+							url :rootPath+"jasdoc/folder/folder/createFolder.do?r="+new Date().getTime()+"&token="+localStorage.getItem("token"),
 							onSubmit : function() {
 								return $(this).form('validate');
 							},
@@ -22,10 +22,10 @@
 //								alert(JSON.stringify(data));
 								var result = eval('(' + data + ')');
 								if (result.error) {
-									top.showAlert('提示',result.msg , 'info');	
+									top.showAlert('提示',result.msg , 'info');
 								} else {
 									if(result.data){
-										
+
 										folderLocationName += "/"+foldername;
 										result.data.attributes.url=result.data.attributes.url+"?id="+result.data.id+"&hierarchy="+result.data.attributes.hierarchy+"&foldertype="+result.data.attributes.foldertype+"&folderLocationName="+folderLocationName;
 										result.data.attributes.folderLocationName=folderLocationName;
@@ -37,7 +37,7 @@
 						}
 					});
 		    	}else{
-		           top.showAlert('提示', '文件夹名称已存在', 'info');	
+		           top.showAlert('提示', '文件夹名称已存在', 'info');
 		    	}
 		    },
 		    dataType:"json",
@@ -47,7 +47,7 @@
 	}
 	/**
 	 * 方法描述： 关闭界面
-	 */	
+	 */
 	function closeFolder(){
 		parent.closeDlg('addfolder');
-	}	
+	}

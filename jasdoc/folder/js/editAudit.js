@@ -26,7 +26,7 @@ function preview(){
  */
 function downloadDoc(){
 	$("<iframe id=\"fileDownload\" style=\"display: none;\"></iframe>").appendTo("body");
-	var url="../doccenter/downloadDoc.do?downloaddocid="+eventid+"&usereventid="+top.loginUser.eventid+"&token="+ localStorage.getItem("token");
+	var url=rootPath+"jasdoc/folder/doccenter/downloadDoc.do?downloaddocid="+eventid+"&usereventid="+top.loginUser.eventid+"&token="+ localStorage.getItem("token");
 	$("#fileDownload").attr("src",url);
 }
 
@@ -35,7 +35,7 @@ function downloadDoc(){
  */
 function saveAuditState(){
 	var auditstate = $("#newAuditState").val();
-	var url = '../docaudit/documentAudit.do?eventid='+eventid+"&auditstate="+auditstate+"&token="+localStorage.getItem("token");
+	var url = rootPath+'jasdoc/folder/docaudit/documentAudit.do?eventid='+eventid+"&auditstate="+auditstate+"&token="+localStorage.getItem("token");
 	$('#editAuditForm').form('submit', {
 	   	url: url,
    		dataType:"json",
@@ -74,14 +74,14 @@ function loadData() {
 			}else if(d[0]=='versionid'){
 				versionid=d[1];
 			}
-			
+
 		});
 	}
-	
+
 	if (eventid != null && "" != param) {
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/getFileInfoById.do?random=" + new Date().getTime(),
+		   	url:rootPath+"jasdoc/folder/doccenter/getFileInfoById.do?random=" + new Date().getTime(),
 	   		data: {"docId":eventid},
 		   	success: function(result){
 				putValue(result);
@@ -90,11 +90,11 @@ function loadData() {
 		   		$.messager.alert('错误','加载信息失败','error');
 		   	}
 	   	});
-		
+
 	}else if(versionid != null && "" != param){
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
+		   	url:rootPath+"jasdoc/folder/doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
 	   		data: {"versionid":versionid},
 		   	success: function(result){
 				putValue(result);
@@ -127,5 +127,5 @@ function putValue(obj) {
 	$("#auditstateName").html(obj.auditstateName);
 	$("#audituser").html(obj.audituser);
 	$("#audittime").html(obj.audittime);
-	
+
 }

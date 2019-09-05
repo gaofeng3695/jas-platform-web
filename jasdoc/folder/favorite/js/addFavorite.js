@@ -11,7 +11,7 @@ $(function(){
 
 function save() {
 	$('#addFavoriteFrom').form('submit', {
-		url : "../favorite/createFavoriteFolder.do?token="+localStorage.getItem("token"),
+		url : rootPath+"jasdoc/folder/favorite/createFavoriteFolder.do?token="+localStorage.getItem("token"),
 		onSubmit : function() {
 			return $(this).form('validate');
 		},

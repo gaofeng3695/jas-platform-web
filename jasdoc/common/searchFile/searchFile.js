@@ -1,6 +1,6 @@
 (function($) {
 
-	$.fn.searchFile = function(options, _67) { 
+	$.fn.searchFile = function(options, _67) {
 
 		if (typeof options == "string") {
 			return $.fn.searchFile.methods[options](this, _67);
@@ -22,7 +22,7 @@
 			}
 			initEvent(this,settings);
 		});
-		
+
 	};
 	$.fn.searchFile.methods = {
 		options : function(jq) {
@@ -42,7 +42,7 @@
 	};
 	function init(_15,_16){
 //		alert(JSON.stringify(_16));
-		var cpTxt = 
+		var cpTxt =
 		"<table id='searchFile_search' style='width:"+_16.width+"px;'>"
 			+ "<tr>"
 				+ "<td style='width: 81%;'>"
@@ -53,8 +53,8 @@
 				+ "</td>"
 				+ "<td style='width: 5%'>"
 					+ "<img src='../../common/images/searchbox_button.png' style='cursor:pointer' onclick='searchFileBycontent()'/>"
-				+ "</td>" 
-			+ "</tr>" 
+				+ "</td>"
+			+ "</tr>"
 		+ "</table>";
 		$(_15).append(cpTxt);
 		var html = "<div id='searchbox'  style='position:absolute;left:-1000px;top:-100px;z-index:1000;width:"+_16.width+"px;background-color:#99CCFF;font-size:"+_16.size+"' >"
@@ -129,13 +129,13 @@
 			var _1f = $.data(_1d, "searchFile");
 			var _20 = _1f.options;
 			_20.onkeyupdd.call(_1d);
-			
+
 		});
 		$("#searchstring").bind('mouseup', function() {
 			var _1f = $.data(_1d, "searchFile");
 			var _20 = _1f.options;
 			_20.onkeyupdds.call(_1d);
-			
+
 		});
 		$("#imgid").bind('click',function(){
 			showProvince(_1d,_1e);
@@ -155,7 +155,7 @@
 	    		}
 	    	});
 			$("#fileclassify").combotree({
-				url: "../classify/getDocClassifyTreeAsync.do",
+				url:rootPath+"/jasdoc/folder/classify/getDocClassifyTreeAsync.do",
 				cascadeCheck:false,
 				onBeforeExpand:function(node){
 					url=rootPath+"/jasdoc/folder/classify/getChildrenClassify.do";

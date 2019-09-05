@@ -8,7 +8,7 @@
 				nowrap: false,
 				striped: true,
 				collapsible:false,
-				url:"../../share/getAllShareFileToMe.do",
+				url:rootPath+"jasdoc/share/getAllShareFileToMe.do",
 				remoteSort: true,
 				idField:'eventid',
 				pagination:true,
@@ -16,8 +16,8 @@
 				toolbar:'#toolbar',
 				title:'共享文档列表',
 			 	columns:[[
-			           {field:'ck',title:'全选',checkbox:true}, 
-			           {field:'filename',title:'文档名称',width:0.25*width}, 
+			           {field:'ck',title:'全选',checkbox:true},
+			           {field:'filename',title:'文档名称',width:0.25*width},
 			           {field:'fileno',title:'文档编号',width:0.1*width},
 			           {field:'createusername',title:'上传者',width:0.07*width},
 			           {field:'keyword',title:'关键词',width:0.07*width},
@@ -25,13 +25,13 @@
 			           {field:'filelocation',title:'文档位置',width:0.18*width} ,
 			           {field:'filesizeStr',title:'文档大小(kb)',width:0.1*width},
 			           {field:'createuser',title:'上传者id',width:0.07*width,hidden:true},
-			           {field : 'eventid',hidden:true}, 
-					   {field : 'hierarchyRole',hidden:true}, 
+			           {field : 'eventid',hidden:true},
+					   {field : 'hierarchyRole',hidden:true},
 					   {field:'manager',title:'操作',width:0.1*width,formatter:function(value,rowData,rowIndex){
 							return getManagerField(rowData,false,false);
-						  }} 
+						  }}
 			       ]],
-				    
+
 				onDblClickRow:function(index,indexData){
 					var eventid=indexData.eventid;
 					if( indexData.preview == 1 ){
@@ -39,8 +39,8 @@
 					}else{
 						$.messager.alert('提示','对不起，您没有预览权限！','info');
 					}
-					
-					//top.getDlg("viewFile.htm?hidden=&eventid="+indexData.eventid+"&r="+new Date().getTime(),'',getLanguageValue("role.viewRole"),700,140);			
+
+					//top.getDlg("viewFile.htm?hidden=&eventid="+indexData.eventid+"&r="+new Date().getTime(),'',getLanguageValue("role.viewRole"),700,140);
 				},
 //				onClickCell:function(rowIndex, field, value){
 //				},
@@ -98,14 +98,14 @@
 									$(this).css("display", "");
 								}
 							});
-							
+
 							if( hierarchy == docCenterRootFolderHierarchy ){
 								$("#40").css("display", "none");
 							}
 						}else if( foldertype == 4  || foldertype == 5 ){ //搜索出的数据只具有移动的权限
 							$.each(data.role, function(i, item) {
 								if( item==7 ){
-									//控制移动 
+									//控制移动
 									$("#"+item).css("display", "");
 								}
 							});
@@ -113,10 +113,10 @@
 					}
 			    	$('#dg').datagrid('clearSelections'); //clear selected options
 			    }
-			});	
+			});
 			initDatagrigHeight('dg','',0);
 		});
-		
+
 		/**
 		 * 方法描述：共享
 		 * @param sid

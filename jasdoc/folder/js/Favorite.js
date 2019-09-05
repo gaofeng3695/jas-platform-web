@@ -17,7 +17,7 @@
 						+ filenames + "&foldertype=" + foldertype + "&folderid="
 						+ folderId + "&r=" + new Date().getTime(), '', '移动文档', 700,
 						210);
-	
+
 			} else {
 				$.messager.alert('提示', '请选择记录', 'info');
 			}
@@ -29,9 +29,9 @@
 		 */
 		function deleteDoc(){
 			if( foldertype == 1 ){
-				deleteDocUrl = '../doccenter/deleteDoc.do';
+				deleteDocUrl = rootPath+'jasdoc/folder/doccenter/deleteDoc.do';
 			}else if( foldertype == 2 ){
-				deleteDocUrl = '../favorite/deletefileref.do';
+				deleteDocUrl =  rootPath+'jasdoc/folder/favorite/deletefileref.do';
 			}
 			var rows = $('#dg').datagrid('getSelections');
 			if (rows.length > 0){
@@ -46,7 +46,7 @@
 							if (result.success){
 								$.messager.alert('成功',result.ok,'ok',function(){
 									$('#dg').datagrid('reload');	// reload the user data
-									//reloaddate();		
+									//reloaddate();
 									$('#dg').datagrid('clearSelections'); 	//clear selected options
 								});
 							} else {

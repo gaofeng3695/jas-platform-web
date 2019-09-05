@@ -11,7 +11,7 @@ $(function() {
 		setTextboxWidth("foldrname",0.75);
 		setPanelHeight();
 	});
-}); 
+});
 function initZtree(){
 	$.ajax({
 		url: rootPath+"jasdoc/folder/doccenter/queryDocCenterFolderForSync.do",
@@ -100,7 +100,7 @@ function setPanelHeight(){
 	var top=offset.top+$("#foldrname").outerHeight()-1;
 	$("#floderZtreeDiv").css("top",top);
 	$("#floderZtreeDiv").css("left",offset.left-1);
-	
+
 	var opts=$("#foldrname").textbox("textbox");
 	var panelHeight=$("#floderZtreeDiv").panel("options").height;
 	var treeHeight=$("#floderZtree").height();
@@ -160,7 +160,7 @@ function closeWindow(){
 function documentImport(){
 	showLoadingMessage("正在执行文档导入操作，请稍后！");
 	$('#saveHistory').form('submit', {
-		url : "../doccenter/documentImport.do?token="+localStorage.getItem("token"),
+		url : rootPath+"jasdoc/folder/doccenter/documentImport.do?token="+localStorage.getItem("token"),
 		dataType : "json",
 		onSubmit : function() {
 			if(!($(this).form('validate'))){
@@ -183,7 +183,7 @@ function documentImport(){
 
 
 
-/**	
+/**
  * 方法描述：加载初始化树
  */
 function queryTree(){
@@ -208,7 +208,7 @@ function queryTree(){
 		},onLoadSuccess:function(node, data){
 
 		}
-	}); 
+	});
 }
 
 

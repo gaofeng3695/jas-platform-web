@@ -2,15 +2,15 @@
 		var folderId = "";
 		var hierarchy = "";
 		var foldertype = "1";
-		var queryDocUrl = "../doccenter/getAllDoc.do";		//查询的url
+		var queryDocUrl =rootPath+ "jasdoc/folder/doccenter/getAllDoc.do";		//查询的url
 		var deleteDocUrl = "";		//删除的url
-		
+
 		var folderLocationName = "文档中心";
 		var parentObj = self.parent;
 
 		/**
 		 * 方法描述：移动
-		 * 
+		 *
 		 */
 		function moveFile(){
 			var rows = $('#dg').datagrid('getSelections');
@@ -45,7 +45,7 @@
 				$.messager.alert('提示','请选择记录','info');
 			}
 		}
-		
+
 		/**
 		 * 方法描述：添加到收藏夹
 		 */
@@ -61,18 +61,18 @@
 					}
 					eventids += rows[rows.length-1].eventid;
 					filenames += rows[rows.length-1].filename;
-					
+
 					top.getDlg("../favorite/addToFavorite.htm?eventids="+eventids+"&filenames="+filenames+"&foldertype="+foldertype+"&folderid="+folderId+"&r="+new Date().getTime(),'favorite','添加收藏',580,164);
-					
+
 				}else{
 					$.messager.alert('提示','请选择记录','info');
 				}
 			//}
 		}
-		
+
 		/**
 		 * 方法描述：分类
-		 * 
+		 *
 		 */
 		function addtoDocClassify(){
 				var rows = $('#dg').datagrid('getSelections');
@@ -90,17 +90,17 @@
 					$.messager.alert('提示','请选择记录','info');
 				}
 		}
-		
-		
+
+
 		/**
 		 * 方法描述：删除文档
-		 * 
+		 *
 		 */
 		function deleteDoc(){
 			if( foldertype == 1 ){
-				deleteDocUrl = '../doccenter/deleteDoc.do';
+				deleteDocUrl = rootPath+ 'jasdoc/folder/doccenter/deleteDoc.do';
 			}else{
-				deleteDocUrl = '../favorite/deletefileref.do';
+				deleteDocUrl = rootPath+ 'jasdoc/folder/favorite/deletefileref.do';
 			}
 			var rows = $('#dg').datagrid('getSelections');
 			if (rows.length > 0){
@@ -124,21 +124,21 @@
 			}else{
 				$.messager.alert('提示','请选择记录','info');
 			}
-			
-			
-			
+
+
+
 		}
-		
+
 		/**
 		 * 方法描述：添加到默认收藏夹
-		 * 
+		 *
 		 * @param eventid
 		 * @param state
 		 */
 		function addfavorite(eventid,state){
 			if(state=="2"){
 				$.ajax({
-					url : '../favorite/addDocToFavorite.do',
+					url : rootPath+'jasdoc/folder/favorite/addDocToFavorite.do',
 	 				type : 'POST',
 	 				data:"docids="+eventid,
 	 				success : function(data) {
@@ -147,12 +147,12 @@
 					},
 	 				dataType:"json",
 	 				error : function(data) {
-	 					$.messager.alert('提示', '添加默认收藏夹失败', 'error');	
+	 					$.messager.alert('提示', '添加默认收藏夹失败', 'error');
 	 				}
-	 			});	
+	 			});
 			}else{
 				$.ajax({
-						url : '../favorite/deleteFilerefFromFavorite.do',
+						url : rootPath+'jasdoc/folder/favorite/deleteFilerefFromFavorite.do',
 		 				type : 'POST',
 		 				data:"ids="+eventid,
 		 				success : function(data) {
@@ -161,13 +161,13 @@
 						},
 		 				dataType:"json",
 		 				error : function(data) {
-		 					$.messager.alert('提示', '从默认收藏夹删除失败', 'error');	
+		 					$.messager.alert('提示', '从默认收藏夹删除失败', 'error');
 		 				}
-		 			});	
+		 			});
 			}
- 			
+
 		}
-		
+
 		/**
 		 * 方法描述：是否查看所有子文件夹的文档
 		 */
@@ -189,7 +189,7 @@
 			}
 			var query={"allOrOnlyDocFile":allOrOnlyDocFileValue}; 			//把查询条件拼接成JSON
 			$("#dg").datagrid('options').queryParams=query; 				//把查询条件赋值给datagrid内部变量
-			$("#dg").datagrid('load'); 										//重新加载 
+			$("#dg").datagrid('load'); 										//重新加载
 		}
 		function getAllDocFileData(){
 			if($('#checked').attr("checked")){
@@ -201,15 +201,15 @@
 			}
 			var query={"allOrOnlyDocFile":allOrOnlyDocFileValue}; 			//把查询条件拼接成JSON
 			$("#dg").datagrid('options').queryParams=query; 				//把查询条件赋值给datagrid内部变量
-			$("#dg").datagrid('load'); 										//重新加载 
-			
+			$("#dg").datagrid('load'); 										//重新加载
+
 		}
-		
+
 		/**
 		 * 方法描述：彻底删除
 		 */
 		function shiftDeleteFile(){
-			var url="../doccenter/shiftDeleteFile.do";
+			var url=rootPath+"jasdoc/folder/doccenter/shiftDeleteFile.do";
 			var rows = $('#dg').datagrid('getSelections');
 				if (rows.length > 0){
 					var ids="";
@@ -233,10 +233,10 @@
 					$.messager.alert('提示','请选择记录','info');
 				}
 		}
-		
+
   /**
 	* 方法描述：加载文档列表
-	*/	
+	*/
 $(function() {
 	folderId = getParamter("id");
 	hierarchy = getParamter("chy");
@@ -247,7 +247,7 @@ $(function() {
 		}
 	});
 	var datagridTitle = '文档列表';
-	queryDocUrl = "../../share/getShareFile.do?folderid=" + folderId
+	queryDocUrl =rootPath+"jasdoc/share/getShareFile.do?folderid=" + folderId
 			+ "&hierarchy=" + hierarchy + "&sharerole=" + sharerole;
 	var menuUrl = this.location.search;
 	if (menuUrl != null && "" != menuUrl) {
@@ -300,7 +300,7 @@ $(function() {
 			}
 		});
 	}
-	
+
 	if (hierarchy == "mysharefolder" || hierarchy=='foldersharetome') {
 		queryDocUrl+="&allOrOnlyDocFile=true";
 	}
@@ -321,10 +321,10 @@ $(function() {
 			field : 'ck',
 			title : '全选',
 			checkbox : true
-		}, 
+		},
 		{field : 'favorite',title : '',width : 0.02 * width,formatter:function(value,rowData,rowIndex){
 			return getFavoriteField(rowData);
-		}}, 
+		}},
 		{
 			field : 'filename',
 			title : '文档名称',
@@ -354,8 +354,8 @@ $(function() {
 			title:'上传者id',
 			width:0.07*width,
 			hidden:true},
-			{field : 'eventid',hidden:true}, 
-			{field : 'hierarchyRole',hidden:true}, 			
+			{field : 'eventid',hidden:true},
+			{field : 'hierarchyRole',hidden:true},
 			{field : 'manager',title : '操作',width : 0.1 * width,formatter:function(value,rowData,rowIndex){
 				return getManagerField(rowData,false,true);
 			 }}]],

@@ -1,14 +1,14 @@
-	
+
 var folderId = getParamter("folderId");
 $(function(){
 	$('#id').val(folderId);
 	getFolderById(folderId);
 });
 
- 
+
 function save(){
 	$('#updateFolderfrom').form('submit', {
-		url : "../favorite/updateFavoriteFolder.do?token="+localStorage.getItem("token"),
+		url :rootPath+ "jasdoc/folder/favorite/updateFavoriteFolder.do?token="+localStorage.getItem("token"),
 		onSubmit : function() {
 			return $(this).form('validate');
 		},
@@ -18,11 +18,11 @@ function save(){
 				top.showAlert('提示',result.message, 'info',function(){
 					parent.reloadDataTree(null,2);
 					closeFolder();
-				});	
+				});
 			}else{
 				top.showAlert('提示',result.message, 'info');
 			}
-			
+
 		}
   });
 }
@@ -33,7 +33,7 @@ function save(){
  */
 function getFolderById(folderId){
 	$.ajax({
-		url:"../favorite/getFavoriteFolderById.do?folderId="+folderId,
+		url:rootPath+ "jasdoc/folder/favorite/getFavoriteFolderById.do?folderId="+folderId,
 		type:"POST",
 		success:function(result){
 			if(result!=null){
@@ -45,10 +45,10 @@ function getFolderById(folderId){
 		}
 	});
 }
-	
+
 /**
  * 方法描述： 关闭界面
- */	
+ */
 function closeFolder(){
 	parent.closeDlg('updateFolder');
 }

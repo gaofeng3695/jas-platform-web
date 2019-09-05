@@ -17,15 +17,15 @@ $(function(){
 			$('#deptprivilegeEventId').tree('select',node.target);
 		}
 	});
-	
-	$('#setlevel').linkbutton({    
+
+	$('#setlevel').linkbutton({
 	    onClick:function(e){
 	    	var e=$('#setlevel').position();
 	    	document.getElementById("levelDiv").style.top=e.top+2+"px";
 	    	document.getElementById("levelDiv").style.left=e.left+$('#setlevel').width()+8+"px";
 	    	$("#levelDiv").fadeIn('normal');
 	    }
-	}); 
+	});
 	$('#level').searchbox({
 		width:$('#setlevel').width()
 	});
@@ -111,7 +111,7 @@ function saveConfig() {
 	var privilegeStr=JSON.stringify(privilegeObj);
 	$.ajax({
 		type: "POST",
-	   	url: '../../../jasdoc/privilege/privilege/saveDeptPrivilege.do',
+	   	url: rootPath+'jasdoc/privilege/privilege/saveDeptPrivilege.do',
    		data: {'privilegeStr':privilegeStr,"deptid":deptid},
 	   	success: function(result){
 	   		if(result.success==1){
@@ -218,12 +218,12 @@ function setFolderLevel(number,node,treeObj){
 		if(childrenNode!=null){
 			for(var i=0;i<childrenNode.length;i++){
 				setFolderLevel(number-1,childrenNode[i],treeObj);
-			}	
+			}
 		}
 	}else{
 		return;
 	}
-	
+
 }
 /***
  * ztree右键点击事件

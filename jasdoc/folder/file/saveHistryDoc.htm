@@ -22,8 +22,8 @@
 <script type="text/javascript">
 function saveHistryFilesPreviewFile(){
 	showLoadingMessage("正在生成预览文件，请稍后！");
-	$.ajax({ 
-		url : "../doccenter/saveHistryFilesPreviewFile.do",
+	$.ajax({
+		url : rootPath+"jasdoc/folder/doccenter/saveHistryFilesPreviewFile.do",
 		success : function(result) {
 			hiddenLoadingMessage();
 			var result = eval('(' + result + ')');
@@ -33,8 +33,8 @@ function saveHistryFilesPreviewFile(){
 }
 function saveHistryFilesMessage(){
 	showLoadingMessage("正在生成摘要属性，请稍后！");
-	$.ajax({ 
-		url : "../doccenter/saveHistryFilesMessage.do",
+	$.ajax({
+		url :rootPath+"jasdoc/folder/doccenter/saveHistryFilesMessage.do",
 		success : function(result) {
 			hiddenLoadingMessage();
 			var result = eval('(' + result + ')');
@@ -45,7 +45,7 @@ function saveHistryFilesMessage(){
 function saveHistryFiles(){
 	showLoadingMessage("正在操作，请稍后！");
 	$('#saveHistory').form('submit', {
-		url : "../doccenter/saveHistryFiles.do?token="+localStorage.getItem("token"),
+		url :rootPath+"jasdoc/folder/doccenter/saveHistryFiles.do?token="+localStorage.getItem("token"),
 		onSubmit : function() {
 			return $(this).form('validate');
 		},
@@ -60,7 +60,7 @@ function saveHistryFiles(){
 function setFileName(){
 	showLoadingMessage("正在操作，请稍后！");
 	$('#saveHistory').form('submit', {
-		url : "../doccenter/setFileName.do?token="+localStorage.getItem("token"),
+		url :rootPath+"jasdoc/folder/doccenter/setFileName.do?token="+localStorage.getItem("token"),
 		dataType : "json",
 		success : function(result) {
 			hiddenLoadingMessage();
@@ -75,7 +75,7 @@ function setFileName(){
 <body>
 	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons">
 		<form id="saveHistory" method="post">
-			<table  class="edittable" >	
+			<table  class="edittable" >
 				<tr>
 					<td width="15%"><span key="file.filename"  required="true" class="paltform-i18n">文件路径：</span></td>
 					<td width="65%">
@@ -105,11 +105,10 @@ function setFileName(){
 							<a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveHistryFilesPreviewFile()"><span key="unit.save" class="paltform-i18n">生成预览</span></a>
          				</td>
          		 </tr>
-         	</table>	 
+         	</table>
 		    </div>
 			</form>
-			
+
 	</div>
 </body>
 </html>
-	

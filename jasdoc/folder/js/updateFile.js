@@ -2,7 +2,7 @@
  * 方法描述：修改文档基本信息
  */
 function updateFile(){
-		var url = '../doccenter/updateDoc.do';
+		var url =rootPath+ "jasdoc/folder/doccenter/updateDoc.do";
  		var filename = $("#filename").val();
  		var fileno = $("#fileno").val();
  		var fileclassifys = $("#fileclassify").combotree('getValues');
@@ -44,7 +44,7 @@ function updateFile(){
 			},
 		   	dataType:"json"
 		});
-		
+
 	}
 	function closeFile(){
 		parent.closeDlg('update');
@@ -56,8 +56,8 @@ function updateFile(){
 				fra[i].contentWindow.$(elementId).datagrid("reload");
 			}
 		}
-	}	
-	
+	}
+
 	var id1;
 	var parenteventid = "";
 	var param = this.location.search;
@@ -70,13 +70,13 @@ function updateFile(){
 			}
 		});
 	}
-	
+
 	/**
 	 *  方法描述：回显文档基本信息
 	 */
 	$(function(){
-		$.getJSON('../doccenter/getDocBySid.do?random='+new Date(), 
-		{'eventid':id1},function(obj){	
+		$.getJSON(rootPath+ 'jasdoc/folder/doccenter/getDocBySid.do?random='+new Date(),
+		{'eventid':id1},function(obj){
 				$("#eventid").attr("value",obj.eventid);
 				$("#filename").attr("value",obj.filename);
 				$("#filename1").attr("value",obj.filename);
@@ -84,15 +84,15 @@ function updateFile(){
 				$("#keyword").attr("value",obj.keyword);
 				$("#summary").attr("value",obj.summary);
 				$("#remark").attr("value",obj.remark);
-			
+
 			var fileclassify = obj.fileclassify;
 			 $('#fileclassify').combotree({
-					url:'../folder/queryFolderComboTree.do?foldertype='+3, 
+					url:rootPath+'jasdoc/folder/folder/queryFolderComboTree.do?foldertype='+3,
 					cascadeCheck:false,
 						onBeforeExpand:function(node){
 							var hierarchyid=node.attributes.hierarchy;
 							var hierarchy = hierarchyid.substring(0,4);
-								url="../folder/getChildren.do";
+								url=rootPath+"jasdoc/folder/folder/getChildren.do";
 					 	$('#fileclassify').combotree("tree").tree("options").url= url+"?id="+node.id+"&hierarchy="+hierarchy;
 						node.iconCls= 'icon-tree-classify-node-open';
 						$('#fileclassify').combotree("tree").tree('update', node);
@@ -101,7 +101,7 @@ function updateFile(){
 						$('#fileclassify').combotree("tree").tree('update', node);
 					},onLoadSuccess:function(){
 						$.ajax({
-							url:"../classify/getFolderidByFileid.do?fileid="+obj.eventid,
+							url:rootPath+"jasdoc/folder/classify/getFolderidByFileid/.do?fileid="+obj.eventid,
 							success:function(result){
 								for(i = 0; i<result.length; i++){
 									var node1 = $("#fileclassify").combotree("tree").tree('find',result[i].ID);
@@ -114,6 +114,6 @@ function updateFile(){
 							dataType:"json"
 						});
 					}
-				});  
+				});
 		});
 	});

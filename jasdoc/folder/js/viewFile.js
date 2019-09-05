@@ -25,10 +25,10 @@ function loadData() {
 			}else if(d[0]=='versionid'){
 				versionid=d[1];
 			}
-			
+
 		});
 	}
-	
+
 	if (id1 != null && "" != param) {
 		$.ajax({
 			type: "POST",
@@ -42,11 +42,11 @@ function loadData() {
 		   		$.messager.alert('错误','加载信息失败','error');
 		   	}
 	   	});
-		
+
 	}else if(versionid != null && "" != param){
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
+		   	url:rootPath+ "jasdoc/folder/doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
 	   		data: {"versionid":versionid},
 		   	success: function(jso){
 		   		var result = eval('(' + jso + ')');
@@ -105,5 +105,5 @@ function putValue(obj) {
 	if(obj.remark!=null){
 		$("#remark").text(obj.remark);
 	}
-	
+
 }
