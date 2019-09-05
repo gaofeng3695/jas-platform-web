@@ -51,7 +51,7 @@ function queryFavoriteTree() {
 					"oldFolderId" : oldFolderId
 				},
 				success : function(data) {
-					var result = eval('(' + data + ')');
+					var result = JSON.parse(data);
 					if (result.success=="1") {
 						$.messager.alert('提示', result.message, 'info',function(){
 							closeFavorite();

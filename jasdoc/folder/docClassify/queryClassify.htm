@@ -10,22 +10,22 @@
 	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
 	<link rel="stylesheet" href="../../../jasframework/common/css/queryStyle.css" type="text/css"></link>
 	<link rel="stylesheet" href="../../common/css/icon.css" type="text/css"></link>
-	
+
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/validate_class.js"></script>
-	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>	
+	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/date/My97DatePicker/WdatePicker.js"></script>
 	<script type="text/javascript"  src="js/docClassify.js"></script>
-	<script type="text/javascript" src="js/queryClassify.js"></script>	
+	<script type="text/javascript" src="js/queryClassify.js"></script>
 </head>
 <body  oncontextmenu="return true" >
 	<input type="hidden" id="id" value=""/>
 	<input type="hidden" id="foldertype" value=""/>
 	<div id="layout" class="easyui-layout" fit="true" style="border:1px solid #ccc;">
-    	<div region="west" title='文档分类列表' style="width:20%;" data-options="split:true,collapsible:true">  
+    	<div region="west" title='文档分类列表' style="width:20%;" data-options="split:true,collapsible:true">
      		<ul id="docClassifyEventId">
 			</ul>
         </div>
@@ -65,7 +65,7 @@
 				</form>
 			</div>
 			<table id="dg"></table>
-		</div>   
+		</div>
 	</div>
 	<div id="toolbar">
 		<a id="addfavorite" name ="-1" style="display: " href="#" class="easyui-linkbutton" iconCls="icon-favorite" plain="true" onclick="addToFavorite()"><span key="file.addfavorte" class="paltform-i18n">添加到收藏夹</span></a>
@@ -91,9 +91,9 @@
         <div  data-options="iconCls:'icon-add',name:'create'">创建文档分类</div>
         <div  data-options="iconCls:'icon-edit',name:'update'" >重命名分类</div>
         <div  data-options="iconCls:'icon-remove',name:'delete'" >删除分类</div>
-    </div> 
+    </div>
      <div id="DocClassify1" class="easyui-menu" style="width:115px;">
         <div  data-options="iconCls:'icon-add',name:'create'">创建文档分类</div>
-    </div> 
+    </div>
 </body>
 </html>

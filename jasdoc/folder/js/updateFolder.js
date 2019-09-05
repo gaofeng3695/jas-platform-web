@@ -29,7 +29,7 @@ function save(){
 		    				return $(this).form('validate');
 		    			},
 		    			success : function(data) {
-		    				var result = eval('(' + data + ')');
+		    				var result =JSON.parse(data);
 		    				if (result.success==1) {
 		    					top.showAlert('提示',result.msg, 'info',function(){
 			    					parent.reloadDataTree(null,2);
@@ -60,9 +60,9 @@ function getFolderById(folderId){
 	$.ajax({
 		url:rootPath+ "jasdoc/folder/folder/getFolderBoById.do?folderId="+folderId,
 		type:"POST",
-		success:function(result){
-			if(result!=null){
-				result=eval('(' + result + ')');
+		success:function(data){
+			if(data!=null){
+				var result=JSON.parse(data);;
 				$("#foldername").val(result.foldername);
 				$("#description").val(result.description);
 				$("#hierarchy").val(result.hierarchy);

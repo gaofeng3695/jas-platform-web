@@ -13,7 +13,7 @@ function save(){
 			return $(this).form('validate');
 		},
 		success : function(data) {
-			var result = eval('(' + data + ')');
+			var result = JSON.parse(data);
 			if (result.success=="1") {
 				top.showAlert('提示',result.message, 'info',function(){
 					parent.reloadDataTree(null,2);
@@ -37,7 +37,6 @@ function getFolderById(folderId){
 		type:"POST",
 		success:function(result){
 			if(result!=null){
-				result=eval('(' + result + ')');
 				$("#foldername").val(result.foldername);
 				$("#description").val(result.description);
 				$("#parentid").val(result.parentid);

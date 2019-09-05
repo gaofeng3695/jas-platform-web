@@ -436,7 +436,7 @@ function Preview(eventid,versionid){
 			if(result.success==1){
 //				var totalPages=result.totalPages;
 //				var url = rootPath+ "/jasdoc/folder/preview/FlexPaper_2.0.3/index.html?eventid="+ eventid +"&versionid="+versionid+ "&totalPages="+totalPages;
-				var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ docId +"&versionid="+versionid;
+				var url = rootPath + "/jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ eventid +"&versionid="+versionid;
 				top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
 			}else if(result.success==0){
 				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');
