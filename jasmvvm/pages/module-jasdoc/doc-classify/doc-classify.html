@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
 	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./../../../lib/vue-treeselect/vue-treeselect.min.css">
-	<link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css">
+	<!-- <link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css"> -->
 	<link rel="stylesheet" href="./../../../common/css/main.css">
 	<style>
 		.resizepanel {
@@ -251,7 +251,7 @@
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
 <script src="./../../../lib/vue-treeselect/vue-treeselect.min.js"></script>
-<script src="./../../../lib/viewer/viewer.min.js"></script>
+<!-- <script src="./../../../lib/viewer/viewer.min.js"></script> -->
 
 <script src="./../../../common/js/jas-tools.js"></script>
 <script>
@@ -439,7 +439,7 @@
 							docId: oid,
 							token: localStorage.getItem('token'),
 						});
-					return jasTools.base.viewImg(src);
+					return top.jasTools.base.viewImg(src);
 				}
 				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/isExistPdfFile.do";
 				jasTools.ajax.postForm(url, {
