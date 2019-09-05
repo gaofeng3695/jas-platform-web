@@ -20,7 +20,7 @@
 							},
 							success : function(data) {
 //								alert(JSON.stringify(data));
-								var result = eval('(' + data + ')');
+								var result = JSON.parse(data);
 								if (result.error) {
 									top.showAlert('提示',result.msg , 'info');
 								} else {

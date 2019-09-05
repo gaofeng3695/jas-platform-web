@@ -12,7 +12,7 @@ function save() {
 			return $(this).form('validate');
 		},
 		success : function(data) {
-			var result = eval('(' + data + ')');
+			var result =JSON.parse(data);
 			if (result.success=="1") {
 				//刷新父页面，参数：返回值，操作类型（1：新增，2：修改）
 				parent.reloadDataTree(parentId,'add');

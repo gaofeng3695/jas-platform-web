@@ -30,12 +30,13 @@ function loadData() {
 	}
 
 	if (id1 != null && "" != param) {
+		debugger
 		$.ajax({
 			type: "POST",
 		   	url: "../doccenter/getDocBySid.do?random=" + new Date().getTime(),
 	   		data: {"eventid":id1},
 		   	success: function(jso){
-		   		var result = eval('(' + jso + ')');
+		   		var result =JSON.parse(jso);;
 				putValue(result);
 		   	},
 		   	error:function(){
@@ -49,7 +50,7 @@ function loadData() {
 		   	url:rootPath+ "jasdoc/folder/doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
 	   		data: {"versionid":versionid},
 		   	success: function(jso){
-		   		var result = eval('(' + jso + ')');
+		   		var result = JSON.parse(jso);;
 				putValue(result);
 		   	},
 		   	error:function(){

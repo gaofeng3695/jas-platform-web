@@ -57,7 +57,7 @@ function saveShare(){
 		},
 		dataType:"json",
 		success: function(result){
-		var result=	eval('('+result+')');
+		var result=JSON.parse(result);
 			if(result.success==1){
 				$.messager.alert("提示",result.ok,"info",function(){reloadData('queryFileShareDetails.htm', '#dg'),closePanol()});
 

@@ -43,8 +43,8 @@ function documentAudit(auditstate){
 	$('#viewAuditForm').form('submit', {
 	   	url: url,
    		dataType:"json",
-	   	success: function(result){
-	   		var result = eval('(' + result + ')');
+	   	success: function(data){
+	   		var result =JSON.parse(data);;
 			if (result.success=="1"){
 				$.messager.alert("提示", result.message, "info",function(){
 					reloadData("documentList.htm","dg");

@@ -1464,3 +1464,17 @@ function commonExport(templateCode, functionCode, keywords) {
 	});
 	return fileId;
 }
+
+/***
+ * 预览图片
+ */
+function viewPic(src){
+	var image = new Image();
+	image.src = src;
+	var viewer = new Viewer(image, {
+		hidden: function () {
+			viewer.destroy();
+		},
+	});
+	viewer.show();
+}
