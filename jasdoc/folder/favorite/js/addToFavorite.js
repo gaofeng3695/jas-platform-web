@@ -8,7 +8,7 @@ var oldFolderId = "";
  */
 function queryFavoriteTree() {
 	$('#foldreeventid').combotree({
-		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",  
+		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",
 		onBeforeExpand:function(node){
 			url=rootPath+"jasdoc/folder/favorite/getChildren.do";
 		 	$('#foldreeventid').combotree("tree").tree("options").url= url+"?folderId="+node.id;
@@ -19,22 +19,22 @@ function queryFavoriteTree() {
 			$('#foldreeventid').combotree("tree").tree('update', node);
 		},onLoadSuccess:function(node, data){
 		}
-	}); 
+	});
 }
-	
+
 	$(function() {
 		docIds = getParamter("docIds");
-		fileNames = getParamter("fileNames");
+		fileNames = decodeURIComponent(decodeURIComponent(getParamter("fileNames")));
 		oldFolderId = getParamter("folderId");
 		$("#fileNames").text(fileNames);
-		
+
 		queryFavoriteTree();
-	}); 
-	
-	
+	});
+
+
 	/**
 	 * 方法描述： 保存收藏夹与文档的关系
-	 * 
+	 *
 	 */
 	function save() {
 		url = "../favorite/addDocToFavorite.do";
@@ -70,4 +70,3 @@ function queryFavoriteTree() {
 	function closeFavorite() {
 		parent.closeDlg('favorite');
 	}
-	

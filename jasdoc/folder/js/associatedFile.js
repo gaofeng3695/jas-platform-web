@@ -20,13 +20,13 @@ function clickBox(type){
 	if($("#"+type).find(":checkbox").attr('checked')){
 		$('#privelegetype div').each(function() {
 			if (type >= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",true); 
+				$(this).find(":checkbox").attr("checked",true);
 			}
 		});
 	}else{
 		$('#privelegetype div').each(function() {
 			if (type <= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
 			}
 		});
 	}
@@ -38,7 +38,7 @@ function saveAssociated(){
 		$.messager.alert("提示","请填写关联描述。","info");
 	}else{
 		$('#fileAssociated').form('submit',{
-			url: "../../folder/associated/saveAssociated.do?token="+localStorage.getItem("token"),
+			url: rootPath+"jasdoc/folder/associated/saveAssociated.do?token="+localStorage.getItem("token"),
 			onSubmit: function(){
 				return $(this).form('validate');
 			},
@@ -47,7 +47,7 @@ function saveAssociated(){
 			var result=	eval('('+result+')');
 				if(result.success==1){
 					$.messager.alert("提示",result.ok,"info",function(){reloadData('queryAssociatedFiles.htm', '#AssociatedDocument'),closePanol()});
-							
+
 				}else{
 					$.messager.alert("提示",result.ok,"info",function(){});
 				}
@@ -61,17 +61,17 @@ $(document).ready(function(){
 	eventid = getParamter("eventid");
 	$("#eventid").val(eventid);
 	$("#associateduserid").val(top.loginUser.eventid);
-	
-	var url = "../../../jasdoc/folder/folder/getMenu.do?id="+top.docCenterRootFolderHierarchy+"&r="+new Date().getTime();
+
+	var url = rootPath+"jasdoc/folder/folder/getMenu.do?id="+top.docCenterRootFolderHierarchy+"&r="+new Date().getTime();
 	$('#folderlist').tree( {
 		url : url,
 //		checkbox:true,
 //		cascadeCheck:false,
 		onClick:function(node){
-			var queryDocUrl = "../../../jasdoc/folder/doccenter/getAllDocforAssociated.do?folderid=" + node.id
+			var queryDocUrl = rootPath+"jasdoc/folder/doccenter/getAllDocforAssociated.do?folderid=" + node.id
 			+ "&hierarchy=" + node.attributes.hierarchy+"&allOrOnlyDocFile=" + allOrOnlyDocFile+"&fileid=" + eventid;
 			$("#filetable").datagrid("options").url = queryDocUrl;
-			$("#filetable").datagrid('reload'); 
+			$("#filetable").datagrid('reload');
 		},
 		onLoadSuccess:function(node,data) {
 			var rootnode = $('#folderlist').tree('getRoot');
@@ -84,8 +84,8 @@ $(document).ready(function(){
 				var url2;
 				var foldertype=node.attributes.foldertype;
 				var hierarchyid=node.attributes.hierarchy;
-				url2="../../../jasdoc/folder/folder/getChildren.do";
-				$('#folderlist').tree('options').url = url2+"?id="+node.id+"&hierarchy="+hierarchyid;// 
+				url2=rootPath+"jasdoc/folder/folder/getChildren.do";
+				$('#folderlist').tree('options').url = url2+"?id="+node.id+"&hierarchy="+hierarchyid;//
 				if(foldertype==top.FOLDERTYPE_DOCCENTER){
 					node.iconCls= 'icon-tree-center-node-open';
 				}
@@ -98,21 +98,21 @@ $(document).ready(function(){
 				 $('#folderlist').tree('update', node);
 		}
 	});
-	
+
 });
 function initdatagrid(id,hierarchy){
-	var querydocurl = "../../../jasdoc/folder/doccenter/getAllDocforAssociated.do?folderid=" +id + "&hierarchy=" + hierarchy+"&allOrOnlyDocFile=" + allOrOnlyDocFile+"&fileid=" + eventid;
+	var querydocurl = rootPath+"jasdoc/folder/doccenter/getAllDocforAssociated.do?folderid=" +id + "&hierarchy=" + hierarchy+"&allOrOnlyDocFile=" + allOrOnlyDocFile+"&fileid=" + eventid;
 	$("#filetable").datagrid({
 		loadMsg : '数据装载中......',
 		rownumbers:true,
 		pagination:true,
 		height:379,
 		idField:"eventid",
-		columns:[[ 
+		columns:[[
 				  {field : 'ck',title : "",checkbox : true},
-				  {field:'eventid',title:"fileid",width:100,hidden:true}, 
-				  {field : 'filename',title : '文档名称',width : 300}, 
-				  {field:'createusername',title:"上传人",width:100} 
+				  {field:'eventid',title:"fileid",width:100,hidden:true},
+				  {field : 'filename',title : '文档名称',width : 300},
+				  {field:'createusername',title:"上传人",width:100}
 			]],
 		 url:querydocurl,
 		 title:"文档列表",
@@ -156,13 +156,13 @@ function reloadData(shortUrl, elementId) {
 				fra[i].contentWindow.$(elementId).datagrid("reload");
 			}
 		}
-	}	
+	}
 //修改时，显示原有信息
 function getMessageById(shareid){
-	$.ajax({ 
-		url: "../../share/getMessageById.do?id="+shareid,
+	$.ajax({
+		url:rootPath+ "jasdoc/share/getMessageById.do?id="+shareid,
 		success: function(result){
-        	var data = jQuery.parseJSON( result ); 
+        	var data = jQuery.parseJSON( result );
         	$("#deptIds").val(data.sharescropMap.deptIds);
         	$("#roleIds").val(data.sharescropMap.roleIds);
         	$("#userIds").val(data.sharescropMap.userIds);

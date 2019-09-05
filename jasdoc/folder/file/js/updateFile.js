@@ -2,7 +2,7 @@
  * 方法描述：修改文档基本信息
  */
 function updateFile(){
-		var url = '../doccenter/updateDoc.do';
+		var url = rootPath+'jasdoc/folder/doccenter/updateDoc.do';
  		var fileclassifys = $("#classify").combotree('getValues');
  		var fileclassify = "";
  		if( fileclassifys != null && fileclassifys.length > 0 ){
@@ -31,7 +31,7 @@ function updateFile(){
 			},
 		   	dataType:"json"
 		});
-		
+
 	}
 	function closeFile(){
 		parent.closeDlg('updateFile');
@@ -42,7 +42,7 @@ function updateFile(){
 	 */
 	$(function(){
 		var eventid = getParamter("eventid");
-		$.getJSON('../doccenter/getFileInfoById.do',{'docId':eventid},function(obj){	
+		$.getJSON( rootPath+'jasdoc/folder/doccenter/getFileInfoById.do',{'docId':eventid},function(obj){
 				$("#eventid").val(obj.eventid);
 				$("#filename").val(obj.filename);
 				$("#filename1").val(obj.filename);
@@ -63,7 +63,7 @@ function updateFile(){
 						$('#classify').combotree("tree").tree('update', node);
 					},onLoadSuccess:function(){
 						$.ajax({
-							url:"../classify/getFolderidByFileid.do?fileid="+obj.eventid,
+							url:rootPath+"jasdoc/folder/classify/getFolderidByFileid.do?fileid="+obj.eventid,
 							success:function(result){
 								for(var i = 0; i<result.length; i++){
 									var node1 = $("#classify").combotree("tree").tree('find',result[i].ID);
@@ -76,6 +76,6 @@ function updateFile(){
 							dataType:"json"
 						});
 					}
-				});  
+				});
 		});
 	});

@@ -15,7 +15,7 @@ var rootPath = getRootPath();
 /**
  * @desc 页面加载完毕监听，处理某些问题
  */
-$(window).bind("load", function() {
+$(window).bind("load", function () {
 	// 解决easyui-combo对象与select对象Backspace导致页面回退问题
 	comboBackspaceDisabled();
 
@@ -28,66 +28,66 @@ $(window).bind("load", function() {
 	changeDatagridHeaderInputCheckedStyle();
 
 });
-$(window).bind("resize", function() {
-	setMain_areaHeight();// 设置页面contentArea区域高度
+$(window).bind("resize", function () {
+	setMain_areaHeight(); // 设置页面contentArea区域高度
 	masterTableChildHeight(); //设置主子表contentArea区域高度
 });
 
 /**
  * @desc 页面初始化处理
  */
-$(document).ready(function() {
-	createSpan();// 给增加了required属性的地方增加必填提示
+$(document).ready(function () {
+	createSpan(); // 给增加了required属性的地方增加必填提示
 
-	setMain_areaHeight();// 设置页面contentArea区域高度
+	setMain_areaHeight(); // 设置页面contentArea区域高度
 
 
 
-	addFocusCssToHtmlElement();// 给html元素添加获取焦点时的样式
+	addFocusCssToHtmlElement(); // 给html元素添加获取焦点时的样式
 
-//	loadBlankTextJs();// 加载输入框提示信息
+	//	loadBlankTextJs();// 加载输入框提示信息
 
 	$.ajaxSetup({
-		cache : false,
+		cache: false,
 		type: 'POST',
 		// 发送请求前触发
-		beforeSend : function(xhr, params) {
-			if(typeof this.ajaxBeforeSendCallback != 'undefined'){
+		beforeSend: function (xhr, params) {
+			if (typeof this.ajaxBeforeSendCallback != 'undefined') {
 				this.ajaxBeforeSendCallback();
 			}
-			if(localStorage.length > 0 && localStorage.getItem("user")){
+			if (localStorage.length > 0 && localStorage.getItem("user")) {
 				var roleId = getParamter("roleId");
 				var dataFilterRegulationCode = getParamter("dataFilterRegulationCode");
 				if (params.url.indexOf('?') == -1) {
-					params.url = params.url + "?loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName +"&token="+ localStorage.getItem("token");// +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
+					params.url = params.url + "?loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName + "&token=" + localStorage.getItem("token"); // +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
 				} else {
-					params.url = params.url + "&loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName +"&token="+ localStorage.getItem("token");// +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
+					params.url = params.url + "&loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName + "&token=" + localStorage.getItem("token"); // +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
 				}
-				var data = params.data ;
+				var data = params.data;
 				//设置排序字段
-				var sort = getParamter("sort",data)||"";
-				var order = getParamter("order",data)||"";
-				if(sort||order||""){
-					params.url = params.url + "&orderBy="+ sort + " "+order;
+				var sort = getParamter("sort", data) || "";
+				var order = getParamter("order", data) || "";
+				if (sort || order || "") {
+					params.url = params.url + "&orderBy=" + sort + " " + order;
 				}
 				//设置分页条件
-				var page = getParamter("page",data)||"";
-				if(page){
-					params.url = params.url + "&pageNo="+ page;
+				var page = getParamter("page", data) || "";
+				if (page) {
+					params.url = params.url + "&pageNo=" + page;
 				}
-				var rows = getParamter("rows",data)||"";
-				if(rows){
-					params.url = params.url + "&pageSize="+ rows;
+				var rows = getParamter("rows", data) || "";
+				if (rows) {
+					params.url = params.url + "&pageSize=" + rows;
 				}
 				return true;
 			}
 		},
-		complete : function(xhr, params) {
-			if(200 == xhr.status){
+		complete: function (xhr, params) {
+			if (200 == xhr.status) {
 				var obj = JSON.parse(xhr.responseText);
-				if('402' == obj.code){
-					top.$.messager.alert('提示', obj.msg, 'info',function(){
-						top.location.href= getRootPath()+ "jasframework/login/login.htm"
+				if ('402' == obj.code) {
+					top.$.messager.alert('提示', obj.msg, 'info', function () {
+						top.location.href = getRootPath() + "jasframework/login/login.htm"
 					});
 				}
 			}
@@ -101,16 +101,16 @@ $(document).ready(function() {
  * @param url
  * @returns
  */
-function addTokenForUrl(url){
-	if(localStorage.length == 0){
+function addTokenForUrl(url) {
+	if (localStorage.length == 0) {
 		return;
 	}
 	var roleId = getParamter("roleId");
 	var dataFilterRegulationCode = getParamter("dataFilterRegulationCode");
 	if (url.indexOf('?') == -1) {
-		url = url + "?loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName +"&token="+ localStorage.getItem("token") +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
+		url = url + "?loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName + "&token=" + localStorage.getItem("token") + "&roleId=" + roleId + "&dataFilterRegulationCode=" + dataFilterRegulationCode;
 	} else {
-		url = url + "&loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName +"&token="+ localStorage.getItem("token") +"&roleId="+roleId+"&dataFilterRegulationCode="+dataFilterRegulationCode;
+		url = url + "&loginUserName=" + JSON.parse(localStorage.getItem("user")).loginName + "&token=" + localStorage.getItem("token") + "&roleId=" + roleId + "&dataFilterRegulationCode=" + dataFilterRegulationCode;
 	}
 	return url;
 }
@@ -129,15 +129,18 @@ function getRootPath() {
 	// 获取带"/"的项目名，如：/uimcardprj
 	var projectName = pathName.substring(0, pathName.substring(1).indexOf('/') + 1);
 	if (location.href.indexOf('jasframework/privilege') > -1) {
-		localhostPaht =ipConfig?ipConfig:localhostPaht;
-		projectName = projectNameConfig?projectNameConfig:projectName;
-		return localhostPaht+"/"+ projectName + "/"
+		localhostPaht = ipConfig ? ipConfig : localhostPaht;
+		projectName = projectNameConfig ? projectNameConfig : projectName;
+		return localhostPaht + "/" + projectName + "/"
 	}
-////	// 判断是否是前端项目，则设定代理前缀
+	////	// 判断是否是前端项目，则设定代理前缀
 	if (!projectName || projectName === '/jasframework' || projectName === '/jasmvvm' || projectName === '/pages') {
 		return (localhostPaht + '/jasproxy' + "/");
 	}
-	console.log(localhostPaht+projectName)
+	if (pathName.indexOf('jasframework/jasdoc') > -1) {
+		return (localhostPaht + '/jasproxy' + "/");
+	}
+	console.log(localhostPaht + projectName)
 
 	return (localhostPaht + projectName + "/");
 }
@@ -146,12 +149,12 @@ function getRootPath() {
  * @desc 解决easyui-combo对象与select对象Backspace导致页面回退问题
  */
 function comboBackspaceDisabled() {
-	jQuery.fn.ready(function() {
+	jQuery.fn.ready(function () {
 		// 解决easyui-combo对象Backspace导致页面回退问题
-		$.each($(".combo-text"), function(i, item) {
+		$.each($(".combo-text"), function (i, item) {
 			var combotextreadOnly = $(item).attr("readOnly");
 			if (combotextreadOnly == "readonly") {
-				$(item).bind('keydown', function() {
+				$(item).bind('keydown', function () {
 					if (8 == event.keyCode) {
 						return false;
 					}
@@ -159,8 +162,8 @@ function comboBackspaceDisabled() {
 			}
 		});
 		// 解决普通select对象Backspace导致页面回退问题
-		$.each($("select"), function(i, item) {
-			$(item).bind('keydown', function() {
+		$.each($("select"), function (i, item) {
+			$(item).bind('keydown', function () {
 				if (8 == event.keyCode) {
 					return false;
 				}
@@ -178,7 +181,7 @@ function comboBackspaceDisabled() {
  */
 function loadBlankTextJs() {
 	var path = rootPath + "jasframework/common/lib/other/jquery.inputDefault.js";
-	$.getScript(path, function() {
+	$.getScript(path, function () {
 		$('[blankText]').inputDefault();
 	});
 }
@@ -187,8 +190,8 @@ function loadBlankTextJs() {
  * @desc 给html元素添加获取焦点时的样式
  */
 function addFocusCssToHtmlElement() {
-	$("input").not(":checkbox").each(function() {
-		$(this).bind('focus', function() {
+	$("input").not(":checkbox").each(function () {
+		$(this).bind('focus', function () {
 			// alert('focus');
 			if ($(this).hasClass('combo-text')) {
 				$(this).parent().addClass('input_bg_focus');
@@ -198,7 +201,7 @@ function addFocusCssToHtmlElement() {
 				$(this).addClass('input_bg_focus');
 			}
 		});
-		$(this).bind('blur', function() {
+		$(this).bind('blur', function () {
 			if ($(this).hasClass('combo-text')) {
 				$(this).parent().removeClass('input_bg_focus');
 			} else if ($(this).hasClass('Wdate')) {
@@ -209,23 +212,23 @@ function addFocusCssToHtmlElement() {
 		});
 	});
 
-	$(" textarea").each(function() {
-		$(this).bind('focus', function() {
+	$(" textarea").each(function () {
+		$(this).bind('focus', function () {
 			// alert('focus');
 			$(this).addClass('input_bg_focus');
 		});
-		$(this).bind('blur', function() {
+		$(this).bind('blur', function () {
 			// alert('blur');
 			$(this).removeClass('input_bg_focus');
 		});
 	});
 
-	$("select").each(function() {
-		$(this).bind('focus', function() {
+	$("select").each(function () {
+		$(this).bind('focus', function () {
 			// alert('focus');
 			$(this).addClass('input_bg_focus');
 		});
-		$(this).bind('blur', function() {
+		$(this).bind('blur', function () {
 			// alert('blur');
 			$(this).removeClass('input_bg_focus');
 		});
@@ -242,11 +245,11 @@ function addFocusCssToHtmlElement() {
 function setComboObjWidth(comboObjId, width, comboObjType, containerObjId) {
 
 	setComboObjWidth_private(comboObjId, width, comboObjType, containerObjId);
-	var _fn = function() {
+	var _fn = function () {
 		setComboObjWidth_private(comboObjId, width, comboObjType, containerObjId);
 	};
 	// $(window).bind('resize',_fn);//不能使用该方法
-	onWindowResize.add(_fn);// 要使用该方法
+	onWindowResize.add(_fn); // 要使用该方法
 }
 
 /**
@@ -277,9 +280,9 @@ function setComboObjWidth_private(comboObjId, width, comboObjType, containerObjI
 		} else {
 			comboObj.combo('resize', comboObjWidth);
 		}
-//		comboObj.parent().css('padding-right', '3px');
+		//		comboObj.parent().css('padding-right', '3px');
 	} else {
-		$(".combo").each(function() {
+		$(".combo").each(function () {
 			// $(this).parent().css('padding-right','3px');
 		});
 	}
@@ -289,8 +292,8 @@ function setComboObjWidth_private(comboObjId, width, comboObjType, containerObjI
  * @desc 设置下拉选的宽度，解决下拉选与页面其他input元素不对其问题
  */
 function setSelectObjWidth() {
-	$("select").each(function() {
-//		$(this).parent().css('padding-right', '3px');
+	$("select").each(function () {
+		//		$(this).parent().css('padding-right', '3px');
 	});
 }
 
@@ -324,18 +327,18 @@ function loadjscssfile(filename, filetype) {
 function setMain_areaHeight() {
 	if (document.getElementById('contentArea') != null) {
 		var parentNodeInfo = document.getElementById("contentArea").parentNode.nodeName;
-		if(parentNodeInfo == "BODY"){
-			if($("html").find("div.button-area").length>0 && !$("html").find("div.button-area").is(":hidden")){
+		if (parentNodeInfo == "BODY") {
+			if ($("html").find("div.button-area").length > 0 && !$("html").find("div.button-area").is(":hidden")) {
 				$("#contentArea").css({
-					height:document.documentElement.clientHeight-60
+					height: document.documentElement.clientHeight - 60
 				});
-			}else{
+			} else {
 				$("#contentArea").css({
-					height:document.documentElement.clientHeight-20
+					height: document.documentElement.clientHeight - 20
 				});
-			}
 			}
 		}
+	}
 }
 /**
  * @desc 清空表单
@@ -349,12 +352,12 @@ function setMain_areaHeight() {
  * @param tableId 重新加载表格的id
  */
 
-function clearQueryForm(formId, text, hidden, select, textarea,tableId) {
+function clearQueryForm(formId, text, hidden, select, textarea, tableId) {
 	if (typeof $("#" + formId) == undefined) {
 		return;
 	}
 	if (text) {
-		$("#" + formId + " input:text").each(function() {
+		$("#" + formId + " input:text").each(function () {
 			var isClear = $(this).attr("isClear");
 			if (typeof isClear == 'undefined' || isClear == true) {
 				$(this).val("");
@@ -362,30 +365,30 @@ function clearQueryForm(formId, text, hidden, select, textarea,tableId) {
 		});
 	}
 	if (hidden) {
-		$("#" + formId + " input:hidden").each(function() {
+		$("#" + formId + " input:hidden").each(function () {
 			$(this).val("");
 		});
 	}
 	if (select) {
-		$("#" + formId + " select").each(function() {
-			try{
+		$("#" + formId + " select").each(function () {
+			try {
 				$(this).combobox("clear");
-			}catch(e){
+			} catch (e) {
 				$(this).val("");
 			}
 		});
 	}
 	if (textarea) {
-		$("#" + formId + " textarea").each(function() {
+		$("#" + formId + " textarea").each(function () {
 			var isClear = $(this).attr("isClear");
 			if (typeof isClear == 'undefined' || isClear == true) {
 				$(this).html("");
 			}
 		});
 	}
-	if(tableId){
-		$("#"+tableId).datagrid('options').queryParams=null;
-		$("#"+tableId).datagrid('load');
+	if (tableId) {
+		$("#" + tableId).datagrid('options').queryParams = null;
+		$("#" + tableId).datagrid('load');
 	}
 }
 
@@ -394,7 +397,7 @@ function clearQueryForm(formId, text, hidden, select, textarea,tableId) {
  *
  */
 function createSpan() {
-	$(":input").each(function() {
+	$(":input").each(function () {
 		var reSpan = "<span style='color:red;vertical-align: bottom;margin-right:5px'>&nbsp</span>";
 		/*if ($(this).attr("required")) {
 			var requiredSpan = "<span style='color:red;vertical-align: bottom;'>*</span>";
@@ -444,26 +447,25 @@ function initDatagrigHeight(datagridObjId, queryPanelObjId, queryPanelH, contain
 
 		if (queryPanelId && queryPanelId != '') {
 			$('#' + queryPanelId).panel({
-				onOpen:changeDatagrigHeight,
-				onExpand : function() {
+				onOpen: changeDatagrigHeight,
+				onExpand: function () {
 					changeDatagrigHeight();
 				},
-				onCollapse : function() {
+				onCollapse: function () {
 					changeDatagrigHeight();
 				}
 			});
 		} else {
-			setTimeout(function(){
+			setTimeout(function () {
 				$('#' + datagridId).datagrid('resize', {
-					width : containerWidth,
-					height : containerHeight
+					width: containerWidth,
+					height: containerHeight
 				});
-			},500)
+			}, 500)
 		}
 
-		document.body.onresize = changeDatagrigHeight;// 只能用js原生的方法，不能使用jquery的resize方法：$('body').bind('resize',function(){})
-	} catch (e) {
-	}
+		document.body.onresize = changeDatagrigHeight; // 只能用js原生的方法，不能使用jquery的resize方法：$('body').bind('resize',function(){})
+	} catch (e) {}
 }
 
 /**
@@ -484,16 +486,16 @@ function changeDatagrigHeight() {
 		if (queryPanelId && queryPanelId != '') {
 
 			$('#' + queryPanelId).panel('resize', {
-				width : containerWidth
+				width: containerWidth
 			});
 			gridHeight = containerHeight - $('#' + queryPanelId).panel('panel').height();
 		}
-		setTimeout(function(){
+		setTimeout(function () {
 			$('#' + datagridId).datagrid('resize', {
-				width : gridWidth,
-				height : gridHeight
+				width: gridWidth,
+				height: gridHeight
 			});
-		},500)
+		}, 500)
 	} catch (e) {
 		// alert(e);
 	}
@@ -517,7 +519,7 @@ function getParamter(paramName, url) {
 	var ss = seachUrl.split("&");
 	var paramNameStr = "";
 	var paramNameIndex = -1;
-	for ( var i = 0; i < ss.length; i++) {
+	for (var i = 0; i < ss.length; i++) {
 		paramNameIndex = ss[i].indexOf("=");
 		paramNameStr = ss[i].substring(0, paramNameIndex);
 		if (paramNameStr == paramName) {
@@ -534,38 +536,42 @@ function getParamter(paramName, url) {
 /**
  * @desc  解决 lte ie8 & chrome 及其他可能会出现的 原生 window.resize 事件多次执行的 BUG. <methods> add: 添加事件句柄 remove: 删除事件句柄 </methods>
  */
-var onWindowResize = function() {
+var onWindowResize = function () {
 	// 事件队列
-	var queue = [], indexOf = Array.prototype.indexOf || function() {
-		var i = 0, length = this.length;
-		for (; i < length; i++) {
-			if (this[i] === arguments[0]) {
-				return i;
+	var queue = [],
+		indexOf = Array.prototype.indexOf || function () {
+			var i = 0,
+				length = this.length;
+			for (; i < length; i++) {
+				if (this[i] === arguments[0]) {
+					return i;
+				}
 			}
-		}
-		return -1;
-	};
+			return -1;
+		};
 
 	var isResizing = {}, // 标记可视区域尺寸状态， 用于消除 lte ie8 / chrome 中
-	// window.onresize 事件多次执行的 bug
-	lazy = true, // 懒执行标记
-	listener = function(e) { // 事件监听器
-		var h = window.innerHeight || (document.documentElement && document.documentElement.clientHeight) || document.body.clientHeight, w = window.innerWidth
-				|| (document.documentElement && document.documentElement.clientWidth) || document.body.clientWidth;
+		// window.onresize 事件多次执行的 bug
+		lazy = true, // 懒执行标记
+		listener = function (e) { // 事件监听器
+			var h = window.innerHeight || (document.documentElement && document.documentElement.clientHeight) || document.body.clientHeight,
+				w = window.innerWidth ||
+				(document.documentElement && document.documentElement.clientWidth) || document.body.clientWidth;
 
-		if (h === isResizing.h && w === isResizing.w) {
-			return;
-		} else {
-			e = e || window.event;
-			var i = 0, len = queue.length;
-			for (; i < len; i++) {
-				queue[i].call(this, e);
+			if (h === isResizing.h && w === isResizing.w) {
+				return;
+			} else {
+				e = e || window.event;
+				var i = 0,
+					len = queue.length;
+				for (; i < len; i++) {
+					queue[i].call(this, e);
+				}
+				isResizing.h = h, isResizing.w = w;
 			}
-			isResizing.h = h, isResizing.w = w;
-		}
-	};
+		};
 	return {
-		add : function(fn) {
+		add: function (fn) {
 			if (typeof fn === 'function') {
 				if (lazy) { // 懒执行
 					if (window.addEventListener) {
@@ -576,11 +582,10 @@ var onWindowResize = function() {
 					lazy = false;
 				}
 				queue.push(fn);
-			} else {
-			}
+			} else {}
 			return this;
 		},
-		remove : function(fn) {
+		remove: function (fn) {
 			if (typeof fn === 'undefined') {
 				queue = [];
 			} else if (typeof fn === 'function') {
@@ -601,14 +606,14 @@ var onWindowResize = function() {
  * @param elementId 网格id
  */
 function reloadData(url, elementId) {
-	if(elementId.indexOf("#")!=-1){
+	if (elementId.indexOf("#") != -1) {
 		elementId = elementId.substring(1);
 	}
 	var iframeArray = top.$("iframe");
 	var browser = $.browser;
-	for ( var i = 0; i < iframeArray.length; i++) {
-		if ((iframeArray[i].src && iframeArray[i].src.indexOf(url) != -1)||(iframeArray[i].contentWindow.location.href && iframeArray[i].contentWindow.location.href.indexOf(url) != -1)) {
-			if (browser.msie && (document.documentMode == '7')) {// 如果浏览器为ie
+	for (var i = 0; i < iframeArray.length; i++) {
+		if ((iframeArray[i].src && iframeArray[i].src.indexOf(url) != -1) || (iframeArray[i].contentWindow.location.href && iframeArray[i].contentWindow.location.href.indexOf(url) != -1)) {
+			if (browser.msie && (document.documentMode == '7')) { // 如果浏览器为ie
 				// 且文档模式为ie7，则重新载入页面（因为刷新datagrid会导致datagrid显示不全）
 				iframeArray[i].contentWindow.location.reload();
 				break;
@@ -632,8 +637,8 @@ function reloadData(url, elementId) {
  * @param formid 查看页面表格表单id
  */
 function businessView(url, formid) {
-	$.getJSON(url + '&r=' + new Date().getTime(), function(item) {
-		$("#" + formid + " td > span").each(function() {
+	$.getJSON(url + '&r=' + new Date().getTime(), function (item) {
+		$("#" + formid + " td > span").each(function () {
 			var spanid = $(this).attr("id");
 			if (spanid != "undefined" && spanid != "") {
 				var property = spanid;
@@ -703,7 +708,7 @@ function checkDocumentMode() {
 
 /** ----------------弹出窗口定义开始--------------------------* */
 
-var biframe;// 窗口内容的iframe
+var biframe; // 窗口内容的iframe
 var dlgNumber = 1; // 弹出窗口序号1到5
 var isMove = false;
 
@@ -721,7 +726,7 @@ var isMove = false;
  * 一般调用方式：parent.getDlg("url","iframeId","title",宽度,高度)
  */
 
-function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizable) {
+function getDlg(url, dialogid, title, w, h, modal, closable, maximizable, resizable) {
 
 	/*console.log(url, dialogid, title, w, h, modal, closable,maximizable,resizable);*/
 	if (!modal) {
@@ -764,26 +769,26 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 		dlgIframe = $("<iframe width=\"100%\" height=\"100%\" src=\"\" frameborder=\"0\"></iframe>").appendTo(dlgDiv);
 		dlgIframe.attr("id", "iframe_" + dialogid);
 		// 在窗口下面添加一个遮罩层，解决窗口被activie控件遮挡问题
-		window_mask = $("<div id=\""
-				+ dlgid
-				+ "-mask\" class=\"window-maskDiv\" style='position: absolute;top:0;left:0;width:100%;height:100%;background-color:white;opacity:0;'></div>");
-//		window_mask.width(w);
-//		window_mask.height(h);
+		window_mask = $("<div id=\"" +
+			dlgid +
+			"-mask\" class=\"window-maskDiv\" style='position: absolute;top:0;left:0;width:100%;height:100%;background-color:white;opacity:0;'></div>");
+		//		window_mask.width(w);
+		//		window_mask.height(h);
 		window_mask.appendTo("body");
 		dlgNumber++;
 	}
 
 	// 初始化窗口
 	$('#' + dlgid).dialog({
-		title : title,
-		height : h,
-		width : w,
-		modal : modal,
-		shadow : false,
-		closable : closable,
-		maximizable:maximizable,
-		resizable:resizable,
-		onMove : function(left, top) {
+		title: title,
+		height: h,
+		width: w,
+		modal: modal,
+		shadow: false,
+		closable: closable,
+		maximizable: maximizable,
+		resizable: resizable,
+		onMove: function (left, top) {
 			if ($(this).panel('options').reSizing) {
 				return;
 			}
@@ -798,13 +803,13 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 			if (left < 0) {
 				left = 0;
 				$(this).panel('move', {
-					left : 0
+					left: 0
 				});
 			}
 			if (top < 0) {
 				top = 0;
 				$(this).panel('move', {
-					top : 0
+					top: 0
 				});
 			}
 
@@ -816,37 +821,37 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 				if (left > parentObj.width() - width) {
 					left = parentObj.width() - width;
 					$(this).panel('move', {
-						"left" : parentObj.width() - width
+						"left": parentObj.width() - width
 					});
 				}
 				if (top > parentObj.height() - height) {
 					top = parentObj.height() - height;
 					$(this).panel('move', {
-						"top" : parentObj.height() - height
+						"top": parentObj.height() - height
 					});
 				}
 			}
-//			window_mask.css('left', left);
-//			window_mask.css('top', top);
+			//			window_mask.css('left', left);
+			//			window_mask.css('top', top);
 		},
-		onClose : function() {
+		onClose: function () {
 			$('#' + dlgid).dialog('destroy');
 			$('#' + dlgid).attr("closeFlag", "");
 			window_mask.remove();
 			dlgNumber = dlgNumber - 1;
 		},
-		onResize:function(width, height){
-//			var left = $(this).panel('options').left;
-//			var top = $(this).panel('options').top;
-//			window_mask.css('left', left);
-//			window_mask.css('top', top);
-//			window_mask.css('width', width);
-//			window_mask.css('height', height);
+		onResize: function (width, height) {
+			//			var left = $(this).panel('options').left;
+			//			var top = $(this).panel('options').top;
+			//			window_mask.css('left', left);
+			//			window_mask.css('top', top);
+			//			window_mask.css('width', width);
+			//			window_mask.css('height', height);
 		},
-		onMinimize : function() {
+		onMinimize: function () {
 			window_mask.css('display', 'none');
 		},
-		onOpen : function() {
+		onOpen: function () {
 			window_mask.css('display', 'block');
 			var window_z_index = $(this).panel("panel").css('z-index');
 			window_mask.css('z-index', window_z_index - 1);
@@ -857,11 +862,11 @@ function getDlg(url, dialogid, title, w, h, modal, closable,maximizable,resizabl
 	dlgIframe[0].contentWindow.location.href = url;
 	//拖动时给内容块的iframe加遮罩层
 	var tempMask = $("<div style='position: absolute;top:0;left:0;width:100%;height:100%;background-color:white;opacity:0;'></div>");
-	$( ".ui-draggable" ).on( "dragstart", function( event, ui ) {
+	$(".ui-draggable").on("dragstart", function (event, ui) {
 		tempMask.appendTo(this);
-	} ).on( "dragstop", function( event, ui ) {
+	}).on("dragstop", function (event, ui) {
 		tempMask.remove();
-	} );
+	});
 }
 
 /**
@@ -887,7 +892,7 @@ function hideDlg(dialogid) {
 		}
 	} else {
 		var dlgDivArray = $("div[name='dlgDiv']");
-		$.each(dlgDivArray, function(i) {
+		$.each(dlgDivArray, function (i) {
 			if ($(this).attr("closeFlag") != '') {
 				$(this).dialog('minimize');
 			}
@@ -908,7 +913,7 @@ function showDlg(dialogid) {
 		}
 	} else {
 		var dlgDivArray = $("div[name='dlgDiv']");
-		$.each(dlgDivArray, function(i) {
+		$.each(dlgDivArray, function (i) {
 			if ($(this).attr("closeFlag") != '') {
 				$(this).dialog('open');
 			}
@@ -937,10 +942,10 @@ function showAlert(title, msg, type, callbackFn) {
  * @param datagrid datagrid的jquery对象
  */
 function createColumnMenu(datagrid) {
-	var menuid=datagrid[0].id+"_menu";
-	var tmenu = $("<div id='"+menuid+"' style='width:100px;'></div>").appendTo('body');
+	var menuid = datagrid[0].id + "_menu";
+	var tmenu = $("<div id='" + menuid + "' style='width:100px;'></div>").appendTo('body');
 	var fields = datagrid.datagrid('getColumnFields');
-	for ( var i = 0; i < fields.length; i++) {
+	for (var i = 0; i < fields.length; i++) {
 		if (fields[i] == "ck") {
 			continue;
 		}
@@ -952,18 +957,18 @@ function createColumnMenu(datagrid) {
 		}
 	}
 	tmenu.menu({
-		onClick : function(item) {
+		onClick: function (item) {
 			if (item.iconCls == 'icon-ok') {
 				datagrid.datagrid('hideColumn', item.id.substring(1));
 				tmenu.menu('setIcon', {
-					target : item.target,
-					iconCls : 'icon-empty'
+					target: item.target,
+					iconCls: 'icon-empty'
 				});
 			} else {
 				datagrid.datagrid('showColumn', item.id.substring(1));
 				tmenu.menu('setIcon', {
-					target : item.target,
-					iconCls : 'icon-ok'
+					target: item.target,
+					iconCls: 'icon-ok'
 				});
 			}
 		}
@@ -979,17 +984,17 @@ function createColumnMenu(datagrid) {
 function showLoadingMessage(message) {
 	if (!document.getElementById("load-mask")) {
 		$("<div id=\"load-mask\" class=\"datagrid-mask\"></div>").css({
-			width : "100%",
-			height : $(window).height()
+			width: "100%",
+			height: $(window).height()
 		}).appendTo("body");
 		var msg = $("<div id=\"load-mask-msg\" class=\"datagrid-mask-msg\"></div>").appendTo("body");
 	}
 	if (message) {
 		$('#load-mask-msg').html(message);
-	}else{
+	} else {
 		$('#load-mask-msg').html("正在处理，请稍候。。。");
 	}
-	msg.css("left",($(document.body).outerWidth()-msg._outerWidth())/2);
+	msg.css("left", ($(document.body).outerWidth() - msg._outerWidth()) / 2);
 	$('#load-mask').css('display', 'block');
 	$('#load-mask-msg').css('display', 'block');
 }
@@ -1009,13 +1014,13 @@ function hiddenLoadingMessage() {
  * @param {Object} datagridID 需要重载的datagrid的id
  */
 
-function queryDatagrid(queryformID,datagridID){
-	querySerialize =$('#'+queryformID).serializeToJson();
+function queryDatagrid(queryformID, datagridID) {
+	querySerialize = $('#' + queryformID).serializeToJson();
 
 	encodeURI(querySerialize);
 	querySerialize.pageNumber = 1;
-	$('#'+datagridID).datagrid('options').queryParams= querySerialize;
-	$('#'+datagridID).datagrid('load');
+	$('#' + datagridID).datagrid('options').queryParams = querySerialize;
+	$('#' + datagridID).datagrid('load');
 }
 
 /**
@@ -1024,38 +1029,38 @@ function queryDatagrid(queryformID,datagridID){
  */
 
 $.fn.serializeToJson = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-        if (o[this.name]) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value.trim() || '');
-        } else {
-            o[this.name] = this.value.trim() || '';
-        }
-    });
-    return o;
+	var o = {};
+	var a = this.serializeArray();
+	$.each(a, function () {
+		if (o[this.name]) {
+			if (!o[this.name].push) {
+				o[this.name] = [o[this.name]];
+			}
+			o[this.name].push(this.value.trim() || '');
+		} else {
+			o[this.name] = this.value.trim() || '';
+		}
+	});
+	return o;
 };
 
 
 /**
  * @desc 获取主子表tab切换的内容元素高度
  */
-function masterTableChildHeight(){
+function masterTableChildHeight() {
 
 	if (document.getElementById('tabContainer') != null) {
-		$("#tabContainer").tabs("resize",{
-			width:document.documentElement.clientWidth,
-			height:document.documentElement.clientHeight
+		$("#tabContainer").tabs("resize", {
+			width: document.documentElement.clientWidth,
+			height: document.documentElement.clientHeight
 		});
 
-		var tabsPanelsHeight = $(".master-table .easyui-tabs").height()-$(".master-table .tabs-header").outerHeight(),
+		var tabsPanelsHeight = $(".master-table .easyui-tabs").height() - $(".master-table .tabs-header").outerHeight(),
 			tabsPanelsPaddingTop = parseInt($(".tabs-panels").css("padding-top")),
 			tabsPanelsPaddingBottom = parseInt($(".tabs-panels").css("padding-bottom"));
-		$(".tabs-panels").height(tabsPanelsHeight-tabsPanelsPaddingTop-tabsPanelsPaddingBottom);
-		$("#contentArea").height($(".tabs-panels").height()-70);
+		$(".tabs-panels").height(tabsPanelsHeight - tabsPanelsPaddingTop - tabsPanelsPaddingBottom);
+		$("#contentArea").height($(".tabs-panels").height() - 70);
 		$(".tabs-panels .panel-body").height($(".tabs-panels").height());
 	}
 }
@@ -1066,11 +1071,11 @@ function masterTableChildHeight(){
  * @param {String} param
  */
 function isNull(param) {
-    if (param == "" || param == null || param == undefined) {
-        return true;
-    } else {
-        return false;
-    }
+	if (param == "" || param == null || param == undefined) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 /**
@@ -1079,34 +1084,34 @@ function isNull(param) {
  */
 function getDcumentObject(url) {
 	var parentObj = "";
-    var search = function (iframes) {
-        for (var n = 0; n < iframes.length; n++) {
-            if (iframes[n].frames.length > 0) {
-                search(iframes[n].frames);
-            }
-            if ((iframes[n].frameElement.src && iframes[n].frameElement.src.indexOf(url) != -1)||(iframes[n].frameElement.contentWindow.location.href && iframes[n].frameElement.contentWindow.location.href.indexOf(url) != -1)) {
+	var search = function (iframes) {
+		for (var n = 0; n < iframes.length; n++) {
+			if (iframes[n].frames.length > 0) {
+				search(iframes[n].frames);
+			}
+			if ((iframes[n].frameElement.src && iframes[n].frameElement.src.indexOf(url) != -1) || (iframes[n].frameElement.contentWindow.location.href && iframes[n].frameElement.contentWindow.location.href.indexOf(url) != -1)) {
 				parentObj = iframes[n];
 				break;
-		    }
-        }
-    };
-    search(window.top.frames);
-    return parentObj;
+			}
+		}
+	};
+	search(window.top.frames);
+	return parentObj;
 }
 
 /**
  * @desc 获取地图frame对象
  * @param fId
  */
-var getApiByIframeId = function(fId ,apiName){
-    if(!apiName){
-        apiName = "mapApi";
-    }
-    var ifrWindow = top.frames[fId].contentWindow;
-    if(!ifrWindow){//for ie
-        ifrWindow = top.frames[fId].window;
-    }
-    return ifrWindow[apiName];
+var getApiByIframeId = function (fId, apiName) {
+	if (!apiName) {
+		apiName = "mapApi";
+	}
+	var ifrWindow = top.frames[fId].contentWindow;
+	if (!ifrWindow) { //for ie
+		ifrWindow = top.frames[fId].window;
+	}
+	return ifrWindow[apiName];
 };
 
 
@@ -1130,25 +1135,25 @@ var getApiByIframeId = function(fId ,apiName){
     		console.log([year,month,date].join('-'));  // 2014年-6月-8日
  * 详情参考  https://www.cnblogs.com/tugenhua0707/p/3776808.html
  */
-Date.prototype.format = function(fmt) {
-    var o = {
-       "M+" : this.getMonth()+1,                 //月份
-       "d+" : this.getDate(),                    //日
-       "h+" : this.getHours(),                   //小时
-       "m+" : this.getMinutes(),                 //分
-       "s+" : this.getSeconds(),                 //秒
-       "q+" : Math.floor((this.getMonth()+3)/3), //季度
-       "S"  : this.getMilliseconds()             //毫秒
-   };
-   if(/(y+)/.test(fmt)) {
-           fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
-   }
-    for(var k in o) {
-       if(new RegExp("("+ k +")").test(fmt)){
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
-        }
-    }
-   return fmt;
+Date.prototype.format = function (fmt) {
+	var o = {
+		"M+": this.getMonth() + 1, //月份
+		"d+": this.getDate(), //日
+		"h+": this.getHours(), //小时
+		"m+": this.getMinutes(), //分
+		"s+": this.getSeconds(), //秒
+		"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+		"S": this.getMilliseconds() //毫秒
+	};
+	if (/(y+)/.test(fmt)) {
+		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	}
+	for (var k in o) {
+		if (new RegExp("(" + k + ")").test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+		}
+	}
+	return fmt;
 };
 
 
@@ -1156,38 +1161,38 @@ Date.prototype.format = function(fmt) {
  * @desc  默认datagrid属性定义
  */
 
-(function() {
-	if($.fn.datagrid!=null){
+(function () {
+	if ($.fn.datagrid != null) {
 		$.extend($.fn.datagrid.defaults, {
-			pageSize : 10,
-			pageList : [ 5, 10, 15, 20, 50 ],
-			striped : true,
-			pagination : true,
-			rownumbers : true,
-			singleSelect : false,
-			nowrap : true,
-			toolbar : "#toolbar",
-			onLoadSuccess1 : function(data) {  // 为了防止单个页面与这里默认的权限处理相覆盖，这里调用onLoadSuccess1, 并扩展源代码 调用onLoadSuccess1
+			pageSize: 10,
+			pageList: [5, 10, 15, 20, 50],
+			striped: true,
+			pagination: true,
+			rownumbers: true,
+			singleSelect: false,
+			nowrap: true,
+			toolbar: "#toolbar",
+			onLoadSuccess1: function (data) { // 为了防止单个页面与这里默认的权限处理相覆盖，这里调用onLoadSuccess1, 并扩展源代码 调用onLoadSuccess1
 				$(this).datagrid('clearSelections'); // clear selected options
-				if(typeof getDataPrivilege != 'undefined'){
+				if (typeof getDataPrivilege != 'undefined') {
 					getDataPrivilege();
 				}
 				$(".tip").tooltip({
-		    		onShow:function(){
-		    			$(this).tooltip('tip').css("boxShadow","1px 1px 3px #292929")
-		    		}
-		    	})
+					onShow: function () {
+						$(this).tooltip('tip').css("boxShadow", "1px 1px 3px #292929")
+					}
+				})
 			},
-			onHeaderContextMenu : function(e, field) {
+			onHeaderContextMenu: function (e, field) {
 				e.preventDefault();
-				var menuid=$(this)[0].id+"_menu";
-				if (!$('#'+menuid).length) {
+				var menuid = $(this)[0].id + "_menu";
+				if (!$('#' + menuid).length) {
 
 					createColumnMenu($(this));
 				}
-				$('#'+menuid).menu('show', {
-					left : e.pageX,
-					top : e.pageY
+				$('#' + menuid).menu('show', {
+					left: e.pageX,
+					top: e.pageY
 				});
 			}
 		});
@@ -1207,11 +1212,11 @@ Date.prototype.format = function(fmt) {
 function setComboObjReferenceInput(comboObjId, referenceObjId, comboObjType) {
 
 	setComboObjReferenceInput_private(comboObjId, referenceObjId, comboObjType);
-	var _fn = function() {
+	var _fn = function () {
 		setComboObjReferenceInput_private(comboObjId, referenceObjId, comboObjType);
 	};
 	// $(window).bind('resize',_fn);//不能使用该方法
-	onWindowResize.add(_fn);// 要使用该方法
+	onWindowResize.add(_fn); // 要使用该方法
 }
 
 /**
@@ -1221,8 +1226,8 @@ function setComboObjReferenceInput(comboObjId, referenceObjId, comboObjType) {
  * @param comboObjType easyui Combo组件对象类型，（'combobox'||'combotree'||datetimebox）
  */
 function setComboObjReferenceInput_private(comboObjId, referenceObjId, comboObjType) {
-	if (comboObjId && comboObjId != ''&&referenceObjId && referenceObjId != '') {
-		var comboObjWidth=$("#"+referenceObjId).width();
+	if (comboObjId && comboObjId != '' && referenceObjId && referenceObjId != '') {
+		var comboObjWidth = $("#" + referenceObjId).width();
 		var comboObj = $('#' + comboObjId);
 		if ('combobox' == comboObjType) {
 			comboObj.combobox('resize', comboObjWidth);
@@ -1234,7 +1239,7 @@ function setComboObjReferenceInput_private(comboObjId, referenceObjId, comboObjT
 			comboObj.combo('resize', comboObjWidth);
 		}
 	} else {
-		$(".combo").each(function() {
+		$(".combo").each(function () {
 			// $(this).parent().css('padding-right','3px');
 		});
 	}
@@ -1243,13 +1248,13 @@ function setComboObjReferenceInput_private(comboObjId, referenceObjId, comboObjT
 /**
  * @desc 修改datagrid table 头部input全选的样式
  */
-function changeDatagridHeaderInputCheckedStyle(){
+function changeDatagridHeaderInputCheckedStyle() {
 	var datagridHeaderCheck = $(".datagrid .datagrid-view1 .datagrid-header .datagrid-header-inner").find(".datagrid-header-check input");
-	if(datagridHeaderCheck.length==1){
-		$(datagridHeaderCheck).on("click",function(){
-			if($(this).is(":checked")){
+	if (datagridHeaderCheck.length == 1) {
+		$(datagridHeaderCheck).on("click", function () {
+			if ($(this).is(":checked")) {
 				$(this).addClass("datagrid-header-check-check")
-			}else{
+			} else {
 				$(this).removeClass("datagrid-header-check-check")
 			}
 		})
@@ -1262,11 +1267,11 @@ function changeDatagridHeaderInputCheckedStyle(){
  * @desc  地图定位
  */
 
-function GPSMap(locationData){
-	var data = locationData?locationData:"";
-	if(typeof showmap2d != 'undefined'){
+function GPSMap(locationData) {
+	var data = locationData ? locationData : "";
+	if (typeof showmap2d != 'undefined') {
 		showmap2dAndLocation(data);
-	}else{
+	} else {
 		top.showmap2dAndLocation(data);
 	}
 }
@@ -1277,65 +1282,64 @@ function GPSMap(locationData){
  * @param containerId 容器ID
  * @returns
  */
-function addBusinessHistoryRecords(businessid,containerId){
+function addBusinessHistoryRecords(businessid, containerId) {
 	//$('<fieldset id="actionbox" class="actionbox"><legend style="font-size:14px;font-weight:bold;margin-bottom:0px;"><i class="icon-time"></i>历史记录</legend></fieldset>').appendTo($('#'+containerId));
-	$('<fieldset id="actionbox" class="actionbox"></fieldset>').appendTo($('#'+containerId));
+	$('<fieldset id="actionbox" class="actionbox"></fieldset>').appendTo($('#' + containerId));
 	var historyItems = [];
 	$.ajax({
-		url:rootPath+"log/business/getList.do?pageNo=-1",
-		dataType:"json",
-		data:{businessId:businessid},
-		async:false,
-		success:function(result){
-			historyItems=result.rows;
+		url: rootPath + "log/business/getList.do?pageNo=-1",
+		dataType: "json",
+		data: {
+			businessId: businessid
+		},
+		async: false,
+		success: function (result) {
+			historyItems = result.rows;
 		}
 	});
 	var content = '<ol id="historyItem">';
-	for(var i=0;i<historyItems.length;i++){
+	for (var i = 0; i < historyItems.length; i++) {
 		var item = historyItems[i];
-		content+='<li value="'+(i+1)+'">';
-		content+='<span class="item">'+item.createTime+', 由 <strong>'+item.createUserName+'</strong> '+item.optType+'。</span>';
-		if(item.detail){
-			content+='<span><a id="switchButton'+(i+1)+'" class="switch-btn btn-icon" onclick="switchChange('+(i+1)+')" href="javascript:;"><i class="icon- change-show"></i></a></span>';
-			content+='<div class="changes alert" id="changeBox'+(i+1)+'" style="display: none;">';
-			try{
+		content += '<li value="' + (i + 1) + '">';
+		content += '<span class="item">' + item.createTime + ', 由 <strong>' + item.createUserName + '</strong> ' + item.optType + '。</span>';
+		if (item.detail) {
+			content += '<span><a id="switchButton' + (i + 1) + '" class="switch-btn btn-icon" onclick="switchChange(' + (i + 1) + ')" href="javascript:;"><i class="icon- change-show"></i></a></span>';
+			content += '<div class="changes alert" id="changeBox' + (i + 1) + '" style="display: none;">';
+			try {
 				var detail = $.parseJSON(item.detail);
-				for(var j=0;j<detail.length;j++){
+				for (var j = 0; j < detail.length; j++) {
 					var detailItem = detail[j];
-					content+='修改了 <strong><i>'+detailItem.dataItemName+'</i></strong>，旧值为 "'+(detailItem.oldValue||"")+'"，新值为 "'+(detailItem.newValue||"")+'"。<br>';
+					content += '修改了 <strong><i>' + detailItem.dataItemName + '</i></strong>，旧值为 "' + (detailItem.oldValue || "") + '"，新值为 "' + (detailItem.newValue || "") + '"。<br>';
 				}
 
-			}catch(e){
-				content+=item.detail;
+			} catch (e) {
+				content += item.detail;
 			}
-			content+='</div>';
+			content += '</div>';
 		}
-		if(item.remark){
-			content+='<div class="history article-content"><p>'+item.remark+'</p></div>';
+		if (item.remark) {
+			content += '<div class="history article-content"><p>' + item.remark + '</p></div>';
 		}
-		content+='</li>';
+		content += '</li>';
 	}
-	content+='</ol>';
+	content += '</ol>';
 	$(content).appendTo($('#actionbox'));
 }
-function switchChange(historyID)
-{
-    $swbtn = $('#switchButton' + historyID);
-    $showTag = $swbtn.find('.change-show');
-    if($showTag.length)
-    {
-        $swbtn.closest('li').addClass('show-changes');
-        $showTag.removeClass('change-show').addClass('change-hide');
-        $('#changeBox' + historyID).show();
-        $('#changeBox' + historyID).prev('.changeDiff').show();
-    }
-    else
-    {
-        $swbtn.closest('li').removeClass('show-changes');
-        $swbtn.find('.change-hide').removeClass('change-hide').addClass('change-show');
-        $('#changeBox' + historyID).hide();
-        $('#changeBox' + historyID).prev('.changeDiff').hide();
-    }
+
+function switchChange(historyID) {
+	$swbtn = $('#switchButton' + historyID);
+	$showTag = $swbtn.find('.change-show');
+	if ($showTag.length) {
+		$swbtn.closest('li').addClass('show-changes');
+		$showTag.removeClass('change-show').addClass('change-hide');
+		$('#changeBox' + historyID).show();
+		$('#changeBox' + historyID).prev('.changeDiff').show();
+	} else {
+		$swbtn.closest('li').removeClass('show-changes');
+		$swbtn.find('.change-hide').removeClass('change-hide').addClass('change-show');
+		$('#changeBox' + historyID).hide();
+		$('#changeBox' + historyID).prev('.changeDiff').hide();
+	}
 }
 /**
  * datagrid请求数据前置处理
@@ -1343,36 +1347,36 @@ function switchChange(historyID)
  *    2.将排序参数sort、order转换为orderBy
  *    3.将分页参数page、row转换为pageNo、pageSize
  */
-function datagridBeforeSend(param, success, error,opts){
+function datagridBeforeSend(param, success, error, opts) {
 	//设置排序
-	var sort = param.sort||"";
-	var order = param.order||"";
-	if(sort||order||""){
-		param.orderBy =  sort + " "+order;
+	var sort = param.sort || "";
+	var order = param.order || "";
+	if (sort || order || "") {
+		param.orderBy = sort + " " + order;
 	}
 	delete param.sort;
 	delete param.order;
 	//设置分页
-	var pageNo = param.page||"";
-	if(pageNo){
+	var pageNo = param.page || "";
+	if (pageNo) {
 		param.pageNo = pageNo;
 	}
-	var pageSize = param.rows||"";
-	if(pageSize){
+	var pageSize = param.rows || "";
+	if (pageSize) {
 		param.pageSize = pageSize;
 	}
 	delete param.page;
 	delete param.rows;
-    $.ajax({
-        type :opts.method,
-        url : opts.url,
-        dataType : 'json',
-        contentType : 'application/json;charset=utf-8', // 设置请求头信息
-        data : JSON.stringify(param),
-        success : function(result) {
-             success(result);
-        }
-     });
+	$.ajax({
+		type: opts.method,
+		url: opts.url,
+		dataType: 'json',
+		contentType: 'application/json;charset=utf-8', // 设置请求头信息
+		data: JSON.stringify(param),
+		success: function (result) {
+			success(result);
+		}
+	});
 }
 
 /**
@@ -1380,12 +1384,12 @@ function datagridBeforeSend(param, success, error,opts){
  * @param datetimeString
  * @returns
  */
-function datetimeToMillsConverter(datetimeString){
-	datetimeString = datetimeString||"";
-	if(datetimeString==""){
+function datetimeToMillsConverter(datetimeString) {
+	datetimeString = datetimeString || "";
+	if (datetimeString == "") {
 		return null;
 	}
-	var mills = new Date(datetimeString.replace(new RegExp(/-/gm) ,"/")).getTime();
+	var mills = new Date(datetimeString.replace(new RegExp(/-/gm), "/")).getTime();
 	return mills;
 }
 /**
@@ -1394,15 +1398,15 @@ function datetimeToMillsConverter(datetimeString){
  * @returns
  */
 function millsToHmsConverter(mills) {
-    var days = parseInt(mills / (1000 * 60 * 60 * 24));
-    var hours = parseInt((mills % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = parseInt((mills % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = (mills % (1000 * 60)) / 1000;
-    days = days!=0?days+ " 天 ":"";
-    hours = hours!=0?hours+ " 小时 ":"";
-    minutes = minutes!=0?minutes+ " 分钟 ":"";
-    seconds = seconds!=0?seconds+ " 秒 ":"";
-    return days + hours + minutes + seconds;
+	var days = parseInt(mills / (1000 * 60 * 60 * 24));
+	var hours = parseInt((mills % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	var minutes = parseInt((mills % (1000 * 60 * 60)) / (1000 * 60));
+	var seconds = (mills % (1000 * 60)) / 1000;
+	days = days != 0 ? days + " 天 " : "";
+	hours = hours != 0 ? hours + " 小时 " : "";
+	minutes = minutes != 0 ? minutes + " 分钟 " : "";
+	seconds = seconds != 0 ? seconds + " 秒 " : "";
+	return days + hours + minutes + seconds;
 }
 
 /**
@@ -1412,22 +1416,22 @@ function millsToHmsConverter(mills) {
  * @param datagridElementId	{string} （业务数据网格Id 如：queryDatagrid）
  * @returns
  */
-function commonImport(templateCode, callerPageUrl, datagridElementId){
-	if(isNull(templateCode)){
+function commonImport(templateCode, callerPageUrl, datagridElementId) {
+	if (isNull(templateCode)) {
 		top.showAlert("提示", "导入模板编码为空", 'info');
 		return;
 	}
-	if(isNull(callerPageUrl)){
+	if (isNull(callerPageUrl)) {
 		top.showAlert("提示", "回调页面为空", 'info');
 		return;
 	}
-	if(isNull(datagridElementId)){
+	if (isNull(datagridElementId)) {
 		top.showAlert("提示", "数据网格Id为空", 'info');
 		return;
 	}
 	top.getDlg(rootPath + "jasframework/components/importexcel/import_excel.htm?templateCode=" + templateCode +
-			"&callerPageUrl=" + callerPageUrl +"&datagridElementId=" + datagridElementId, "importExcel",
-			"导入", 700, 400, false, true, false);
+		"&callerPageUrl=" + callerPageUrl + "&datagridElementId=" + datagridElementId, "importExcel",
+		"导入", 700, 400, false, true, false);
 }
 
 /**
@@ -1437,23 +1441,23 @@ function commonImport(templateCode, callerPageUrl, datagridElementId){
  * @param keywords	{object} 导出查询条件json对象
  * @returns	文件名
  */
-function commonExport(templateCode, functionCode, keywords){
-	var fileId ;
+function commonExport(templateCode, functionCode, keywords) {
+	var fileId;
 	$.ajax({
 		url: rootPath + '/importExcelController/exportExcel.do',
 		type: 'post',
 		contentType: 'application/json;charset=utf-8',
-		dataType:'json',
-		async:false,
-		data:JSON.stringify({
+		dataType: 'json',
+		async: false,
+		data: JSON.stringify({
 			"templateCode": templateCode,
 			"functionCode": functionCode,
 			"keywords": keywords,
 		}),
-		success: function(result){
-			if(result.status == 1){
-				fileId = result.data;//encodeURI(encodeURI(result.data));
-			}else{
+		success: function (result) {
+			if (result.status == 1) {
+				fileId = result.data; //encodeURI(encodeURI(result.data));
+			} else {
 				top.showAlert("提示", result.msg, 'info');
 			}
 		}

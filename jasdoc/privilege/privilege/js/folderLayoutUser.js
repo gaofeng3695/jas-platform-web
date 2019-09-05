@@ -1,6 +1,6 @@
 /**
  * 方法描述： 加载左侧角色树形菜单
- */	
+ */
 var folderUserValues = new Array();	//用户勾选的 文件夹权限数据
 var initUserValues = new Array();	//该角色以拥有的文件夹权限数据
 var parentValues = new Array();		//文件夹的父节点数据
@@ -19,13 +19,13 @@ $(function(){
 	doc.style.width=$("#search").width()+"px";
 	/***end 定位部门树面板的位置***/
 	/***begin 获取部门树***/
-	var deptUrl = "../../../jasdoc/privilege/privilege/getUnitAndChildrenTree.do?r="+new Date().getTime();
+	var deptUrl = rootPath+"jasdoc/privilege/privilege/getUnitAndChildrenTree.do?r="+new Date().getTime();
 	$('#deptPrivilegeEventId').tree( {
 		url : deptUrl,
 		checkbox:true,
 		cascadeCheck:false,
 		onSelect:function(node){
-			
+
 		},onLoadSuccess:function(node,data){
 			$('#deptPrivilegeEventId').tree('check',data[0].target);
 		},onBeforeCheck:function(node,checked){
@@ -49,11 +49,11 @@ $(function(){
 
 	});
 	/***begin 部门树面板折叠与展开***/
-	
+
 	$('#searchUnit').bind('keyup', function(event) {
 		search(event);
 	});
-	$('#user').searchbox({ 
+	$('#user').searchbox({
 		searcher:function(value,name){
 			var data=$("#userPrivilegeEventId").tree("getRoots");
 			positionUser(value,data);
@@ -71,7 +71,7 @@ function positionUser(value,data){
 		if(data[j].text.indexOf(value)!=-1){
 			if(nodeUser==null){
 				var node=$("#userPrivilegeEventId").tree('find',data[j].id);
-				
+
 				$("#userPrivilegeEventId").tree('scrollTo',node.target);
 				$("#userPrivilegeEventId").tree('select',node.target);
 				nodeUser=node.attributes;
@@ -100,7 +100,7 @@ function positionUser(value,data){
 					}
 					continue;
 				}
-				
+
 			}
 		}
 	}
@@ -120,7 +120,7 @@ function search(event){
 			positionUnit(keyWord,"deptPrivilegeEventId",data);
 		}
 	}
-	
+
 }
 /******
  * 部门的查询并定位
@@ -171,9 +171,9 @@ function positionUnit(value,elementid,data){
 			return;
 		}
 	}
-	
-	
-	
+
+
+
 }
 /***
  * 关闭其他节点
@@ -206,7 +206,7 @@ function setUnitInfo(node,checked){
 			unitName=node.text;
 		}
 		$("#searchUnit").attr('value',unitName);
-		
+
 		var unitId=$("#unitId").val();
 		if(unitId!=""){
 			unitId+=","+node.id;
@@ -226,7 +226,7 @@ function setUnitInfo(node,checked){
 			}
 		}
 		$("#searchUnit").attr('value',newNuitName);
-		
+
 		var unitId=$("#unitId").val();
 		var newNuitId="";
 		var unitIds=unitId.split(',');
@@ -245,7 +245,7 @@ function setUnitInfo(node,checked){
  */
 function crateUserTree(){
 	var unitId=$("#unitId").val();
-	var roleUrl = "../../../jasdoc/privilege/privilege/getUserListByUnitId.do?unitIds="+unitId;
+	var roleUrl = rootPath+"jasdoc/privilege/privilege/getUserListByUnitId.do?unitIds="+unitId;
 	$('#userPrivilegeEventId').tree({
 		url : roleUrl,
 		onLoadSuccess:function(node,data) {
@@ -254,22 +254,22 @@ function crateUserTree(){
 		},onSelect:function(node){
 			getPrivilegeByUserIdAndFolderId(folderId,node.id);
 		}
-		
-	});	
+
+	});
 }
 
 
 function getPrivilegeByUserIdAndFolderId(folderId,userId){
 	$.ajax({
 		type: "POST",
-	   	url: 'getPrivilegeByUserIdAndFolderId.do',
+	   	url:rootPath+'jasdoc/privilege/privilege/getPrivilegeByUserIdAndFolderId.do',
    		data: {
    			    "folderId":folderId,
    			    "userId":userId
 		  },
 	   	success: function(data){
 	   		$('#privelegetype div').each(function() {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
     		});
    			$("#folderUserRefId").val("");
 	   		if(data!=null&&data.length>0){
@@ -277,7 +277,7 @@ function getPrivilegeByUserIdAndFolderId(folderId,userId){
 	   			var type=result.folderprivilegetype;
 	     		$('#privelegetype div').each(function() {
 	    			if (type >= $(this).attr('id')) {
-	    				$(this).find(":checkbox").attr("checked",true); 
+	    				$(this).find(":checkbox").attr("checked",true);
 	    			}
 	    		});
 	     		$("#folderUserRefId").val(result.id);
@@ -336,7 +336,7 @@ function saveFolderUser(){
 	$("#role").val(role);
 	$.ajax({
 		type: "POST",
-	   	url: 'saveSingleUserFolderPrivilege.do',
+	   	url:rootPath+'jasdoc/privilege/privilege/saveSingleUserFolderPrivilege.do',
  		data: {
  			    "userId":userSelect.id,
  			    "folderId":folderId,
@@ -347,7 +347,7 @@ function saveFolderUser(){
    			$.messager.alert('提示',check.message,'ok',function(){
 					getPrivilegeByUserIdAndFolderId(folderId,userSelect.id);
 				});
-				
+
 			} else{
 				$.messager.alert('错误',check.message,'error');
 			}
@@ -360,15 +360,15 @@ function clickBox(type){
 	if($("#"+type).find(":checkbox").attr('checked')){
 		$('#privelegetype div').each(function() {
 			if (type >= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",true); 
+				$(this).find(":checkbox").attr("checked",true);
 			}
 		});
 	}else{
 		$('#privelegetype div').each(function() {
 			if (type <= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
 			}
 		});
 	}
 }
-	
+

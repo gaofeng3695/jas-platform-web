@@ -43,7 +43,7 @@ function initDocClassifyTree(){
 					}
 				}
 			});
-			
+
 		},onBeforeExpand:function(node){
 			url=rootPath+"/jasdoc/folder/classify/getChildrenClassify.do";
 		 	$('#docClassifyEventId').tree("options").url= url+"?folderId="+node.id;
@@ -70,17 +70,17 @@ function initDataGrid(folderLocation){
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:"../classify/getAllClassifyAndFiles.do?folderId="+folderId,
+		url:rootPath+"jasdoc/folder/classify/getAllClassifyAndFiles.do?folderId="+folderId,
 		remoteSort: true,
 		idField:'eventid',
 		pagination:true,
 		rownumbers:true,
 		toolbar:'#toolbar',
 		title:datagridTitle,
-		columns : [[{field : 'ck',title : '全选',checkbox : true}, 		        					
+		columns : [[{field : 'ck',title : '全选',checkbox : true},
 		            {field : 'filename',title : '名称',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 						return getFileNameField(rowData);
-					 }}, 
+					 }},
 					 {field : 'filetype',title : '格式',width : 0.07 * width,formatter:function(value,rowData,rowIndex){
 						 var typeFlag = rowData.typeFlag;
 						 if(typeFlag==1){
@@ -89,10 +89,10 @@ function initDataGrid(folderLocation){
 							 return rowData.filetype;
 						 }
 					 }},
-					 {field : 'createusername',title : '创建人',width : 0.07 * width},  
-					 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},  
-					 {field : 'updateuser',title : '修改人',width : 0.07 * width},  
-					 {field : 'updatetime',title : '修改时间',width : 0.1 * width},  
+					 {field : 'createusername',title : '创建人',width : 0.07 * width},
+					 {field : 'uploadtime',title : '创建时间',width : 0.1 * width},
+					 {field : 'updateuser',title : '修改人',width : 0.07 * width},
+					 {field : 'updatetime',title : '修改时间',width : 0.1 * width},
 					 {field : 'filesizeStr',title : '大小(kb)',width : 0.07 * width},
 		            {field : 'filelocation',title : '文档位置',width : 0.18 * width,formatter:function(value,rowData,rowIndex){
 		            	 var typeFlag = rowData.typeFlag;
@@ -101,7 +101,7 @@ function initDataGrid(folderLocation){
 		            	 }else{
 		            		 return rowData.filelocation;
 		            	 }
-		            }}, 
+		            }},
 					{field : 'privilege',title : '我的权限',width : 0.09 * width,formatter:function(value,rowData,rowIndex){
 						return getPrivilegeField(rowData);
 					  }},
@@ -156,7 +156,7 @@ function initDataGrid(folderLocation){
 				$('#45').attr('disabled', true);
 				var role = rowData.hierarchyRole;
 				$('#fileManager div').each(function() {
-					
+
 					if (role >= $(this).attr('id')) {
 						$(this).attr('disabled', false);
 					}
@@ -223,7 +223,7 @@ function deleteClassify(folderId){
 			});
 		}
 	});
-	
+
 }
 function shiftDeleteDocClassify(folderId,hierarchy){
 	$.messager.confirm('提示','该操作将彻底删除该文档分类，确定继续吗？',function(f){
@@ -298,9 +298,9 @@ function addToFavorite(){
 			}
 			eventids += rows[rows.length-1].eventid;
 			filenames += rows[rows.length-1].filename;
-			
+
 			getDlg("../favorite/addToFavorite.htm?docIds="+eventids+"&fileNames="+filenames+"&folderId="+folderId,'favorite','添加收藏',580,162);
-			
+
 		}else{
 			$.messager.alert('提示','请选择记录','info');
 		}
@@ -309,10 +309,10 @@ function addToFavorite(){
 
 /**
  * 方法描述：删除文档的分类信息
- * 
+ *
  */
 function deleteDocFromClassify(){
-		deleteDocUrl = '../classify/deletefilereffromclassify.do';
+		deleteDocUrl =rootPath+"jasdoc/folder/classify/classify/deletefilereffromclassify.do";
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length > 0){
 		var ids="";
@@ -362,7 +362,7 @@ function updateFileClassifyInfo(){
  */
 function queryDocByConditions(){
 	$("#dg").datagrid('clearSelections'); // clear
-	var filename = $("#filename").val();	
+	var filename = $("#filename").val();
 	var filetype = $("#filetype").val();
 	var uploadtime_start = $("#uploadtime_start").val();
 	var uploadtime_end = $("#uploadtime_end").val();
@@ -370,10 +370,10 @@ function queryDocByConditions(){
 	var keyword = $("#keyword").val();
 	var query = null;
 	query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,"uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":true};
-	var url= "../classify/getAllClassifyAndFiles.do?folderId=" + folderId;
+	var url= rootPath+"jasdoc/folder/classify/getAllClassifyAndFiles.do?folderId=" + folderId;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid('options').queryParams=query;
-	$("#dg").datagrid('load');	
+	$("#dg").datagrid('load');
 	$("#dg").datagrid('options').queryParams=null;
 }
 /**
@@ -403,9 +403,9 @@ function operationFolderContextMenu(rowData){
 			} else if (item.name == '003') {
 				updateDocClassify(rowData.eventid);
 			} else if (item.name == '004') {
-				deleteClassify(rowData.eventid);  
+				deleteClassify(rowData.eventid);
 			}else if (item.name == '005') {
-				shiftDeleteDocClassify(rowData.eventid);  
+				shiftDeleteDocClassify(rowData.eventid);
 			} else if (item.name == '001') {
 				viewDetailInfo(rowData.eventid,1);
 			}
@@ -446,7 +446,7 @@ function operationFileContentMenu(rowData){
 
 /**
  * 方法描述：查看文件或文件夹详情
- */	
+ */
 function viewDetailInfo(eventid,typeFlag){
 	var eventId = eventid;
 	var flag = typeFlag;
@@ -482,11 +482,11 @@ function updateInfo(eventid){
  */
 function downloadDoc(eventid){
 	$("<iframe id=\"fileDownload\" style=\"display: none;\"></iframe>").appendTo("body");
-	var url="../doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
+	var url=rootPath+"jasdoc/folder/doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
 	$("#fileDownload").attr("src",url);
 }
 
-/** 
+/**
  *	方法描述：预览
  *	@param eventid	选中记录的eventid
  */
@@ -502,7 +502,7 @@ function Preview(eventid,versionid){
 				var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ docId +"&versionid="+versionid;
 				top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
 			}else if(result.success==0){
-				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');	
+				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');
 			}else if(result.success==-1){
 				parent.showAlert("提示",result.msg,"info");
 			}
@@ -511,7 +511,7 @@ function Preview(eventid,versionid){
 }
 /**
  * 方法描述：删除文档
- * 
+ *
  */
 function deleteDoc(eventid,typeFlag){
 	if(arguments.length==2){
@@ -519,7 +519,7 @@ function deleteDoc(eventid,typeFlag){
 			//删除文件夹
 			$.messager.confirm("删除文档","您确定要删除该文档分类吗？\n\t",function(r){
 				if (r){
-					$.post('../classify/deletefilereffromclassify.do',
+					$.post(rootPath+'jasdoc/folder/classify/deletefilereffromclassify.do',
 							{"docIds":eventid,"hierarchys":hierarchy},function(result){
 						if (result.success=="1"){
 							reloadDataTree(eventid,'delete');
@@ -533,7 +533,7 @@ function deleteDoc(eventid,typeFlag){
 		}else{
 			$.messager.confirm("删除文档","您确定要删除该文档分类中的文档吗？\n\t",function(r){
 				if (r){
-					$.post('../classify/deletefilereffromclassify.do',
+					$.post(rootPath+'jasdoc/folder/classify/deletefilereffromclassify.do',
 							{"docIds":eventid,"folderId":folderId},function(result){
 						if (result.success=="1"){
 							reloadDataTree(eventid);
@@ -562,7 +562,7 @@ function deleteDoc(eventid,typeFlag){
 			hierarchys=hierarchys.substring(0,hierarchys.length-1);
 			$.messager.confirm("删除文档","您确定要删除该文档分类中的文档吗？\n\t",function(r){
 				if (r){
-					$.post('../classify/deletefilereffromclassify.do',
+					$.post(rootPath+'jasdoc/folder/classify/deletefilereffromclassify.do',
 							{"docIds":eventid,"folderId":folderId},function(result){
 						if (result.success=="1"){
 							reloadDataTree(eventid,'delete');
@@ -607,7 +607,7 @@ function openFolder(eventid,folderLocation){
 			return;
 		}
 	}
-	var url= "../classify/getAllClassifyAndFiles.do?folderId=" + folderEventId;
+	var url= rootPath+"jasdoc/folder/classify/getAllClassifyAndFiles.do?folderId=" + folderEventId;
 	folderLocationName = location;
 	folderId = folderEventId;
 	try{
@@ -619,7 +619,7 @@ function openFolder(eventid,folderLocation){
 	datagridTitle = "当前位置：" + folderLocationName;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid({title:datagridTitle});
-	$("#dg").datagrid('load');	
+	$("#dg").datagrid('load');
 	$("#operation").attr('disabled', true);
 }
 function setRemoveButton(rows,eventId){

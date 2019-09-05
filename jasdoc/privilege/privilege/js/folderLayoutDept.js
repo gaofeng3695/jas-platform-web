@@ -1,9 +1,9 @@
 /**
  * 方法描述： 加载左侧角色树形菜单
- */	
+ */
 var folderId = getParamter("folderId");
-$(function(){	
-	var deptUrl = "../../../jasdoc/privilege/privilege/getUnitAndChildrenTree.do?folderId="+folderId;
+$(function(){
+	var deptUrl = rootPath+"jasdoc/privilege/privilege/getUnitAndChildrenTree.do?folderId="+folderId;
 	$('#deptprivilegeEventId').tree( {
 		url : deptUrl,
 		checkbox:true,
@@ -24,8 +24,8 @@ $(function(){
 });
 
 
-	
-	
+
+
 //保存方法
 function saveFolderDept(){
 	//获取选中的部门
@@ -37,7 +37,7 @@ function saveFolderDept(){
 	}
 	$.ajax({
 		type: "POST",
-	   	url: 'saveDeptFolderPrivilege.do',
+	   	url:  rootPath+'jasdoc/privilege/privilege/saveDeptFolderPrivilege.do',
    		data: {
    				"deptprivilegeEventIds":deptprivilegeEventIds,
    				"privilegeFolderEventIds":folderId
@@ -45,7 +45,7 @@ function saveFolderDept(){
 	   	success: function(check){
      		if (check.error=='-1'){
 				$.messager.alert('错误',check.message,'error');
-				
+
 			} else{
 				$.messager.alert('提示',check.message,'ok',function(){
 				});

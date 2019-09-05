@@ -17,6 +17,7 @@ var apiProxy = proxy(function (pathname, req) {
         '^/jasproxy': '/jasframework-platform',
     }
 });
+
 var iframeProxy = proxy(function (pathname, req) {
     return pathname.match('^/jasproxy/jasmvvm');
 }, {
@@ -47,9 +48,7 @@ var iframeProxy3 = proxy(function (pathname, req) {
         '^/jasframework/jasmvvm': '/jasmvvm',
     }
 });
-
-
-var iframeProxy4= proxy(function (pathname, req) {
+var iframeProxy4 = proxy(function (pathname, req) {
     return pathname.match('^/jasframework/jasdoc');
 }, {
     target: 'http://localhost:3030/',
@@ -59,6 +58,9 @@ var iframeProxy4= proxy(function (pathname, req) {
         '^/jasframework/jasdoc': '/jasdoc',
     }
 });
+
+
+
 module.exports = {
     port: 3030,
     startPath: "/jasmvvm/pages/page-login/login.html",

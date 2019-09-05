@@ -168,7 +168,7 @@ function deleteDoc(eventid,typeFlag){
 			//删除文件夹
 			$.messager.confirm("删除文档","您确定要删除该收藏夹吗？\n\t",function(r){
 				if (r){
-					$.post("../favorite/deleteFavoriteFolder.do",
+					$.post(rootPath+"jasdoc/folder/favorite/deleteFavoriteFolder.do",
 							{"folderId":eventid},function(result){
 						if (result.success=="1"){
 							reloadDataTree(null,3);
@@ -182,7 +182,7 @@ function deleteDoc(eventid,typeFlag){
 		}else{
 			$.messager.confirm("删除文档","您确定要删除该收藏夹中的文档吗？\n\t",function(r){
 				if (r){
-					$.post("../favorite/deleteFileFromFavorite.do",
+					$.post(rootPath+"jasdoc/folder/favorite/deleteFileFromFavorite.do",
 							{"docIds":eventid,"folderId":folderId},function(result){
 						if (result.success=="1"){
 							reloadDataTree(null,0);
@@ -208,7 +208,7 @@ function deleteDoc(eventid,typeFlag){
 			docIds = docIds.substring(0,docIds.length-1);
 			$.messager.confirm("删除文档","您确定要删除该收藏夹中的文档吗？\n\t",function(r){
 				if (r){
-					$.post("../favorite/deleteFileFromFavorite.do",
+					$.post(rootPath+"jasdoc/folder/favorite/deleteFileFromFavorite.do",
 							{"docIds":docIds,"folderId":folderId},function(result){
 						if (result.success=="1"){
 							reloadDataTree(null,0);
@@ -240,7 +240,7 @@ function openFolder(eventid,folderLocation){
 			return;
 		}
 	}
-	var url= "../favorite/getAllFavorite.do?folderId="+folderEventId;
+	var url=rootPath+"jasdoc/folder/favorite/getAllFavorite.do?folderId="+folderEventId;
 	folderLocationName = location;
 	folderId = folderEventId;
 	datagridTitle = "当前位置："+folderLocationName;
@@ -316,7 +316,7 @@ function createFolder(){
  */
 function downloadDoc(eventid){
 	$("<iframe id=\"fileDownload\" style=\"display: none;\"></iframe>").appendTo("body");
-	var url="../doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
+	var url=rootPath+"jasdoc/folder/doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
 	$("#fileDownload").attr("src",url);
 }
 

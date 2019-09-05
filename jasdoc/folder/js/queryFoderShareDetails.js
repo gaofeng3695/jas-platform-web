@@ -12,7 +12,7 @@
 		}
 		/**
 		 * 方法描述：修改共享
-		 * 
+		 *
 		 */
 		function updateShare(){
 			var rows = $('#dg').datagrid('getSelections');
@@ -25,7 +25,7 @@
 		}
 		/**
 		 * 方法描述：删除共享
-		 * 
+		 *
 		 */
 		function deleteShare(){
 			var rows = $('#dg').datagrid('getSelections');
@@ -37,7 +37,7 @@
 				ids += rows[rows.length-1].id;
 				$.messager.confirm("删除文件夹分享","您确定要删除选择的共享记录吗？\n\t",function(r){
 					if (r){
-						$.post("../../share/deleteFolderShareById.do",
+						$.post(rootPath+"jasdoc/share/deleteFolderShareById.do",
 							{"ids":ids,"rd":Math.random()},
 							function(result){
 							if (result.success){
@@ -58,7 +58,7 @@
 				$.messager.alert('提示','请选择记录','info');
 			}
 		}
-		
+
 		/**
 		 * 方法描述：加载文档列表
 		 */
@@ -74,7 +74,7 @@
 				nowrap: false,
 //				striped: true,
 				collapsible:false,
-				url:"../../share/getAllShareFolderDetails.do?eventid="+eventidforShare,
+				url:rootPath+"jasdoc/share/getAllShareFolderDetails.do?eventid="+eventidforShare,
 				remoteSort: true,
 				idField:'id',
 //				pagination:true,
@@ -82,9 +82,9 @@
 //				toolbar:'#toolbar',
 				title:'文档共享详细列表',
 			 	columns:[[
-			           {field:'ck',title:'全选',checkbox:true}, 
-			           {field:'id',title:'文件夹分享ID',width:0.25*width,hidden:true}, 
-			           {field:'foldername',title:'文件夹名称',width:0.15*width}, 
+			           {field:'ck',title:'全选',checkbox:true},
+			           {field:'id',title:'文件夹分享ID',width:0.25*width,hidden:true},
+			           {field:'foldername',title:'文件夹名称',width:0.15*width},
 			           {field:'folderlocation',title:'文件夹位置',width:0.18*width} ,
 			           {field:'sharedate',title:'共享时间',width:0.11*width} ,
 			           {field:'overdate',title:'过期时间',width:0.11*width,
@@ -93,15 +93,15 @@
 									if(value!=null){
 										var str = value.replace(/-/g,"/");
 									}
-									var date = new Date(str); 
-								        if (nowTime>date){ 
-//								            return 'color:red';    
-								            return 'background-color:#50a9d5';    
-								        }    
+									var date = new Date(str);
+								        if (nowTime>date){
+//								            return 'color:red';
+								            return 'background-color:#50a9d5';
+								        }
 								    }
 			           },
 			           {field:'shareprivilegetype',title:'共享权限',width:0.14*width,
-			        	 	formatter:function(value,row,index){  
+			        	 	formatter:function(value,row,index){
 			        	   		var str = "";
 			        	   		if(value == 20){
 			        	   			str = "预览";
@@ -114,7 +114,7 @@
 			        	   		}else if(value == 60){
 			        	   			str = "预览，下载，上传和修改，删除，移动";
 			        	   		}
-			        	   		
+
 			        	   		return str;
 			        	 	}
 			           },
@@ -122,7 +122,7 @@
 			           {field:'remark',title:'共享说明',width:0.08*width}
 			       ]]
 //			,
-				  
+
 //				onDblClickRow:function(index,indexData){
 //				alert(indexData.shareprivilegetype)
 //				},
@@ -133,14 +133,14 @@
 //				,
 //				onLoadSuccess:function(data){
 //			    	$('#dg').datagrid('clearSelections'); //clear selected options
-//			    	
+//
 //			    },
 //				onHeaderContextMenu: function(e, field){
 //				}
-			});	
+			});
 			initDatagrigHeight('dg','',0);
 		});
-		
+
 		function getNowTime(){
 			var myDate = new Date();
 			return myDate;

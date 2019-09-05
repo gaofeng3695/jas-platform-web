@@ -1,7 +1,7 @@
 /**
- * 
+ *
  * 方法描述：初始化数据
- * 
+ *
  */
 $(function(){
 	var menuUrl = this.location.search;
@@ -19,15 +19,15 @@ $(function(){
 		nowrap: false,
 		striped: true,
 		collapsible:false,
-		url:'../recyclebin/queryListRecycleBin.do',
+		url:rootPath+'jasdoc/folder/recyclebin/queryListRecycleBin.do',
 		remoteSort: true,
 		idField:'eventid',
 		pagination:true,
 		rownumbers:true,
 		toolbar:'#toolbar',
 	 	columns:[[
-	           {field:'ck',title:'全选',checkbox:true}, 
-	           {field:'recycleobjname',title:'删除对象名称',width:0.25*width}, 
+	           {field:'ck',title:'全选',checkbox:true},
+	           {field:'recycleobjname',title:'删除对象名称',width:0.25*width},
 	           {field:'oldlocation',title:'原位置',width:0.3*width} ,
 	           {field:'recycledate',title:'删除时间',width:0.18*width},
 	           {field:'filesize',title:'文档大小(kb)',width:0.1*width},
@@ -40,12 +40,12 @@ $(function(){
 			}
 	    	$('#dg').datagrid('clearSelections'); //clear selected options
 	    }
-	});	
+	});
 	initDatagrigHeight('dg', 'searchpanel', $('#searchpanel').height());
 });
-			
-		
-		
+
+
+
 function createColumnMenu(){
 	var tmenu = $('<div id="tmenu" style="width:100px;"></div>').appendTo('body');
 	var fields = $('#dg').datagrid('getColumnFields');
@@ -82,7 +82,7 @@ function deleteRecycleObj(){
 		var eventIds = "";
 		for(var i=0;i<rows.length-1;i++){
 			eventIds += rows[i].eventid+",";
-			recycleObjTypes += rows[i].recycleobjtype+","; 
+			recycleObjTypes += rows[i].recycleobjtype+",";
 			recycleObjIds+=rows[i].recycleobjid+",";
 		}
 		eventIds += rows[rows.length-1].eventid;
@@ -92,11 +92,11 @@ function deleteRecycleObj(){
 			if (r){
 				$.ajax({
 					type: "POST",
-				   	url: "../recyclebin/deleteRecycleObj.do?random=" + new Date().getTime(),
+				   	url:rootPath+"jasdoc/folder/recyclebin/deleteRecycleObj.do?random=" + new Date().getTime(),
 			   		data: {"eventId":eventIds,"recycleObjType":recycleObjTypes,"recycleObjIds":recycleObjIds},
 				   	success: function(jso){
 				   		$('#dg').datagrid('reload');	// reload the user data
-						//reloaddate();		
+						//reloaddate();
 						$('#dg').datagrid('clearSelections'); 	//clear selected options
 				   	},
 				   	error:function(){
@@ -110,7 +110,7 @@ function deleteRecycleObj(){
 	}
 }
 
-/**  
+/**
  * 方法描述：清空回收站 、根据回收站中用户id 、删除回收站数据及同批次下的文档及文件夹,及关联关系
  */
 function clearRecycleBin(){
@@ -118,7 +118,7 @@ function clearRecycleBin(){
 			if (r){
 				$.ajax({
 				type: "POST",
-			   	url: "../recyclebin/clearRecycleBin.do?random=" + new Date().getTime(),
+			   	url:rootPath+"jasdoc/folder/recyclebin/clearRecycleBin.do?random=" + new Date().getTime(),
 		   		data: {},
 			   	success: function(jso){
 			   		$('#dg').datagrid('reload');	// reload the user data
@@ -127,7 +127,7 @@ function clearRecycleBin(){
 			   	error:function(){
 			   		$.messager.alert('错误','清空回收站失败！','error');
 			   	}
-	  	 	});	
+	  	 	});
 			}
 		});
 	}
@@ -151,7 +151,7 @@ function restoreRecycleObj(){
 		var eventIds = "";
 		for(var i=0;i<rows.length-1;i++){
 			eventIds += rows[i].eventid+",";
-			recycleObjTypes += rows[i].recycleobjtype+","; 
+			recycleObjTypes += rows[i].recycleobjtype+",";
 			recycleObjIds += rows[i].recycleobjid+",";
 		}
 		eventIds += rows[rows.length-1].eventid;
@@ -159,7 +159,7 @@ function restoreRecycleObj(){
 		recycleObjIds += rows[rows.length-1].recycleobjid;
 		$.ajax({
 			type: "POST",
-		   	url: "../recyclebin/queryRepeatNameData.do?random=" + new Date().getTime(),
+		   	url:rootPath+"jasdoc/folder/recyclebin/queryRepeatNameData.do?random=" + new Date().getTime(),
 	   		data: {"eventId":eventIds,"recycleObjType":recycleObjTypes,"recycleObjId":recycleObjIds},
 		   	success: function(result){
 				if (result.success) {
@@ -181,7 +181,7 @@ function restoreRecycleObj(){
 		   		$.messager.alert('提示','操作发生异常！','error');
 		   	}
 	   	});
-		
+
 	}else{
 		$.messager.alert('提示','请选择记录！','info');
 	}
@@ -199,11 +199,11 @@ function closeWindow(id){
 	return objectList;
 }
 function reloadDataGrid(){
-	$('#dg').datagrid('reload');	
-	$('#dg').datagrid('clearSelections'); 	
+	$('#dg').datagrid('reload');
+	$('#dg').datagrid('clearSelections');
 }
 /**
- * 方法描述：重置数据  目的： 避免 点击还原后  不刷新页面 又点击 还原 
+ * 方法描述：重置数据  目的： 避免 点击还原后  不刷新页面 又点击 还原
  */
 function resetValue(){
 	recycleObjIds = recycleObjIds.substr(0,recycleObjIds.length-1);
@@ -211,7 +211,7 @@ function resetValue(){
 	hierarchys = hierarchys.substr(0,hierarchys.length-1);
 	$.ajax({
 		type: "POST",
-	   	url: "../recyclebin/restoreRecycleObj.do?random=" + new Date().getTime(),
+	   	url:rootPath+"jasdoc/folder/recyclebin/restoreRecycleObj.do?random=" + new Date().getTime(),
    		data: { "recycleObjIds":recycleObjIds ,"pageMotions":pageMotions ,"hierarchys":hierarchys },
 	   	success: function(jso){
 	   		$('#dg').datagrid('reload');	// reload the user data
@@ -225,7 +225,7 @@ function resetValue(){
 	skipHierarchy = "";
 	al = 0;
 	repeatlist = null;
-	
+
 	recycleObjIds = "";
 	pageMotions = "";
 	hierarchys = "";
@@ -236,21 +236,21 @@ function resetValue(){
  * @param promptstr
  */
 function docPrompt( promptstr ){
-	
+
 }
 
 /**
  * 方法描述：文件夹重名提示
- * 
+ *
  * @param promptstr
  */
 function folPrompt(promptstr){
-	
+
 }
 
 /**
  * 方法描述：回收站查询
- * 
+ *
  * @returns {Boolean}
  */
 function queryRecyclebin(){

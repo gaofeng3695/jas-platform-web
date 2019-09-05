@@ -7,22 +7,22 @@ var allOrOnlyDocFileValue = false;
  */
 $(function(){
 	var width = $('body').width();
-	$('#tt').tree({		
-		url: '../folder/getLeftFolderTree.do?folderId='+folderId,
+	$('#tt').tree({
+		url: rootPath+'jasdoc/folder/folder/getLeftFolderTree.do?folderId='+folderId,
 		onLoadSuccess:function(node,data) {
 		 	var aa=$('#tt').tree('select',$('#tt').tree('getRoot').target);
-			var url = "../doccenter/getAllDoc.do?folderId=" + folderId;
+			var url = rootPath+ "jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId;
 			getChildren();
 			$("#10060201").datagrid("options").url = url;
-			$("#10060201").datagrid('load'); 
+			$("#10060201").datagrid('load');
 		},
 		onClick:function(node){
 			$("#10060201").datagrid('clearSelections'); // clear
 			queryDocByConditions();
 		}
 	});
-	
-	var queryDocUrl = "../doccenter/getAllDoc.do?folderId=" + folderId;
+
+	var queryDocUrl = rootPath+ "jasdoc/folder/doccenter/getAllDoc.do?folderId=" + folderId;
 	//datagrid初始化
   	$("#10060201").datagrid({
 		nowrap : true,
@@ -31,24 +31,24 @@ $(function(){
 		rownumbers:true,
 		autoRowHeight: false,
 		fitColumns:true,
-		columns:[[{field : 'ck',title : '全选',checkbox : true}, 
-		            {field : 'filename',title : '文档名称',width : 0.18 * width}, 
-		            {field : 'fileno',title : '文档编号',width : 0.07 * width},  
-		            {field : 'author',title : '文档作者',width : 0.08 * width,hidden:true}, 
-		            {field : 'createusername',title : '上传人',width : 0.08 * width}, 
-		            {field : 'keyword',title : '关键词',width : 0.07 * width}, 
+		columns:[[{field : 'ck',title : '全选',checkbox : true},
+		            {field : 'filename',title : '文档名称',width : 0.18 * width},
+		            {field : 'fileno',title : '文档编号',width : 0.07 * width},
+		            {field : 'author',title : '文档作者',width : 0.08 * width,hidden:true},
+		            {field : 'createusername',title : '上传人',width : 0.08 * width},
+		            {field : 'keyword',title : '关键词',width : 0.07 * width},
 		            {field : 'filetype',title : '文档格式',width : 0.06 * width},
-		            {field : 'docactualLocation',title : '文档位置',width : 0.18 * width}, 
+		            {field : 'docactualLocation',title : '文档位置',width : 0.18 * width},
 		            {field : 'filesizeStr',title : '文档大小(kb)',width : 0.09 * width},
 		            {field : 'versionnumber',title : '版本号',width : 0.05 * width},
 		            {field : 'versionid',title : '历史版本ID',width : 0.07 * width,hidden:true},
 					{field:  'createuser',title:'上传者id',width:0.07*width,hidden:true},
-					{field : 'eventid',hidden:true}, 
-					{field : 'hierarchyRole',hidden:true}, 
+					{field : 'eventid',hidden:true},
+					{field : 'hierarchyRole',hidden:true},
 					{field : 'favoritefileid',hidden:true},
 					{field : 'manager',title : '操作',width : 0.15 * width,formatter:function(value,rowData,rowIndex){
 						return getManagerFieldButton(rowData,true);
-					  }} 
+					  }}
 					]],
 			title:"文档列表",
 		 	url:queryDocUrl,
@@ -70,7 +70,7 @@ $(function(){
 		    	$('#10060201').datagrid('clearSelections'); //clear selected options
 		    }
 		});
-  	
+
 	  	/**
 	  	 * 页面自适应
 	  	 */
@@ -80,7 +80,7 @@ $(function(){
 		}
    		initDatagrigHeight('10060201','userquery','65','right');
    		initResize();
-		
+
 	});
 	var clientWidth = document.documentElement.clientWidth;
 	var clientHeight = document.documentElement.clientHeight;
@@ -89,25 +89,25 @@ $(function(){
  	/**
  	 * 描述：页面自适应
  	 */
-	
+
 	$(window).bind("resize",function(){
 		resizeLayout();
 	});
-	
-	
+
+
 	function resizeLayout(){
 		try{
 			clientWidth = document.documentElement.clientWidth;
 			var div_left_width = $("#left").width()+11;
 			$("#cc").layout("resize");
-			$('#userquery').panel('resize',{width:clientWidth-div_left_width}); 
+			$('#userquery').panel('resize',{width:clientWidth-div_left_width});
 			$('#10060201').datagrid('resize',{width:clientWidth-div_left_width});
-			
+
 			$('#userrange').combobox({
 				width :  $('#right').width() * 0.35
 			});
 		}catch(e){
-			
+
 		}
 	}
  	function initResize(){
@@ -116,19 +116,19 @@ $(function(){
 			$('#userquery').panel('resize',{width:clientWidth-28});
 			$('#10060201').datagrid('resize',{width:clientWidth-28});
 			$(".layout-button-right").bind("click",function(){
-				$('#userquery').panel('resize',{width:tempWidth}); 
+				$('#userquery').panel('resize',{width:tempWidth});
 				$('#10060201').datagrid('resize',{width:tempWidth});
 			});
 		});
  	}
- 	
- 	
+
+
 /**
  * 描述：根据查询条件，查询文档信息
  */
 function queryDocByConditions(){
 	$("#10060201").datagrid('clearSelections'); // clear
-	var filename = $("#filename").val();	
+	var filename = $("#filename").val();
 	var filetype = $("#filetype").val();
 	var uploadtime_start = $("#uploadtime_start").val();
 	var uploadtime_end = $("#uploadtime_end").val();
@@ -137,11 +137,11 @@ function queryDocByConditions(){
 	var query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,"uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":allOrOnlyDocFileValue};
 	var row = $('#tt').tree('getSelected');
 	var url;
-	if (row != null ){	
-		url="../doccenter/getAllDoc.do?folderId=" + row.id;
+	if (row != null ){
+		url=rootPath+ "jasdoc/folder/doccenter/getAllDoc.do?folderId=" + row.id;
 		$("#10060201").datagrid("options").url = url;
 		$("#10060201").datagrid('options').queryParams=query;
-		$("#10060201").datagrid('load');	
+		$("#10060201").datagrid('load');
 		$("#10060201").datagrid('options').queryParams=null;
 	 }else{
 		top.showAlert(getLanguageValue("tip"),getLanguageValue("chooserecord"),'info');
@@ -159,7 +159,7 @@ function clearQueryConditions(){
 	$("#fileno").val("");
 	$("#keyword").val("");
 }
- 	
+
 
 function getChildren(){
 	var node = $('#tt').tree('getSelected');
@@ -193,12 +193,12 @@ function zipDownloadDocByFolderId(){
 		var lastIndes = folderLocationName.lastIndexOf("/")+1;
 		var folderName=folderLocationName.substring(lastIndes);
 		$("<iframe id=\"zipDownloadDoc\" style=\"display: none;\"></iframe>").appendTo("body");
-		var url="../doccenter/zipDownloadDoc.do?zipDownloadDoceventid="+ids+"&folderName="+folderName+"&token="+ localStorage.getItem("token");
+		var url=rootPath+ "jasdoc/folder/doccenter/zipDownloadDoc.do?zipDownloadDoceventid="+ids+"&folderName="+folderName+"&token="+ localStorage.getItem("token");
 		$("#zipDownloadDoc").attr("src",url);
 	}else{
 		$.messager.alert('提示','请选择记录！','info');
 	}
-	
+
 }
 
 /**
@@ -221,7 +221,7 @@ function getAllDocFileByFolderId(){
 	}
 	var query={"allOrOnlyDocFile":allOrOnlyDocFileValue}; 			//把查询条件拼接成JSON
 	$("#10060201").datagrid('options').queryParams=query; 				//把查询条件赋值给datagrid内部变量
-	$("#10060201").datagrid('load'); 										//重新加载 
+	$("#10060201").datagrid('load'); 										//重新加载
 }
 function getAllDocFileDataByFolderId(){
 	if($('#checked').attr("checked")){
@@ -233,7 +233,7 @@ function getAllDocFileDataByFolderId(){
 	}
 	var query={"allOrOnlyDocFile":allOrOnlyDocFileValue}; 			//把查询条件拼接成JSON
 	$("#10060201").datagrid('options').queryParams=query; 				//把查询条件赋值给datagrid内部变量
-	$("#10060201").datagrid('load'); 										//重新加载 
+	$("#10060201").datagrid('load'); 										//重新加载
 }
 
 /**
@@ -245,7 +245,7 @@ function getAllDocFileDataByFolderId(){
 function getManagerFieldButton(rowData,isDocCenter){
 	var eventid=rowData.eventid;
 	var role=rowData.hierarchyRole;
-	var managerField="<img src='../../common/images/tip.png' title='查看'  style='cursor:hand' onclick='showInfo(\""+eventid + "\")'>	"; 
+	var managerField="<img src='../../common/images/tip.png' title='查看'  style='cursor:hand' onclick='showInfo(\""+eventid + "\")'>	";
 	if(role>=20){
 		var fileType = rowData.filetype;
 		if(fileType!=null&&fileType!=""){
@@ -266,4 +266,4 @@ function getManagerFieldButton(rowData,isDocCenter){
 	return managerField;
 }
 
-	
+

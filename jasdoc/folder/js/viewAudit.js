@@ -11,27 +11,27 @@ function preview(){
 		url:rootPath+ '/jasdoc/folder/doccenter/isExistPdfFile.do?docId='+eventid,
 		dataType:"json",
 		success:function(result){
-			
+
 			if(result.success==1){
 //				var totalPages=result.totalPages;
 //				var url = rootPath+ "/jasdoc/folder/preview/FlexPaper_2.0.3/index.html?eventid="+ eventid +"&versionid="+versionid+ "&totalPages=" + totalPages;
 				var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ eventid +"&versionid="+versionid;
 				top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
 			}else if(result.success==0){
-				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');	
+				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');
 			}else if(result.success==-1){
 				parent.showAlert("提示",result.msg,"info");
 			}
 		}
 	});
-	
+
 }
 /**
  * 下载
  */
 function downloadDoc(){
 	$("<iframe id=\"fileDownload\" style=\"display: none;\"></iframe>").appendTo("body");
-	var url="../doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
+	var url=rootPath+ "/jasdoc/folder/doccenter/downloadDoc.do?docId="+eventid+"&token="+ localStorage.getItem("token");
 	$("#fileDownload").attr("src",url);
 }
 
@@ -39,7 +39,7 @@ function downloadDoc(){
  * 文档审核
  */
 function documentAudit(auditstate){
-	var url = '../docaudit/documentAudit.do?eventid='+eventid+"&auditstate="+auditstate+"&token="+localStorage.getItem("token");
+	var url =rootPath+ '/jasdoc/folder/docaudit/documentAudit.do?eventid='+eventid+"&auditstate="+auditstate+"&token="+localStorage.getItem("token");
 	$('#viewAuditForm').form('submit', {
 	   	url: url,
    		dataType:"json",
@@ -85,14 +85,14 @@ function loadData() {
 			}else if(d[0]=='versionid'){
 				versionid=d[1];
 			}
-			
+
 		});
 	}
-	
+
 	if (eventid != null && "" != param) {
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/getFileInfoById.do?random=" + new Date().getTime(),
+		   	url: rootPath+ "/jasdoc/folder/doccenter//getFileInfoById.do?random=" + new Date().getTime(),
 	   		data: {"docId":eventid},
 		   	success: function(result){
 				putValue(result);
@@ -101,11 +101,11 @@ function loadData() {
 		   		$.messager.alert('错误','加载信息失败','error');
 		   	}
 	   	});
-		
+
 	}else if(versionid != null && "" != param){
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/getDocByVersionid.do?random=" + new Date().getTime(),
+		   	url: rootPath+ "/jasdoc/folder/doccenter//getDocByVersionid.do?random=" + new Date().getTime(),
 	   		data: {"versionid":versionid},
 		   	success: function(result){
 				putValue(result);

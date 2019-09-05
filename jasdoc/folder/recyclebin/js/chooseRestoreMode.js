@@ -53,13 +53,13 @@ function stepover(){
 	restoreRecycleObj(objId,2);
 }
 /***
- * 
+ *
  */
 function restoreRecycleObj(objId,modeType){
 	var fileAllOperation=($('#file_checked').attr("checked") == 'checked');
 	var folderAllOperation=($('#folder_checked').attr("checked") == 'checked');
 	$.ajax({
-		url:"../recyclebin/restoreRecycleObj.do",
+		url:rootPath+"jasdoc/folder/recyclebin/restoreRecycleObj.do",
 		type: "POST",
 		data:{'objId':objId,"modeType":modeType,'fileAllOperation':fileAllOperation,'folderAllOperation':folderAllOperation},
 		dataType:'json',

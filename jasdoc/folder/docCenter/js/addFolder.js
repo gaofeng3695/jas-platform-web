@@ -17,8 +17,6 @@ $(function(){
 });
 
 function save() {
-	debugger;
-	alert("wqw")
 		$('#addFolderForm').form('submit', {
 			url :rootPath+ "jasdoc/folder/doccenter/createFolder.do?token="+localStorage.getItem("token"),
 			onSubmit : function() {
@@ -31,7 +29,6 @@ function save() {
 					parent.reloadDataTree(result.data,1);
 					closeFolder();
 				} else {
-					debugger;
 					parent.showAlert('提示',result.message , 'info');
 				}
 			}

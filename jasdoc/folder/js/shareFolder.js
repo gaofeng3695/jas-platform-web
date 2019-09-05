@@ -20,13 +20,13 @@ function clickBox(type){
 	if($("#"+type).find(":checkbox").attr('checked')){
 		$('#privelegetype div').each(function() {
 			if (type >= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",true); 
+				$(this).find(":checkbox").attr("checked",true);
 			}
 		});
 	}else{
 		$('#privelegetype div').each(function() {
 			if (type <= $(this).attr('id')) {
-				$(this).find(":checkbox").attr("checked",false); 
+				$(this).find(":checkbox").attr("checked",false);
 			}
 		});
 	}
@@ -51,7 +51,7 @@ function saveShare(){
 		top.showAlert("提示","请选择过期时间。","info");
 	}else{
 		$('#fileShare').form('submit',{
-		url: "../../share/saveShareFolder.do?role = "+role+"&token="+localStorage.getItem("token"),
+		url:rootPath+"jasdoc/share/saveShareFolder.do?role = "+role+"&token="+localStorage.getItem("token"),
 		onSubmit: function(){
 			return $(this).form('validate');
 		},
@@ -68,7 +68,7 @@ function saveShare(){
 					}
 					closePanol();
 				});
-						
+
 			}else{
 				top.showAlert("提示",result.ok,"info",function(){});
 			}
@@ -85,7 +85,7 @@ $(document).ready(function(){
 	var role = getParamter("role");
 	$('#privelegetype div').each(function() {
 			if (role <= $(this).attr('id')) {
-				$(this).css("display","none"); 
+				$(this).css("display","none");
 			}
 	});
 	var eventid = getParamter("eventid");
@@ -93,7 +93,7 @@ $(document).ready(function(){
 	$("#eventid").val(eventid);
 	$("#shareid").val(shareid);
 	$("#createuser").val(createuser);
-	
+
 });
 function reloadData(shortUrl, elementId) {
 		var fra = parent.$("iframe");
@@ -102,13 +102,13 @@ function reloadData(shortUrl, elementId) {
 				fra[i].contentWindow.$('#'+elementId).datagrid("reload");
 			}
 		}
-}	
+}
 //修改时，显示原有信息
 function getMessageById(shareid){
-	$.ajax({ 
-		url: "../../share/getShareFolderById.do?id="+shareid,
+	$.ajax({
+		url:rootPath+"jasdoc/share/getShareFolderById.do?id="+shareid,
 		success: function(result){
-        	var data = jQuery.parseJSON( result ); 
+        	var data = jQuery.parseJSON( result );
         	$("#deptIds").val(data.sharescropMap.deptIds);
         	$("#roleIds").val(data.sharescropMap.roleIds);
         	$("#userIds").val(data.sharescropMap.userIds);

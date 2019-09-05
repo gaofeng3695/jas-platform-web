@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/css/addAndUpdateStyle.css"></link>
 	<link rel="stylesheet" type="text/css" href="../../common/css/icon.css" ></link>
 	<link rel="stylesheet" type="text/css" href="css/uploadify.css" ></link>
-	
+
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js"></script>
@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>
 	<script type="text/javascript" src="jquery/uploadify/jquery.uploadify.min.js"></script>
 	<script type="text/javascript" src="jquery/uploadify/swfobject.js"></script>
-	<script type="text/javascript" src="jquery/json2.js"></script>	
+	<script type="text/javascript" src="jquery/json2.js"></script>
 	<style>
 		.uploadpage_textStyle {
 			line-height: 30px;
@@ -30,7 +30,7 @@
 			color: #333;
 		}
 	</style>
-	<script type="text/javascript">	
+	<script type="text/javascript">
 		var folderId = "";
 		$(function (){
 			folderId =getParamter("folderId");
@@ -51,10 +51,10 @@
 			var fileExt = uploadFileTypes.replace(new RegExp(",",'g'),";");
 		    $("#fileInput").uploadify({
 		        'uploader'     : 'jquery/uploadify/uploadify.swf',//设置uploadify路径
-		        'script'       : '../../folder/doccenter/uploadDoc.do',//请求响应的Action
+		        'script'       : rootPath+'jasdoc/folder/doccenter/uploadDoc.do',//请求响应的Action
 		        'method'	   :'GET',
 		        'scriptData'   :{'folderId':folderId,"token":token},
-		        'cancelImg'    : 'images/cancel.png',//设置  取消按钮图片的路径  
+		        'cancelImg'    : 'images/cancel.png',//设置  取消按钮图片的路径
 		        'buttonText'   : '选择上传照片',
 		        'buttonImg'    : 'images/upload1.jpg',
 		        'width'		   : 64,
@@ -63,26 +63,26 @@
 		        'fileExt'      : fileExt,
 		        'fileDesc'     : '附件格式:'+uploadFileTypes,
 		        'fileDataName' : 'fileInput',//上传文件的文件
-		        'queueID' 	   : 'fileQueue',  
-		        'auto'         : false,//设置是否自动上传  
+		        'queueID' 	   : 'fileQueue',
+		        'auto'         : false,//设置是否自动上传
 		        'sizeLimit'	   : uploadMaxsize, //设置文件大小
-		        'multi'        : true,//设置是否多文件上传  
+		        'multi'        : true,//设置是否多文件上传
 		        'queueSizeLimit':uploadFileCount,
 		        'simUploadLimit':1,
-		        onAllComplete: function (event, queueID, fileObj, response, data){  
-		               // $("#result").html(response);//显示上传成功结果  
-		              // setInterval("showResult()",60000);//两秒后删除显示的上传成功结果  
+		        onAllComplete: function (event, queueID, fileObj, response, data){
+		               // $("#result").html(response);//显示上传成功结果
+		              // setInterval("showResult()",60000);//两秒后删除显示的上传成功结果
 		        	//刷新列表
 		            refreshParentPage();
 		        },
 			    onError: function(event, queueID, fileObj) {
 		    	    alert("文件:" + fileObj.name + "上传失败");
 		        },
-				onCancel: function(event, queueID, fileObj){  
+				onCancel: function(event, queueID, fileObj){
 					//alert("取消了" + fileObj.name);
 				}
 		    });
-			
+
 		})
 		//刷新数据列表
 		function refreshParentPage(){
@@ -92,14 +92,14 @@
 		//保存事件
 		function save(){
 			var remarkGroup = "";
-			$("[name='remark']").each(function(){  
-				remarkGroup+=$(this).val()+",";  
+			$("[name='remark']").each(function(){
+				remarkGroup+=$(this).val()+",";
 			})
 			var fileclassifys = $("#fileclassify").combotree('getValues');
-			$('#fileInput').uploadifySettings('scriptData',{'fileclassifys':fileclassifys ,'folderId':folderId}); 
+			$('#fileInput').uploadifySettings('scriptData',{'fileclassifys':fileclassifys ,'folderId':folderId});
 			$('#fileInput').uploadifyUpload();
 		}
-		
+
 		function closeWindow(){
 			parent.closeDlg('uploadify');
 		}
@@ -108,13 +108,13 @@
 
 <body style="overflow:hidden ;">
 	<div style="width: 100%;height:315px;" >
-		<div>
+		<div style="display: none;">
 			<span class="uploadpage_textStyle" >&nbsp;&nbsp;文档分类：</span><input type="text" id="fileclassify" name='fileclassify' validType="fileclassify"  style="width: 650px"  class="easyui-combotree" multiple="true" panelHeight="80px"/>
-		</div>	
+		</div>
 		<div style="width: 100%">
 		  	<fieldset>
 		  		<legend align="right"><input type="file" name="fileInput" id="fileInput" /></legend>
-		  		<div id="fileQueue" style="overflow:auto ;height:260px"></div>  
+		  		<div id="fileQueue" style="overflow:auto ;height:260px"></div>
 		  	</fieldset>
 	  	</div>
 	</div>

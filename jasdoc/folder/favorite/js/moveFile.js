@@ -10,13 +10,13 @@ var oldFolderId = "";
 //		alert(oldFolderId);
 		$("#fileNames").text(fileNames);
 		queryFavoriteTree();
-	}); 
-/**	
+	});
+/**
  * 方法描述：加载初始化树
  */
 function queryFavoriteTree(){
 	$('#foldreeventid').combotree({
-		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",  
+		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",
 		onBeforeExpand:function(node){
 			url=rootPath+"jasdoc/folder/favorite/getChildren.do";
 		 	$('#foldreeventid').combotree("tree").tree("options").url= url+"?folderId="+node.id;
@@ -32,15 +32,15 @@ function queryFavoriteTree(){
 				return false;
 			}
 		}
-	}); 
+	});
 }
-		
-		
+
+
 /**
  * 方法描述：保存移动后的关系
  */
 function save(){
-	url = "../favorite/moveDocsInFavorite.do";
+	url = rootPath+"jasdoc/folder/favorite/moveDocsInFavorite.do";
 	var folderId = $("#foldreeventid").combotree('getValue');
 	if(folderId==""||folderId==null){
 		$.messager.alert('提示',"请选择文件夹",'info');
@@ -64,21 +64,20 @@ function save(){
 		   					closeMoveDlg();
 		   				});
 		   			}
-		   			
+
 				} else {
 					$.messager.alert('错误',re.message,"error");
 				}
 			}
 		});
 	}
-	
+
 }
 
-	
+
 	/**
 	 * 方法描述： 关闭界面
 	 */
 	function closeMoveDlg(){
 		parent.closeDlg('move');
-	}	
-		
+	}

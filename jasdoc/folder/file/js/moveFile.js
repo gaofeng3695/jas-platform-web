@@ -4,18 +4,18 @@ var	fileNames = "";
 //加载树
 $(function() {
 	docIds = getParamter("docIds");
-	fileNames = getParamter("fileNames");
+	fileNames = decodeURIComponent(decodeURIComponent(getParamter("fileNames")));
 	$("#fileNames").val(fileNames);
 	queryTree();
-}); 
-/**	
+});
+/**
  * 方法描述：加载初始化树
  */
 function queryTree(){
 	$('#foldreeventid').combotree({
-		url:"../doccenter/queryFavoriteFolderTree.do?token="+localStorage.getItem("token"),
+		url:rootPath+"jasdoc/folder/doccenter/queryFavoriteFolderTree.do?token="+localStorage.getItem("token"),
 		onBeforeExpand:function(node){
-			url="../doccenter/getChildrenTree.do";
+			url=rootPath+"jasdoc/folder/doccenter/getChildrenTree.do";
 		 	$('#foldreeventid').combotree("tree").tree("options").url= url+"?folderId="+node.id+"&folderType=1";
 			node.iconCls= 'icon-tree-center-node-open';
 		 	$('#foldreeventid').combotree("tree").tree('update', node);
@@ -41,10 +41,10 @@ function queryTree(){
 		onLoadSuccess:function(node, data){
 			console.log(data);
 		}
-	}); 
+	});
 }
 
-		
+
 /**
  * 方法描述：保存移动后的关系
  */
@@ -55,7 +55,7 @@ function save(){
 	}else{
 		$.ajax({
 			type: "POST",
-		   	url: "../doccenter/moveFiles.do",
+		   	url:rootPath+"jasdoc/folder/doccenter/moveFiles.do",
 	   		data: {"docIds":docIds,
 	   				"targetFolderId":folderId
 	   				},
@@ -77,14 +77,13 @@ function save(){
 			}
 		});
 	}
-	
+
 }
-	
-		
+
+
 /**
  * 方法描述： 关闭界面
  */
 function closeMoveFileDlg(){
 	parent.closeDlg('moveFile');
-}	
-		
+}

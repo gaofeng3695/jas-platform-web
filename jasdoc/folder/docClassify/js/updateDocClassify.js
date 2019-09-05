@@ -1,10 +1,10 @@
-	
+
 var folderId = getParamter("folderId");
 $(function(){
 	$('#id').val(folderId);
 	getFolderById(folderId);
 });
- 
+
 function save(){
 	$('#updateFolderfrom').form('submit', {
 		url : rootPath+"jasdoc/folder/classify/updateDocClassifyFolder.do?token="+localStorage.getItem("token"),
@@ -17,11 +17,11 @@ function save(){
 				top.showAlert('提示',result.message, 'info',function(){
 					parent.reloadDataTree(folderId,'update',result.obj);
 					closeFolder();
-				});	
+				});
 			}else{
 				top.showAlert('提示',result.message, 'info');
 			}
-			
+
 		}
   });
 }
@@ -32,7 +32,7 @@ function save(){
  */
 function getFolderById(folderId){
 	$.ajax({
-		url:"../classify/getDocClassifyById.do?folderId="+folderId,
+		url:rootPath+"jasdoc/folder/classify/getDocClassifyById.do?folderId="+folderId,
 		type:"POST",
 		success:function(result){
 			if(result!=null){
@@ -43,10 +43,10 @@ function getFolderById(folderId){
 		}
 	});
 }
-	
+
 /**
  * 方法描述： 关闭界面
- */	
+ */
 function closeFolder(){
 	parent.closeDlg('updateDocClassify');
 }

@@ -3,8 +3,8 @@ var	filenames = "";
 var foldertype = "1";
 //var foldertype;
 var oldfolderid = "";
-var url = "../doccenter/queryFolderComboTree.do";
-var param = this.location.search;	
+var url = rootPath+"jasdoc/folder/folder/queryFolderComboTree.do";
+var param = this.location.search;
 //var filenames = "";
 var favoriteNodeid;
 
@@ -30,18 +30,18 @@ var favoriteNodeid;
 			});
 		}
 		queryTree();
-	}); 
-/**	
+	});
+/**
  * 方法描述：加载初始化树
  */
 function queryTree(){
 		$('#foldreeventid').combotree({
-			url:'../folder/queryFolderComboTree.do?foldertype='+foldertype,  
+			url:rootPath+'jasdoc/folder/folder/queryFolderComboTree.do?foldertype='+foldertype,
 				onBeforeExpand:function(node){
 					var foldertype=node.attributes.foldertype;
 					var hierarchyid=node.attributes.hierarchy;
 					var hierarchy = hierarchyid.substring(0,8);
-						url="../folder/getChildren.do";
+						url=rootPath+"jasdoc/folder/folder/getChildren.do";
 			 	$('#foldreeventid').combotree("tree").tree("options").url= url+"?id="+node.id+"&hierarchy="+hierarchy;
 			 	if(foldertype==FOLDERTYPE_DOCCENTER){
 					node.iconCls= 'icon-tree-center-node-open';
@@ -64,7 +64,7 @@ function queryTree(){
 					node.iconCls= 'icon-tree-center-node-close';
 				}else if(foldertype==FOLDERTYPE_FAVORITE){
 					if(favoriteNodeid==node.id){
-						
+
 					}else{
 						node.iconCls="icon-tree-favorite-node-close";
 					}
@@ -75,9 +75,9 @@ function queryTree(){
 					var foldertype=data[0].attributes.foldertype;
 					if(foldertype==FOLDERTYPE_FAVORITE){
 							$.ajax({
-							    url : "../favorite/queryDefaultFavoriteId.do?t="+new Date(),
+							    url :rootPath+"jasdoc/folder/favorite/queryDefaultFavoriteId.do?t="+new Date(),
 							    type : 'POST',
-							    success : function(data){ 
+							    success : function(data){
 							    	favoriteNodeid=data;
 							    },
 							    dataType:"json",
@@ -87,26 +87,26 @@ function queryTree(){
 					}
 				}
 			}
-		}); 
+		});
 	}
-		
-		
+
+
 //		if( filenames != "" ){
 //			$("#fordername").text(filenames);
 //		}
-//		
+//
 //		if(foldertype==4||foldertype==5){
 //			foldertype=1;
 //		}
-		
+
 		/**
 		 * 方法描述：保存移动后的关系
 		 */
 		function save(){
 			if( foldertype == 1 ){
-				url = "../doccenter/moveToFolderInDocCenter.do";
+				url = rootPath+"jasdoc/folder/doccenter/moveToFolderInDocCenter.do";
 			}else if( foldertype == 2 ){
-				url = "../favorite/moveToFolderInFavorite.do";
+				url =rootPath+"jasdoc/folder/favorite/moveToFolderInFavorite.do";
 			}
 			var folderid = $("#foldreeventid").combotree('getValue');
 			if(folderid==""||folderid==null){
@@ -133,14 +133,14 @@ function queryTree(){
 				   			}else{
 				   				closeUnit();
 				   			}
-				   			
+
 						} else {
 							$.messager.alert('错误',re.msg,re.error);
 						}
 					}
 				});
 			}
-			
+
 		}
 		/**
 		 * 方法描述： 加载数据
@@ -153,11 +153,10 @@ function queryTree(){
 				}
 			}
 		}
-		
+
 		/**
 		 * 方法描述： 关闭界面
 		 */
 		function closeUnit(){
 			parent.closeDlg('move');
-		}	
-		
+		}

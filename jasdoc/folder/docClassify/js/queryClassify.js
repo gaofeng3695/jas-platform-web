@@ -168,14 +168,14 @@ function onExpandNode(nodeId){
  * 创建文档分类文件夹
  */
 function createDocClassify(folderId,hierarchy){
-	getDlg("../docClassify/addDocClassify.htm?parentId="+folderId+"&hierarchy="+hierarchy,'addDocClassify',"新增文档分类",400,150);
+	getDlg("addDocClassify.htm?parentId="+folderId+"&hierarchy="+hierarchy,'addDocClassify',"新增文档分类",400,150);
 }
 /***
  * 修改文档分类文件夹
  * @param folderId
  */
 function updateDocClassify(folderId){
-	getDlg("../docClassify/updateDocClassify.htm?id="+folderId,'updateDocClassify',"修改文档分类",400,150);
+	getDlg("updateDocClassify.htm?id="+folderId,'updateDocClassify',"修改文档分类",400,150);
 }
 /***
  * 删除文档分类文件夹
@@ -341,7 +341,7 @@ function queryDocByConditions(){
 	var keyword = $("#keyword").val();
 	var query = null;
 	query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,"uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":true};
-	var url= "../classify/getAllClassify.do?folderid=" + folderId + "&hierarchy=" + hierarchy;
+	var url= rootPath+"/jasdoc/folderclassify/getAllClassify.do?folderid=" + folderId + "&hierarchy=" + hierarchy;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid('options').queryParams=query;
 	$("#dg").datagrid('load');

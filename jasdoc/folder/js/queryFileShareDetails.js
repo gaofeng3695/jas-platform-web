@@ -12,7 +12,7 @@
 		}
 		/**
 		 * 方法描述：修改共享
-		 * 
+		 *
 		 */
 		function updateShare(){
 			var rows = $('#dg').datagrid('getSelections');
@@ -25,7 +25,7 @@
 		}
 		/**
 		 * 方法描述：删除共享
-		 * 
+		 *
 		 */
 		function deleteShare(){
 			var rows = $('#dg').datagrid('getSelections');
@@ -37,7 +37,7 @@
 				ids += rows[rows.length-1].id;
 				$.messager.confirm("删除文档分享","您确定要删除选择的分享记录吗？\n\t",function(r){
 					if (r){
-						$.post("../../share/deleteFileShareById.do",
+						$.post(rootPath+"jasdoc/share/deleteFileShareById.do",
 							{"ids":ids,"rd":Math.random()},
 							function(result){
 							if (result.success){
@@ -53,7 +53,7 @@
 				$.messager.alert('提示','请选择记录','info');
 			}
 		}
-		
+
 		/**
 		 * 方法描述：加载文档列表
 		 */
@@ -69,7 +69,7 @@
 				nowrap: false,
 				striped: true,
 				collapsible:false,
-				url:"../../share/getAllShareFileDetails.do?eventid="+eventidforShare,
+				url:rootPath+"jasdoc/share/getAllShareFileDetails.do?eventid="+eventidforShare,
 				remoteSort: true,
 				idField:'id',
 				pagination:true,
@@ -77,9 +77,9 @@
 				toolbar:'#toolbar',
 				title:'文档共享详细列表',
 			 	columns:[[
-			           {field:'ck',title:'全选',checkbox:true}, 
-			           {field:'id',title:'文档分享ID',width:0.25*width,hidden:true}, 
-			           {field:'filename',title:'文档名称',width:0.25*width}, 
+			           {field:'ck',title:'全选',checkbox:true},
+			           {field:'id',title:'文档分享ID',width:0.25*width,hidden:true},
+			           {field:'filename',title:'文档名称',width:0.25*width},
 			           {field:'filelocation',title:'文档位置',width:0.18*width} ,
 			           {field:'sharedate',title:'共享时间',width:0.11*width} ,
 			           {field:'overdate',title:'共享过期时间',width:0.11*width,
@@ -88,15 +88,15 @@
 									if(value!=null){
 										var str = value.replace(/-/g,"/");
 									}
-									var date = new Date(str); 
-								        if (nowTime>date){ 
-//								            return 'color:red';    
-								            return 'background-color:#50a9d5';    
-								        }    
+									var date = new Date(str);
+								        if (nowTime>date){
+//								            return 'color:red';
+								            return 'background-color:#50a9d5';
+								        }
 								    }
 			           },
 			           {field:'shareprivilegetype',title:'共享权限',width:0.09*width,
-			        	 	formatter:function(value,row,index){  
+			        	 	formatter:function(value,row,index){
 			        	   		var str = "";
 			        	   		if(value == 10){
 			        	   			str = "查看";
@@ -111,7 +111,7 @@
 			           {field:'sharescrop',title:'共享范围',width:0.1*width},
 			           {field:'remark',title:'共享说明',width:0.08*width}
 			       ]],
-				  
+
 				onDblClickRow:function(index,indexData){
 				},
 				onClickCell:function(rowIndex, field, value){
@@ -120,14 +120,14 @@
 				},
 				onLoadSuccess:function(data){
 			    	$('#dg').datagrid('clearSelections'); //clear selected options
-			    	
+
 			    },
 				onHeaderContextMenu: function(e, field){
 				}
-			});	
+			});
 			initDatagrigHeight('dg','',0);
 		});
-		
+
 		function getNowTime(){
 			var myDate = new Date();
 			return myDate;
