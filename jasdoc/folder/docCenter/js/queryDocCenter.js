@@ -370,7 +370,8 @@ function clearQueryConditions(){
  * 方法描述：上传
  */
 function uploadDoc(){
-	getDlg("../uploadify/index.html?folderId="+folderId+"&r="+new Date().getTime(),'uploadify',"文档上传",800,370);
+	// getDlg("../uploadify/index.html?folderId="+folderId+"&r="+new Date().getTime(),'uploadify',"文档上传",800,370);
+	getDlg("file-upload.html?oid="+folderId+"&r="+new Date().getTime(),'uploadify',"文档上传",800,400);
 }
 
 /**

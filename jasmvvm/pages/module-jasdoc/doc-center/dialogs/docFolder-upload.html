@@ -2,64 +2,59 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Document</title>
-<link rel="stylesheet"
-	href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
-<link rel="stylesheet"
-	href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
-<link rel="stylesheet"
-	href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
-<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/vue-treeselect/vue-treeselect.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
 
 </head>
 
 <body>
 	<div id="app" v-cloak>
-		<jas-dialog-wrapper> <jas-base-group-title
-			name="选择文件"></jas-base-group-title>
-		<div class="fileUpload" v-show="fileUpload">
-			<div style="text-align: center">
-				<el-upload ref="uploader" accept=".xls,.xlsx" :on-exceed="limitNum"
-					:on-success="successUpload" :on-error="errorUpload"
-					class="upload-demo" drag :action="uploadUrl" :limit="1"
-					:multiple="false" :auto-upload="false"> <i
-					class="el-icon-upload"></i>
-				<div class="el-upload__text">
-					将文件拖到此处，或 <em>点击上传</em>
-				</div>
-				<div class="el-upload__tip" slot="tip">只能上传excel，支持2003、2007及以上版本</div>
-				</el-upload>
-			</div>
-		</div>
-
-		<div class="fileVerification" v-show="fileVerification">
-			<!--文件检查结果显示-->
-			<div v-show="verifyError">
-				<div>
-					数据总条数:<span style="color: red">{{total}}</span>以下为具体检查结果：
-				</div>
-				<div v-for="item in msgs">{{item}}</div>
-			</div>
-			<div v-show="verifySuccess">
-				<div style="color: red">
-					共获取到了<span>{{total}}</span>条数据；
+		<jas-dialog-wrapper>
+			<jas-base-group-title name="选择文件"></jas-base-group-title>
+			<div class="fileUpload" v-show="fileUpload">
+				<div style="text-align: center">
+					<el-upload ref="uploader" accept=".xls,.xlsx" :on-exceed="limitNum" :on-success="successUpload"
+						:on-error="errorUpload" class="upload-demo" drag :action="uploadUrl" :limit="1" :multiple="false"
+						:auto-upload="false"> <i class="el-icon-upload"></i>
+						<div class="el-upload__text">
+							将文件拖到此处，或 <em>点击上传</em>
+						</div>
+						<div class="el-upload__tip" slot="tip">只能上传excel，支持2003、2007及以上版本</div>
+					</el-upload>
 				</div>
 			</div>
 
-		</div>
-		<!-- <div class="importFile" v-show="importFile">
+			<div class="fileVerification" v-show="fileVerification">
+				<!--文件检查结果显示-->
+				<div v-show="verifyError">
+					<div>
+						数据总条数:<span style="color: red">{{total}}</span>以下为具体检查结果：
+					</div>
+					<div v-for="item in msgs">{{item}}</div>
+				</div>
+				<div v-show="verifySuccess">
+					<div style="color: red">
+						共获取到了<span>{{total}}</span>条数据；
+					</div>
+				</div>
+
+			</div>
+			<!-- <div class="importFile" v-show="importFile">
 			文件导入结果显示
 
 		</div> -->
 
-		<div slot="footer">
-			<el-button size="small" @click="cancel()" v-show="isCancel">取
-			消</el-button>
-			<el-button size="small" type="primary" @click="submit" v-show="isBtn">{{butName}}</el-button>
-		</div>
+			<div slot="footer">
+				<el-button size="small" @click="cancel()" v-show="isCancel">取
+					消</el-button>
+				<el-button size="small" type="primary" @click="submit" v-show="isBtn">{{butName}}</el-button>
+			</div>
 
 
 		</jas-dialog-wrapper>
@@ -75,38 +70,37 @@
 
 <script>
 	var app = new Vue({
-		el : "#app",
-		data : function() {
+		el: "#app",
+		data: function () {
 			var that = this;
 			return {
-				fileUpload : true,
-				fileVerification : false,
+				fileUpload: true,
+				fileVerification: false,
 				/* importFile : false, */
-				verifyError : true,
-				verifySuccess : false,
-				butName : "上传",
-				total : 0,
-				isBtn : true,
-				isCancel : true,
-				msgs : [],//数据校验结果显示
-				uploadUrl : jasTools.base.rootPath
-						+ "/jasdoc/folder/doccenter/verification.do" //上传之前进行数据的校验
-						//    校验成功之后 进行数据的上传
+				verifyError: true,
+				verifySuccess: false,
+				butName: "上传",
+				total: 0,
+				isBtn: true,
+				isCancel: true,
+				msgs: [], //数据校验结果显示
+				uploadUrl: jasTools.base.rootPath +
+					"/jasdoc/folder/doccenter/verification.do" //上传之前进行数据的校验
+				//    校验成功之后 进行数据的上传
 			}
 		},
-		created : function() {
+		created: function () {
 			var that = this;
 			var param = window.jasTools.base.getParamsInUrl(location.href);
 			if (param.oid) {
 				this.oid = param.oid;
-			}
-			;
+			};
 		},
-		methods : {
-			cancel : function(param) {
+		methods: {
+			cancel: function (param) {
 				window.parent.jasTools.dialog.close(param);
 			},
-			submit : function() {
+			submit: function () {
 				var that = this;
 				if (that.fileUpload) {
 					that.upload();
@@ -115,32 +109,32 @@
 				}
 
 			},
-			upload : function() {
+			upload: function () {
 				var that = this;
 				this.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
-					folderid : that.oid,
-					token : localStorage.getItem('token')
+					folderid: that.oid,
+					token: localStorage.getItem('token')
 				});
-				this.$nextTick(function() {
+				this.$nextTick(function () {
 					that.$refs.uploader.submit();
 				});
 			},
 
-			normalizer : function(node) {
+			normalizer: function (node) {
 				return {
-					id : node.id,
-					label : node.text,
-					children : node.children,
-					isDefaultExpanded : true
+					id: node.id,
+					label: node.text,
+					children: node.children,
+					isDefaultExpanded: true
 				}
 			},
-			limitNum : function() {
+			limitNum: function () {
 				top.Vue.prototype.$message({
-					type : 'info',
-					message : '最多上传一个文件'
+					type: 'info',
+					message: '最多上传一个文件'
 				});
 			},
-			successUpload : function(response, file, fileList) {
+			successUpload: function (response, file, fileList) {
 				var that = this;
 				that.fileUpload = false;
 				that.fileVerification = true;
@@ -160,33 +154,33 @@
 				}
 
 			},
-			dataImport : function() {//数据的导入
+			dataImport: function () { //数据的导入
 				var that = this;
-				var url = jasTools.base.rootPath
-						+ "/jasdoc/folder/doccenter/importFolder.do?folderid="
-						+ that.oid;
+				var url = jasTools.base.rootPath +
+					"/jasdoc/folder/doccenter/importFolder.do?folderid=" +
+					that.oid;
 				jasTools.ajax.post(url, {
 
-				}, function(data) {
+				}, function (data) {
 					if (data.status == 1) {
 						top.Vue.prototype.$message({
-							type : 'success',
-							message : '导入成功'
+							type: 'success',
+							message: '导入成功'
 						});
 						that.cancel(1);
 					} else {
 						top.Vue.prototype.$message({
-							type : 'error',
-							message : '导入失败'
+							type: 'error',
+							message: '导入失败'
 						});
 
 					}
 				});
 			},
-			errorUpload : function(err, file, fileList) {
+			errorUpload: function (err, file, fileList) {
 				top.Vue.prototype.$message({
-					type : 'error',
-					message : '上传失败'
+					type: 'error',
+					message: '上传失败'
 				});
 				// this.cancel(1);
 			},
