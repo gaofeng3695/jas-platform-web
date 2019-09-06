@@ -21,7 +21,8 @@
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
 						<el-form-item label="文档分类" prop="foldername">
-							<treeselect :multiple="true" aria-placeholder="请选择文档分类" :flat="true" :options="treeList" :normalizer="normalizer" v-model="treeValue">
+							<treeselect :multiple="true" aria-placeholder="请选择文档分类" :flat="true" :options="treeList"
+								:normalizer="normalizer" v-model="treeValue">
 							</treeselect>
 						</el-form-item>
 					</el-col>
@@ -30,13 +31,14 @@
 			<jas-base-group-title name="选择文件"></jas-base-group-title>
 			<div style="text-align: center">
 
-				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload" class="upload-demo" drag
-				  :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false">
+				<el-upload ref="uploader" :on-exceed="limitNum"  :on-success="successUpload"
+					:on-error="errorUpload" class="upload-demo" drag :action="uploadUrl" :limit="50" :multiple="true"
+					:auto-upload="false">
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
 					</div>
-					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
+					<div class="el-upload__tip" slot="tip">最多不能超过50个文件</div>
 				</el-upload>
 			</div>
 			<div slot="footer">
@@ -61,6 +63,8 @@
 		data: function () {
 			var that = this;
 			return {
+				lengthOfFileToSubmit:0,
+				indexOfFileToSubmit:0,
 				treeList: [],
 				treeValue: [],
 				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do'
@@ -85,8 +89,17 @@
 					fileclassifys: this.treeValue.join(','),
 					folderId: this.oid
 				});
-				this.$nextTick(function () {
-					that.$refs.uploader.submit();
+				this.$nextTick(function () { //此处进行循环调用上传的方法
+					var files = that.$refs.uploader.uploadFiles.filter(function (item) {
+						return !item.oid
+					});
+					that.lengthOfFileToSubmit = files.length;
+					that.indexOfFileToSubmit = 0;
+					if (files.length > 0) {
+						that.$refs.uploader.submit();
+					} else {
+						that.successUpload();
+					}
 				});
 			},
 			getDocClassifyTree: function (oid) {
@@ -110,12 +123,17 @@
 					message: '最多上传一个文件'
 				});
 			},
-			successUpload: function () {
-				top.Vue.prototype.$message({
-					type: 'success',
-					message: '上传成功'
-				});
-				this.cancel(1);
+			successUpload: function (response, file, fileList) {
+				var that = this;
+				that.indexOfFileToSubmit++;
+				if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '上传成功'
+					});
+					that.cancel(1);
+				}
+
 			},
 			errorUpload: function (err, file, fileList) {
 				top.Vue.prototype.$message({

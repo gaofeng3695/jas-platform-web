@@ -36,7 +36,7 @@
 
 
 
-		<div style="width: 100%;height:350px;padding:15px 10px 0 0;box-sizing: border-box;">
+		<div style="width: 100%;height:350px;padding:15px 10px 0 0;box-sizing: border-box;overflow: auto;">
 			<el-form ref="formData" label-width="100px">
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
@@ -51,16 +51,16 @@
 			<div style="text-align: center">
 
 				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload"
-					class="upload-demo" drag :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false">
+					class="upload-demo" drag :action="uploadUrl" :limit="50" :multiple="true" :auto-upload="false">
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
 					</div>
-					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
+					<div class="el-upload__tip" slot="tip">最多不能超过50个文件</div>
 				</el-upload>
 			</div>
 		</div>
-		<div style="">
+		<div >
 			<table align="center" class="querytable">
 				<tr>
 					<td height="33" colspan="4" class="button_area" align="center">
@@ -78,44 +78,6 @@
 				</tr>
 			</table>
 		</div>
-
-
-
-
-
-
-
-		<!-- <jas-dialog-wrapper>
-			<jas-base-group-title name="文档分类"></jas-base-group-title>
-			<el-form ref="formData" label-width="100px">
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
-						<el-form-item label="文档分类" prop="foldername">
-							<treeselect :multiple="true" aria-placeholder="请选择文档分类" :flat="true" :options="treeList"
-								:normalizer="normalizer" v-model="treeValue">
-							</treeselect>
-						</el-form-item>
-					</el-col>
-				</el-row>
-			</el-form>
-			<jas-base-group-title name="选择文件"></jas-base-group-title>
-			<div style="text-align: center">
-
-				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload"
-					class="upload-demo" drag :action="uploadUrl" :limit="1" :multiple="false" :auto-upload="false">
-					<i class="el-icon-upload"></i>
-					<div class="el-upload__text">将文件拖到此处，或
-						<em>点击上传</em>
-					</div>
-					<div class="el-upload__tip" slot="tip">只能上传一个文件，且不超过1G</div>
-				</el-upload>
-			</div>
-			<div slot="footer">
-				<el-button size="small" @click="cancel()">取 消</el-button>
-				<el-button size="small" type="primary" @click="upload('formData')">确 定</el-button>
-			</div>
-		</jas-dialog-wrapper> -->
-
 	</div>
 </body>
 <script src="./../../lib/jquery/jquery-1.12.4.min.js"></script>
@@ -132,6 +94,8 @@
 		data: function () {
 			var that = this;
 			return {
+				lengthOfFileToSubmit:0,
+				indexOfFileToSubmit:0,
 				treeList: [],
 				treeValue: [],
 				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do'
@@ -158,8 +122,17 @@
 					fileclassifys: this.treeValue.join(','),
 					folderId: this.oid
 				});
-				this.$nextTick(function () {
-					that.$refs.uploader.submit();
+				this.$nextTick(function () { //此处进行循环调用上传的方法
+					var files = that.$refs.uploader.uploadFiles.filter(function (item) {
+						return !item.oid
+					});
+					that.lengthOfFileToSubmit = files.length;
+					that.indexOfFileToSubmit = 0;
+					if (files.length > 0) {
+						that.$refs.uploader.submit();
+					} else {
+						that.successUpload();
+					}
 				});
 			},
 			getDocClassifyTree: function (oid) {
@@ -184,12 +157,13 @@
 				// });
 			},
 			successUpload: function () {
-				// top.Vue.prototype.$message({
-				// 	type: 'success',
-				// 	message: '上传成功'
-				// });
-				parent.reloadDataTree(null,0);
-				this.cancel(1);
+				var that = this;
+				that.indexOfFileToSubmit++;
+				if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
+					parent.reloadDataTree(null,0);
+				that.cancel(1);
+				}
+
 			},
 			errorUpload: function (err, file, fileList) {
 				alert("文件上传失败");
