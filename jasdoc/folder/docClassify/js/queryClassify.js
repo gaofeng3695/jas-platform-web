@@ -295,7 +295,7 @@ function addToFavorite() {
 		eventids += rows[rows.length - 1].eventid;
 		filenames += rows[rows.length - 1].filename;
 
-		getDlg("../favorite/addToFavorite.htm?eventids=" + eventids + "&filenames=" + filenames + "&foldertype=" + foldertype + "&folderid=" + folderId + "&r=" + new Date().getTime(), 'favorite', '添加收藏', 580, 162);
+		getDlg("../favorite/addToFavorite.htm?eventids=" + eventids + "&filenames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&foldertype=" + foldertype + "&folderid=" + folderId + "&r=" + new Date().getTime(), 'favorite', '添加收藏', 580, 162);
 
 	} else {
 		$.messager.alert('提示', '请选择记录', 'info');

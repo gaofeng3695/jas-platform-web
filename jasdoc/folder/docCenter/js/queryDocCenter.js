@@ -642,6 +642,22 @@ function viewPicOrPdf(fileType,docId,versionid){
 		}
 	});
 }
+
+function downloadTemplate(){
+	$.ajax({
+		url: rootPath + '/jasdoc/folder/doccenter/downloadTemplate.do',
+		dataType: "json",
+		success: function (result) {
+			if (result.success == 1) {
+				parent.showAlert('提示', "下载成功", 'info');
+			} else if (result.success == 0) {
+				parent.showAlert('提示', "下载失败", 'info');
+			}
+		}
+	});
+}
+
+
 var showAllFileFlag = 1;
 
 function showAllFile() {

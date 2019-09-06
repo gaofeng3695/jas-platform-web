@@ -17,8 +17,7 @@
 	</link>
 	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
 	</link>
-	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/css/addAndUpdateStyle.css">
-	</link>
+	<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
 	<link rel="stylesheet" type="text/css" href="../../common/css/icon.css">
 	</link>
 	<link rel="stylesheet" type="text/css" href="../uploadify/css/uploadify.css">
@@ -51,12 +50,12 @@
 			<div style="text-align: center">
 
 				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload"
-					class="upload-demo" drag :action="uploadUrl" :limit="50" :multiple="true" :auto-upload="false">
+					class="upload-demo" drag :action="uploadUrl" :limit="10" :multiple="true" :auto-upload="false">
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
 					</div>
-					<div class="el-upload__tip" slot="tip">最多不能超过50个文件</div>
+					<div class="el-upload__tip" slot="tip">最多不能超过10个文件</div>
 				</el-upload>
 			</div>
 		</div>

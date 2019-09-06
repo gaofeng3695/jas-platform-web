@@ -8,7 +8,8 @@
 <title></title>
 <link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
 <link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
-<link rel="stylesheet" href="../../../jasframework/common/css/addAndUpdateStyle.css" type="text/css"></link>
+<!-- <link rel="stylesheet" href="../../../jasframework/common/css/addAndUpdateStyle.css" type="text/css"></link> -->
+<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
 <link rel="stylesheet" type="text/css" href="../../common/css/icon.css">
 
 <script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
@@ -25,11 +26,11 @@
 			<input type="hidden" name="eventid" id="eventid"/>
 			<input type="hidden" name="filename" id="filename"/>
 			<input type="hidden" name="fileclassify" id="fileclassify"/>
-			<table  class="edittable" >	
+			<table  class="edittable" >
 				<tr>
 					<td width="15%"><span key="file.filename" class="paltform-i18n">文档名称：</span></td>
 					<td width="35%">
-						<input type="text" id="filename1" name='filename1' disabled="disabled" class="easyui-validatebox input_bg" readonly="readonly"	>
+						<input type="text" id="filename1" name='filename1'  class="easyui-validatebox input_bg" 	>
 					</td>
 					<td width="15%"><span key="file.fileno" class="paltform-i18n">文档编号：</span></td>
 					<td width="35%">
@@ -41,12 +42,12 @@
 					<td>
 						<input type="text" id="keyword" name='keyword'   class="easyui-validatebox input_bg"	maxlength="25">
 					</td>
-					
+
 					<td><span key="file.uploadtime" class="paltform-i18n">文档分类：</span></td>
 					<td>
 						<input type="text" id="classify" name='classify' validType="fileclassify"  style="width: 230px"  class="easyui-combotree select" multiple="true" panelHeight="80px" >
 					</td>
-					
+
 				</tr>
 				<tr>
 				    <td><span key="file.summary" class="paltform-i18n">文档摘要：</span></td>
@@ -60,7 +61,7 @@
 				    	<textarea id="remark" class="easyui-validatebox"  name="remark" style="height: 120px;" onpropertychange="if(value.length>1000) value=value.substr(0,1000)"></textarea>
 				    </td>
 				</tr>
-		    </table>	
+		    </table>
 		    <div class="button_area_absolute">
 		   <table width="100%">
 		 		  <tr>
@@ -69,11 +70,10 @@
 							<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="closeFile()"><span key="unit.cancel" class="paltform-i18n">取消</span></a>
          				</td>
          		</tr>
-         	</table>	 
+         	</table>
 		    </div>
 			</form>
-			
+
 	</div>
 </body>
 </html>
-	

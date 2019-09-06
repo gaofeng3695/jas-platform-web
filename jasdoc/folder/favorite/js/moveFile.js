@@ -5,7 +5,7 @@ var oldFolderId = "";
 //加载树
 	$(function() {
 		docIds = getParamter("docIds");
-		fileNames = getParamter("fileNames");
+		fileNames = decodeURIComponent(decodeURIComponent(getParamter("fileNames")));
 		oldFolderId = getParamter("folderId");
 //		alert(oldFolderId);
 		$("#fileNames").text(fileNames);

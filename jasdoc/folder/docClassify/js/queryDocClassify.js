@@ -312,7 +312,7 @@ function addToFavorite(){
  *
  */
 function deleteDocFromClassify(){
-		deleteDocUrl =rootPath+"jasdoc/folder/classify/classify/deletefilereffromclassify.do";
+		deleteDocUrl =rootPath+"jasdoc/folder/classify/deletefilereffromclassify.do";
 	var rows = $('#dg').datagrid('getSelections');
 	if (rows.length > 0){
 		var ids="";
@@ -349,7 +349,7 @@ function updateFileClassifyInfo(){
 			$.messager.alert('提示','只能对文档进行设置分类！','info');
 		}else{
 			var fileId=row[0].eventid;
-			getDlg("updateFileClassifyInfo.htm?fileId="+fileId,'updateFileClassifyInfo',"修改文档的分类信息",400,150);
+			getDlg("updateFileClassifyInfo.htm?fileId="+fileId,'updateFileClassifyInfo',"修改文档的分类信息",400,135);
 		}
 	}else{
 		$.messager.alert('提示','请选择一条记录！','info');
