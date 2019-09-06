@@ -11,8 +11,8 @@ function save(){
 		onSubmit : function() {
 			return $(this).form('validate');
 		},
-		success : function(result) {
-			var result = eval('(' + data + ')');
+		success : function(data) {
+			var result = JSON.parse(data);
 			if (result.success=="1") {
 				top.showAlert('提示',result.message, 'info',function(){
 					parent.reloadDataTree(folderId,'update',result.obj);

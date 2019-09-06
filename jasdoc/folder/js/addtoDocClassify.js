@@ -25,7 +25,7 @@
 		   				"fileclassifys":fileclassifys
 		   				},
 			   	success: function(check){
-			   		var re =  eval('('+check+')');
+			   		var re = JSON.parse(check);
 			   		if (re.success){
 			   			$.messager.alert('提示', re.ok, 'info',function(){
 			   				reloadData("queryFolder.html","dg");

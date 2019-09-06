@@ -1,4 +1,4 @@
-	var fileId = getParamter("fileId");
+var fileId = getParamter("fileId");
 //	var folderid=getParamter("folderid");
 	$(document).ready(function(){
 		$('#folderClassifyId').combotree({
@@ -60,7 +60,7 @@
 				return $(this).form('validate');
 			},
 			success : function(data) {
-				var result = eval('(' + data + ')');
+				var result =JSON.parse(data);
 				top.showAlert('提示',result.msg , 'info');
 				if(result.success==1){
 					parent.reloadDataTree();
@@ -72,7 +72,7 @@
 //			url:rootPath+"jasdoc/folder/classify/updateFileClassifyInfo.do",
 //			type:'POST',
 //			data:{},
-//			
+//
 //		});
 	}
 	/**

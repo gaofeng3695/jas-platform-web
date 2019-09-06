@@ -119,8 +119,8 @@ function queryTree(){
 			   				"folderid":folderid,
 			   				"oldfolderid":oldfolderid
 			   				},
-				   	success: function(result){
-				   		var re = eval('(' + result + ')');
+				   	success: function(data){
+				   		var re =  JSON.parse(data);
 				   		if (re.success){
 				   			if(foldertype == 1){
 				   				parent.reloadDataTree(null,0);

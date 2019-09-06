@@ -111,7 +111,7 @@ function initDataGrid(folderLocation){
 			if(indexData.typeFlag==1){
 				openFolder(indexData.eventid,indexData.filelocation);
 			}else{
-				Preview(indexData.eventid);
+				Preview(indexData.filetype,indexData.eventid);
 			}
 		},
 		onCheck:function(index, row){
@@ -357,19 +357,38 @@ function updateFileClassifyInfo(){
 }
 
 
+var allOrOnlyDocFile = false;
 /**
  * 描述：根据查询条件，查询文档信息
  */
 function queryDocByConditions(){
 	$("#dg").datagrid('clearSelections'); // clear
 	var filename = $("#filename").val();
+	if(filename!=null && filename!=""){
+		allOrOnlyDocFile = true;
+	}
 	var filetype = $("#filetype").val();
+	if(filetype!=null && filetype!=""){
+		allOrOnlyDocFile = true;
+	}
 	var uploadtime_start = $("#uploadtime_start").val();
+	if(uploadtime_start!=null && uploadtime_start!=""){
+		allOrOnlyDocFile = true;
+	}
 	var uploadtime_end = $("#uploadtime_end").val();
+	if(uploadtime_end!=null && uploadtime_end!=""){
+		allOrOnlyDocFile = true;
+	}
 	var fileno = $("#fileno").val();
+	if(fileno!=null && fileno!=""){
+		allOrOnlyDocFile = true;
+	}
 	var keyword = $("#keyword").val();
+	if(keyword!=null && keyword!=""){
+		allOrOnlyDocFile = true;
+	}
 	var query = null;
-	query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,"uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":true};
+	query={"filename":filename,"filetype":filetype,"uploadtimeStart":uploadtime_start,"uploadtimeEnd":uploadtime_end,"fileno":fileno,"keyword":keyword,"allOrOnlyDocFile":allOrOnlyDocFile};
 	var url= rootPath+"jasdoc/folder/classify/getAllClassifyAndFiles.do?folderId=" + folderId;
 	$("#dg").datagrid("options").url = url;
 	$("#dg").datagrid('options').queryParams=query;
@@ -380,6 +399,7 @@ function queryDocByConditions(){
  * 描述：清空查询条件
  */
 function clearQueryConditions(){
+	allOrOnlyDocFile = false;
 	$("#filename").val("");
 	$("#filetype").val("");
 	$("#uploadtime_start").val("");
@@ -432,7 +452,7 @@ function operationFileContentMenu(rowData){
 				var fileType = rowData.filetype;
 				if(fileType!=null&&fileType!=""){
 					if(previewFileType.indexOf(fileType.toLocaleLowerCase())>-1){
-						Preview(rowData.eventid);
+						Preview(fileType,rowData.eventid);
 					}else{
 						$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
 					}
@@ -490,24 +510,27 @@ function downloadDoc(eventid){
  *	方法描述：预览
  *	@param eventid	选中记录的eventid
  */
-function Preview(eventid,versionid){
-	$.ajax({
-		url:rootPath+ '/jasdoc/folder/doccenter/isExistPdfFile.do?docId='+eventid,
-//		url:rootPath+ '/jasdoc/folder/doccenter/isExistSwfFile.do?docId='+eventid,
-		dataType:"json",
-		success:function(result){
-			if(result.success==1){
-//				var totalPages=result.totalPages;
-//				var url = rootPath+ "/jasdoc/folder/preview/FlexPaper_2.0.3/index.html?eventid="+ eventid +"&versionid="+versionid+ "&totalPages="+totalPages;
-				var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid="+ docId +"&versionid="+versionid;
-				top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
-			}else if(result.success==0){
-				parent.showAlert('提示',"正在生成转换文档，可能需要花费一段时间，请稍后重试！" , 'info');
-			}else if(result.success==-1){
-				parent.showAlert("提示",result.msg,"info");
+function Preview(type,eventid){
+	if (['jpg', 'png', 'gif'].indexOf(type) > -1) {
+		var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + eventid + "&token=" + localStorage.getItem("token");
+		top.viewPic(url);
+	} else {
+		$.ajax({
+			url: rootPath + '/jasdoc/folder/doccenter/isExistPdfFile.do?docId=' + eventid,
+			dataType: "json",
+			success: function (result) {
+				if (result.success == 1) {
+					var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid=" + eventid  ;
+					top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
+
+				} else if (result.success == 0) {
+					parent.showAlert('提示', "正在生成转换文档，可能需要花费一段时间，请稍后重试！", 'info');
+				} else if (result.success == -1) {
+					parent.showAlert("提示", result.msg, "info");
+				}
 			}
-		}
-	});
+		});
+	}
 }
 /**
  * 方法描述：删除文档
