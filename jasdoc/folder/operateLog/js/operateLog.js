@@ -1,5 +1,5 @@
-$(function() {	
-	
+$(function() {
+
 
 	$("#beginDate").datetimebox({
 		width : document.documentElement.clientWidth * 0.35
@@ -21,13 +21,13 @@ $(function() {
 		toolbar:'#toolbar',
 		title:"文档操作日志",
 	 	columns:[[
-	           {field:'ck',title:'全选',checkbox:true}, 
+	           {field:'ck',title:'全选',checkbox:true},
 	           {field:'businessName',title:'业务模块',width:200},
 	           {field:'createUserName',title:'操作人',width:200} ,
 	           {field:'optType',title:'操作类型',width:200},
 	           {field:'createTime',title:'操作时间',width:200}
 	          ] ]
-	});	
+	});
 	initDatagrigHeight('operateLogTable', 'searchpanel', 100);
 });
 
@@ -48,7 +48,7 @@ function operateLogExecuteQuery() {
 	var url= rootPath+"jasdoc/operateLogSon/getAll.do";
 	$("#operateLogTable").datagrid("options").url = url;
 	$("#operateLogTable").datagrid('options').queryParams=query;
-	$("#operateLogTable").datagrid('load');	
+	$("#operateLogTable").datagrid('load');
 	$("#operateLogTable").datagrid('options').queryParams=null;
 
 }
@@ -68,6 +68,7 @@ function viewLog() {
 		getDlg("viewLog.htm?eventid="+row.oid, "viewLog", "查看", 500, 310);
 
 	} else {
+		// parent.showAlert("提示",'请选中一条操作日志记录', "info");
 		$.messager.alert('提示', '请选中一条操作日志记录', 'info');
 	}
 }

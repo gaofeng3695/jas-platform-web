@@ -23,8 +23,8 @@ function queryFavoriteTree() {
 }
 
 	$(function() {
-		docIds = getParamter("docIds");
-		fileNames = decodeURIComponent(decodeURIComponent(getParamter("fileNames")));
+		docIds = getParamter("eventids");
+		fileNames = decodeURIComponent(decodeURIComponent(getParamter("filenames")));
 		oldFolderId = getParamter("folderId");
 		$("#fileNames").text(fileNames);
 
@@ -37,7 +37,7 @@ function queryFavoriteTree() {
 	 *
 	 */
 	function save() {
-		url = "../favorite/addDocToFavorite.do";
+		url =rootPath+"jasdoc/folder/favorite/addDocToFavorite.do";
 		var folderId = $("#foldreeventid").combotree('getValue');
 		if(folderId==""||folderId==null){
 			$.messager.alert('提示',"请选择收藏夹",'info');
@@ -47,15 +47,16 @@ function queryFavoriteTree() {
 				url : url,
 				data : {
 					"docIds" : docIds,
-					"folderId" : folderId,
-					"oldFolderId" : oldFolderId
+					"folderId" : folderId
 				},
 				success : function(result) {
 					if (result.success=="1") {
 						$.messager.alert('提示', result.message, 'info',function(){
 							parent.reloadDataTree(null,0);
 							closeFavorite();
+
 						});
+
 					} else {
 						$.messager.alert('错误', result.message, result.error);
 					}

@@ -13,9 +13,9 @@ function closeClassify() {
 function viewFolderById(folderId){
 	$.ajax({
 		type: "POST",
-	   	url: rootPath+'jasdoc/folder/classify/queryDocClassify.do',
+	   	url: rootPath+'jasdoc/folder/classify/getDocClassifyById.do',
    		data: {
-   			    "docClassifyId":folderId
+   			    "folderId":folderId
    			  },
 	   	success: function(data){
      		if(data!=null){
