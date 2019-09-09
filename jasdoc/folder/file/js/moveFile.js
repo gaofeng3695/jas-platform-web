@@ -13,6 +13,7 @@ $(function() {
  */
 function queryTree(){
 	$('#foldreeventid').combotree({
+		panelHeight:'auto',
 		url:rootPath+"jasdoc/folder/doccenter/queryFavoriteFolderTree.do?token="+localStorage.getItem("token"),
 		onBeforeExpand:function(node){
 			url=rootPath+"jasdoc/folder/doccenter/getChildrenTree.do";

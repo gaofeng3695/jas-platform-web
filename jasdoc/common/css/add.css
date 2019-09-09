@@ -42,7 +42,7 @@ html{
 .input_bg {
 	width: 100%;
 	height: 18px;
-	background: #fff url(../image/text-bg.gif) repeat-x;/*input的背景图像，边框颜色和外边距*/
+	background: #fff url(../images/text-bg.gif) repeat-x;/*input的背景图像，边框颜色和外边距*/
 	margin: 1px 0px ;
 	border-top: 1px solid #b4b5bd;
 	border-left: 1px solid #c3c5cd;
@@ -64,7 +64,7 @@ html{
 	width: 100%;
 	height: 18px;
 	padding-top: 1px;
-	background: #fff url(../image/text-bg.gif) repeat-x;
+	background: #fff url(../images/text-bg.gif) repeat-x;
 	/*input的背景图像，边框颜色和外边距*/
 	border: none;
 	margin: 0px;
@@ -83,7 +83,7 @@ html{
 	width: 100%;
 	height: 22px;
 	line-height: 22px;
-	background: #fff url(../image/text-bg.gif) repeat-x;
+	background: #fff url(../images/text-bg.gif) repeat-x;
 }
 
 
@@ -120,7 +120,7 @@ html{
 textarea
 {
 	width:100%;
-	background: #fff url(../image/text-bg.gif) repeat-x;
+	background: #fff url(../images/text-bg.gif) repeat-x;
 	/*input的背景图像，边框颜色和外边距*/
 	padding-top: 1px;
 	margin: 1px 0;
@@ -135,7 +135,7 @@ textarea
 .inputselect {
 	width:100%;
 	height:22px;
-	background:url(../image/inputselect.gif) repeat-x;/*input的背景图像，边框颜色和外边距*/
+	background:url(../images/inputselect.gif) repeat-x;/*input的背景图像，边框颜色和外边距*/
 	border-top:1px solid #b4b5bd;
 	border-left:1px solid #c3c5cd;
 	border-bottom:1px solid #c9cdd3;
@@ -145,9 +145,9 @@ textarea
 	background-position: right;
 	background-repeat: no-repeat;
 }
-.xuxian_td{ background:url(../image/line_1.jpg) repeat-x;height:28px; line-height:28px;margin-left:7px;padding-left:16px;}
-.xuxian_all_td{ background:url(../image/line_1.jpg) repeat-x;height:28px; line-height:28px;padding:0 15px;}
-.xuxian_all2_td{ background:url(../image/line_sm.gif) repeat-x;height:4px; line-height:4px;padding:0 15px;}
+.xuxian_td{ background:url(../images/line_1.jpg) repeat-x;height:28px; line-height:28px;margin-left:7px;padding-left:16px;}
+.xuxian_all_td{ background:url(../images/line_1.jpg) repeat-x;height:28px; line-height:28px;padding:0 15px;}
+.xuxian_all2_td{ background:url(../images/line_sm.gif) repeat-x;height:4px; line-height:4px;padding:0 15px;}
 .attmenttable {
 	border:1px solid #cad9ea;
 	border-top:0px;

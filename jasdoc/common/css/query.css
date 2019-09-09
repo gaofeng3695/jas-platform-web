@@ -191,7 +191,7 @@ input[type=file]{
     border:0;
 }
 .datagrid .datagrid-pager{
-	padding:5px 0 0 0;
+	/* padding:5px 0 0 0; */
 }
 
 .datagrid .datagrid-toolbar{

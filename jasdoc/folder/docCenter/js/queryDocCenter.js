@@ -336,10 +336,11 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 
 		},
 		onLoadSuccess: function (data) {
-			//debugger
+			// debugger
 			if (data.msg) {
 				$.messager.alert('错误', data.msg, data.error);
 			} else {
+				// debugger;
 				var role = data.role;
 				//加载工具栏按钮
 				$('#toolbar a').each(function () {
@@ -354,6 +355,11 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 					//文档中心下只能创建文件夹
 					$("#44").hide();
 				}
+				var userBo = JSON.parse(localStorage.getItem("user"));
+				if (userBo.roleNames.indexOf("docadmin")>-1) {
+					$("#downTemplate").show();
+					$("#uploadTemplate").show();
+				}
 			}
 			$('#dg').datagrid('clearSelections'); //clear selected options
 		},
@@ -365,7 +371,7 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 		}
 	});
 
-	initDatagrigHeight('dg', '', 100);
+	initDatagrigHeight('dg', '', 30,'containerDivId');
 }
 
 /**
@@ -802,7 +808,7 @@ function deleteFolderAndDocs(shiftDeleteFlag) {
 function moveFile(eventid, fileName) {
 	if (arguments.length == 2) {
 		//移动单个文档（右键）
-		getDlg("../file/moveFile.htm?docIds=" + eventid + "&fileNames=" + encodeURIComponent(encodeURIComponent(fileName)), 'moveFile', '移动文档', 580, 162);
+		getDlg("../file/moveFile.htm?docIds=" + eventid + "&fileNames=" + encodeURIComponent(encodeURIComponent(fileName)), 'moveFile', '移动文档', 580, 400);
 	} else {
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0) {
@@ -929,7 +935,7 @@ function associateFile(fileId, role, createuser) {
  */
 function addToFavorite(eventid, filename) {
 	if (arguments.length == 2) {
-		getDlg("../favorite/addToFavorite.htm?docIds=" + eventid + "&fileNames=" + encodeURIComponent(encodeURIComponent(filename)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 164);
+		getDlg("../favorite/addToFavorite.htm?eventids=" + eventid + "&filenames=" + encodeURIComponent(encodeURIComponent(filename)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 200);
 	} else {
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0) {
@@ -1450,4 +1456,12 @@ function uploadFolder() {
 		return;
 	}
 	top.getDlg("importExcelData.htm?folderId=" + folderId, "importiframe", "导入", 560, 360);
+}
+
+
+
+function initToobarByRole() {
+	//根据当前用户的角色，进行按钮的分配；
+	$("#uploadTemplate").attr('disabled', true);
+	$("#downTemplate").attr('disabled', true);
 }
