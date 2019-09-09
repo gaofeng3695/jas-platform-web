@@ -598,42 +598,43 @@ function downloadDocs(folderEventid) {
  */
 function previewDoc(eventid, versionid) {
 	var docId = eventid;
-	var fileType="";
-		var rows = $('#dg').datagrid('getSelections');
-		if (rows.length == 1) {
-			var typeFlag = rows[0].typeFlag;
-			docId = rows[0].eventid;
-			if (typeFlag == 1) {
-				return;
-			}
-			 fileType = rows[0].filetype;
-
-			if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
-         viewPicOrPdf(fileType,docId,versionid);
-			} else {
-				$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
-				return;
-			}
-
-		} else {
-			$.messager.alert('提示', '请选择一条记录', 'info');
+	var fileType = "";
+	var rows = $('#dg').datagrid('getSelections');
+	if (rows.length == 1) {
+		var typeFlag = rows[0].typeFlag;
+		docId = rows[0].eventid;
+		if (typeFlag == 1) {
 			return;
 		}
+		fileType = rows[0].filetype;
+
+		if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
+			viewPicOrPdf(fileType, docId, versionid);
+		} else {
+			$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
+			return;
+		}
+
+	} else {
+		$.messager.alert('提示', '请选择一条记录', 'info');
+		return;
+	}
 }
-function viewPicOrPdf(fileType,docId,versionid){
+
+function viewPicOrPdf(fileType, docId, versionid) {
 	$.ajax({
 		url: rootPath + '/jasdoc/folder/doccenter/isExistPdfFile.do?docId=' + docId,
 		dataType: "json",
 		success: function (result) {
 			if (result.success == 1) {
-          if(['jpg', 'png', 'gif'].indexOf(fileType) > -1){
-						var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + docId + "&token=" + localStorage.getItem("token");
-						top.viewPic(url);
-						// top.getDlg("view.html");
-					}else{
-						var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid=" + docId + "&versionid=" + versionid;
-						top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
-					}
+				if (['jpg', 'png', 'gif'].indexOf(fileType) > -1) {
+					var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + docId + "&token=" + localStorage.getItem("token");
+					top.viewPic(url);
+					// top.getDlg("view.html");
+				} else {
+					var url = rootPath + "jasdoc/folder/preview/pdfjs_1.10.88/web/viewer.html?eventid=" + docId + "&versionid=" + versionid;
+					top.getDlg(url, "viewiframe", "预览", 800, 550, false, true, true);
+				}
 			} else if (result.success == 0) {
 				parent.showAlert('提示', "正在生成转换文档，可能需要花费一段时间，请稍后重试！", 'info');
 			} else if (result.success == -1) {
@@ -643,18 +644,12 @@ function viewPicOrPdf(fileType,docId,versionid){
 	});
 }
 
-function downloadTemplate(){
-	$.ajax({
-		url: rootPath + '/jasdoc/folder/doccenter/downloadTemplate.do',
-		dataType: "json",
-		success: function (result) {
-			if (result.success == 1) {
-				parent.showAlert('提示', "下载成功", 'info');
-			} else if (result.success == 0) {
-				parent.showAlert('提示', "下载失败", 'info');
-			}
-		}
-	});
+function downloadTemplate() {
+	var downloadUrl = rootPath + '/jasdoc/folder/doccenter/downloadTemplate.do?token=' + localStorage.getItem("token");
+	if ($('#folderDownload').length == 0) {
+		$("<iframe id=\"folderDownload\" style=\"display: none;\"></iframe>").appendTo("body");
+	}
+	$("#folderDownload").attr("src", downloadUrl);
 }
 
 
