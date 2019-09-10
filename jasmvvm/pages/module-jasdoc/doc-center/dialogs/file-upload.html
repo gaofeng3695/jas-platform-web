@@ -33,7 +33,7 @@
 
 				<el-upload ref="uploader" :on-exceed="limitNum"  :on-success="successUpload"
 					:on-error="errorUpload" class="upload-demo" drag :action="uploadUrl" :limit="10" :multiple="true"
-					:auto-upload="false">
+					:auto-upload="false"  :on-progress="showPressage" >
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
@@ -142,6 +142,11 @@
 				});
 				// this.cancel(1);
 			},
+			showPressage:function(a,b,c){
+				console.log(a);
+				console.log(b);
+				console.log(c)
+			}
 		},
 	});
 </script>

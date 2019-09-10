@@ -10,19 +10,19 @@
 	<link rel="stylesheet" href="./../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
 	<link rel="stylesheet" href="./../../lib/vue-treeselect/vue-treeselect.min.css">
 	<link rel="stylesheet" href="./../../common/css/main.css">
-
-
 	<link rel="stylesheet" type="text/css"
 		href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
 	</link>
 	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
 	</link>
-	<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
+	<link rel="stylesheet" href="../../common/css/add.css" type="text/css">
+	</link>
 	<link rel="stylesheet" type="text/css" href="../../common/css/icon.css">
 	</link>
 	<link rel="stylesheet" type="text/css" href="../uploadify/css/uploadify.css">
 	</link>
-
+	<link href="../../lib/vue-upload-component/vue-upload-component.part.css">
+	</link>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js">
@@ -49,17 +49,72 @@
 			</el-form>
 			<div style="text-align: center">
 
-				<el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload"
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Thumb</th>
+								<th>Name</th>
+								<th>Size</th>
+								<th>Speed</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- <tr v-if="!files.length">
+										<td colspan="7">
+											<div class="text-center p-5">
+												<h4>Drop files anywhere to upload<br/>or</h4>
+												<label :for="name" class="btn btn-lg btn-primary">Select Files</label>
+											</div>
+										</td>
+									</tr> -->
+							<tr v-for="(file, index) in files" :key="file.id">
+								<td>{{index}}</td>
+								<td>
+									<img v-if="file.thumb" :src="file.thumb" width="40" height="auto" />
+									<span v-else>No Image</span>
+								</td>
+								<td>
+									<div class="filename">
+										{{file.name}}
+									</div>
+									<div class="progress" v-if="file.active || file.progress !== '0.00'">
+										<div
+											:class="{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active}"
+											role="progressbar" :style="{width: file.progress + '%'}">{{file.progress}}%</div>
+									</div>
+								</td>
+								<td v-if="file.error">{{file.error}}</td>
+								<td v-else-if="file.success">success</td>
+								<td v-else-if="file.active">active</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<file-upload ref="upload" v-model="files" :drop="true" :multiple="true" :maximum="10" :thread="1"
+					:post-action="uploadUrl" @input-file="inputFile" :data="data" @input-filter="inputFilter">
+					Upload file
+				</file-upload>
+				<!-- <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true"
+					type="button">Start upload</button>
+				<button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false"
+					type="button">Stop upload</button> -->
+
+
+				<!-- <el-upload ref="uploader" :on-exceed="limitNum" :on-success="successUpload" :on-error="errorUpload"
 					class="upload-demo" drag :action="uploadUrl" :limit="10" :multiple="true" :auto-upload="false">
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
 					</div>
 					<div class="el-upload__tip" slot="tip">最多不能超过10个文件</div>
-				</el-upload>
+				</el-upload> -->
 			</div>
 		</div>
-		<div >
+		<div>
 			<table align="center" class="querytable">
 				<tr>
 					<td height="33" colspan="4" class="button_area" align="center">
@@ -68,8 +123,8 @@
 								<td>
 									<a href="#" class="easyui-linkbutton" iconCls="icon-ok" @click="upload"><span key="unit.save"
 											class="paltform-i18n">保存</span></a>
-									<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" @click="cancel"><span
-											key="unit.cancel" class="paltform-i18n">关闭</span></a>
+									<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" @click="cancel"><span key="unit.cancel"
+											class="paltform-i18n">关闭</span></a>
 								</td>
 							</tr>
 						</table>
@@ -81,6 +136,7 @@
 </body>
 <script src="./../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../lib/vue/vue.js"></script>
+<script src="../../lib/vue-upload-component/vue-upload-component.js"></script>
 <script src="./../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../lib/vue-treeselect/vue-treeselect.min.js"></script>
 <script src="./../../common/components/jas-components.js "></script>
@@ -88,25 +144,39 @@
 
 
 <script>
+	Vue.component('file-upload', VueUploadComponent)
 	var app = new Vue({
 		el: "#app",
 		data: function () {
 			var that = this;
 			return {
-				lengthOfFileToSubmit:0,
-				indexOfFileToSubmit:0,
 				treeList: [],
 				treeValue: [],
-				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do'
+				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do?token=' + localStorage.getItem(
+					'token'),
+				files: [],
+				data: {
+					token: localStorage.getItem('token'),
+					fileclassifys: "",
+					folderId: ""
+				}
 			}
+		},
+		components: {
+			FileUpload: VueUploadComponent
 		},
 		created: function () {
 			var that = this;
 			var param = window.jasTools.base.getParamsInUrl(location.href);
 			if (param.oid) {
 				this.oid = param.oid;
+				this.data.folderId = this.oid;
 				this.getDocClassifyTree();
 			};
+			this.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
+				fileclassifys: this.treeValue.join(','),
+				folderId: this.oid
+			});
 		},
 		methods: {
 			cancel: function (param) {
@@ -116,23 +186,19 @@
 			},
 			upload: function () {
 				var that = this;
+				that.data = {
+					folderId: this.oid,
+					fileclassifys: this.treeValue.join(','),
+				}
+				console.log(JSON.stringify(that.data))
 				this.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
-					token: localStorage.getItem('token'),
 					fileclassifys: this.treeValue.join(','),
 					folderId: this.oid
 				});
-				this.$nextTick(function () { //此处进行循环调用上传的方法
-					var files = that.$refs.uploader.uploadFiles.filter(function (item) {
-						return !item.oid
-					});
-					that.lengthOfFileToSubmit = files.length;
-					that.indexOfFileToSubmit = 0;
-					if (files.length > 0) {
-						that.$refs.uploader.submit();
-					} else {
-						that.successUpload();
-					}
-				});
+
+				setTimeout(function () {
+					that.$refs.upload.active = true;
+				}, 300);
 			},
 			getDocClassifyTree: function (oid) {
 				var that = this;
@@ -157,17 +223,65 @@
 			},
 			successUpload: function () {
 				var that = this;
-				that.indexOfFileToSubmit++;
-				if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
-					parent.reloadDataTree(null,0);
+				parent.reloadDataTree(null, 0);
 				that.cancel(1);
+			},
+			inputFile: function (newFile, oldFile) {
+				var that = this;
+				if (newFile && oldFile && !newFile.active && oldFile.active) {
+					if (newFile.xhr) {
+						if (that.$refs.upload.uploaded) {
+							that.successUpload();
+						}
+					}
+				}
+			},
+			inputFilter(newFile, oldFile, prevent) {
+				if (newFile && !oldFile) {
+					if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
+						return prevent()
+					}
+					if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+						return prevent()
+					}
+					if (newFile.file && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress <
+						newFile.size) {
+						newFile.error = 'compressing'
+						const imageCompressor = new ImageCompressor(null, {
+							convertSize: Infinity,
+							maxWidth: 512,
+							maxHeight: 512,
+						})
+						imageCompressor.compress(newFile.file)
+							.then((file) => {
+								this.$refs.upload.update(newFile, {
+									error: '',
+									file,
+									size: file.size,
+									type: file.type
+								})
+							})
+							.catch((err) => {
+								this.$refs.upload.update(newFile, {
+									error: err.message || 'compress'
+								})
+							})
+					}
 				}
 
-			},
-			errorUpload: function (err, file, fileList) {
-				alert("文件上传失败");
 
-				// this.cancel(1);
+				if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
+
+					newFile.blob = ''
+					let URL = window.URL || window.webkitURL
+					if (URL && URL.createObjectURL) {
+						newFile.blob = URL.createObjectURL(newFile.file)
+					}
+					newFile.thumb = ''
+					if (newFile.blob && newFile.type.substr(0, 6) === 'image/') {
+						newFile.thumb = newFile.blob
+					}
+				}
 			},
 		},
 	});
