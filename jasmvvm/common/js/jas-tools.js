@@ -6,6 +6,8 @@
  * ------ jasTools.base.createuuid 创建uuid
  * ------ jasTools.base.extend 对象继承
  * ------ jasTools.base.rootPath 服务器路径中的项目名称
+ * ------ jasTools.base.setAppId 设置appId
+ * ------ jasTools.base.getAppid 获取appId
  * ------ jasTools.base.getParamsInUrl 获取url里的参数
  * ------ jasTools.base.setParamsToUrl 向url里添加参数
  * ------ jasTools.base.getIdArrFromTree 在树形结构内获取id
@@ -160,6 +162,19 @@
 			// return (localhostPaht + projectName + "/");
 		};
 
+		var setAppId = function (appId) {
+			if (!appId) return alert('请传入appId');
+			localStorage.setItem('appId', appId);
+		};
+
+		var getAppId = function () {
+			var id = localStorage.getItem('appId');
+			if (!id) {
+				alert('未设置AppId')
+			}
+			return id;
+		};
+
 		var getIdArrFromTree = function (treeData, nodeId, config) {
 
 			var pidArr = [nodeId];
@@ -297,6 +312,8 @@
 
 		return {
 			rootPath: getRootPath(),
+			setAppId: setAppId,
+			getAppId: getAppId,
 			createuuid: createuuid,
 			extend: extend,
 			formatDate: formatDate,

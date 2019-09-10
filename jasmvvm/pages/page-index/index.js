@@ -41,8 +41,7 @@ window.app = new Vue({
 		this.currentTap = (location.hash && location.hash.slice(1)) || '';
 		this.currentTap && (this.menusOpened = [this.currentTap]);
 		var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
-		this.appId = params.appId || '402894a152681ba30152681e8b320003';
-		// this.appId = '402894a152681ba30152681e8b320003';
+		this.appId = params.appId || jasTools.base.getAppId() || '402894a152681ba30152681e8b320003';
 		this._queryMenuData();
 	},
 	mounted: function () {

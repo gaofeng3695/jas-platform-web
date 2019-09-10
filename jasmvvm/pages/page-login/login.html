@@ -103,6 +103,7 @@
 			};
 		},
 		created: function () {
+			jasTools.base.setAppId('402894a152681ba30152681e8b320003');
 		},
 		mounted: function () {
 
@@ -127,7 +128,7 @@
 						"loginNum": that.ruleForm.userid,
 						"pass": that.ruleForm.pass,
 						"i18n": "zh_CN",
-						"appId": "402894a152681ba30152681e8b320003"
+						"appId": jasTools.base.getAppId() || "402894a152681ba30152681e8b320003"
 					}, function (data) {
 						localStorage.setItem("token", data.token);
 						var userBo = data.user;
