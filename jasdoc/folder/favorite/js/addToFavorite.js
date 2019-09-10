@@ -8,6 +8,7 @@ var oldFolderId = "";
  */
 function queryFavoriteTree() {
 	$('#foldreeventid').combotree({
+		panelHeight:'auto',
 		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",
 		onBeforeExpand:function(node){
 			url=rootPath+"jasdoc/folder/favorite/getChildren.do";

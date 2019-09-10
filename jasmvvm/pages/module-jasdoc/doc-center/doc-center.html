@@ -190,7 +190,11 @@
 										@click="collectFiles">收藏</el-button>
 									<el-button size="small" plain type="warning" icon="fa fa-trash-o"
 										:disabled="selectedRowOids.length==0" @click="deleteFile">删除</el-button>
-									<el-button size="small" plain type="primary" icon="fa fa-file-text" @click="uploadDocFolder">文件夹上传
+									<el-button v-if="docadmin" size="small" plain type="primary" icon="fa fa-file-text"
+										@click="uploadDocFolder">文件夹上传
+									</el-button>
+									<el-button v-if="docadmin" size="small" plain type="primary" icon="fa fa-download"
+										@click="uploadTemplate">下载模板
 									</el-button>
 									<span class="fr">
 										<el-checkbox :disabled="isSearchMode" v-model="isALLFile" style="margin-right: 10px;">显示所有文件
@@ -222,9 +226,8 @@
 												<span>{{scope.row.filename}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="编码" prop="fileno" min-width="130px" show-overflow-tooltip
-										align="center">
-									</el-table-column>
+										<el-table-column label="编码" prop="fileno" min-width="130px" show-overflow-tooltip align="center">
+										</el-table-column>
 										<el-table-column label="格式" prop="filetype" :formatter="formatFiletype" min-width="80px"
 											show-overflow-tooltip align="center">
 										</el-table-column>
@@ -314,6 +317,7 @@
 		el: '#app',
 		data: function () {
 			return {
+				docadmin: false,
 				userName: localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).loginName,
 				classifyTreeList: [],
 				isSearchMode: false,
@@ -409,6 +413,7 @@
 		mounted: function () {
 			this.setFieldsPattern();
 			this.getDocClassifyTree();
+			this.showToolbarByRole();
 		},
 		methods: {
 			formatNames: function (name) {
@@ -747,6 +752,13 @@
 				}
 
 			},
+			uploadTemplate: function () {
+				var baseUrl = jasTools.base.rootPath + '/jasdoc/folder/doccenter/downloadTemplate.do?';
+				var downloadUrl = jasTools.base.setParamsToUrl(baseUrl, {
+					token: localStorage.getItem("token")
+				});
+				jasTools.ajax.downloadByIframe('POST', downloadUrl);
+			}, //下载树形模板
 			_refreshCurrentNode: function () {
 				var that = this;
 				// that.$refs.orgtree.updateKeyChildren(that.currentNodeId, []);
@@ -1002,6 +1014,13 @@
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
 			},
+			showToolbarByRole: function () { //根据当前登录用户设置按钮权限
+				var that = this;
+				var user = JSON.parse(localStorage.getItem('user'));
+				if (user.roleNames.indexOf("docadmin") > -1) {
+					that.docadmin = true;
+				}
+			}
 		},
 	});
 </script>
