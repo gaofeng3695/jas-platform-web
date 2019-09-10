@@ -365,7 +365,7 @@ function operationFileContentMenu(rowData) {
  * 方法描述：创建收藏夹
  */
 function createFolder() {
-	getDlg("addFavorite.htm?parentid=" + folderId + "&folderLocationName=" + folderLocationName, 'addFavorite', "新增收藏夹", 400, 150);
+	getDlg("addFavorite.htm?parentid=" + folderId, 'addFavorite', "新增收藏夹", 400, 150);
 }
 
 /**
