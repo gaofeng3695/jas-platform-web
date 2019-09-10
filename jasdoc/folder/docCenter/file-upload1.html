@@ -10,8 +10,6 @@
 	<link rel="stylesheet" href="./../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
 	<link rel="stylesheet" href="./../../lib/vue-treeselect/vue-treeselect.min.css">
 	<link rel="stylesheet" href="./../../common/css/main.css">
-
-
 	<link rel="stylesheet" type="text/css"
 		href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
 	</link>
@@ -23,7 +21,8 @@
 	</link>
 	<link rel="stylesheet" type="text/css" href="../uploadify/css/uploadify.css">
 	</link>
-
+	<link href="../../lib/vue-upload-component/vue-upload-component.part.css">
+	</link>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js">
@@ -32,9 +31,9 @@
 </head>
 
 <body>
-	<div id="app">
+	<div id="app" v-cloak>
 		<div style="width: 100%;height:512px;padding:15px 10px 0 0;box-sizing: border-box;overflow: auto;">
-			<!-- <el-form ref="formData" label-width="100px">
+			<el-form ref="formData" label-width="100px">
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
 						<el-form-item label="文档分类" prop="foldername">
@@ -44,18 +43,34 @@
 						</el-form-item>
 					</el-col>
 				</el-row>
-			</el-form> -->
-			<div style="text-align: center">
-				<el-upload ref="uploader" :on-exceed="limitNum" :on-error="errorUpload" class="upload-demo" drag action="#"
-					:http-request="uploadSectionFile" :limit="10" :multiple="true" :auto-upload="false"
-					:on-progress="showProgress">
-					<i class="el-icon-upload"></i>
-					<div class="el-upload__text">将文件拖到此处，或
-						<em>点击上传</em>
-					</div>
-					<div class="el-upload__tip" slot="tip">最多不能超过10个文件</div>
-				</el-upload>
-				<!-- <el-progress :text-inside="true" :stroke-width="2" :percentage="percentage"></el-progress> -->
+			</el-form>
+
+			<file-upload ref="upload" style="width:100%" v-model="files" :drop="true" :multiple="true" :maximum="10"
+				:thread="1" :post-action="uploadUrl" @input-file="inputFile" :data="data" @input-filter="inputFilter">
+				<div class="el-upload-dragger" style="margin:auto"><i class="el-icon-upload"></i>
+					<div class="el-upload__text">
+						将文件拖拽到此处，或
+						<em>点击上传</em></div>
+				</div>
+				<div class="el-upload__tip" slot="tip">最多不能超过10个文件</div>
+			</file-upload>
+
+			<div style="text-align: center" v-if="files.length>0">
+				<div class="table-responsive">
+					<el-table :data="files" style="width: 100%">
+						<el-table-column label="序号" type="index" align="center" width="50" fixed>
+						</el-table-column>
+						<el-table-column prop="name" label="名称" align="center">
+						</el-table-column>
+						<el-table-column prop="name" label="进度" align="center">
+							<template slot-scope="scope">
+								<el-progress   :percentage="scope.row.progress"></el-progress>
+							</template>
+						</el-table-column>
+
+					</el-table>
+				</div>
+
 			</div>
 		</div>
 		<div>
@@ -80,6 +95,7 @@
 </body>
 <script src="./../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../lib/vue/vue.js"></script>
+<script src="../../lib/vue-upload-component/vue-upload-component.js"></script>
 <script src="./../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../lib/vue-treeselect/vue-treeselect.min.js"></script>
 <script src="./../../common/components/jas-components.js "></script>
@@ -87,20 +103,26 @@
 
 
 <script>
+	Vue.component('file-upload', VueUploadComponent)
 	var app = new Vue({
 		el: "#app",
 		data: function () {
 			var that = this;
 			return {
-				lengthOfFileToSubmit: 0,
-				indexOfFileToSubmit: 1,
 				treeList: [],
 				treeValue: [],
-				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do',
-				paramsList:[]
-				// fileList: [], //文件列表
-				// percentage: 0, //表示进度条
+				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do?token=' + localStorage.getItem(
+					'token'),
+				files: [],
+				data: {
+					token: localStorage.getItem('token'),
+					fileclassifys: "",
+					folderId: ""
+				}
 			}
+		},
+		components: {
+			FileUpload: VueUploadComponent
 		},
 		created: function () {
 			var that = this;
@@ -118,64 +140,17 @@
 			},
 			upload: function () {
 				var that = this;
-
 				that.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
-					token: localStorage.getItem('token'),
 					fileclassifys: this.treeValue.join(','),
 					folderId: this.oid
 				});
-				this.$nextTick(function () {
-					var files = that.$refs.uploader.uploadFiles.filter(function (item) {
-						return !item.oid
-					});
-					that.lengthOfFileToSubmit = files.length;
-					that.indexOfFileToSubmit = 1;
-					if (files.length > 0) {
-						that.$refs.uploader.submit();
-					} else {
-						that.successUpload();
-					}
+				that.files.forEach(function (item) {
+					item.postAction = that.uploadUrl;
 				});
-			},
-			uploadSectionFile: function (params) {
-				var that = this;
-				if (that.indexOfFileToSubmit < that.lengthOfFileToSubmit) {
-					that.paramsList.push(params);
-				} else {
-					that.paramsList.push(params);
-					that.submitToServer(0);
-				}
-				that.indexOfFileToSubmit++;
-			},
-			submitToServer: function (index) {
-				var that = this;
-				if (index >= that.lengthOfFileToSubmit) {
-					parent.reloadDataTree(null, 0);
-					that.cancel(1);
-					return;
-				} else {
-					var item = that.paramsList[index];
-					var file = item.file;
-					var formData = new FormData();
-					formData.append("file", file);
-					var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/uploadDoc.do?token=" + localStorage.getItem(
-						"token") + "&folderId=" + that.oid + "&fileclassifys=" + that.treeValue.join(',');
-					var xhr = new XMLHttpRequest();
-					xhr.open("post", url, true); //false同步  true异步  同步时无法监听
-					xhr.upload.addEventListener("progress", function (e) {
-						console.log(e)
-						var percentage = Math.round((e.loaded * 100) / e.total);
-						item.onProgress({
-							percent: percentage
-						})
-
-					}, false); //监听上传进度
-					xhr.onload = function () {
-						index++;
-						that.submitToServer(index);
-					};
-					xhr.send(formData);
-				}
+				console.log(that.files)
+				setTimeout(function () {
+					that.$refs.upload.active = true;
+				}, 300);
 			},
 			getDocClassifyTree: function (oid) {
 				var that = this;
@@ -193,22 +168,73 @@
 				}
 			},
 			limitNum: function () {
-
+				// top.Vue.prototype.$message({
+				// 	type: 'info',
+				// 	message: '最多上传一个文件'
+				// });
 			},
 			successUpload: function () {
 				var that = this;
-				that.indexOfFileToSubmit++;
-				if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
-					parent.reloadDataTree(null, 0);
-					that.cancel(1);
+				parent.reloadDataTree(null, 0);
+				that.cancel(1);
+			},
+			inputFile: function (newFile, oldFile) {
+				var that = this;
+				if (newFile && oldFile && !newFile.active && oldFile.active) {
+					if (newFile.xhr) {
+						if (that.$refs.upload.uploaded) {
+							that.successUpload();
+						}
+					}
+				}
+			},
+			inputFilter(newFile, oldFile, prevent) {
+				if (newFile && !oldFile) {
+					if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
+						return prevent()
+					}
+					if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+						return prevent()
+					}
+					if (newFile.file && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress <
+						newFile.size) {
+						newFile.error = 'compressing'
+						const imageCompressor = new ImageCompressor(null, {
+							convertSize: Infinity,
+							maxWidth: 512,
+							maxHeight: 512,
+						})
+						imageCompressor.compress(newFile.file)
+							.then((file) => {
+								this.$refs.upload.update(newFile, {
+									error: '',
+									file,
+									size: file.size,
+									type: file.type
+								})
+							})
+							.catch((err) => {
+								this.$refs.upload.update(newFile, {
+									error: err.message || 'compress'
+								})
+							})
+					}
 				}
 
-			},
-			errorUpload: function (err, file, fileList) {
-				alert("文件上传失败");
 
-				// this.cancel(1);
-			}
+				if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
+
+					newFile.blob = ''
+					let URL = window.URL || window.webkitURL
+					if (URL && URL.createObjectURL) {
+						newFile.blob = URL.createObjectURL(newFile.file)
+					}
+					newFile.thumb = ''
+					if (newFile.blob && newFile.type.substr(0, 6) === 'image/') {
+						newFile.thumb = newFile.blob
+					}
+				}
+			},
 		},
 	});
 </script>
