@@ -23,8 +23,8 @@
           <jas-detail-table :titles="formatFields(item.fields, fieldsConfig)" :detail="detail">
           </jas-detail-table>
         </template>
-        <jas-base-group-title name="附件信息"></jas-base-group-title>
-        <jas-file-list :biz-id="oid"></jas-file-list>
+        <jas-base-group-title v-if="ifAttachment" name="附件信息"></jas-base-group-title>
+        <jas-file-list v-if="ifAttachment" :biz-id="oid"></jas-file-list>
       </div>
     </jas-approve-dialog>
   </div>
@@ -49,6 +49,8 @@
     data: function () {
       var that = this;
       return {
+        ifAttachment: false,
+
         detailFields: [],
         detail: {},
         detailPath: '',
@@ -64,6 +66,7 @@
       this.fieldsConfig = window.pageConfig.fieldsConfig;
       this.detailFields = window.pageConfig.detailFields;
       this.detailPath = window.pageConfig.detailPath;
+      this.ifAttachment = window.pageConfig.ifAttachment;
 
       if (param.oid) {
         this.oid = param.oid;
@@ -96,6 +99,9 @@
           oid: that.oid
         }
         var type = url.indexOf('commonData')>-1?'post':'get';
+        if( url.indexOf('get.do') > -1 ){
+          type = 'get';
+        }        
         jasTools.ajax[type](url, obj, function (data) {
           that.detail = data.data || data.rows[0];
         });

@@ -18,6 +18,18 @@ var apiProxy = proxy(function (pathname, req) {
     }
 });
 
+var apiProxyToRisk = proxy(function (pathname, req) {
+    if (pathname.match('^/jasproxy/jasmvvm')) return false;
+    return pathname.match('^/jasproxy');
+}, {
+    target: 'http://192.168.100.45:38080/',
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: {
+        '^/jasproxy': '/risk',
+    }
+});
+
 var iframeProxy = proxy(function (pathname, req) {
     return pathname.match('^/jasproxy/jasmvvm');
 }, {
@@ -68,7 +80,8 @@ module.exports = {
         baseDir: "./",
         // index: "index.html",
         middleware: [
-            apiProxy,
+            // apiProxy,
+            apiProxyToRisk,
             iframeProxy2,
             iframeProxy3,
             iframeProxy4,

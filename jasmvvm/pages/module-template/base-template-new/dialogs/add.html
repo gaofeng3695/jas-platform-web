@@ -59,16 +59,7 @@
         ifAttachment: false,
         loading: false,
         form: {},
-        options: [{
-          "key": "2ae3f66d-bcf7-4427-a8e0-14c2bd4702f5",
-          "value": "高压管线01"
-        }, {
-          "key": "c7bcd53c-c59c-4cb0-842c-36cfe7d078a6",
-          "value": "高压管线02"
-        }, {
-          "key": "99417af1-fbce-459a-879a-d5efe3a49e0e",
-          "value": "高压管线03"
-        }]
+        options: []
       }
     },
     created: function () {
@@ -116,7 +107,7 @@
         });
         if (pageConfig.searchParams) {
           obj = jasTools.base.extend(obj, pageConfig.searchParams);
-        }
+        }        
         return obj;
       },
       formatFields: function (fields, fieldsConfig) {
@@ -156,6 +147,8 @@
           } else {
             that.uploadSuccess();
           }
+        },function(){
+          that.loading = false;
         });
 
       },
@@ -171,6 +164,9 @@
         var that = this;
         var url = jasTools.base.rootPath + this.detailPath;
         var type = url.indexOf('commonData') > -1 ? 'post' : 'get';
+        if( url.indexOf('get.do') > -1 ){
+          type = 'get';
+        }
         jasTools.ajax[type](url, {
           oid: that.oid
         }, function (data) {
