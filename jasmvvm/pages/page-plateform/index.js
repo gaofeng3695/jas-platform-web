@@ -47,7 +47,7 @@ window.app = new Vue({
 			var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getChildrenMenuList.do';
 			jasTools.ajax.get(url, {
 				id: fid,
-				appId: '402894a152681ba30152681e8b320003',
+				appId: jasTools.base.getAppId() || '402894a152681ba30152681e8b320003',
 			}, function (data) {
 				console.log(data)
 
@@ -66,7 +66,7 @@ window.app = new Vue({
 			var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getProject.do';
 			jasTools.ajax.postForm(url, {
 				"menutype": "0",
-				"appnumber": "402894a152681ba30152681e8b320003",
+				"appnumber": jasTools.base.getAppId() || "402894a152681ba30152681e8b320003",
 				"language": "zh_CN"
 			}, function (data) {
 				that.isloading = false;
@@ -161,7 +161,7 @@ window.app = new Vue({
 			var url = jasTools.base.rootPath + '/jasframework/multiprojectPrivilege/getProject.do';
 			jasTools.ajax.postForm(url, {
 				"menutype": "0",
-				"appnumber": "402894a152681ba30152681e8b320003",
+				"appnumber": jasTools.base.getAppId() || "402894a152681ba30152681e8b320003",
 				"language": "zh_CN",
 				queryType: 1
 			}, function (data) {
