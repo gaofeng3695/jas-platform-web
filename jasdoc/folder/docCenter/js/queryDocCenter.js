@@ -952,7 +952,7 @@ function addToFavorite(eventid, filename) {
 			}
 			eventids = eventids.substring(0, eventids.length - 1);
 			filenames = filenames.substring(0, filenames.length - 1);
-			getDlg("../favorite/addToFavorite.htm?docIds=" + eventids + "&fileNames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 164);
+			getDlg("../favorite/addToFavorite.htm?eventids=" + eventids + "&filenames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 164);
 
 		} else {
 			$.messager.alert('提示', '请选择记录', 'info');

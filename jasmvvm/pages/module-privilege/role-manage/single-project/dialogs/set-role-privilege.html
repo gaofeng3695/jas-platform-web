@@ -73,7 +73,7 @@
 </head>
 
 <body>
-	<div id="app" v-cloak>
+	<div id="app" v-cloak v-loading="saveLoading"  element-loading-text="正在保存，请稍候。。">
 		<!--<jas-dialog-wrapper>-->
 		<jas-two-panel-resizer layout="vertical" length="200px">
 			<template slot="closePanel">
@@ -91,7 +91,7 @@
 					<el-button size="small" plain type="primary" icon="fa fa-refresh" @click="refreshCurrentAppTree">刷新</el-button>
 					<el-button size="small" type="primary" icon="fa fa-floppy-o" @click="saveAppPrival">保存</el-button>
 				</div>
-				<el-tree v-loading="loading" class="is-grown" ref="privaltree" :data="menuData" node-key="id" :props="defaultProps" show-checkbox
+				<el-tree ref="menuTree" v-loading="loading" class="is-grown" ref="privaltree" :data="menuData" node-key="id" :props="defaultProps" show-checkbox
 				 :default-expanded-keys="[currentNodeId]" :default-checked-keys="checkedKeys" highlight-current @node-click="clicknode"
 				 :expand-on-click-node="false" style="margin-top: 10px "></el-tree>
 				</el-tree>
@@ -112,10 +112,12 @@
 		data: function () {
 			var that = this;
 			return {
+				loadig:true,
 				applications: [],//获取当前用户所拥有的系统列表
 				roleId: '',//用户角色Id
 				but_disabled: false,
 				loading: false,
+				saveLoading:false,
 				// tableFormData: {
 				// },
 				currentApplicationId: '',
@@ -184,22 +186,62 @@
 			},
 			saveAppPrival: function () {
 				var that = this;
+				that.saveLoading=true;
 				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/setPrivilege.do";
+				var aKey = that.getCheckedKeys(that.menuData, that.$refs.menuTree.getCheckedKeys(), 'id');
+				console.log(aKey);
 				jasTools.ajax.postForm(url, {
 					appId: that.currentApplicationId,
 					roleId: that.roleId,
-					privilegeIds: that.$refs.privaltree.getCheckedKeys().join(",")
+					privilegeIds:aKey.join(",")
 				}, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',
 						message: "权限分配成功"
 					});
+					that.saveLoading=false;
 					//	that.cancel(1);
 				}, function (data) {
 					if (data.status == -1) {
 						that.but_disabled = false;
 					}
 				});
+			},
+				getCheckedKeys: function(data, keys, key) {
+				var res = [];
+				recursion(data, false);
+				return res;
+
+				// arr -> 树形总数据
+				// keys -> getCheckedKeys获取到的选中key值
+				// isChild -> 用来判断是否是子节点
+				function recursion (arr, isChild) {
+					var aCheck = [];
+					for ( var i = 0; i < arr.length; i++ ) {
+						var obj = arr[i];
+						aCheck[i] = false;
+
+						if ( obj.children ) {
+							aCheck[i] = recursion(obj.children, true) ? true : aCheck[i];
+							if ( aCheck[i] ) {
+								res.push(obj[key]);
+							}
+						}
+
+						for ( var j = 0; j < keys.length; j++ ) {
+							if ( obj[key] == keys[j] ) {
+								aCheck[i] = true;
+								if ( res.indexOf(obj[key]) == -1 ) {
+									res.push(obj[key]);
+								}
+								break;
+							}
+						}
+					}
+					if ( isChild ) {
+						return aCheck.indexOf(true) != -1;
+					}
+				}
 			},
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
