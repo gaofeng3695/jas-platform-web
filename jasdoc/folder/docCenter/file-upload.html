@@ -34,7 +34,7 @@
 <body>
 	<div id="app">
 		<div style="width: 100%;height:512px;padding:15px 10px 0 0;box-sizing: border-box;overflow: auto;">
-			<!-- <el-form ref="formData" label-width="100px">
+			<el-form ref="formData" label-width="100px">
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
 						<el-form-item label="文档分类" prop="foldername">
@@ -44,18 +44,16 @@
 						</el-form-item>
 					</el-col>
 				</el-row>
-			</el-form> -->
+			</el-form>
 			<div style="text-align: center">
 				<el-upload ref="uploader" :on-exceed="limitNum" :on-error="errorUpload" class="upload-demo" drag action="#"
-					:http-request="uploadSectionFile" :limit="10" :multiple="true" :auto-upload="false"
-					:on-progress="showProgress">
+					:http-request="uploadSectionFile" :limit="10" :multiple="true" :auto-upload="false">
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
 					</div>
 					<div class="el-upload__tip" slot="tip">最多不能超过10个文件</div>
 				</el-upload>
-				<!-- <el-progress :text-inside="true" :stroke-width="2" :percentage="percentage"></el-progress> -->
 			</div>
 		</div>
 		<div>
@@ -97,7 +95,7 @@
 				treeList: [],
 				treeValue: [],
 				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do',
-				paramsList:[]
+				paramsList: []
 				// fileList: [], //文件列表
 				// percentage: 0, //表示进度条
 			}
@@ -163,7 +161,7 @@
 					var xhr = new XMLHttpRequest();
 					xhr.open("post", url, true); //false同步  true异步  同步时无法监听
 					xhr.upload.addEventListener("progress", function (e) {
-						console.log(e)
+						// console.log(e)
 						var percentage = Math.round((e.loaded * 100) / e.total);
 						item.onProgress({
 							percent: percentage
@@ -193,7 +191,7 @@
 				}
 			},
 			limitNum: function () {
-
+				parent.showAlert('提示', "最多上传10个文件", 'info');
 			},
 			successUpload: function () {
 				var that = this;

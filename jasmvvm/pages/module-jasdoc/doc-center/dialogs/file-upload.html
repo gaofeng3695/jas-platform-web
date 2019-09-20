@@ -31,9 +31,9 @@
 			<jas-base-group-title name="选择文件"></jas-base-group-title>
 			<div style="text-align: center">
 
-				<el-upload ref="uploader" :on-exceed="limitNum"  :on-success="successUpload"
-					:on-error="errorUpload" class="upload-demo" drag :action="uploadUrl" :limit="10" :multiple="true"
-					:auto-upload="false"  :on-progress="showPressage" >
+				<el-upload ref="uploader" :on-exceed="limitNum" :on-error="errorUpload" class="upload-demo" drag action="#"
+					:http-request="uploadSectionFile" :limit="10" :multiple="true" :auto-upload="false"
+					>
 					<i class="el-icon-upload"></i>
 					<div class="el-upload__text">将文件拖到此处，或
 						<em>点击上传</em>
@@ -63,11 +63,14 @@
 		data: function () {
 			var that = this;
 			return {
-				lengthOfFileToSubmit:0,
-				indexOfFileToSubmit:0,
+				lengthOfFileToSubmit: 0,
+				indexOfFileToSubmit: 1,
 				treeList: [],
 				treeValue: [],
-				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do'
+				uploadUrl: jasTools.base.rootPath + '/jasdoc/folder/doccenter/uploadDoc.do',
+				paramsList:[]
+				// fileList: [], //文件列表
+				// percentage: 0, //表示进度条
 			}
 		},
 		created: function () {
@@ -81,26 +84,67 @@
 		methods: {
 			cancel: function (param) {
 				window.parent.jasTools.dialog.close(param);
+
 			},
 			upload: function () {
 				var that = this;
-				this.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
+
+				that.uploadUrl = jasTools.base.setParamsToUrl(this.uploadUrl, {
 					token: localStorage.getItem('token'),
 					fileclassifys: this.treeValue.join(','),
 					folderId: this.oid
 				});
-				this.$nextTick(function () { //此处进行循环调用上传的方法
+				this.$nextTick(function () {
 					var files = that.$refs.uploader.uploadFiles.filter(function (item) {
 						return !item.oid
 					});
 					that.lengthOfFileToSubmit = files.length;
-					that.indexOfFileToSubmit = 0;
+					that.indexOfFileToSubmit = 1;
 					if (files.length > 0) {
 						that.$refs.uploader.submit();
 					} else {
 						that.successUpload();
 					}
 				});
+			},
+			uploadSectionFile: function (params) {
+				var that = this;
+				if (that.indexOfFileToSubmit < that.lengthOfFileToSubmit) {
+					that.paramsList.push(params);
+				} else {
+					that.paramsList.push(params);
+					that.submitToServer(0);
+				}
+				that.indexOfFileToSubmit++;
+			},
+			submitToServer: function (index) {
+				var that = this;
+				if (index >= that.lengthOfFileToSubmit) {
+
+					that.cancel(1);
+					return;
+				} else {
+					var item = that.paramsList[index];
+					var file = item.file;
+					var formData = new FormData();
+					formData.append("file", file);
+					var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/uploadDoc.do?token=" + localStorage.getItem(
+						"token") + "&folderId=" + that.oid + "&fileclassifys=" + that.treeValue.join(',');
+					var xhr = new XMLHttpRequest();
+					xhr.open("post", url, true); //false同步  true异步  同步时无法监听
+					xhr.upload.addEventListener("progress", function (e) {
+						var percentage = Math.round((e.loaded * 100) / e.total);
+						item.onProgress({
+							percent: percentage
+						})
+
+					}, false); //监听上传进度
+					xhr.onload = function () {
+						index++;
+						that.submitToServer(index);
+					};
+					xhr.send(formData);
+				}
 			},
 			getDocClassifyTree: function (oid) {
 				var that = this;
@@ -120,10 +164,10 @@
 			limitNum: function () {
 				top.Vue.prototype.$message({
 					type: 'info',
-					message: '最多上传一个文件'
+					message: '最多上传10个文件'
 				});
 			},
-			successUpload: function (response, file, fileList) {
+			successUpload: function () {
 				var that = this;
 				that.indexOfFileToSubmit++;
 				if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
@@ -136,16 +180,9 @@
 
 			},
 			errorUpload: function (err, file, fileList) {
-				top.Vue.prototype.$message({
-					type: 'error',
-					message: '上传失败'
-				});
+				alert("文件上传失败");
+
 				// this.cancel(1);
-			},
-			showPressage:function(a,b,c){
-				console.log(a);
-				console.log(b);
-				console.log(c)
 			}
 		},
 	});

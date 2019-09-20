@@ -11,51 +11,56 @@ var pageConfig = {
   },
   ifAttachment: false,
   ifHideSearch: false,
-
+  isHideBtnCol: true,
   topBtns: [{
       name: '新增',
       icon: 'fa fa-plus',
       method: 'addItem'
-    }
-  //   {
-  //   name: '模型复制',
-  //   icon: 'fa fa-clone',
-  //   method: 'riskModelCopy'
-  // }
-],
+    },
+    //   {
+    //   name: '模型复制',
+    //   icon: 'fa fa-clone',
+    //   method: 'riskModelCopy'
+    // }
+  ],
   btncolwidth: '220px',
-  rowBtns: [ 
-    {
+  rowBtns: [{
       name: '定义模型',
+      icon: 'fa fa-clone',
       method: 'definitionRiskModel',
       // type:'primary',
       isShow: function (row) {
-        return row.useStatus == '未使用' && row.riskModelType != '1' ;
+        return row.useStatus == '未使用' && row.riskModelType != '1';
       }
     }, {
       name: '查看模型',
       method: 'definitionRiskModel',
-      // type:'success',
+      icon: 'fa fa-eye',
       isShow: function (row) {
         return row.useStatus == '已使用' || row.riskModelType == '1';
       }
     }, {
       name: '详情',
+      isTip: true,
+      icon: 'fa fa-eye',
       privilegeCode: 'bt_select',
       method: 'detailItem',
     }, {
       name: '编辑',
+      isTip: true,
+      icon: 'fa fa-edit',
       privilegeCode: 'bt_update',
       method: 'addItem',
       isShow: function (row) {
-        return row.riskModelType != '1' &&  row.useStatus != '已使用' ;
+        return row.riskModelType != '1' && row.useStatus != '已使用';
       }
     }, {
       name: '删除',
+      icon: 'fa fa-delete',
       privilegeCode: 'bt_delete',
       isDefaultMethod: true,
       isShow: function (row) {
-        return row.riskModelType != '1' && row.useStatus != '已使用' ;
+        return row.riskModelType != '1' && row.useStatus != '已使用';
       }
     }
 
@@ -69,26 +74,26 @@ var pageConfig = {
   searchFields: [
     'riskModelName',
     'riskModelCode',
-    'riskModelType'
+    'riskModelType',
+    'createDatetime'
   ],
   tableFields: [
     'riskModelName',
     'riskModelCode',
-    'useStatus',
+    // 'useStatus',
     'modelStatistics',
     'description',
     'createUserName',
-    'createDatetime',  
+    'createDatetime',
     'oid'
   ],
   addFields: [{
-      title: '模型信息',
-      fields: [
-        'riskModelName',
-        'riskModelCode',
-      ]
-    }
-  ],
+    title: '模型信息',
+    fields: [
+      'riskModelName',
+      'riskModelCode',
+    ]
+  }],
   detailFields: [{
       title: '模型信息',
       fields: [
@@ -100,7 +105,7 @@ var pageConfig = {
       title: '其他信息',
       fields: [
         'createUserName',
-        'createDatetime',  
+        'createDatetime',
         'description',
       ]
     }
@@ -119,15 +124,18 @@ var pageConfig = {
     riskModelCode: {
       name: '模型编号',
       type: 'input',
-      isRequired: false
+      sortable:true,
+      isRequired: false,
+      //高级搜索，如果没有该配置为空数组即可
+
     },
     useStatus: {
       name: '使用状态',
       type: 'input',
       isRequired: false,
-      tagTypeFn:function(row){ // success/info/warning/danger
-        if( row.useStatus == '已使用') return 'success';
-        if( row.useStatus == '未使用') return 'warning';
+      tagTypeFn: function (row) { // success/info/warning/danger
+        if (row.useStatus == '已使用') return 'success';
+        if (row.useStatus == '未使用') return 'warning';
       }
     },
     description: {
@@ -141,6 +149,7 @@ var pageConfig = {
       type: 'select',
       name: '模型类型',
       domainName: 'risk_model_type',
+      isMoreSearch: true,
       isRequired: false
       // width: '200px',
     },
@@ -148,6 +157,7 @@ var pageConfig = {
       name: '创建时间',
       type: 'date',
       isRequired: true,
+      isMoreSearch: true,
       // width: '160px',
     },
     modifyDatetime: {
@@ -162,7 +172,7 @@ var pageConfig = {
       isRequired: true,
       // width: '160px',
     },
-    modelSourceId:{
+    modelSourceId: {
       name: '模型复制',
       type: 'select',
       optionUrl: '/jdbc/commonData/getRiskModelList/simpleQuery.do',
@@ -171,17 +181,17 @@ var pageConfig = {
         value: 'KEY'
       }
     },
-    modelStatistics:{
+    modelStatistics: {
       name: '统计信息',
       width: '430px'
     }
   },
   methods: {
-    detailItem:function(row){
+    detailItem: function (row) {
       var that = this;
       var url = jasTools.base.rootPath +
-        '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/detail-risk-model-manage.html?pageCode=risk-model-manage&oid='+row.oid;
-      
+        '/jasmvvm/pages/module-template/base-template-new/dialogs/detail-easyui.html?pageCode=risk-model-manage&oid=' + row[0].oid;
+
       top.jasTools.dialog.show({
         height: '50%',
         width: '800px',
@@ -192,22 +202,22 @@ var pageConfig = {
         }
       });
     },
-    addItem: function(row){
+    addItem: function (row) {
       console.log(row);
       //console.log(this) // this指向当前的vue实例，此处可操作vue的实例
       var that = this;
       var url;
-      if(typeof(row.oid) == "undefined"){
+      if (row && typeof (row.oid) == "undefined") {
         url = jasTools.base.rootPath +
-        '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/add-risk-model-manage.html?pageCode=risk-model-manage';
-      }else{
+          '/jasmvvm/pages/module-template/base-template-new/dialogs/add-easyui.html?pageCode=risk-model-manage';
+      } else {
         url = jasTools.base.rootPath +
-        '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/add-risk-model-manage.html?pageCode=risk-model-manage&oid='+row.oid;
+          '/jasmvvm/pages/module-template/base-template-new/dialogs/add-easyui.html?pageCode=risk-model-manage&oid=' + row[0].oid;
       }
       var title = '新增';
-      if(row.oid){
+      if (row.oid) {
         title = '编辑';
-      }  
+      }
       top.jasTools.dialog.show({
         height: '54%',
         width: '860px',
@@ -228,15 +238,15 @@ var pageConfig = {
         title: '【' + row.riskModelName + '】要素配置',
         src: url,
         cbForClose: function (param) {
-          
+
         }
       });
     },
-    riskModelCopy: function(){
+    riskModelCopy: function () {
       var that = this;
-      var url  = jasTools.base.rootPath + '/treeView/cloneTree.do?treeViewCode=modelClone';
+      var url = jasTools.base.rootPath + '/treeView/cloneTree.do?treeViewCode=modelClone';
       that.$refs.table.loading = true;
-      if(window.vm.$refs.table.oids && window.vm.$refs.table.oids.length === 1){
+      if (window.vm.$refs.table.oids && window.vm.$refs.table.oids.length === 1) {
         //console.log(window.vm.$refs.table.oids);
         jasTools.ajax.get(url, {
           'oid': window.vm.$refs.table.oids[0]
@@ -251,9 +261,9 @@ var pageConfig = {
           that.$refs.table.loading = false;
           that.$refs.table.refresh();
         });
-       
-      }else{
-        
+
+      } else {
+
         top.Vue.prototype.$message({
           type: 'warning',
           message: '请选择一个模型复制！'
