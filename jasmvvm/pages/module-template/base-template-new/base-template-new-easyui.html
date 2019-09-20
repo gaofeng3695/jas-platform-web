@@ -9,37 +9,40 @@
   <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
   <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="./../../../common/css/main.css">
+  <link rel="stylesheet" href="./../../../common/css/easyui-reset.css">
   <style>
     .el-tag {
-        padding: 0px 0px;
-        margin: 0px 0px;
-        height: 100%;
-        width: 100%;
-        line-height: 36px;
-        font-size: 12px;
-        border-radius: 0px;
-        box-sizing: border-box;
-        border: 0px solid rgba(64,158,255,.2);
-        white-space: nowrap;
+      padding: 0px 0px;
+      margin: 0px 0px;
+      height: 100%;
+      width: 100%;
+      line-height: 36px;
+      font-size: 12px;
+      border-radius: 0px;
+      box-sizing: border-box;
+      border: 0px solid rgba(64, 158, 255, .2);
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
-  <div id="app" v-cloak>
+  <div id="app" v-cloak style="	background: #eee;">
 
     <jas-list-wrapper :if-search="searchFields.length>0">
-      <jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig" @search="searchList"></jas-search-for-list>
+      <jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig"
+        @search="searchList"></jas-search-for-list>
 
       <jas-table-for-list-new ref="table" slot="list" :is-search-btn="searchFields.length>0" @locate="locate"
-        :privilege-code="privilegeCode" :fields="tableFields" :form="topSearch" :search-path="searchPath" :delete-path="deletePath"
-        :add-url="addUrl" :detail-url="detailUrl" :upcall-path="upcallPath" :class-name="className" @deleterow="deleteRow"
-        @clickrowbtn="clickrowbtn" :row-btns="rowBtns" :btncolwidth="btncolwidth" :propconfig="{oid:'oid'}"
-        :import-config="importConfig" :template-code="templateCode" :export-template-code="exportTemplateCode"
-        :is-hide-btn-col="isHideBtnCol" :dialogconfig="dialogconfig">
+        :privilege-code="privilegeCode" :fields="tableFields" :form="topSearch" :search-path="searchPath"
+        :delete-path="deletePath" :add-url="addUrl" :detail-url="detailUrl" :upcall-path="upcallPath"
+        :class-name="className" @deleterow="deleteRow" @clickrowbtn="clickrowbtn" :row-btns="rowBtns"
+        :btncolwidth="btncolwidth" :propconfig="{oid:'oid'}" :import-config="importConfig" :template-code="templateCode"
+        :export-template-code="exportTemplateCode" :is-hide-btn-col="isHideBtnCol" :dialogconfig="dialogconfig"
+        @selectchanged="selectchanged">
         <template slot="btns">
-          <el-button v-for="item in topBtns" v-if="item.method" size="small" plain :icon="item.icon" @click="clickCustomFn(item.method,item)"
-            type="primary">{{item.name}}</el-button>
+          <el-button v-for="item in topBtns" v-if="item.method" :disabled="disableBtns(item,rows)" size="small" plain :icon="item.icon"
+            @click="clickCustomFn(item.method,item)" type="primary">{{item.name}}</el-button>
         </template>
       </jas-table-for-list-new>
     </jas-list-wrapper>
@@ -49,9 +52,9 @@
 
 <script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../lib/vue/vue.js"></script>
-<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1-easyui/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
-<script src="./../components/components.js"></script>
+<script src="./../components/components-easyui-reset.js"></script>
 <script src="./../../../common/js/jas-tools.js"></script>
 <script>
   (function () { //加载配置未见
@@ -82,6 +85,7 @@
             rowBtns: [] || ['配置', '审核'],
             btncolwidth: '180px',
             isHideBtnCol: false,
+            rows: [], //表示当前选中的行
           }
         },
         created: function () {
@@ -95,10 +99,10 @@
 
 
           that.addUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/add.html?pageCode=' + that.pageCode;
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/add-easyui.html?pageCode=' + that.pageCode;
           that.detailUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/detail.html?pageCode=' + that
-              .pageCode;
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/detail-easyui.html?pageCode=' + that
+            .pageCode;
           if (pageConfig.addParams) {
             that.addUrl = jasTools.base.setParamsToUrl(that.addUrl, pageConfig.addParams)
           }
@@ -119,28 +123,31 @@
           that.btncolwidth = that.pageConfig.btncolwidth ? that.pageConfig.btncolwidth : that.btncolwidth;
           that.topBtns = that.pageConfig.topBtns;
           that.rowBtns = that.pageConfig.rowBtns || [];
-          // that.rowBtns = that.pageConfig.rowBtns && that.pageConfig.rowBtns.map(function (item) {
-          //   return item.name
-          // });
-
+          that.topBtns=that.topBtns.concat(that.rowBtns);
           that.fieldsConfig = that.pageConfig.fieldsConfig;
           that.searchFields = that.formatFields(that.pageConfig.searchFields, that.fieldsConfig);
           that.tableFields = that.formatFields(that.pageConfig.tableFields, that.fieldsConfig);
           that.topSearch = that.formatForm(that.pageConfig.searchFields);
-
-
         },
         mounted: function () {
-          console.log(pageConfig.searchFields.length > 0, 1, 1)
           if (pageConfig.ifHideSearch && (pageConfig.searchFields.length > 0)) {
             this.$refs.table.toggleSearch();
           }
         },
         methods: {
-          clickCustomFn: function (name, a, b, c, d) {
+          disableBtns: function (btnCfg,rows) {
+            if (btnCfg.isShow) {
+              return !btnCfg.isShow(rows);
+            }
+            return false;
+          },
+          selectchanged: function (rows) {
+            this.rows = rows;
+          },
+          clickCustomFn: function (name, btnCfg) {
             var fn = this.pageConfig.methods[name];
             if (fn) {
-              fn.call(this, a, b, c, d);
+              fn.call(this, this.rows);
             }
           },
           formatForm: function (fields) {
@@ -164,8 +171,8 @@
                 tablehidden: fieldsConfig[item].tablehidden,
                 tagTypeFn: fieldsConfig[item].tagTypeFn,
               } : {
-                  field: item
-                };
+                field: item
+              };
             });
           },
           searchList: function () {
@@ -193,22 +200,23 @@
               }
             }
           },
-          clickrowbtn: function (a, b) {
+          clickrowbtn: function (row, btnName) {
             // console.log(a, b)
             var fn = null;
             var that = this;
             that.pageConfig.rowBtns && that.pageConfig.rowBtns.forEach(function (item) {
-              if (item.name == b) {
+              if (item.name == btnName) {
                 fn = that.pageConfig.methods[item.method];
               }
             });
             if (fn) {
-              fn.call(this, a, b);
+              fn.call(this, [row]);
             }
           },
-          deleteRow: function (a, b) { 
+          deleteRow: function (a, b) {
             console.log(a, b)
           },
+
         },
       });
     });
