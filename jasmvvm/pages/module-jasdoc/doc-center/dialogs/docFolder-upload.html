@@ -53,7 +53,7 @@
 			<div slot="footer">
 				<el-button size="small" @click="cancel()" v-show="isCancel">取
 					消</el-button>
-				<el-button size="small" type="primary" @click="submit" v-show="isBtn">{{butName}}</el-button>
+				<el-button size="small" type="primary" @click="submit" v-show="isBtn" :disabled="btnDisabled">{{butName}}</el-button>
 			</div>
 
 
@@ -85,8 +85,9 @@
 				isCancel: true,
 				msgs: [], //数据校验结果显示
 				uploadUrl: jasTools.base.rootPath +
-					"/jasdoc/folder/doccenter/verification.do" //上传之前进行数据的校验
+					"/jasdoc/folder/doccenter/verification.do" ,//上传之前进行数据的校验
 				//    校验成功之后 进行数据的上传
+				btnDisabled:false,//按钮是否禁用
 			}
 		},
 		created: function () {
@@ -102,12 +103,12 @@
 			},
 			submit: function () {
 				var that = this;
+				that.btnDisabled=true;//禁用
 				if (that.fileUpload) {
 					that.upload();
 				} else if (that.fileVerification) {
 					that.dataImport();
 				}
-
 			},
 			upload: function () {
 				var that = this;
@@ -115,6 +116,7 @@
 					folderid: that.oid,
 					token: localStorage.getItem('token')
 				});
+				that.btnDisabled=false;
 				this.$nextTick(function () {
 					that.$refs.uploader.submit();
 				});
@@ -129,6 +131,7 @@
 				}
 			},
 			limitNum: function () {
+				that.btnDisabled=false;
 				top.Vue.prototype.$message({
 					type: 'info',
 					message: '最多上传一个文件'
@@ -162,6 +165,7 @@
 				jasTools.ajax.post(url, {
 
 				}, function (data) {
+					that.btnDisabled=false;
 					if (data.status == 1) {
 						top.Vue.prototype.$message({
 							type: 'success',
@@ -178,6 +182,7 @@
 				});
 			},
 			errorUpload: function (err, file, fileList) {
+				that.btnDisabled=false;
 				top.Vue.prototype.$message({
 					type: 'error',
 					message: '上传失败'

@@ -27,6 +27,30 @@
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js">
 	</script>
+	<style>
+		.iconBtn {
+			background: none !important;
+			border: none !important;
+			font-size: 18px;
+		}
+
+		.iconBtn i {
+			color: #409EFF
+		}
+
+		.cell {
+			height: 32px;
+			line-height: 32px;
+		}
+
+		input {
+			height: 30px;
+			width: 100%;
+			border: 1px solid #ddd;
+			line-height: 30px;
+			padding-left: 5px;
+		}
+	</style>
 
 </head>
 
@@ -61,13 +85,28 @@
 						<el-table-column label="序号" type="index" align="center" width="50" fixed>
 						</el-table-column>
 						<el-table-column prop="name" label="名称" align="center">
+							<template slot-scope="scope">
+								<span v-if="!scope.row.isEdit">{{scope.row.name}}</span>
+								<input v-else v-model="scope.row.name" size="small">
+							</template>
+						</el-table-column>
+						<el-table-column prop="size" label="大小" align="center">
 						</el-table-column>
 						<el-table-column prop="name" label="进度" align="center">
 							<template slot-scope="scope">
-								<el-progress   :percentage="scope.row.progress"></el-progress>
+								<el-progress :percentage="scope.row.progress"></el-progress>
 							</template>
 						</el-table-column>
-
+						<el-table-column label="操作" align="center">
+							<template slot-scope="scope">
+								<el-button class="iconBtn" size="small" plain type="primary" icon="fa fa-edit"
+									@click="editFileName(scope.row)">
+								</el-button>
+								<el-button class="iconBtn" size="small" plain type="primary" icon="fa fa-remove"
+									@click="delFiles(scope.row)">
+								</el-button>
+							</template>
+						</el-table-column>
 					</el-table>
 				</div>
 
@@ -117,7 +156,7 @@
 				data: {
 					token: localStorage.getItem('token'),
 					fileclassifys: "",
-					folderId: ""
+					folderId: "",
 				}
 			}
 		},
@@ -147,7 +186,7 @@
 				that.files.forEach(function (item) {
 					item.postAction = that.uploadUrl;
 				});
-				console.log(that.files)
+				// console.log(that.files)
 				setTimeout(function () {
 					that.$refs.upload.active = true;
 				}, 300);
@@ -190,51 +229,47 @@
 			},
 			inputFilter(newFile, oldFile, prevent) {
 				if (newFile && !oldFile) {
+					newFile.size = this.changeToKb(newFile.size);
+					newFile.progress = Number(newFile.progress);
 					if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
 						return prevent()
 					}
 					if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
 						return prevent()
 					}
-					if (newFile.file && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress <
-						newFile.size) {
-						newFile.error = 'compressing'
-						const imageCompressor = new ImageCompressor(null, {
-							convertSize: Infinity,
-							maxWidth: 512,
-							maxHeight: 512,
-						})
-						imageCompressor.compress(newFile.file)
-							.then((file) => {
-								this.$refs.upload.update(newFile, {
-									error: '',
-									file,
-									size: file.size,
-									type: file.type
-								})
-							})
-							.catch((err) => {
-								this.$refs.upload.update(newFile, {
-									error: err.message || 'compress'
-								})
-							})
-					}
-				}
-
-
-				if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
-
-					newFile.blob = ''
-					let URL = window.URL || window.webkitURL
-					if (URL && URL.createObjectURL) {
-						newFile.blob = URL.createObjectURL(newFile.file)
-					}
-					newFile.thumb = ''
-					if (newFile.blob && newFile.type.substr(0, 6) === 'image/') {
-						newFile.thumb = newFile.blob
-					}
 				}
 			},
+			changeToKb: function (limit) {
+				var size = "";
+				if (limit < 0.1 * 1024) { //小于0.1KB，则转化成B
+					size = limit.toFixed(2) + "B"
+				} else if (limit < 0.1 * 1024 * 1024) { //小于0.1MB，则转化成KB
+					size = (limit / 1024).toFixed(2) + "KB"
+				} else if (limit < 0.1 * 1024 * 1024 * 1024) { //小于0.1GB，则转化成MB
+					size = (limit / (1024 * 1024)).toFixed(2) + "MB"
+				} else { //其他转化成GB
+					size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB"
+				}
+				var sizeStr = size + ""; //转成字符串
+				var index = sizeStr.indexOf("."); //获取小数点处的索引
+				var dou = sizeStr.substr(index + 1, 2) //获取小数点后两位的值
+				if (dou == "00") { //判断后两位是否为00，如果是则删除00
+					return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
+				}
+				return size;
+			},
+			editFileName: function (row) {
+				if (!row.isEdit) {
+					row.isEdit = true;
+				} else {
+					row.isEdit = true;
+				}
+			},
+			delFiles: function (row) {
+				this.files = this.files.filter(function (item) {
+					return item.id != row.id;
+				});
+			}
 		},
 	});
 </script>
