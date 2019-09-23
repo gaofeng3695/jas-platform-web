@@ -1,60 +1,130 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta http-equiv="pragma" content="no-cache" />
-<meta name="keywords" content="gis,web">
-<meta name="description" content="">
-<title></title>
-	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta name="keywords" content="gis,web">
+	<meta name="description" content="">
+	<title></title>
+	<link rel="stylesheet" type="text/css"
+		href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
-	 <!-- <link rel="stylesheet" href="../../../jasframework/common/css/addAndUpdateStyle.css" type="text/css"></link> -->
-	<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
+	<!-- <link rel="stylesheet" href="../../../jasframework/common/css/addAndUpdateStyle.css" type="text/css"></link> -->
+	<link rel="stylesheet" href="../../common/css/add.css" type="text/css">
+	</link>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery-1.6.min.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
-	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js">
+	</script>
 	<script type="text/javascript" src="../../../jasframework/common/js/validate_class.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/AppConfig.js"></script>
 	<script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
 	<script type="text/javascript" src="js/addFolder.js"></script>
+	<style>
+		.line{
+			display: inline-block;
+		}
+		div {
+			position: relative;
+			line-height: 30px;
+		}
+
+		input[type="radio"] {
+			width: 20px;
+			height: 20px;
+			opacity: 0;
+		}
+
+		label {
+			position: absolute;
+			left: 10px;
+			top: 11px;
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+			border: 1px solid #999;
+		}
+		input:checked+label {
+			background-color: #006eb2;
+			border: 1px solid #006eb2;
+		}
+
+		input:checked+label::after {
+			position: absolute;
+			content: "";
+			width: 5px;
+			height: 10px;
+			left: 4px;
+			border: 2px solid #fff;
+			border-top: none;
+			border-left: none;
+			transform: rotate(45deg)
+		}
+	</style>
 </head>
+
 <body>
 	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons" style="padding-top: 0px;">
 		<form id="addFolderForm" method="post">
-			<input type="hidden" name="parentid" id="parentid"/>
-			<input type="hidden" name="foldertype" id="foldertype"/>
-			<table align="center" class="edittable" >
+			<input type="hidden" name="parentid" id="parentid" />
+			<input type="hidden" name="foldertype" id="foldertype" />
+			<table align="center" class="edittable">
 				<tr>
-					<td height="115px"  width="23%"><span  id="name" key="file.filename">文件夹名称：</span></td>
+					<td height="115px" width="23%"><span id="name" key="file.filename">文件夹名称：</span></td>
 					<td width="77%">
-						<input type="text" id="foldername" name='foldername' validtype="folderName" required="true" class="easyui-validatebox input_bg" missingmessage="不能为空" maxlength="100">
+						<input type="text" id="foldername" name='foldername' validtype="folderName" required="true"
+							class="easyui-validatebox input_bg" missingmessage="不能为空" maxlength="100">
 					</td>
 				</tr>
 				<tr id="folderNoTr">
-					<td height="115px"  width="23%"><span  id="name" key="file.filename">编号：</span></td>
+					<td height="115px" width="23%"><span id="name" key="file.filename">编号：</span></td>
 					<td width="77%">
-						<input type="text" id="folderno" name='folderno' validtype="folderName" required="true" class="easyui-validatebox input_bg" missingmessage="不能为空" maxlength="100">
+						<input type="text" id="folderno" name='folderno' validtype="folderName" required="true"
+							class="easyui-validatebox input_bg" missingmessage="不能为空" maxlength="100">
 					</td>
 				</tr>
+				<tr >
+					<td height="115px" width="23%"><span
+							style="color:red;vertical-align: bottom;margin-right:5px">&nbsp;</span><span
+							style="color:red;vertical-align: bottom;margin-right:5px">&nbsp;</span><span id="name"
+							key="file.filename">分配权限：</span></td>
+					<td width="77%" style="text-align: left">
+						<div class="line">
+							<input type="radio" id="privilegeType" name="privilegeType" value="1" checked="checked">
+							<label for="privilegeType" style="margin-top:-3px"></label>
+							<span>继承父文件已分配夹权限</span>
+						</div>
+						<div class="line">
+							<input type="radio" id="privilegeType1" name="privilegeType" value="0">
+							<label for="privilegeType1" style="margin-top:-3px"></label>
+							<span style="padding-left:10px">不继承父文件已分配夹权限</span>
+						</div>
+
+					</td>
+				</tr>
+
 				<tr>
-					<td height="115px"  width="23%"><span  id="description" key="file.description">描述：</span></td>
+					<td height="115px" width="23%"><span id="description" key="file.description">描述：</span></td>
 					<td width="77%">
-						<textarea id="description" name="description"
-							style="height: 60px;" class="easyui-validatebox input_bg"
+						<textarea id="description" name="description" style="height: 60px;" class="easyui-validatebox input_bg"
 							onpropertychange="if(value.length>1000) value=value.substr(0,1000)"></textarea>
 					</td>
 				</tr>
-				  </table>
-			 <table width="100%">
-		 		  <tr>
-		        	<td class="button_area" align="center">
-         					    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="save()"><span key="" class="paltform-i18n">保存</span></a>
-								<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="closeFolder()"><span key="" class="paltform-i18n">取消</span></a>
-         					 </td>
-         				</tr>
-         			</table>
-			</form>
+			</table>
+			<table width="100%">
+				<tr>
+					<td class="button_area" align="center">
+						<a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="save()"><span key=""
+								class="paltform-i18n">保存</span></a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="closeFolder()"><span key=""
+								class="paltform-i18n">取消</span></a>
+					</td>
+				</tr>
+			</table>
+		</form>
 
 	</div>
 </body>
+
 </html>

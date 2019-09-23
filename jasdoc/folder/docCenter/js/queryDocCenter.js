@@ -464,7 +464,7 @@ function documentImport() {
  */
 function createFolder() {
 	if (folderType == 1) {
-		getDlg("addFolder.htm?parentid=" + folderId + "&folderType=" + folderType + "&folderNo=" + folderNo, 'addFolder', "新增文件夹", 450, 185);
+		getDlg("addFolder.htm?parentid=" + folderId + "&folderType=" + folderType + "&folderNo=" + folderNo, 'addFolder', "新增文件夹", 500, 215);
 	} else {
 		getDlg("addFolder.htm?parentid=" + folderId + "&folderType=" + folderType + "&folderNo=" + folderNo, 'addFolder', "新增文件夹", 450, 153);
 	}

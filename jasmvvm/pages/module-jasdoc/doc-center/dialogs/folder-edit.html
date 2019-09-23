@@ -32,6 +32,14 @@
 					</el-form-item>
 				</el-col>
 			</el-row>
+			<el-row >
+				<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+					<el-form-item  label="分配权限">
+						<el-radio v-model="form.privilegeType" label="1">继承父文件已分配夹权限</el-radio>
+						<el-radio v-model="form.privilegeType"  label="0">不继承父文件已分配夹权限</el-radio>
+					</el-form-item>
+				</el-col>
+			</el-row>
 			<el-row>
 				<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 					<el-form-item label="文件夹描述" prop="description">
@@ -97,6 +105,7 @@
 					foldername: '',
 					description: '',
 					folderno:'',
+					privilegeType:'1',//用于是否继承上级编号
 				},
 				parentFolderData:{},
 				folderType:'',
@@ -122,6 +131,9 @@
 			},
 			submit: function (formName) {
 				var that = this;
+				if(this.form.foldertype!="1"){
+					this.rules.folderno[0].required=false;
+				}
 				this.$refs[formName].validate(function (valid) {
 					if (valid) {
 						if (that.parentid) {
@@ -141,6 +153,7 @@
 					foldername: this.form.foldername,
 					description: this.form.description,
 					folderno: this.form.folderno,
+					privilegeType:this.form.privilegeType,
 					foldertype: this.form.foldertype
 				}, function (data) {
 					top.Vue.prototype.$message({
@@ -158,6 +171,7 @@
 					foldername: this.form.foldername,
 					description: this.form.description,
 					foldertype: this.folderType,
+					privilegeType:this.form.privilegeType,
 					folderno: this.form.folderno
 
 				}, function (data) {

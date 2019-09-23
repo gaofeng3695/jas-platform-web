@@ -17,9 +17,11 @@ $(function(){
 });
 
 function save() {
+	var privilegeType=$("input[name='privilegeType']:checked").val();
+	console.log(privilegeType);
 		$('#addFolderForm').form('submit', {
 			url :rootPath+ "jasdoc/folder/doccenter/createFolder.do?token="+localStorage.getItem("token"),
-			onSubmit : function() {
+			onSubmit : function(data) {
 				return $(this).form('validate');
 			},
 			success : function(data) {
