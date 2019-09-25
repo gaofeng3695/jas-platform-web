@@ -77,9 +77,9 @@
 				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
 					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
 					:expand-on-click-node="false">
-					<span class="custom-tree-node" slot-scope="{ node, data}">
+					<span class="custom-tree-node" slot-scope="scope">
 						<!--<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>-->
-						<span>{{ node.label }}</span>
+						<span>{{ scope.node.label }}</span>
 					</span>
 				</el-tree>
 			</template>
@@ -263,7 +263,7 @@
 							that.$nextTick(function () {
 								if (!that.currentNodeId && data.length > 0) {
 									that.currentNodeId = data[0].id;
-									that.$nextTick(() => {
+									that.$nextTick(function(){
 										that.$refs.orgtree.setCurrentKey(that.currentNodeId); // 必须设定node-key
 										that._requestOrgDetail(that.currentNodeId);
 									});
