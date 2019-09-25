@@ -19,25 +19,20 @@
 	<script type="text/javascript" src="js/addToFavorite.js"></script>
 </head>
 <body>
-	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons">
+	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons" style="height:368px;>
 		<form id="editfilefrom" method="post">
 			<input type="hidden" name="sid" id="sid" /> <br>
 			<table align="center" class="edittable">
 				<tr>
-					<td width="20%"><span style="color:red">*&nbsp;</span><span key="file.filename"
-						class="paltform-i18n">收藏夹位置：</span></td>
-					<td width="75%"><input type="text" id="foldreeventid"
-						name="foldreeventid"  panelHeight="80px"class="easyui-combotree"
-						style="width: 430px" panelHeight="80px" /></td>
-				</tr>
-				<tr>
-					<td><span key="file.remark" class="paltform-i18n">待收藏文档：
-					</span></td>
-					<td colspan="3"><textarea id="fileNames"
-							class="easyui-validatebox  textarea" validType="maxLength[300]"
-							name="fileNames" class="easyui-combotree" style="height: 60px;" ></textarea>
+					<td width="20%"><span key="file.remark" class="paltform-i18n">待收藏文档：</span></td>
+					<td width="80%" colspan="3"><textarea id="fileNames" class="easyui-validatebox  textarea" validType="maxLength[300]" name="fileNames" class="easyui-combotree" style="height: 60px;" ></textarea>
 					</td>
 				</tr>
+				<tr>
+					<td><span style="color:red">*&nbsp;</span><span key="file.filename" class="paltform-i18n">收藏夹位置：</span></td>
+					<td><input type="text" id="foldreeventid" name="foldreeventid"  class="easyui-combotree"  /></td>
+				</tr>
+				
 				</table>
 				<div class="button_area_absolute">
 					<table width="100%">

@@ -7,7 +7,9 @@ var oldFolderId = "";
  * 方法描述：加载收藏夹树
  */
 function queryFavoriteTree() {
+	var width = $("#fileNames").width()+3;
 	$('#foldreeventid').combotree({
+		width:width+"px",
 		panelHeight:'auto',
 		url:rootPath+"jasdoc/folder/favorite/queryFavoriteFolder.do",
 		onBeforeExpand:function(node){

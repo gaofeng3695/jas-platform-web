@@ -21,23 +21,22 @@
 	<script type="text/javascript" src="js/moveFile.js"></script>
 </head>
 <body>
-	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons">
+	<div id="dlg" class="easyui-panel" buttons="#dlg-buttons"  style="height:348px;"   >
 		<form id="editfilefrom" method="post">
 			<input type="hidden" name="sid" id="sid"/>
 			<br>
 			<table align="center" class=edittable >
-
 				<tr>
-					<td width="20%"><span style="color:red">*&nbsp;</span><span key="file.filename" class="paltform-i18n">移动到位置：</span></td>
-					<td width="75%">
-						<input id ="foldreeventid" name="foldreeventid" class="easyui-combotree" style="width: 430px" panelHeight="80px" onclick="queryTree()"></select>
-					</td>
-				</tr>
-				<tr>
-				    <td><span key="file.remark" class="paltform-i18n">待移动文档：</span></td>
-				    <td colspan="3">
+				    <td width="20%"><span key="file.remark" class="paltform-i18n">待移动文档：</span></td>
+				    <td colspan="3" width="80%">
 				    	<textarea id="fileNames" class="easyui-validatebox   textarea" validType="maxLength[300]"  name="fileNames" style="height: 60px;" disabled="disabled"></textarea>
 				    </td>
+				</tr>
+				<tr>
+					<td ><span style="color:red">*&nbsp;</span><span key="file.filename" class="paltform-i18n">移动到位置：</span></td>
+					<td >
+						<input id ="foldreeventid" name="foldreeventid" class="easyui-combotree" panelHeight="80px" onclick="queryTree()"></select>
+					</td>
 				</tr>
 		    </table>
 		      <div class="button_area_absolute">

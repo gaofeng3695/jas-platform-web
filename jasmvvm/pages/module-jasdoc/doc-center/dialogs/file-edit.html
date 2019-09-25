@@ -21,7 +21,7 @@
 				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="文档名称" prop="filename">
-							<el-input v-model="form.filename" disabled placeholder="请输入文档名称" size="small" clearable></el-input>
+							<el-input v-model="form.filename"  placeholder="请输入文档名称" size="small" clearable></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
@@ -97,6 +97,7 @@
 					]
 				},
 				form: {},
+				fileSuf:"",
 				treeList: [],
 				treeValue: [],
 			}
@@ -127,7 +128,7 @@
 				var url = jasTools.base.rootPath + "/jasdoc/folder/doccenter/updateDoc.do";
 				jasTools.ajax.postForm(url, {
 					eventid: this.oid,
-					filename: this.form.filename,
+					filename: this.form.filename+"."+that.fileSuf,
 					fileclassify: this.treeValue.join(',') || null,
 					fileno: this.form.fileno,
 					keyword: this.form.keyword,
@@ -148,6 +149,9 @@
 					docId: oid
 				}, function (data) {
 					that.form = data;
+					var filenames=data.filename.split('.');
+					that.form.filename=filenames[0];
+					that.fileSuf=filenames[1];
 				});
 			},
 			getDocClassifyTree: function (oid) {

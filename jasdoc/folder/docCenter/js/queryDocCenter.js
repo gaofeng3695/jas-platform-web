@@ -276,7 +276,8 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 				var fileType = rowData.filetype;
 				if (fileType != null && fileType != "") {
 					if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
-						previewDoc(eventid);
+						// previewDoc(eventid);
+						viewPicOrPdf(fileType, eventid);
 					} else {
 						$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
 					}
@@ -1288,7 +1289,8 @@ function operationFileContentMenu(rowData) {
 				var fileType = rowData.filetype;
 				if (fileType != null && fileType != "") {
 					if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
-						previewDoc(rowData.eventid);
+						// previewDoc(rowData.eventid);
+						viewPicOrPdf(fileType, rowData.eventid);
 					} else {
 						$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
 					}
