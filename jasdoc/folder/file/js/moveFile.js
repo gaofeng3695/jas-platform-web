@@ -12,7 +12,9 @@ $(function() {
  * 方法描述：加载初始化树
  */
 function queryTree(){
+	var width = $("#fileNames").width()+3;
 	$('#foldreeventid').combotree({
+		width:width+"px",
 		panelHeight:'auto',
 		url:rootPath+"jasdoc/folder/doccenter/queryFavoriteFolderTree.do?token="+localStorage.getItem("token"),
 		onBeforeExpand:function(node){

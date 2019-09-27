@@ -276,7 +276,8 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 				var fileType = rowData.filetype;
 				if (fileType != null && fileType != "") {
 					if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
-						previewDoc(eventid);
+						// previewDoc(eventid);
+						viewPicOrPdf(fileType, eventid);
 					} else {
 						$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
 					}
@@ -356,7 +357,7 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 					$("#44").hide();
 				}
 				var userBo = JSON.parse(localStorage.getItem("user"));
-				if (userBo.roleNames.indexOf("docadmin")>-1) {
+				if (userBo.roleNames.indexOf("docadmin") > -1) {
 					$("#downTemplate").show();
 					$("#uploadTemplate").show();
 				}
@@ -371,7 +372,7 @@ function initMessage(menuUrl, allOrOnlyDocFile) {
 		}
 	});
 
-	initDatagrigHeight('dg', '', 30,'containerDivId');
+	initDatagrigHeight('dg', '', 30, 'containerDivId');
 }
 
 /**
@@ -1288,7 +1289,8 @@ function operationFileContentMenu(rowData) {
 				var fileType = rowData.filetype;
 				if (fileType != null && fileType != "") {
 					if (previewFileType.indexOf(fileType.toLocaleLowerCase()) > -1) {
-						previewDoc(rowData.eventid);
+						// previewDoc(rowData.eventid);
+						viewPicOrPdf(fileType, rowData.eventid);
 					} else {
 						$.messager.alert('提示', "暂时不支持这种类型文档的预览功能！", "info");
 					}
@@ -1464,4 +1466,40 @@ function initToobarByRole() {
 	//根据当前用户的角色，进行按钮的分配；
 	$("#uploadTemplate").attr('disabled', true);
 	$("#downTemplate").attr('disabled', true);
+}
+
+
+function bathUpdateFile() {
+	//批量修改
+	var isEdit = false;
+	var rows = $('#dg').datagrid('getSelections');
+	var objs = [];
+	if (rows.length == 0) {
+		$.messager.alert('提示', '请选择一条记录', 'info');
+		return;
+	}
+	for (var i = 0; i < rows.length; i++) {
+		var index=rows[i].filename.lastIndexOf('.') ;
+		var obj = {
+			eventid: rows[i].eventid,
+			filename: rows[i].filename.substring(0, index),
+			fileSuf: rows[i].filetype,
+			fileno: rows[i].fileno
+		}
+		objs.push(JSON.stringify(obj));
+		if (rows[i].typeFlag == 1) {
+			isEdit = true;
+			break;
+		}
+	}
+	if (isEdit) {
+		$.messager.alert('提示', '不能包含文件夹', 'info');
+		return;
+	}
+	// if (role < 90) {
+	// 	var filename = rows[0].filename;
+	// 	$.messager.alert('提示', '对文件夹' + filename + "无修改权限", 'info');
+	// 	return;
+	// }
+	getDlg("bathUpdateFileName.html?rows=" + encodeURIComponent(JSON.stringify(objs)), 'bathUpdateFileName', "文档修改", 900, 400);
 }

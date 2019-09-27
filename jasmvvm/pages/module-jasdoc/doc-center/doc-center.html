@@ -196,6 +196,9 @@
 									<el-button v-if="docadmin" size="small" plain type="primary" icon="fa fa-download"
 										@click="uploadTemplate">下载模板
 									</el-button>
+									<el-button size="small" plain type="primary" icon="fa fa-edit" @click="bathUpdateFile"
+										:disabled="selectedRowOids.length==0" v-show="isHavePrivilege">批量修改
+									</el-button>
 									<span class="fr">
 										<el-checkbox :disabled="isSearchMode" v-model="isALLFile" style="margin-right: 10px;">显示所有文件
 										</el-checkbox>
@@ -334,6 +337,7 @@
 				},
 				tableData: [],
 				isPrivilege: true,
+				isHavePrivilege: false,
 				isContentSearch: true,
 				isALLFile: false,
 				isClosed: false,
@@ -494,6 +498,7 @@
 					that.loading.list = false;
 					that.total = data.total;
 					that.tableData = data.rows;
+					that.checkIsHavePrivilegeBathEdit();
 				});
 			},
 			queryFolderByAttribute: function () {
@@ -1020,6 +1025,53 @@
 				if (user.roleNames.indexOf("docadmin") > -1) {
 					that.docadmin = true;
 				}
+			},
+			checkIsHavePrivilegeBathEdit: function () {
+				var that = this;
+				if (that.tableData.length > 0 && that.tableData[0].hierarchyRole >= 60) {
+					that.isHavePrivilege = true;
+				} else {
+					that.isHavePrivilege = false;
+				}
+			},
+			bathUpdateFile: function () {
+				var that = this;
+				var isEdit = false;
+				var objs = [];
+				for (var i = 0; i < that.selectedRows.length; i++) {
+					var index = that.selectedRows[i].filename.lastIndexOf('.');
+					var obj = {
+						eventid: that.selectedRows[i].eventid,
+						filename: that.selectedRows[i].filename.substring(0, index),
+						fileSuf: that.selectedRows[i].filetype,
+						fileno: that.selectedRows[i].fileno
+					}
+					objs.push(JSON.stringify(obj));
+					if (that.selectedRows[i].typeFlag == 1) {
+						isEdit = true;
+						break;
+					}
+				}
+				if (isEdit) {
+					top.Vue.prototype.$message({
+						type: 'error',
+						message: '不能包含文件夹'
+					});
+					return;
+				}
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-jasdoc/doc-center/dialogs/bathUpdateFileName.html?rows=' + encodeURIComponent(JSON
+						.stringify(objs));
+				top.jasTools.dialog.show({
+					width: '600px',
+					height: '50%',
+					title: '文件批量修改',
+					src: baseSrc,
+					cbForClose: function () {
+						that.requestList();
+					}
+				});
+
 			}
 		},
 	});
