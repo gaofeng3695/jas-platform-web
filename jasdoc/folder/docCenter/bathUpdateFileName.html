@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css"
+		href="../../../jasframework/common/thirdparty/jquery/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../../jasframework/common/thirdparty/jquery/themes/icon.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../common/css/main.css">
+	<link rel="stylesheet" href="../../common/css/add.css" type="text/css">
+	</link>
+	<style>
+		.pass {
+			font-size: 20px;
+			color: green;
+			padding-top: 3px;
+		}
+
+		.nopass {
+			font-size: 20px;
+			color: red;
+			padding-top: 3px;
+		}
+
+		.el-table td,
+		.el-table th {
+			padding: 5px 0px;
+		}
+
+		.is-grown {
+			overflow: hidden;
+			padding: 0px !important;
+		}
+
+		.cell {
+			width: 100%;
+		}
+
+		.cell,
+		.el-input--small .el-input__inner {
+			height: 24px;
+			line-height: 24px;
+		}
+
+		input {
+			-webkit-appearance: none;
+			background-color: #fff;
+			background-image: none;
+			border-radius: 4px;
+			border: 1px solid #dcdfe6;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			color: #606266;
+			display: inline-block;
+			font-size: inherit;
+			height: 24px;
+			line-height: 24px;
+			outline: 0;
+			padding: 0 15px;
+			-webkit-transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
+			transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
+			width: 100%;
+		}
+
+		input:focus {
+			border-color: #409eff;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app">
+		<jas-dialog-wrapper v-loading="loading">
+			<el-table height="100%" :data="rows" border :header-cell-style="headStyle">
+				<el-table-column label="序号" type="index" align="center" width="50">
+				</el-table-column>
+				<el-table-column label="是否重复" width=" 100" align="center" v-if="checkStatus">
+					<template slot-scope="scope">
+						<span v-if="!scope.row.repeat" class="pass el-icon-circle-check"><i></i></span>
+						<span v-else class="nopass el-icon-circle-close"></span>
+					</template>
+				</el-table-column>
+				<el-table-column label="文件名称" prop="filename" align="center">
+					<template slot-scope="scope">
+						<input v-model="scope.row.filename">
+					</template>
+				</el-table-column>
+				<el-table-column label="文件编号" prop="fileno" align="center">
+					<template slot-scope="scope">
+						<!-- <input  v-model="scope.row.fileno"> -->
+						<input size="small" v-model="scope.row.fileno">
+					</template>
+				</el-table-column>
+			</el-table>
+			<div slot="footer">
+				<table width="100%">
+					<tr>
+						<td class="button_area" align="center">
+							<a href="#" class="easyui-linkbutton" iconCls="icon-ok" @click="submit()"><span key=""
+									class="paltform-i18n">保存</span></a>
+							<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" @click="cancel()"><span key=""
+									class="paltform-i18n">取消</span></a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</jas-dialog-wrapper>
+
+	</div>
+</body>
+<script src="./../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../jasframework/common/thirdparty/jquery/locale/easyui-lang-zh_CN.js">
+</script>
+<script type="text/javascript" src="../../../jasframework/common/js/common.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../common/components/jas-components.js "></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			var that = this;
+			return {
+				loading: false,
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				checkStatus: false,
+				rows: []
+			}
+		},
+		created: function () {
+			var that = this;
+			var rows = JSON.parse(decodeURIComponent(getParamter("rows")));
+			that.rows = [];
+			rows.forEach(function (item) {
+				var obj = JSON.parse(item);
+				obj.repeat = false;
+				that.rows.push(obj);
+			});
+		},
+		methods: {
+			submit: function () {
+				var that = this;
+				that.loading = true;
+				that.rows.forEach(function (item) {
+					if (item.isChecked) {
+						delete item.isChecked;
+					}
+				});
+				that.vailiteRepeat();
+			},
+			vailiteRepeat: function () {
+				var that = this;
+				var isCheckRepeat = false;
+				that.rows.forEach(function (item, index) {
+					if (!item.isChecked) {
+						item.repeat = that.isRepeat(item, index);
+					}
+					if (item.repeat) {
+						isCheckRepeat = true;
+					}
+				});
+				if (!isCheckRepeat) {
+					that.submitToServer();
+				} else {
+					that.refreshtable();
+				}
+			},
+			submitToServer: function () {
+				var that = this;
+				that.loading = false;
+				var datas = [];
+				that.rows.forEach(function (item) {
+					var obj = {
+						filename: item.filename + "." + item.fileSuf,
+						fileno: item.fileno,
+						eventid: item.eventid
+					}
+					datas.push(obj);
+				});
+				var url = rootPath + 'jasdoc/folder/doccenter/updateDocs.do?token=' + localStorage.getItem("token");
+				$.ajax({
+					url: url,
+					type: "POST",
+					data: JSON.stringify(datas),
+					contentType: 'application/json',
+					success: function (result) {
+						if (result.status == 1) {
+							parent.reloadDataTree(null, 0);
+							that.cancel();
+						} else {
+							if (result.rows.length > 0) {
+								that.rows = [];
+								result.rows.forEach(function (item) {
+									var index = item.filename.lastIndexOf('.');
+									that.rows.push({
+										filename: item.filename.substring(0, index),
+										fileSuf: item.filename.substring(index + 1, item.filename.length),
+										fileno: item.fileno,
+										eventid: item.eventid,
+										repeat: item.repeat ? item.repeat : false
+									});
+								});
+								that.refreshtable();
+							} else {
+								$.messager.alert('提示', '服务器异常，请稍后尝试', 'info');
+							}
+						}
+					}
+				});
+			},
+			refreshtable: function () {
+				var that = this;
+				that.$set(that.rows, that.rows);
+				that.loading = false;
+				that.checkStatus = true;
+			},
+			isRepeat: function (obj, index) {
+				var that = this;
+				var isRepeat = false;
+				that.rows.forEach(function (item, i) {
+					if (index != i) {
+						if (item.filename == obj.filename || item.fileno == obj.fileno) {
+							isRepeat = true;
+							item.isChecked = true;
+							item.repeat = true;
+						}
+					}
+				});
+				return isRepeat;
+			},
+			cancel: function () {
+				parent.closeDlg('bathUpdateFileName');
+			}
+		},
+	});
+</script>
+
+</html>
