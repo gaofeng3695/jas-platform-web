@@ -41,7 +41,7 @@
         :export-template-code="exportTemplateCode" :is-hide-btn-col="isHideBtnCol" :dialogconfig="dialogconfig"
         @selectchanged="selectchanged">
         <template slot="btns">
-          <el-button v-for="item in topBtns" v-if="item.method" :disabled="disableBtns(item,rows)" size="small" plain :icon="item.icon"
+          <el-button v-for="item in topBtns" v-if="item.method || item.isDefaultMethod" :disabled="disableBtns(item,rows)" size="small" plain :icon="item.icon"
             @click="clickCustomFn(item.method,item)" type="primary">{{item.name}}</el-button>
         </template>
       </jas-table-for-list-new>
@@ -119,7 +119,7 @@
           that.searchPath = that.pageConfig.searchPath;
           that.deletePath = that.pageConfig.deletePath;
 
-          that.isHideBtnCol = that.pageConfig.isHideBtnCol || false;
+          that.isHideBtnCol = true;
           that.btncolwidth = that.pageConfig.btncolwidth ? that.pageConfig.btncolwidth : that.btncolwidth;
           that.topBtns = that.pageConfig.topBtns;
           that.rowBtns = that.pageConfig.rowBtns || [];
@@ -145,6 +145,11 @@
             this.rows = rows;
           },
           clickCustomFn: function (name, btnCfg) {
+            // console.log(btnCfg)
+            if(btnCfg.isDefaultMethod && btnCfg.privilegeCode){
+              this.$refs.table.clickRowBtns(this.rows[0],btnCfg)
+              return;
+            }
             var fn = this.pageConfig.methods[name];
             if (fn) {
               fn.call(this, this.rows);
