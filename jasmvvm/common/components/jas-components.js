@@ -1622,7 +1622,7 @@ Vue.component('jas-table-for-list-new', {
 	},
 	methods: {
 		ckeckIfShow: function (row, item) {
-			var isShow = item.isShow ? item.isShow(row) : true;
+			var isShow = item.isShow ? item.isShow([row]) : true;
 			var isHasPrivilege = item.privilegeCode ? this.isHasPrivilege(item.privilegeCode) : true;
 			return (isShow && isHasPrivilege);
 		},
