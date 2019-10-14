@@ -15,11 +15,13 @@ function closeRole() {
  */
 function loadData() {
 	var oid=getParamter("oid");
-	$.getJSON(rootPath+"jasframework/privilege/application/getById.do?oid="+oid+"&r="+new Date().getTime(),function(data){
-		putValue(data);
+	$.getJSON(rootPath+"jasframework/privilege/application/getById.do?oid="+oid+"&r="+new Date().getTime(),
+	function(data){
+		var sDataFilted = filterXSS(JSON.stringify(data));
+		var oDataFilted = JSON.parse(sDataFilted);
+		putValue(oDataFilted);
 	});
 }
-
 /**
  * 描述：显示数据
  * @param obj 数据

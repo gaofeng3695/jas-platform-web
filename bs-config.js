@@ -80,8 +80,8 @@ module.exports = {
         baseDir: "./",
         // index: "index.html",
         middleware: [
-            // apiProxy,
-            apiProxyToRisk,
+            apiProxy,
+            // apiProxyToRisk,
             iframeProxy2,
             iframeProxy3,
             iframeProxy4,
