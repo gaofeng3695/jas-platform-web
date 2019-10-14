@@ -16,7 +16,7 @@ var tab = new $.jasframeworkTab();
 //获得当前登录用户
 var currentUser = getParamter('loginName');
 var token = getParamter("token");
-var userName = decodeURI(getParamter('userName'));
+var userName = filterXSS(decodeURI(getParamter('userName')));
 var userId = getParamter('userId');
 var currentPageLayout = defaultPageLayout;
 var currentLanguage = getParamter("i18n");
