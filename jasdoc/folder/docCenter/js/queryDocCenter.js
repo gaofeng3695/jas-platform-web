@@ -809,7 +809,7 @@ function deleteFolderAndDocs(shiftDeleteFlag) {
 function moveFile(eventid, fileName) {
 	if (arguments.length == 2) {
 		//移动单个文档（右键）
-		getDlg("../file/moveFile.htm?docIds=" + eventid + "&fileNames=" + encodeURIComponent(encodeURIComponent(fileName)), 'moveFile', '移动文档', 580, 400);
+		getDlg("../file/moveFile.htm?docIds=" + eventid + "&fileNames=" + encodeURIComponent(encodeURIComponent(fileName)), 'moveFile', '移动文档', 580, 300);
 	} else {
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0) {
@@ -835,7 +835,7 @@ function moveFile(eventid, fileName) {
 			filenames = filenames.substring(0, filenames.length - 1);;
 
 			if (eventids != "") {
-				getDlg("../file/moveFile.htm?docIds=" + eventids + "&fileNames=" + encodeURIComponent(encodeURIComponent(filenames)), 'moveFile', '移动文档', 580, 162);
+				getDlg("../file/moveFile.htm?docIds=" + eventids + "&fileNames=" + encodeURIComponent(encodeURIComponent(filenames)), 'moveFile', '移动文档', 580, 300);
 			} else {
 				$.messager.alert('提示', '请选择有移动权限的记录', 'info');
 			}
@@ -936,7 +936,7 @@ function associateFile(fileId, role, createuser) {
  */
 function addToFavorite(eventid, filename) {
 	if (arguments.length == 2) {
-		getDlg("../favorite/addToFavorite.htm?eventids=" + eventid + "&filenames=" + encodeURIComponent(encodeURIComponent(filename)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 200);
+		getDlg("../favorite/addToFavorite.htm?eventids=" + eventid + "&filenames=" + encodeURIComponent(encodeURIComponent(filename)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 300);
 	} else {
 		var rows = $('#dg').datagrid('getSelections');
 		if (rows.length > 0) {
@@ -953,7 +953,7 @@ function addToFavorite(eventid, filename) {
 			}
 			eventids = eventids.substring(0, eventids.length - 1);
 			filenames = filenames.substring(0, filenames.length - 1);
-			getDlg("../favorite/addToFavorite.htm?eventids=" + eventids + "&filenames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 164);
+			getDlg("../favorite/addToFavorite.htm?eventids=" + eventids + "&filenames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'favorite', '添加收藏', 580, 300);
 
 		} else {
 			$.messager.alert('提示', '请选择记录', 'info');

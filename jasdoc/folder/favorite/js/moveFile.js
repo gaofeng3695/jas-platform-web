@@ -8,7 +8,8 @@ var oldFolderId = "";
 		fileNames = decodeURIComponent(decodeURIComponent(getParamter("fileNames")));
 		oldFolderId = getParamter("folderId");
 //		alert(oldFolderId);
-		$("#fileNames").text(fileNames);
+		// $("#fileNames").text(fileNames);
+		renderList(fileNames);
 		queryFavoriteTree();
 	});
 /**
@@ -80,4 +81,14 @@ function save(){
 	 */
 	function closeMoveDlg(){
 		parent.closeDlg('move');
+	}
+
+
+	function renderList(list) {
+		var list = list.split(",");
+		var html = "";
+		list.forEach(function (item) {
+			html += "<li>" + item + "</li>";
+		});
+		$(".fileNameList").append(html);
 	}
