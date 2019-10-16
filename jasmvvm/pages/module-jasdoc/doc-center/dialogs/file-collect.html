@@ -21,15 +21,19 @@
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
 						<el-form-item label="收藏位置" prop="targetFolderId" required>
-							<treeselect aria-placeholder="请选择文件夹" @input="valueChanged" :options="treeList" :normalizer="normalizer" v-model="form.targetFolderId">
+							<treeselect aria-placeholder="请选择文件夹" @input="valueChanged" :options="treeList" :normalizer="normalizer"
+								v-model="form.targetFolderId">
 							</treeselect>
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-						<el-form-item label="待收藏文档" prop="remark">
-							<el-input disabled type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.docNames"></el-input>
+						<el-form-item label="待收藏文档">
+							<li v-for="(item,index) in form.docNames">
+							   {{item}}
+							</li>
+							<!-- <el-input disabled type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :rows="2" size="small" v-model="form.docNames"></el-input> -->
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -84,7 +88,7 @@
 		created: function () {
 			var that = this;
 			var param = window.jasTools.base.getParamsInUrl(location.href);
-			this.form.docNames = decodeURI(param.docNames);
+			this.form.docNames = decodeURI(param.docNames).split(",");
 			this.form.docIds = param.docIds;
 			this.queryFavoriteFolderTree();
 		},

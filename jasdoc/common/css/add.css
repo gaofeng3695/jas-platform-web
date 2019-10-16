@@ -184,3 +184,25 @@ textarea
 	border-right: 1px solid #c3c5cd;
 	line-height: 22px
 }
+
+
+
+
+.fileNameList {
+	padding: 0px;
+	margin: 0px;
+	list-style: none;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.fileNameList>li {
+	height: 20px;
+	line-height: 20px;
+	/* padding-left: 10px; */
+	text-align: left;
+}
+
+.favoriteLocation  >span {
+	width: 100% !important;
+}

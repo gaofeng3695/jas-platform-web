@@ -200,7 +200,7 @@ function moveFile() {
 		eventids = eventids.substring(0, eventids.length - 1);;
 		filenames = filenames.substring(0, filenames.length - 1);;
 		if (eventids != "") {
-			getDlg("moveFile.htm?docIds=" + eventids + "&fileNames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'move', '移动文档', 580, 162);
+			getDlg("moveFile.htm?docIds=" + eventids + "&fileNames=" + encodeURIComponent(encodeURIComponent(filenames)) + "&folderId=" + folderId, 'move', '移动文档', 580, 300);
 		} else {
 			$.messager.alert('提示', '请选择有移动权限的记录', 'info');
 		}
