@@ -15,6 +15,7 @@
  * -- 通用业务组件
  * ---- jas-file-list 附件展示列表
  * ---- jas-file-upload 附件上传表单项
+ * ---- jas-file-upload-new 附件、图片上传表单项
  *
  *
  * @GF created on 2019/1/21
@@ -598,6 +599,75 @@ Vue.component('jas-file-list', {
 
 });
 
+Vue.component('jas-pic-list', {
+	props: {
+		bizId: {
+			type: String,
+			required: true
+		},
+	},
+	data: function () {
+		return {
+			fileList: [],
+			isrequest: true,
+		}
+	},
+	watch: {
+		bizId: function () {
+			if (this.bizId) {
+				this._requestFiles(this.bizId);
+			}
+		}
+	},
+	template: [
+		'<div class="jas-file-list" v-show="!isrequest">',
+		' <div v-show="fileList.length === 0" >无</div>',
+		'	<div v-for="file in fileList"  class="el-upload-list__item">',
+		'		<a class="el-upload-list__item-name">',
+		'			<i class="el-icon-document"></i>{{file.fileName}}',
+		'		</a>',
+		'		<i class="el-icon-download tipBtn" @click="download(file.oid)" style="right:10px;"></i>',
+		'		<i class="el-icon-view tipBtn" @click="preview(file.oid)" style="right:35px;"></i>',
+		'	</div>',
+		'</div>'
+	].join(''),
+	created: function () {
+		if (this.bizId) {
+			this._requestFiles(this.bizId);
+		}
+	},
+	methods: {
+		download: function (oid) {
+			var that = this;
+			jasTools.ajax.downloadByIframe('post', jasTools.base.rootPath + "/attachment/download.do", {
+				oid: oid
+			});
+		},
+		_requestFiles: function (oid) {
+			var that = this;
+			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
+			jasTools.ajax.get(url, {
+				businessType: 'file',
+				businessId: oid
+			}, function (data) {
+				that.fileList = data.rows;
+				that.isrequest = false;
+			});
+		},
+		preview: function (oid) {
+			var that = this;
+			top.jasTools.dialog.show({
+				width: '80%',
+				height: '90%',
+				title: '预览模板',
+				src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
+			});
+		},
+
+	},
+
+});
+
 Vue.component('jas-file-upload', {
 	props: {
 		limit: {
@@ -714,6 +784,311 @@ Vue.component('jas-file-upload', {
 		},
 	}
 
+});
+
+Vue.component('jas-file-upload-new', {
+	props: {
+		businessId: {
+			type: String
+		},
+		fileType: {
+			default: 'file', // pic
+			type: String
+		},
+		limit: {
+			default: 20,
+			type: Number
+		},
+		// formData: {},
+		fileTypes: {
+			default: function () {
+				return []
+			},
+			type: Array
+		}
+	},
+	data: function () {
+		return {
+			fileList: [],
+			uploadurl: '',
+			formData: {
+				fileDescription: ''
+
+			},
+		}
+	},
+	computed: {
+		accept: function () {
+			if (this.fileType == 'pic') {
+				return '.' + ['jpg', 'png', 'gif'].join(',.');
+			}
+			return this.fileTypes.length > 0 ? '.' + this.fileTypes.join(',.') : '';
+		},
+		listType: function () {
+			return this.fileType == 'pic' ? 'picture-card' : 'text';
+
+		}
+	},
+	template: [
+		'<el-upload  ref="upload" multiple :accept="accept" :data="formData" :limit="limit" :auto-upload="false" :file-list="fileList" ',
+		':on-change="changeFiles" :before-upload="beforeUpload" :on-success="fileUploaded" :on-remove="removeFile" :on-preview="handlePreview"',
+		':on-exceed="uploaodNumberlimit" :action="uploadurl" :list-type="listType" style="padding-bottom:10px;">',
+		'<span>',
+		'	<i v-if="fileType ==\'pic\'" class="el-icon-plus"></i>',
+		'	<el-button v-else size="small" type="primary" plain>选取文件</el-button>',
+		'</span>',
+		'	<span v-if="fileType !==\'pic\'" style="padding-left: 10px;" class="el-upload__tip" slot="tip">{{"最多上传"+ limit +"个附件"}}</span>',
+		'</el-upload>',
+	].join(''),
+	created: function () {
+		if (this.businessId) {
+			this.requestFile(this.businessId);
+		}
+
+	},
+	methods: {
+		insertIcon: function (file) {
+			var that = this;
+			setTimeout(function () {
+				$(that.$refs.upload.$el).find('.el-upload-list__item-actions').each(function (i) {
+					// console.log(i, 123123)
+					if ($(this).find('.el-upload-selfbtn').length || file) return;
+					var $dom = $('<span class="el-upload-selfbtn"><i class="el-icon-download"></i></span>');
+					$dom.on('click', function () {
+						var oPic = that.$refs.upload.uploadFiles[i];
+						var url = jasTools.base.rootPath + "/attachment/download.do";
+						url = jasTools.base.setParamsToUrl(url, {
+							token: localStorage.getItem('token'),
+							oid: oPic.oid
+						})
+						$('<a href="' + url + '" / >')[0].click();
+					});
+					$(this).append($dom);
+				});
+				$(that.$refs.upload.$el).find('li').each(function (i) {
+					var oPic = that.$refs.upload.uploadFiles[i];
+					if ($(this).find('img').length) { // 图片
+						if ($(this).find('input').length) return;
+						var $dom = $('<input class="el-input__inner" style="width:138px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;margin:4px;"/>');
+						$dom.val(oPic.name)
+						$dom.on('keydown', function (e) {
+							if (e.keyCode == 8) {
+								e.stopPropagation && e.stopPropagation();
+							}
+						})
+						$(this).append($dom);
+					} else { // 文件
+						if ($(this).find('input').length) return;
+						// input
+						var size = Math.ceil(oPic.size / 1024) + ' kb';
+						var $size = $('<span style="display: inline-block;width: 20%;text-align:center;">' + size + '</span>');
+						var $input = $('<input id="' + (oPic.oid || oPic.uid) + '" data-oldval="' + (oPic.fileDescription || '') + '" class="el-input__inner" placeholder="请输入备注" style="width: 30%;height: 28px;line-height: 28px;"></input>');
+						$input.on('keydown', function (e) {
+							if (e.keyCode == 8) {
+								e.stopPropagation && e.stopPropagation();
+							}
+						}).val(oPic.fileDescription);
+						$(this).css({
+							padding: '4px'
+						})
+						$(this).find('.el-upload-list__item-name').css({
+							width: '30%',
+							display: 'inline-block',
+							'margin-right': '0px',
+							'vertical-align': 'middle'
+						});
+						$(this).find('.el-icon-close').css({
+							top: '8px'
+						});
+						$(this).find('.el-upload-list__item-name').after($size);
+						$size.after($input);
+
+
+						//btns
+						if (!file) {
+							var $dnld = $('<i class="el-icon-download" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>');
+							var $see = $('<i class="el-icon-view" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>');
+							var $btnwrap = $('<span style="display: none;width: 15%;text-align:right;float:right;margin-right:18px;"></span>');
+							$btnwrap.append($see).append($dnld);
+							$(this).hover(function () {
+								$btnwrap.css({
+									display: 'inline-block'
+								});
+							}, function () {
+								$btnwrap.css({
+									display: 'none'
+								});
+
+							});
+							$dnld.on('click', function () {
+								that.download(oPic.oid)
+							});
+							$see.on('click', function () {
+								that.preview(oPic.oid)
+							});
+							$input.after($btnwrap);
+						}
+					}
+
+
+				});
+
+
+			});
+		},
+		updateInfo: function (cb) {
+			var that = this;
+			var aInfo = that.$refs.upload.uploadFiles.filter(function (item) {
+				if (!item.oid) return false;
+				var $input = $('#' + item.oid);
+				if ($input.length == 0) return false;
+				item.newDesc = $input.val();
+				if ($input.val() != $input[0].dataset.oldval) return true;
+			});
+			var nDown = 0;
+			var fnDone = function (nDown, nAll) {
+				if (nDown == nAll) {
+					cb && cb();
+				}
+			};
+			fnDone(nDown, aInfo.length)
+			aInfo.forEach(function (item, index, arr) {
+				jasTools.ajax.post(jasTools.base.rootPath + "/attachment/updateInfo.do", {
+					oid: item.oid,
+					fileDescription: item.newDesc,
+				}, function () {
+					fnDone(++nDown, aInfo.length)
+				});
+			});
+		},
+		preview: function (oid) {
+			var that = this;
+			top.jasTools.dialog.show({
+				width: '80%',
+				height: '90%',
+				title: '预览模板',
+				src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
+			});
+		},
+		download: function (oid) {
+			var that = this;
+			jasTools.ajax.downloadByIframe('post', jasTools.base.rootPath + "/attachment/download.do", {
+				oid: oid
+			});
+		},
+		beforeUpload: function (file) {
+			var desc = $('#' + file.uid).val();
+			this.formData.fileDescription = desc;
+			// file.fileDescription = 'asdasd'
+		},
+		handlePreview: function (file) {
+			console.log(file);
+			if (this.fileType == 'pic') {
+				top.jasTools.base.viewImg(file.url)
+			}
+		},
+		requestFile: function (bizId) {
+			var that = this;
+			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
+			jasTools.ajax.get(url, {
+				fileType: that.fileType,
+				businessType: '',
+				businessId: bizId
+			}, function (data) {
+				data.rows.forEach(function (item) {
+					var file = {
+						name: item.fileName,
+						size: item.size,
+						oid: item.oid,
+						size: item.fileSize,
+						fileDescription: item.fileDescription,
+
+					};
+					if (that.fileType == 'pic') {
+						var url = jasTools.base.rootPath + "/attachment/getImageBySize.do";
+						file.url = jasTools.base.setParamsToUrl(url, {
+							token: localStorage.getItem('token'),
+							eventid: file.oid
+						})
+					}
+					that.fileList.push(file);
+				});
+				that.fileListlength = that.fileList.length;
+				that.insertIcon();
+			});
+		},
+		fileUploaded: function (response, file, fileList) {
+			var that = this;
+			that.indexOfFileToSubmit++;
+			if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
+				that.updateInfo(function () {
+					that.$emit('success', response, file, fileList)
+				});
+			}
+		},
+		removeFile: function (file, fileList) {
+			if (file.status === 'success' && file.oid) {
+				if (this.filesToBeDelete) {
+					this.filesToBeDelete.push(file.oid);
+				} else {
+					this.filesToBeDelete = [file.oid];
+				}
+			}
+		},
+		uploadFile: function (oid) {
+			var that = this;
+			that._deleteFilesToServer(function () {
+				var src = jasTools.base.rootPath + "/attachment/upload.do";
+				that.uploadurl = jasTools.base.setParamsToUrl(src, {
+					token: localStorage.getItem("token"),
+					businessId: that.businessId,
+					businessType: '',
+					fileType: that.fileType
+				});
+				that.$nextTick(function () {
+					var afileToSubmit = that.$refs.upload.uploadFiles.filter(function (item) {
+						return !item.oid
+					});
+					that.lengthOfFileToSubmit = afileToSubmit.length;
+					that.indexOfFileToSubmit = 0;
+					if (afileToSubmit.length > 0) {
+						that.$refs.upload.submit();
+					} else {
+						that.fileUploaded();
+					}
+				});
+			});
+		},
+		_deleteFilesToServer: function (cb) {
+			var that = this;
+			if (!that.filesToBeDelete) {
+				cb && cb();
+				return;
+			}
+			jasTools.ajax.get(jasTools.base.rootPath + "/attachment/delete.do", {
+				oids: that.filesToBeDelete.join(',')
+			}, function (data) {
+				cb && cb();
+			});
+		},
+		changeFiles: function (file, fileList) {
+			var that = this;
+			if (file.status === "ready") {
+				this.insertIcon(file);
+				var aFileName = file.name.split('.');
+				var fileTypes = this.fileTypes;
+				var type = aFileName[aFileName.length - 1 || 1];
+				if (!type || (fileTypes.length > 0 && fileTypes.indexOf(type) === -1)) { // 不是规定格式的文件
+					top.Vue.prototype.$message('请上传规定格式的文件');
+					var index = fileList.indexOf(file);
+					fileList.splice(index, 1);
+				}
+			}
+		},
+		uploaodNumberlimit: function () {
+			top.Vue.prototype.$message("最多上传" + this.limit + "个附件")
+		},
+	}
 });
 
 Vue.component('jas-search-for-list', {

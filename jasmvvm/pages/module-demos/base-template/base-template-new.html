@@ -8,6 +8,7 @@
   <title>自定义表单配置</title>
   <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
   <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../lib/viewer/viewer.min.css">
   <link rel="stylesheet" href="./../../../common/css/main.css">
 
 </head>
@@ -15,19 +16,10 @@
 <body>
   <div id="app" v-cloak>
 
-    <jas-list-wrapper>
-      <jas-search-for-list slot="search" :form="topSearch" :fields="searchFields" :fields-config="fieldsConfig"
-        @search="searchList"></jas-search-for-list>
+    <!-- <jas-file-upload business-type="pic" business-id="0e51a146-800b-40af-a7f4-60457b72d85a"></jas-file-upload> -->
 
-      <jas-table-for-list ref="table" slot="list" @locate="locate" :privilege-code="privilegeCode" :fields="tableFields"
-        :form="topSearch" :search-path="searchPath" :add-url="addUrl" :detail-url="detailUrl" :upcall-path="upcallPath"
-        :class-name="className" :template-code="templateCode" @deleterow="deleteRow" @clickrowbtn="clickrowbtn"
-        :row-btns="['配置','审核']" btncolwidth="260px" :propconfig="{oid:'oid'}">
-        <template slot="btns">
-          <el-button size="small" type="primary">上传</el-button>
-        </template>
-      </jas-table-for-list>
-    </jas-list-wrapper>
+    <br>
+    <el-button size="small" @click="openDialog" type="primary">打开dialog</el-button>
 
   </div>
 </body>
@@ -35,102 +27,41 @@
 <script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../lib/vue/vue.js"></script>
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../lib/viewer/viewer.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
 <script src="./../../../common/js/jas-tools.js"></script>
 <script>
-  (function () { //加载配置未见
-    var param = window.jasTools.base.getParamsInUrl(location.href);
-    var pageCode = param.pageCode;
-    pageCode && $.getScript('./config/' + pageCode + '.js', function (data, textStatus, jqxhr) {
-      window.vm = new Vue({
-        el: '#app',
-        data: function () {
-          return {
-            className: '',
-            templateCode: '',
-            searchPath: '',
-            deletePath: '',
-            upcallPath: '',
-            addUrl: '',
-            detailUrl: '',
-            privilegeCode: '',
-            topSearch: {},
-            searchFields: [],
-            pageConfig: {},
-            fieldsConfig: [],
-            tableFields: [],
-          }
-        },
-        created: function () {
-          var that = this;
-          that.pageConfig = window.pageConfig;
-          var param = window.jasTools.base.getParamsInUrl(location.href);
-          that.privilegeCode = param.privilegeCode || pageConfig.privilegeCode;
-          that.templateCode = param.templateCode; // 导入导出模板
-          that.pageCode = param.pageCode;
-          that.className = param.className;
+  window.vm = new Vue({
+    el: '#app',
+    data: function () {
+      return {
 
 
-          that.addUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/module-template/base-template/dialogs/add.html?pageCode=' + that.pageCode;
-          that.detailUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/module-template/base-template/dialogs/detail.html?pageCode=' + that.pageCode;
-
-          that.searchPath = that.pageConfig.searchPath;
-          that.deletePath = that.pageConfig.deletePath;
-
-          that.fieldsConfig = that.pageConfig.fieldsConfig;
-          that.searchFields = that.formatFields(that.pageConfig.searchFields, that.fieldsConfig);
-          that.tableFields = that.formatFields(that.pageConfig.tableFields, that.fieldsConfig);
-          that.topSearch = that.formatForm(that.pageConfig.searchFields);
+      }
+    },
+    created: function () {
+      var that = this;
 
 
-        },
-        mounted: function () {
+    },
+    mounted: function () {
 
-        },
-        methods: {
-          formatForm: function (fields) {
-            var obj = {};
-            fields.forEach(function (item) {
-              obj[item] = '';
-            });
-            return obj;
-          },
-          formatFields: function (fields, fieldsConfig) {
-            return fields.map(function (item) {
-              return fieldsConfig[item] ? {
-                name: fieldsConfig[item].name,
-                field: item,
-                formatter: fieldsConfig[item].formatter,
-                width: fieldsConfig[item].width,
-                sortable: fieldsConfig[item].sortable,
-                tablehidden: fieldsConfig[item].tablehidden,
-              } : {
-                field: item
-              };
-            });
-          },
-          searchList: function () {
-            this.$refs.table.search();
-          },
-          locate: function (a, b) {
-            console.log(a, b)
-          },
-          clickrowbtn: function (a, b) {
-            console.log(a, b)
-          },
-          deleteRow: function (a, b) {
-            console.log(a, b)
-          },
-        },
-      });
-    });
-    !pageCode && alert('请传入配置参数')
-  })();
-</script>
-<script>
+    },
+    methods: {
 
+      openDialog: function () {
+        var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-demos/base-template/dialogs/add.html';
+        top.jasTools.dialog.show({
+          width: '80%',
+          height: '90%',
+          title: '文件预览',
+          src: baseSrc + '?oid=' + 123 + '&isDoc=true',
+        });
+      },
+
+
+    },
+  });
 </script>
 
 
