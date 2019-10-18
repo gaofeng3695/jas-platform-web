@@ -98,12 +98,13 @@
 
 
           that.addUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/add.html?pageCode=' + that.pageCode;
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/add.html?pageCode=' + that.pageCode;
           that.detailUrl = jasTools.base.rootPath +
-            '/jasmvvm/pages/group-risk-test/base-template-new/dialogs/detail.html?pageCode=' + that
+            '/jasmvvm/pages/module-template/base-template-new/dialogs/detail.html?pageCode=' + that
             .pageCode;
           if (pageConfig.addParams) {
             that.addUrl = jasTools.base.setParamsToUrl(that.addUrl, pageConfig.addParams)
+            that.addUrl = jasTools.base.setParamsToUrl(that.addUrl,jasTools.base.getParamsInUrl(location.href))
           }
           that.className = that.pageConfig.searchPath;
           if (that.pageConfig.excelConfig) {
@@ -134,13 +135,12 @@
 
         },
         mounted: function () {
-          console.log(pageConfig.searchFields.length > 0, 1, 1)
           if (pageConfig.ifHideSearch && (pageConfig.searchFields.length > 0)) {
             this.$refs.table.toggleSearch();
           }
         },
         methods: {
-          disableBtns: function (btnCfg,rows) {
+          disableBtns: function (btnCfg, rows) {
             if (btnCfg.isShow) {
               return !btnCfg.isShow(rows);
             }
