@@ -308,7 +308,45 @@
 				},
 			});
 			viewer.show();
-		}
+		};
+
+		var fileUploader = function (params) {
+			var argument = params.argument;
+			var obj = tools.extend({
+				domId: '',
+				fileType: 'file', //pic
+				businessId: '',
+				cbSuccessed: function () {}
+			}, params);
+			var html = [
+				'<jas-file-upload-new ref="upload"',
+				'	:file-type="fileType" ',
+				'	:business-id="businessId" ',
+				'	@success="cbSuccessed">',
+				'</jas-file-upload-new>'
+			].join('');
+			var res = Vue.compile(html);
+			var inst = new Vue({
+				el: obj.domId,
+				data: {
+					fileType: obj.fileType,
+					businessId: obj.businessId,
+				},
+				methods: {
+					cbSuccessed: function (a, b, c) {
+						obj.cbSuccessed && obj.cbSuccessed()
+					},
+					upload: function () {
+						this.$refs.upload.uploadFile();
+					}
+				},
+				render: res.render,
+			});
+			// document.body.appendChild(inst.$el);
+			// dialogs.push(inst);
+			return inst;
+		};
+
 
 		return {
 			rootPath: getRootPath(),
@@ -323,6 +361,7 @@
 			switchToCamelCase: switchToCamelCase,
 			systemGuard: systemGuard,
 			viewImg: viewImg,
+			fileUploader: fileUploader,
 		};
 	})();
 

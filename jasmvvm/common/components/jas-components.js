@@ -849,7 +849,7 @@ Vue.component('jas-file-upload-new', {
 	methods: {
 		insertIcon: function (file) {
 			var that = this;
-			setTimeout(function () {
+			this.$nextTick(function () {
 				$(that.$refs.upload.$el).find('.el-upload-list__item-actions').each(function (i) {
 					// console.log(i, 123123)
 					if ($(this).find('.el-upload-selfbtn').length || file) return;
@@ -1035,7 +1035,7 @@ Vue.component('jas-file-upload-new', {
 				}
 			}
 		},
-		uploadFile: function (oid) {
+		uploadFile: function () {
 			var that = this;
 			that._deleteFilesToServer(function () {
 				var src = jasTools.base.rootPath + "/attachment/upload.do";
