@@ -114,7 +114,7 @@ function importData() {
 	//		showLoadingMessage('正在进行数据入库，请耐心等待...');
 	//		importDataRequest(importType);
 	//	}
-	$('#importData-initial').linkbutton('disabled');
+	$('#importData-initial').linkbutton('disable');
 	importDataRequest();
 
 }
@@ -130,18 +130,18 @@ function importDataRequest() {
 		success: function (returnData) {
 			hiddenLoadingMessage();
 			if (returnData.status == 0) {
-				$('#importData-initial').linkbutton('enabled');
+				$('#importData-initial').linkbutton('enable');
 				top.showAlert("提示", returnData.msg, '');
 				return;
 			} else {
-				$('#importData-initial').linkbutton('enabled');
+				$('#importData-initial').linkbutton('enable');
 				top.showAlert("提示", "数据导入成功！", 'info', function () {
 					closeSave();
 				});
 			}
 		},
 		error: function (data) {
-			$('#importData-initial').linkbutton('enabled');
+			$('#importData-initial').linkbutton('enable');
 			hiddenLoadingMessage();
 			top.showAlert('提示', '数据导入失败！', 'error');
 		}
