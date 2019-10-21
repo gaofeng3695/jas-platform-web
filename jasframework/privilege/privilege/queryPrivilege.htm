@@ -1,48 +1,57 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta http-equiv="pragma" content="no-cache" />
-<meta name="keywords" content="gis,web">
-<meta name="description" content="">
-<title></title>
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
-<link rel="stylesheet" type="text/css" href="../../common/lib/ztree/css/zTreeStyle/zTreeStyle.css">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta name="keywords" content="gis,web">
+	<meta name="description" content="">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../../common/lib/ztree/css/zTreeStyle/zTreeStyle.css">
 
 
-<link rel="stylesheet" href="../../common/css/common.css" type="text/css"></link>
-<!-- <link rel="stylesheet" href="../../common/css/query.css" type="text/css" ></link> -->
-<link rel="stylesheet" href="../../common/css/detail.css" type="text/css"></link>
-<link rel="stylesheet" href="../../common/css/add.css" type="text/css"></link>
-<style>
-.textbox.combo{
-	width:200px !important;
-}
-</style>
-<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
-<script type="text/javascript" src="../../common/lib/other/jquery.inputDefault.js"></script>
-<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
-<script type="text/javascript" src="../../common/js/common.js"></script>
-<script type="text/javascript" src="" id="i18nEasyui"></script>
-<!-- ztree begin -->
-<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.core-3.5.js"></script>
-<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.excheck-3.5.js"></script>
-<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.exedit-3.5.js"></script>
-<!-- ztree end -->
-<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
-<script type="text/javascript" src="js/queryPrivilege.js"></script>
-<script type="text/javascript" src="../../privilege/js/privilege.js"></script>
+	<link rel="stylesheet" href="../../common/css/common.css" type="text/css">
+	</link>
+	<!-- <link rel="stylesheet" href="../../common/css/query.css" type="text/css" ></link> -->
+	<link rel="stylesheet" href="../../common/css/detail.css" type="text/css">
+	</link>
+	<link rel="stylesheet" href="../../common/css/add.css" type="text/css">
+	</link>
+	<style>
+		.textbox.combo {
+			width: 200px !important;
+		}
+	</style>
+	<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
+	<script type="text/javascript" src="../../common/lib/easyui/locale/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../../common/lib/other/jquery.inputDefault.js"></script>
+	<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+	<script type="text/javascript" src="../../common/js/common.js"></script>
+	<script type="text/javascript" src="" id="i18nEasyui"></script>
+	<!-- ztree begin -->
+	<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.core-3.5.js"></script>
+	<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+	<script type="text/javascript" src="../../common/lib/ztree/js/jquery.ztree.exedit-3.5.js"></script>
+	<!-- ztree end -->
+	<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+	<script type="text/javascript" src="js/queryPrivilege.js"></script>
+	<script type="text/javascript" src="../../privilege/js/privilege.js"></script>
+
+		<script src="../../../jasmvvm/lib/vue/vue.js"></script>
+    <script type="text/javascript" src="../../../jasmvvm/common/js/jas-tools.js"></script>
+		<script type="text/javascript" src="../../../jasmvvm/common/components/jas-components.js"></script>
 </head>
+
 <body>
-	<input type="hidden" id="menuid" value="P-PRI-0040"/>
+	<input type="hidden" id="menuid" value="P-PRI-0040" />
 	<!-- 整个布局 -->
 	<div id="cc" class="easyui-layout" style="width: 100%; height: 700px;overflow:hidden;">
 		<!-- 左侧布局	 -->
-		<div id="left" region="west"  class="easyui-panel"  key="pri.quanxianjiegou" split="false"  title="权限结构"
-				style="width: 200px; height: 90%; overflow:auto;" >
+		<div id="left" region="west" class="easyui-panel" key="pri.quanxianjiegou" split="false" title="权限结构"
+			style="width: 200px; height: 90%; overflow:auto;">
 			<select id="appId1" name="appId1" style="width: 120px;">
 
 			</select>
@@ -81,7 +90,8 @@
 								</label>
 							</th>
 							<td>
-								<input id="parentPrivilegeCode" name="parentPrivilegeCode" class="easyui-validatebox input_bg" maxlength="25">
+								<input id="parentPrivilegeCode" name="parentPrivilegeCode" class="easyui-validatebox input_bg"
+									maxlength="25">
 							</td>
 						</tr>
 						<tr>
@@ -121,7 +131,7 @@
 								</label>
 							</th>
 							<td>
-								<select name="privilegeType" id="privilegeType" class="easyui-validatebox input_bg" >
+								<select name="privilegeType" id="privilegeType" class="easyui-validatebox input_bg">
 									<option value="1">菜单</option>
 									<option value="2">功能点</option>
 									<option value="3">表单</option>
@@ -136,8 +146,8 @@
 								</label>
 							</th>
 							<td>
-								<select id="appId" name="appId"  class="easyui-validatebox input_bg">
-<!-- 									<option value="1">基础开发平台</option> -->
+								<select id="appId" name="appId" class="easyui-validatebox input_bg">
+									<!-- 									<option value="1">基础开发平台</option> -->
 								</select>
 							</td>
 						</tr>
@@ -195,46 +205,49 @@
 							<th>
 								<label id="pri.description">
 									<span key="pri.description" class="paltform-i18n">
-									权限描述：
+										权限描述：
 									</span>
 								</label>
 							</th>
 							<td>
-								<textarea id="description" class="easyui-validatebox  input_bg" validType="maxLength[300]"  name="description" style="height: 60px;">
+								<textarea id="description" class="easyui-validatebox  input_bg" validType="maxLength[300]"
+									name="description" style="height: 60px;">
 								</textarea>
 							</td>
 						</tr>
-							<tr>
-							</tr>
-						</table>
-						<table>
-							<tr>
-								<td width="250px"></td>
-								<td>
-									<a href="#" id="P-PRI-0043" class="easyui-linkbutton"
-										iconCls="icon-add" onclick="savePrivilege()"><span
+						<tr>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td width="250px"></td>
+							<td>
+								<a href="#" id="P-PRI-0043" class="easyui-linkbutton" iconCls="icon-add" onclick="savePrivilege()"><span
 										key="add" class="paltform-i18n">新增</span>
-									</a>
-								</td>
-								<td style="padding: 0 15px;">
-									<a href="#" id="P-PRI-0041" class="easyui-linkbutton"
-										iconCls="icon-edit" onclick="updatePrivilege()"><span
-										key="edit" class="paltform-i18n">修改</span>
-									</a>
-								</td>
-								<td>
-									<a href="#" id="P-PRI-0042" class="easyui-linkbutton"
-										iconCls="icon-remove" onclick="checkPrivilege()"><span
-										key="delete" class="paltform-i18n">删除</span>
-									</a>
-								</td>
-							</tr>
-						</table>
-					</form>
-				</div>
-
+								</a>
+							</td>
+							<td style="padding: 0 15px;">
+								<a href="#" id="P-PRI-0041" class="easyui-linkbutton" iconCls="icon-edit"
+									onclick="updatePrivilege()"><span key="edit" class="paltform-i18n">修改</span>
+								</a>
+							</td>
+							<td style="padding-right:15px">
+								<a href="#" id="P-PRI-0042" class="easyui-linkbutton" iconCls="icon-remove"
+									onclick="checkPrivilege()"><span key="delete" class="paltform-i18n">删除</span>
+								</a>
+							</td>
+							<td>
+								<a href="#" id="P-PRI-0045" class="easyui-linkbutton" iconCls="icon-edit"
+									onclick="privilegeConfig()"><span key="config" class="paltform-i18n">功能权限配置</span>
+								</a>
+							</td>
+						</tr>
+					</table>
+				</form>
 			</div>
+
 		</div>
+	</div>
 	<iframe id="exprotExcelIframe" style="display: none;"></iframe>
 </body>
 <script type="text/javascript">

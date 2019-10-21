@@ -73,6 +73,7 @@
 					<el-button type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
 					<el-button type="text" @click="sortNode" :disabled="!currentNodeId">排序</el-button>
 					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId">删除</el-button>
+					<el-button type="text" @click="configPrivilege" :disabled="configDisabled">功能权限配置</el-button>
 				</div>
 				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
 					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
@@ -108,6 +109,7 @@
 		data: function () {
 			return {
 				refreshTree: true,
+				configDisabled: true,
 				headStyle: {
 					'background-color': '#f5f7fa ',
 				},
@@ -263,7 +265,7 @@
 							that.$nextTick(function () {
 								if (!that.currentNodeId && data.length > 0) {
 									that.currentNodeId = data[0].id;
-									that.$nextTick(function(){
+									that.$nextTick(function () {
 										that.$refs.orgtree.setCurrentKey(that.currentNodeId); // 必须设定node-key
 										that._requestOrgDetail(that.currentNodeId);
 									});
@@ -296,6 +298,11 @@
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
 				this._requestOrgDetail(node.id);
+				if(node.isParent){
+					this.configDisabled=true;
+				}else{
+					this.configDisabled=false;
+				}
 			},
 			addNode: function (row) {
 				var that = this;
@@ -317,8 +324,28 @@
 					}
 				});
 			},
+			configPrivilege: function () {
+				var that = this;
+				localStorage.setItem("currentNodeId",that.currentNodeId);
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '功能配置权限',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-template/base-template-new/base-template-new.html?appId=' + that
+						.currentApplicationId + '&currentNodeId=' + that.currentNodeId+'&pageCode=confiPrivilege',
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.refreshTree = false;
+							that.$nextTick(function () {
+								that.refreshTree = true;
+								that.currentNodeId = '';
+							})
+						}
+					}
+				});
+			},
 			editNode: function (row) {
-				console.log(row)
 				var that = this;
 				top.jasTools.dialog.show({
 					width: '60%',
