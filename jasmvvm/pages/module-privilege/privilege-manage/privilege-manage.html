@@ -73,7 +73,7 @@
 					<el-button type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
 					<el-button type="text" @click="sortNode" :disabled="!currentNodeId">排序</el-button>
 					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId">删除</el-button>
-					<el-button type="text" @click="configPrivilege" :disabled="configDisabled">功能权限配置</el-button>
+					<el-button type="text" @click="configPrivilege" :disabled="configDisabled">配置权限规则</el-button>
 				</div>
 				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
 					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
