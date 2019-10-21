@@ -106,8 +106,8 @@
         fields.forEach(function (item) {
           obj[item] = '';
         });
-        if (pageConfig.searchParams) {
-          obj = jasTools.base.extend(obj, pageConfig.searchParams);
+        if (pageConfig.addParams) {
+          obj = jasTools.base.extend(obj, pageConfig.addParams);
         }
         return obj;
       },
