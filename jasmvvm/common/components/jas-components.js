@@ -599,7 +599,7 @@ Vue.component('jas-file-list', {
 
 });
 
-Vue.component('jas-pic-list', {
+Vue.component('jas-file-list-new', {
 	props: {
 		bizId: {
 			type: String,
@@ -620,15 +620,24 @@ Vue.component('jas-pic-list', {
 		}
 	},
 	template: [
-		'<div class="jas-file-list" v-show="!isrequest">',
-		' <div v-show="fileList.length === 0" >无</div>',
-		'	<div v-for="file in fileList"  class="el-upload-list__item">',
-		'		<a class="el-upload-list__item-name">',
-		'			<i class="el-icon-document"></i>{{file.fileName}}',
-		'		</a>',
-		'		<i class="el-icon-download tipBtn" @click="download(file.oid)" style="right:10px;"></i>',
-		'		<i class="el-icon-view tipBtn" @click="preview(file.oid)" style="right:35px;"></i>',
-		'	</div>',
+		'<div>',
+		'<div style="text-align:right;"><el-button type="text" size="small" @click="downloadAll">下载全部附件</el-button></div>',
+		'<ul v-if="fileList.length" class="el-upload-list el-upload-list--text" style="border-top: 1px solid #f1f1f1;">',
+		'  <li v-for="item in fileList" tabindex="0" class="el-upload-list__item" style="border-radius:0;margin-top:0px;padding: 12px;border-bottom: 1px solid #f1f1f1;">',
+		'    <a class="el-upload-list__item-name"',
+		'      style="width: 30%; display: inline-block; margin-right: 0px; vertical-align: top;">',
+		'      <i class="el-icon-document"></i>{{item.name}}',
+		'    </a>',
+		'    <span style="display: inline-block;width: 20%;text-align:center;vertical-align: top;">',
+		'      {{Math.ceil(item.size / 1024) + "kb" }}',
+		'    </span>',
+		'    <span style="display: inline-block;width: 30%;line-height: 1.2;">{{item.fileDescription}}</span>',
+		'    <span style="width: 62px; text-align: right; float: right; margin-right: 4px;">',
+		'      <i class="el-icon-view" @click="preview(item.oid)" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>',
+		'      <i class="el-icon-download" @click="download(item.oid)" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>',
+		'    </span>',
+		'  </li>',
+		'</ul>',
 		'</div>'
 	].join(''),
 	created: function () {
@@ -643,16 +652,51 @@ Vue.component('jas-pic-list', {
 				oid: oid
 			});
 		},
+		downloadAll: function () {
+			var that = this;
+			var src = jasTools.base.rootPath + "/attachment/downLoadMultiFile.do";
+			var fSrc = jasTools.base.setParamsToUrl(src, {
+				businessId: this.bizId,
+				fileType: 'file',
+				zipFileName: '123'
+			});
+			// console.log(fSrc)
+			jasTools.ajax.downloadByIframe('get', fSrc, {
+				businessId: this.bizId,
+				fileType: 'file',
+				zipFileName: '附件',
+				token: localStorage.getItem('token')
+			});
+		},
 		_requestFiles: function (oid) {
 			var that = this;
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
-				businessType: 'file',
+				fileType: 'file',
+				businessType: '',
 				businessId: oid
 			}, function (data) {
-				that.fileList = data.rows;
-				that.isrequest = false;
+				data.rows.forEach(function (item) {
+					var file = {
+						name: item.fileName,
+						size: item.size,
+						oid: item.oid,
+						size: item.fileSize,
+						fileDescription: item.fileDescription,
+
+					};
+					if (that.fileType == 'pic') {
+						var url = jasTools.base.rootPath + "/attachment/getImageBySize.do";
+						file.url = jasTools.base.setParamsToUrl(url, {
+							token: localStorage.getItem('token'),
+							eventid: file.oid
+						})
+					}
+					that.fileList.push(file);
+				});
+				that.fileListlength = that.fileList.length;
 			});
+
 		},
 		preview: function (oid) {
 			var that = this;
@@ -664,6 +708,94 @@ Vue.component('jas-pic-list', {
 			});
 		},
 
+	},
+
+});
+
+Vue.component('jas-pic-list', {
+	props: {
+		bizId: {
+			type: String,
+			required: true
+		},
+	},
+	data: function () {
+		return {
+			fileList: [],
+			fileType: 'pic',
+			isrequest: true,
+		}
+	},
+	watch: {
+		bizId: function () {
+			if (this.bizId) {
+				this._requestFiles(this.bizId);
+			}
+		}
+	},
+	template: [
+		'<div style="padding-bottom: 10px;">',
+		'  <ul class="el-upload-list el-upload-list--picture-card">',
+		'    <li tabindex="0" class="el-upload-list__item" v-for="item in fileList" :key="item.oid">',
+		'      <img :src="item.url" alt="" class="el-upload-list__item-thumbnail">',
+		'      <div style="color: #fff;background: rgba(0,0,0,0.3);overflow: hidden;text-overflow: ellipsis;width:146px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;padding:0px 10px;">',
+		'      	{{item.name}}',
+		'      </div>',
+		'      <span class="el-upload-list__item-actions">',
+		'        <span class="el-upload-list__item-preview" @click="preview(item)"><i class="el-icon-zoom-in"></i></span>',
+		'        <span class="el-upload-selfbtn" @click="download(item.oid)"><i class="el-icon-download"></i></span>',
+		'      </span>',
+		'    </li>',
+		'  </ul>',
+		'</div>',
+	].join(''),
+	created: function () {
+		if (this.bizId) {
+			this._requestFiles(this.bizId);
+		}
+	},
+	methods: {
+		preview: function (file) {
+			top.jasTools.base.viewImg(file.url)
+		},
+		download: function (oid) {
+			var that = this;
+			jasTools.ajax.downloadByIframe('post', jasTools.base.rootPath + "/attachment/download.do", {
+				oid: oid
+			});
+		},
+		_requestFiles: function (bizId) {
+			var that = this;
+			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
+			jasTools.ajax.get(url, {
+				fileType: that.fileType,
+				businessType: '',
+				businessId: bizId
+			}, function (data) {
+				var list = data.rows.map(function (item) {
+					var file = {
+						name: item.fileName,
+						size: item.size,
+						oid: item.oid,
+						size: item.fileSize,
+						fileDescription: item.fileDescription,
+
+					};
+					if (that.fileType == 'pic') {
+						var url = jasTools.base.rootPath + "/attachment/getImageBySize.do";
+						file.url = jasTools.base.setParamsToUrl(url, {
+							token: localStorage.getItem('token'),
+							eventid: file.oid
+						})
+					}
+					// that.fileList.push(file);
+					return file
+				});
+
+				that.fileList = list;
+				that.fileListlength = that.fileList.length;
+			});
+		},
 	},
 
 });
@@ -851,7 +983,6 @@ Vue.component('jas-file-upload-new', {
 			var that = this;
 			this.$nextTick(function () {
 				$(that.$refs.upload.$el).find('.el-upload-list__item-actions').each(function (i) {
-					// console.log(i, 123123)
 					if ($(this).find('.el-upload-selfbtn').length || file) return;
 					var $dom = $('<span class="el-upload-selfbtn"><i class="el-icon-download"></i></span>');
 					$dom.on('click', function () {
@@ -869,13 +1000,13 @@ Vue.component('jas-file-upload-new', {
 					var oPic = that.$refs.upload.uploadFiles[i];
 					if ($(this).find('img').length) { // 图片
 						if ($(this).find('input').length) return;
-						var $dom = $('<input class="el-input__inner" style="width:138px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;margin:4px;"/>');
-						$dom.val(oPic.name)
-						$dom.on('keydown', function (e) {
-							if (e.keyCode == 8) {
-								e.stopPropagation && e.stopPropagation();
-							}
-						})
+						var $dom = $('<div style="color: #fff;background: rgba(0,0,0,0.3);overflow: hidden;text-overflow: ellipsis;width:146px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;padding:0px 10px;">' + oPic.name + '</div>');
+						// $dom.val(oPic.name)
+						// $dom.on('keydown', function (e) {
+						// 	if (e.keyCode == 8) {
+						// 		e.stopPropagation && e.stopPropagation();
+						// 	}
+						// })
 						$(this).append($dom);
 					} else { // 文件
 						if ($(this).find('input').length) return;
@@ -982,7 +1113,6 @@ Vue.component('jas-file-upload-new', {
 			// file.fileDescription = 'asdasd'
 		},
 		handlePreview: function (file) {
-			console.log(file);
 			if (this.fileType == 'pic') {
 				top.jasTools.base.viewImg(file.url)
 			}

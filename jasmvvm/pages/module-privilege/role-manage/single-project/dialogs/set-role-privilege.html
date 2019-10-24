@@ -79,9 +79,9 @@
 			<template slot="closePanel">
 				<jas-base-module-title name="应用系统列表"></jas-base-module-title>
 				<el-tree ref="appTree" class="is-grown" node-key="oid" default-expand-all :data="applications" :highlight-current="true"  :current-node-key="currentApplicationId" @node-click="clickAppName">
-					<span class="custom-tree-node" slot-scope="{node, data }">
+					<span class="custom-tree-node" slot-scope="scope">
 								<i class="fa fa-user-circle-o" style="color:#99c8f8;" aria-hidden="true"></i>
-								<span>{{node.label}}</span>
+								<span>{{scope.node.label}}</span>
 					</span>
 				</el-tree>
 			</template>
@@ -93,7 +93,7 @@
 				</div>
 				<el-tree ref="menuTree" v-loading="loading" class="is-grown" ref="privaltree" :data="menuData" node-key="id" :props="defaultProps" show-checkbox
 				 :default-expanded-keys="[currentNodeId]" :default-checked-keys="checkedKeys" highlight-current @node-click="clicknode"
-				 :expand-on-click-node="false" style="margin-top: 10px "></el-tree>
+				 :expand-on-click-node="false" style="margin-top: 10px ">
 				</el-tree>
 			</div>
 		</jas-two-panel-resizer>
@@ -155,7 +155,7 @@
 					that.loading = false;
 					if (data.length > 0) {
 						that.currentApplicationId = data[0].oid;
-						that.$nextTick(() => {
+						that.$nextTick(function() {
 							that.$refs.appTree.setCurrentKey(that.currentApplicationId); // 必须设定node-key
 						});
 						that.requestUnitTree();//获取当前系统下面的菜单树

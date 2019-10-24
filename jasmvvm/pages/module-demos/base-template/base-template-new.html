@@ -19,7 +19,10 @@
     <!-- <jas-file-upload business-type="pic" business-id="0e51a146-800b-40af-a7f4-60457b72d85a"></jas-file-upload> -->
 
     <br>
-    <el-button size="small" @click="openDialog" type="primary">打开dialog</el-button>
+    <el-button size="small" @click="openDialog(0)" type="primary">打开附件编辑界面</el-button>
+    <el-button size="small" @click="openDialog(1)" type="primary">打开附件编辑界面(方法)</el-button>
+    <el-button size="small" @click="openDialog(2)" type="primary">打开附件查看界面</el-button>
+    <el-button size="small" @click="openDialog(3)" type="primary">打开附件查看界面（方法）</el-button>
 
   </div>
 </body>
@@ -49,13 +52,18 @@
     },
     methods: {
 
-      openDialog: function () {
-        var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-demos/base-template/dialogs/add.html';
+      openDialog: function (type) {
+        var aSrc = [
+          '/jasmvvm/pages/module-demos/base-template/dialogs/add.html',
+          '/jasmvvm/pages/module-demos/base-template/dialogs/add-fn-mothed.html',
+          '/jasmvvm/pages/module-demos/base-template/dialogs/detail.html',
+          '/jasmvvm/pages/module-demos/base-template/dialogs/detail-fn-mothed.html',
+        ]
         top.jasTools.dialog.show({
           width: '80%',
           height: '90%',
           title: '文件预览',
-          src: baseSrc + '?oid=' + 123 + '&isDoc=true',
+          src: jasTools.base.rootPath + aSrc[type] ,
         });
       },
 

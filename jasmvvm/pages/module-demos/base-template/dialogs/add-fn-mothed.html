@@ -13,16 +13,14 @@
 </head>
 
 <body>
-  <div id="app" v-cloak>
+  <div id="app">
     <jas-dialog-wrapper>
-      <!-- <jas-file-list :biz-id="oid"></jas-file-list> -->
       <jas-base-group-title name="图片信息"></jas-base-group-title>
-      <!-- <jas-file-upload-new ref="upload" file-type="pic" :business-id="oid" @success="picSuccess"></jas-file-upload-new> -->
-      <jas-base-group-title name="附件信息"></jas-base-group-title>
-      <!-- <jas-file-upload-new ref="upload2" file-type="file" :business-id="oid" @success="fileSuccess">
-      </jas-file-upload-new> -->
 
       <div id="myupload"></div>
+
+      <jas-base-group-title name="附件信息"></jas-base-group-title>
+
       <div id="myupload2"></div>
 
 
@@ -63,6 +61,7 @@
     },
     mounted: function () {
       var that = this;
+      
       this.myupload1 = jasTools.base.fileUploader({
         domId: '#myupload',
         fileType: 'pic',
@@ -89,15 +88,10 @@
         });
       },
       savePic: function () {
-        console.log(this.myupload1)
         this.myupload1.upload();
-        // this.$refs.upload.uploadFile();
-        
       },
       saveFile: function () {
         this.myupload2.upload();
-        // this.$refs.upload2.uploadFile();
-
       },
       picSuccess: function () {
         this.saveFile()

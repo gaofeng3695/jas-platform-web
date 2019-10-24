@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.12.0/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div>
+
+    <h1>图片信息</h1>
+    <div id="myupload"></div>
+
+    <h1>文件信息</h1>
+    <div id="myupload2"></div>
+
+
+  </div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.12.0/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+
+<script>
+  jasTools.base.fileLister({
+    domId: '#myupload',
+    fileType: 'pic',
+    businessId: '0e51a146-800b-40af-a7f4-60457b72d85a',
+  });
+  jasTools.base.fileLister({
+    domId: '#myupload2',
+    fileType: 'file',
+    businessId: '0e51a146-800b-40af-a7f4-60457b72d85a',
+  });
+</script>
+
+</html>

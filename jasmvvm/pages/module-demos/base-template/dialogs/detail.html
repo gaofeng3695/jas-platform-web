@@ -17,16 +17,14 @@
     <jas-dialog-wrapper>
 
       <jas-base-group-title name="图片信息"></jas-base-group-title>
-      <jas-file-upload-new ref="upload" file-type="pic" :business-id="oid" @success="picSuccess"></jas-file-upload-new>
+      <jas-pic-list :biz-id="oid"></jas-pic-list>
       <jas-base-group-title name="附件信息"></jas-base-group-title>
-      <jas-file-upload-new ref="upload2" file-type="file" :business-id="oid" @success="fileSuccess">
-      </jas-file-upload-new>
+      <jas-file-list-new :biz-id="oid"></jas-file-list-new>
+
 
       <div slot="footer">
         <el-button size="small" @click="cancel()">取 消</el-button>
-        <el-button size="small" @click="savePic" type="primary">savePic</el-button>
-        <el-button size="small" @click="saveFile" type="primary">saveFile</el-button>
-        <el-button size="small" @click="save" type="primary">saveAll</el-button>
+
       </div>
     </jas-dialog-wrapper>
 
@@ -45,53 +43,23 @@
       var that = this;
       return {
         oid: '0e51a146-800b-40af-a7f4-60457b72d85a',
+        formData: {
+          fileDescription: '123123'
+        },
+        fileList: [],
+        fileType: 'pic'
       }
     },
     created: function () {
       var that = this;
       var param = window.jasTools.base.getParamsInUrl(location.href);
-      // that.requestFile(this.oid);
     },
     mounted: function () {
       var that = this;
     },
     methods: {
-
       cancel: function (param) {
         window.parent.jasTools.dialog.close(param);
-      },
-      submit: function (formName) {
-        var that = this;
-        this.$refs[formName].validate(function (valid) {
-          if (valid) {
-            that.save();
-          }
-        });
-      },
-      savePic: function () {
-        this.$refs.upload.uploadFile();
-
-      },
-      saveFile: function () {
-        this.$refs.upload2.uploadFile();
-
-      },
-      picSuccess: function () {
-        this.saveFile()
-      },
-      fileSuccess: function () {
-        this.uploadSuccess()
-      },
-      save: function () {
-        this.savePic()
-      },
-      uploadSuccess: function () {
-        this.loading = false;
-        top.Vue.prototype.$message({
-          type: 'success',
-          message: !this.isEdit ? '保存成功' : '修改成功'
-        });
-        this.cancel(1);
       },
     },
   });
