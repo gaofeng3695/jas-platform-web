@@ -214,10 +214,12 @@
 		};
 		var systemGuard = function (config, successcb, failcb) {
 			var params = jasTools.base.getParamsInUrl(location.href.split('#')[0]);
+			var error = 0;
 			var isAppRight = function () {
 				if ((config.appId == params.appId) || !config.appId) {
 					return true;
 				}
+				error = 1;
 				return false;
 			};
 			var getPlatRoot = function () {
@@ -241,7 +243,10 @@
 			var isAppAccessable = function () {
 				var result = false;
 				var myRootPath = getPlatRoot();
-				if (!myRootPath) return result;
+				if (!myRootPath) {
+					error = 2;
+					return result;
+				}
 				var url = myRootPath + '/jasframework/privilege/application/userAppPermission.do';
 				$.ajax({
 					type: "GET",
@@ -257,6 +262,7 @@
 						}
 					}
 				});
+				error = 3;
 				return result;
 			};
 			var loginByToken = function () { //http://192.168.100.130:8888/
@@ -290,8 +296,17 @@
 					return;
 				}
 			}
+			if (error == 1) {
+				alert('AppId错误')
+			}
+			if (error == 2) {
+				alert('获取路径请求地址错误')
+			}
+			// if (error == 3) {
+			// 	alert('无进入权限')
+			// }
 			if (typeof failcb == 'function') {
-				return failcb();
+				return failcb(error);
 			}
 			alert('无进入权限')
 		};
@@ -347,6 +362,34 @@
 			return inst;
 		};
 
+		var fileLister = function (params) {
+			var argument = params.argument;
+			var obj = tools.extend({
+				domId: '',
+				fileType: 'file', //pic
+				businessId: '',
+				// cbSuccessed: function () {}
+			}, params);
+			var picHtml = [
+				'<jas-pic-list :biz-id="bizId"></jas-pic-list>'
+			].join('');
+			var fileHtml = [
+				'<jas-file-list-new :biz-id="bizId"></jas-file-list-new>'
+			].join('');
+			var res = Vue.compile(obj.fileType == 'file' ? fileHtml : picHtml);
+			var inst = new Vue({
+				el: obj.domId,
+				data: {
+					// fileType: obj.fileType,
+					bizId: obj.businessId,
+				},
+				methods: {},
+				render: res.render,
+			});
+			// document.body.appendChild(inst.$el);
+			// dialogs.push(inst);
+			return inst;
+		};
 
 		return {
 			rootPath: getRootPath(),
@@ -362,6 +405,7 @@
 			systemGuard: systemGuard,
 			viewImg: viewImg,
 			fileUploader: fileUploader,
+			fileLister: fileLister,
 		};
 	})();
 
