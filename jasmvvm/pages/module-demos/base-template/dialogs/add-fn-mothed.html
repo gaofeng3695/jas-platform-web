@@ -61,18 +61,37 @@
     },
     mounted: function () {
       var that = this;
-      
+
       this.myupload1 = jasTools.base.fileUploader({
         domId: '#myupload',
         fileType: 'pic',
         businessId: this.oid,
         cbSuccessed: this.picSuccess,
+        cbfailed: function (obj) {
+          alert('失败');
+          console.log(obj)
+        }        
       });
       this.myupload2 = jasTools.base.fileUploader({
         domId: '#myupload2',
         fileType: 'file',
         businessId: this.oid,
         cbSuccessed: this.fileSuccess,
+
+        businessType: '',
+        maxSize: 4,
+        maxTotalSize: 5,
+        maxCount: 5,
+        filePreview: function (oid) {
+          alert('自定义预览方法' + oid)
+        },
+        picPreview: function (url) {
+          alert('自定义预览方法' + url)
+        },
+        cbfailed: function (obj) {
+          alert('失败');
+          console.log(obj)
+        }
       });
     },
     methods: {

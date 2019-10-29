@@ -605,6 +605,15 @@ Vue.component('jas-file-list-new', {
 			type: String,
 			required: true
 		},
+		bizType: {
+			type: String,
+		},
+		filePreview: {
+			type: Function
+		},
+		picPreview: {
+			type: Function
+		},
 	},
 	data: function () {
 		return {
@@ -621,7 +630,8 @@ Vue.component('jas-file-list-new', {
 	},
 	template: [
 		'<div>',
-		'<div style="text-align:right;"><el-button type="text" size="small" @click="downloadAll">下载全部附件</el-button></div>',
+		'  <div v-show="fileList.length == 0">暂无附件</div>',
+		'<div v-show="fileList.length > 0" style="text-align:right;"><el-button type="text" size="small" @click="downloadAll">下载全部附件</el-button></div>',
 		'<ul v-if="fileList.length" class="el-upload-list el-upload-list--text" style="border-top: 1px solid #f1f1f1;">',
 		'  <li v-for="item in fileList" tabindex="0" class="el-upload-list__item" style="border-radius:0;margin-top:0px;padding: 12px;border-bottom: 1px solid #f1f1f1;">',
 		'    <a class="el-upload-list__item-name"',
@@ -633,7 +643,7 @@ Vue.component('jas-file-list-new', {
 		'    </span>',
 		'    <span style="display: inline-block;width: 30%;line-height: 1.2;">{{item.fileDescription}}</span>',
 		'    <span style="width: 62px; text-align: right; float: right; margin-right: 4px;">',
-		'      <i class="el-icon-view" @click="preview(item.oid)" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>',
+		'      <i class="el-icon-view" @click="preview(item)" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>',
 		'      <i class="el-icon-download" @click="download(item.oid)" style="font-size: 16px;cursor: pointer;padding:0 4px;"></i>',
 		'    </span>',
 		'  </li>',
@@ -673,7 +683,7 @@ Vue.component('jas-file-list-new', {
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
 				fileType: 'file',
-				businessType: '',
+				businessType: this.bizType,
 				businessId: oid
 			}, function (data) {
 				data.rows.forEach(function (item) {
@@ -685,12 +695,17 @@ Vue.component('jas-file-list-new', {
 						fileDescription: item.fileDescription,
 
 					};
-					if (that.fileType == 'pic') {
+
+					var aName = item.fileName.split('.');
+					var sType = aName[aName.length - 1];
+					if (['bmp', 'tif', 'jpg', 'png', 'gif'].indexOf(sType) > -1) {
+						// if (that.fileType == 'pic') {
 						var url = jasTools.base.rootPath + "/attachment/getImageBySize.do";
 						file.url = jasTools.base.setParamsToUrl(url, {
 							token: localStorage.getItem('token'),
 							eventid: file.oid
 						})
+						// }
 					}
 					that.fileList.push(file);
 				});
@@ -698,14 +713,32 @@ Vue.component('jas-file-list-new', {
 			});
 
 		},
-		preview: function (oid) {
+		preview: function (file) {
 			var that = this;
-			top.jasTools.dialog.show({
-				width: '80%',
-				height: '90%',
-				title: '预览模板',
-				src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
-			});
+			var oid = file.oid;
+			if (file.url) {
+				that.previewPic(file);
+				return;
+			}
+			if (this.filePreview) {
+				this.filePreview(oid);
+			} else {
+				top.jasTools.dialog.show({
+					width: '80%',
+					height: '90%',
+					title: '预览模板',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
+				});
+			}
+		},
+		previewPic: function (file) {
+			if (file.url) {
+				if (this.picPreview) {
+					this.picPreview(file.url);
+				} else {
+					top.jasTools.base.viewImg(file.url);
+				}
+			}
 		},
 
 	},
@@ -717,6 +750,15 @@ Vue.component('jas-pic-list', {
 		bizId: {
 			type: String,
 			required: true
+		},
+		bizType: {
+			type: String,
+		},
+		filePreview: {
+			type: Function
+		},
+		picPreview: {
+			type: Function
 		},
 	},
 	data: function () {
@@ -735,6 +777,7 @@ Vue.component('jas-pic-list', {
 	},
 	template: [
 		'<div style="padding-bottom: 10px;">',
+		'  <div v-show="fileList.length == 0">暂无图片</div>',
 		'  <ul class="el-upload-list el-upload-list--picture-card">',
 		'    <li tabindex="0" class="el-upload-list__item" v-for="item in fileList" :key="item.oid">',
 		'      <img :src="item.url" alt="" class="el-upload-list__item-thumbnail">',
@@ -756,7 +799,13 @@ Vue.component('jas-pic-list', {
 	},
 	methods: {
 		preview: function (file) {
-			top.jasTools.base.viewImg(file.url)
+			if (file.url) {
+				if (this.picPreview) {
+					this.picPreview(file.url);
+				} else {
+					top.jasTools.base.viewImg(file.url);
+				}
+			}
 		},
 		download: function (oid) {
 			var that = this;
@@ -769,7 +818,7 @@ Vue.component('jas-pic-list', {
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
 				fileType: that.fileType,
-				businessType: '',
+				businessType: this.bizType, //'file'
 				businessId: bizId
 			}, function (data) {
 				var list = data.rows.map(function (item) {
@@ -923,12 +972,29 @@ Vue.component('jas-file-upload-new', {
 		businessId: {
 			type: String
 		},
+		filePreview: {
+			type: Function
+		},
+		picPreview: {
+			type: Function
+		},
+		businessType: {
+			type: String
+		},
 		fileType: {
 			default: 'file', // pic
 			type: String
 		},
-		limit: {
+		maxCount: {
 			default: 20,
+			type: Number
+		},
+		maxSize: { //mb
+			default: 500,
+			type: Number
+		},
+		maxTotalSize: { //mb
+			default: 1000,
 			type: Number
 		},
 		// formData: {},
@@ -952,7 +1018,7 @@ Vue.component('jas-file-upload-new', {
 	computed: {
 		accept: function () {
 			if (this.fileType == 'pic') {
-				return '.' + ['jpg', 'png', 'gif'].join(',.');
+				return '.' + ['bmp', 'tif', 'jpg', 'png', 'gif'].join(',.');
 			}
 			return this.fileTypes.length > 0 ? '.' + this.fileTypes.join(',.') : '';
 		},
@@ -962,19 +1028,19 @@ Vue.component('jas-file-upload-new', {
 		}
 	},
 	template: [
-		'<el-upload  ref="upload" multiple :accept="accept" :data="formData" :limit="limit" :auto-upload="false" :file-list="fileList" ',
-		':on-change="changeFiles" :before-upload="beforeUpload" :on-success="fileUploaded" :on-remove="removeFile" :on-preview="handlePreview"',
+		'<el-upload  ref="upload" multiple :accept="accept" :data="formData" :limit="maxCount" :auto-upload="false" :file-list="fileList" ',
+		':on-change="changeFiles" :before-upload="beforeUpload" :on-success="fileUploaded" :on-error="uploadFailed" :on-remove="removeFile" :on-preview="handlePreview"',
 		':on-exceed="uploaodNumberlimit" :action="uploadurl" :list-type="listType" style="padding-bottom:10px;">',
 		'<span>',
 		'	<i v-if="fileType ==\'pic\'" class="el-icon-plus"></i>',
 		'	<el-button v-else size="small" type="primary" plain>选取文件</el-button>',
 		'</span>',
-		'	<span v-if="fileType !==\'pic\'" style="padding-left: 10px;" class="el-upload__tip" slot="tip">{{"最多上传"+ limit +"个附件"}}</span>',
+		'	<span v-if="fileType !==\'pic\'" style="padding-left: 10px;" class="el-upload__tip" slot="tip">{{"限制文件数量"+ maxCount +"个、单文件大小"+ maxSize +"MB"}}</span>',
 		'</el-upload>',
 	].join(''),
 	created: function () {
 		if (this.businessId) {
-			this.requestFile(this.businessId);
+			this.requestFile(this.businessId, this.businessType);
 		}
 
 	},
@@ -982,6 +1048,7 @@ Vue.component('jas-file-upload-new', {
 		insertIcon: function (file) {
 			var that = this;
 			this.$nextTick(function () {
+
 				$(that.$refs.upload.$el).find('.el-upload-list__item-actions').each(function (i) {
 					if ($(this).find('.el-upload-selfbtn').length || file) return;
 					var $dom = $('<span class="el-upload-selfbtn"><i class="el-icon-download"></i></span>');
@@ -996,11 +1063,12 @@ Vue.component('jas-file-upload-new', {
 					});
 					$(this).append($dom);
 				});
+
 				$(that.$refs.upload.$el).find('li').each(function (i) {
 					var oPic = that.$refs.upload.uploadFiles[i];
 					if ($(this).find('img').length) { // 图片
-						if ($(this).find('input').length) return;
-						var $dom = $('<div style="color: #fff;background: rgba(0,0,0,0.3);overflow: hidden;text-overflow: ellipsis;width:146px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;padding:0px 10px;">' + oPic.name + '</div>');
+						if ($(this).find('.picName').length) return;
+						var $dom = $('<div class="picName" style="color: #fff;background: rgba(0,0,0,0.3);overflow: hidden;text-overflow: ellipsis;width:146px;height: 28px;line-height: 28px;box-sizing:border-box;position:absolute;bottom:0;right:0;padding:0px 10px;">' + oPic.name + '</div>');
 						// $dom.val(oPic.name)
 						// $dom.on('keydown', function (e) {
 						// 	if (e.keyCode == 8) {
@@ -1055,7 +1123,13 @@ Vue.component('jas-file-upload-new', {
 								that.download(oPic.oid)
 							});
 							$see.on('click', function () {
-								that.preview(oPic.oid)
+								// console.log(oPic)
+								// return
+								if (oPic.url) {
+									that.handlePreview(oPic)
+								} else {
+									that.preview(oPic.oid)
+								}
 							});
 							$input.after($btnwrap);
 						}
@@ -1089,17 +1163,26 @@ Vue.component('jas-file-upload-new', {
 					fileDescription: item.newDesc,
 				}, function () {
 					fnDone(++nDown, aInfo.length)
+				}, function () {
+					that.$emit('fail', {
+						errorCode: 2,
+						msg: '文件备注更新失败'
+					});
 				});
 			});
 		},
 		preview: function (oid) {
 			var that = this;
-			top.jasTools.dialog.show({
-				width: '80%',
-				height: '90%',
-				title: '预览模板',
-				src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
-			});
+			if (this.filePreview) {
+				this.filePreview(oid);
+			} else {
+				top.jasTools.dialog.show({
+					width: '80%',
+					height: '90%',
+					title: '预览模板',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-pdf-viewer/web/viewer.html?oid=' + oid,
+				});
+			}
 		},
 		download: function (oid) {
 			var that = this;
@@ -1113,16 +1196,20 @@ Vue.component('jas-file-upload-new', {
 			// file.fileDescription = 'asdasd'
 		},
 		handlePreview: function (file) {
-			if (this.fileType == 'pic') {
-				top.jasTools.base.viewImg(file.url)
+			if (file.url) {
+				if (this.picPreview) {
+					this.picPreview(file.url);
+				} else {
+					top.jasTools.base.viewImg(file.url);
+				}
 			}
 		},
-		requestFile: function (bizId) {
+		requestFile: function (bizId, businessType) {
 			var that = this;
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
 				fileType: that.fileType,
-				businessType: '',
+				businessType: businessType,
 				businessId: bizId
 			}, function (data) {
 				data.rows.forEach(function (item) {
@@ -1134,12 +1221,16 @@ Vue.component('jas-file-upload-new', {
 						fileDescription: item.fileDescription,
 
 					};
-					if (that.fileType == 'pic') {
+					var aName = item.fileName.split('.');
+					var sType = aName[aName.length - 1];
+					if (['bmp', 'tif', 'jpg', 'png', 'gif'].indexOf(sType) > -1) {
+						// if (that.fileType == 'pic') {
 						var url = jasTools.base.rootPath + "/attachment/getImageBySize.do";
 						file.url = jasTools.base.setParamsToUrl(url, {
 							token: localStorage.getItem('token'),
 							eventid: file.oid
 						})
+						// }
 					}
 					that.fileList.push(file);
 				});
@@ -1151,8 +1242,26 @@ Vue.component('jas-file-upload-new', {
 			var that = this;
 			that.indexOfFileToSubmit++;
 			if (that.indexOfFileToSubmit >= that.lengthOfFileToSubmit) {
-				that.updateInfo(function () {
-					that.$emit('success', response, file, fileList)
+				that.$emit('success', response, file, fileList)
+				return;
+			}
+			if ((that.failCount + that.indexOfFileToSubmit) >= that.lengthOfFileToSubmit) {
+				that.$emit('fail', {
+					errorCode: 3,
+					msg: that.failCount + '个文件上传失败',
+					failList: that.failList
+				});
+			}
+		},
+		uploadFailed: function (err, file, fileList) {
+			var that = this;
+			that.failCount++;
+			that.failList.push(file);
+			if ((that.failCount + that.indexOfFileToSubmit) >= that.lengthOfFileToSubmit) {
+				that.$emit('fail', {
+					errorCode: 3,
+					msg: that.failCount + '个文件上传失败',
+					failList: that.failList
 				});
 			}
 		},
@@ -1165,27 +1274,31 @@ Vue.component('jas-file-upload-new', {
 				}
 			}
 		},
-		uploadFile: function () {
+		uploadFile: function (oid, bizType) {
 			var that = this;
 			that._deleteFilesToServer(function () {
-				var src = jasTools.base.rootPath + "/attachment/upload.do";
-				that.uploadurl = jasTools.base.setParamsToUrl(src, {
-					token: localStorage.getItem("token"),
-					businessId: that.businessId,
-					businessType: '',
-					fileType: that.fileType
-				});
-				that.$nextTick(function () {
-					var afileToSubmit = that.$refs.upload.uploadFiles.filter(function (item) {
-						return !item.oid
+				that.updateInfo(function () {
+					var src = jasTools.base.rootPath + "/attachment/upload.do";
+					that.uploadurl = jasTools.base.setParamsToUrl(src, {
+						token: localStorage.getItem("token"),
+						businessId: that.businessId || oid,
+						businessType: that.businessType || bizType,
+						fileType: that.fileType
 					});
-					that.lengthOfFileToSubmit = afileToSubmit.length;
-					that.indexOfFileToSubmit = 0;
-					if (afileToSubmit.length > 0) {
-						that.$refs.upload.submit();
-					} else {
-						that.fileUploaded();
-					}
+					that.$nextTick(function () {
+						var afileToSubmit = that.$refs.upload.uploadFiles.filter(function (item) {
+							return !item.oid
+						});
+						that.lengthOfFileToSubmit = afileToSubmit.length;
+						that.indexOfFileToSubmit = 0;
+						that.failList = [];
+						that.failCount = 0;
+						if (afileToSubmit.length > 0) {
+							that.$refs.upload.submit();
+						} else {
+							that.fileUploaded();
+						}
+					});
 				});
 			});
 		},
@@ -1199,11 +1312,43 @@ Vue.component('jas-file-upload-new', {
 				oids: that.filesToBeDelete.join(',')
 			}, function (data) {
 				cb && cb();
+			}, function () {
+				alert(111)
+				that.$emit('fail', {
+					errorCode: 1,
+					msg: '删除文件失败'
+				});
 			});
 		},
 		changeFiles: function (file, fileList) {
 			var that = this;
 			if (file.status === "ready") {
+				// 判断单个文件大小
+				if (file.size > that.maxSize * 1024 * 1024) {
+					var index = fileList.indexOf(file);
+					fileList.splice(index, 1);
+					setTimeout(function () {
+						top.Vue.prototype.$message.error('文件大小不得超过' + that.maxSize + 'MB');
+					})
+					return;
+				}
+
+				// 判断待上传文件总大小	
+				var total = 0;
+				fileList.filter(function (item) {
+					if (item.status === "ready") {
+						total += item.size
+					}
+				});
+				if (total > that.maxTotalSize * 1024 * 1024) {
+					var index = fileList.indexOf(file);
+					fileList.splice(index, 1);
+					setTimeout(function () {
+						top.Vue.prototype.$message.error('待上传文件大小不得超过' + that.maxTotalSize + 'MB');
+					})
+					return;
+				}
+
 				this.insertIcon(file);
 				var aFileName = file.name.split('.');
 				var fileTypes = this.fileTypes;
@@ -1216,7 +1361,7 @@ Vue.component('jas-file-upload-new', {
 			}
 		},
 		uploaodNumberlimit: function () {
-			top.Vue.prototype.$message("最多上传" + this.limit + "个附件")
+			top.Vue.prototype.$message("最多上传" + this.maxCount + "个附件")
 		},
 	}
 });

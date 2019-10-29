@@ -8,6 +8,7 @@
   <title>Document</title>
   <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
   <link rel="stylesheet" href="./../../../../lib/element-ui/v2.12.0/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../lib/viewer/viewer.min.css">
   <link rel="stylesheet" href="./../../../../common/css/main.css">
 
 </head>
@@ -17,9 +18,12 @@
     <jas-dialog-wrapper>
 
       <jas-base-group-title name="图片信息"></jas-base-group-title>
-      <jas-file-upload-new ref="upload" file-type="pic" :business-id="oid" @success="picSuccess"></jas-file-upload-new>
+      <jas-file-upload-new ref="upload" :max-size="4" :max-total-size="5" file-type="pic" :business-id="oid"
+        @success="picSuccess" @fail="picFail" business-type="demo"></jas-file-upload-new>
       <jas-base-group-title name="附件信息"></jas-base-group-title>
-      <jas-file-upload-new ref="upload2" file-type="file" :business-id="oid" @success="fileSuccess">
+      <jas-file-upload-new ref="upload2" :max-size="4" business-type="demo" :max-total-size="5" file-type="file"
+        :business-id="oid" @success="fileSuccess" @fail="fileFail" :file-preview="previewFile"
+        :pic-preview="previewPic">
       </jas-file-upload-new>
 
       <div slot="footer">
@@ -35,6 +39,7 @@
 <script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../../lib/vue/vue.js"></script>
 <script src="./../../../../lib/element-ui/v2.12.0/index.min.js"></script>
+<script src="./../../../../lib/viewer/viewer.min.js"></script>
 <script src="./../../../../common/components/jas-components.js "></script>
 <script src="./../../../../common/js/jas-tools.js"></script>
 
@@ -74,13 +79,25 @@
       },
       saveFile: function () {
         this.$refs.upload2.uploadFile();
-
+      },
+      previewFile: function (oid) {
+        alert('自定义预览方法' + oid)
+      },
+      previewPic: function (url) {
+        alert('自定义预览方法' + url)
       },
       picSuccess: function () {
         this.saveFile()
       },
+      picFail: function () {
+        this.saveFile()
+      },
       fileSuccess: function () {
         this.uploadSuccess()
+      },
+      fileFail: function (errObj) {
+        // alert(1111)
+        console.log(errObj.msg)
       },
       save: function () {
         this.savePic()
