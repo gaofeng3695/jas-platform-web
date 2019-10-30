@@ -49,10 +49,19 @@
 				<jas-base-group-title name="基本信息"></jas-base-group-title>
 				<el-row :gutter="10">
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="部门名称" prop="unitId">
+							<el-cascader :options="treeData" :props="treeProps" v-model="unitIdArr" :show-all-levels="false" change-on-select clearable
+								placeholder="请选择所属部门" size="small">
+							</el-cascader>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="用户名" prop="loginName">
 							<el-input v-model="tableFormData.loginName" clearable placeholder="请输入用户名" size="small"></el-input>
 						</el-form-item>
 					</el-col>
+				</el-row>
+				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="姓名" prop="userName">
 							<el-input v-model="tableFormData.userName" clearable placeholder="请输入姓名" size="small"></el-input>
@@ -63,14 +72,14 @@
 							<el-input v-model="tableFormData.phone" clearable placeholder="请输入联系电话" size="small"></el-input>
 						</el-form-item>
 					</el-col>
+				</el-row>
+				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="Email" prop="email">
 							<el-input v-model="tableFormData.email" clearable placeholder="请输入Email地址" size="small"></el-input>
 						</el-form-item>
 					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="密码到期时间" prop="passwordExpiredDate">
 							<el-date-picker v-model="tableFormData.passwordExpiredDate" :picker-options="disabledToday"  type="date" placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
 						</el-form-item>
@@ -158,6 +167,7 @@
 					}]
 				},
 				tableFormData: {
+					"unitId": "",//部门
 					"loginName": "", //用户名
 					"userName": "", //姓名
 					"phone": "", //电话
@@ -166,6 +176,23 @@
 					"description": "", //描述
 					"unitId": "f4b587f5-4f84-4e51-9ae7-529a7f16b2f6", //部门oid
 				},
+				treeProps: {
+					value: 'id',
+					label: 'text',
+				},
+				treeData: []
+
+			}
+		},
+		computed: {
+			unitIdArr: {
+				get: function () {
+					if (!this.treeData || !this.tableFormData.unitId || !this.treeData.length) return [];
+					return jasTools.base.getIdArrFromTree(this.treeData, this.tableFormData.unitId);
+				},
+				set: function (newValue) {
+					this.tableFormData.unitId = newValue[newValue.length - 1];
+				}
 			}
 		},
 
@@ -180,6 +207,8 @@
 			if (param.pid) {
 				this.tableFormData.unitId = param.pid;
 			}
+			this.requestUnitTree();
+
 		},
 		methods: {
 			submit: function (formName) {
@@ -226,6 +255,14 @@
 					}
 				});
 			},
+			requestUnitTree: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true";
+				jasTools.ajax.get(url, {}, function (data) {
+					that.treeData = data;
+				});
+			},
+
 			cancel: function (param) {
 				window.parent.jasTools.dialog.close(param);
 			}
