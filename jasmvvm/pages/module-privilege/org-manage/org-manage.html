@@ -67,7 +67,7 @@
 					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId || isFixed">删除</el-button>
 				</div>
 				<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" default-expand-all :props="defaultProps" :default-expanded-keys="[currentNodeId]"
-				  highlight-current @node-click="clicknode" :expand-on-click-node="false" :filter-node-method="filterNode"></el-tree>
+				  highlight-current @node-click="clicknode"  :expand-on-click-node="false" :filter-node-method="filterNode"></el-tree>
 			</template>
 			<div class="content" slot="mainPanel">
 				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
@@ -93,14 +93,19 @@
 									<div slot="search">
 										<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
 											<el-row>
-												<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+												<el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
 													<el-form-item label="用户名" prop="loginName" style="margin-bottom: 15px ">
 														<el-input v-model="form.loginName" :placeholder="'请输入用户名'" size="small" clearable></el-input>
 													</el-form-item>
 												</el-col>
-												<el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
+												<el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
 													<el-form-item label="姓名" prop="userName" style="margin-bottom: 15px ">
 														<el-input v-model="form.userName" :placeholder="'请输入姓名'" size="small" clearable></el-input>
+													</el-form-item>
+												</el-col>
+												<el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+													<el-form-item label="显示用户范围" prop="userName" style="margin-bottom: 15px; ">
+														<el-switch  v-model="form.userRange"  active-text="显示所有子部门" inactive-text="只显示本部门" @change="_requestUserManage(2)"></el-switch>
 													</el-form-item>
 												</el-col>
 												<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
@@ -247,6 +252,7 @@
 				filterText: '',
 				currentNode: '',
 				currentNodeId: '',
+				unitIdList:'',
 				orgnData: [],
 				defaultProps: {
 					label: 'text',
@@ -511,11 +517,11 @@
 			},
 
 			setFieldsPattern: function () {
-				var nFields = 5;
+				var nFields = 3;
 				this.btnSize.sm = 24 - (24 * nFields) % 24;
 				this.btnSize.md = 24 - (12 * nFields) % 24;
-				this.btnSize.lg = 24 - (8 * nFields) % 24;
-				this.btnSize.xl = 24 - (6 * nFields) % 24;
+				this.btnSize.lg = 24 - (6* nFields) % 24;
+				this.btnSize.xl = 24 - (6* nFields) % 24;
 			},
 
 			_requestUserManage: function (param) { // 0刷新  1重置  2搜索
@@ -530,13 +536,21 @@
 					this.currentPage = 1;
 				}
 				var url = jasTools.base.rootPath + "/jasframework/privilege/user/getList.do";
+				this.unitIdList='';
+				var unitId=this.currentNodeId;
+				if(this.form.userRange){
+					this.getChildrenIds(this.$refs.orgtree.getCurrentNode());
+					unitId=null;
+				}
 				var paramData = {};
 				if (that.isMulti) {
 					paramData = {
 						projectOid:'platform',
-						unitId: this.currentNodeId,
+						unitId: unitId,
 						loginName: this.form.loginName,
 						userName: this.form.userName,
+						userRange:this.form.userRange?1:0,
+						unitIdList:this.unitIdList,
 						pageNo: this.currentPage,
 						pageSize: this.pageSize,
 						page: this.currentPage,
@@ -544,9 +558,11 @@
 					}
 				}else{
 					paramData = {
-						unitId: this.currentNodeId,
+						unitId: unitId,
 						loginName: this.form.loginName,
 						userName: this.form.userName,
+						userRange:this.form.userRange?1:0,
+						unitIdList:this.unitIdList,
 						pageNo: this.currentPage,
 						pageSize: this.pageSize,
 						page: this.currentPage,
@@ -584,7 +600,7 @@
 					title: '修改用户',
 					src: baseSrc + '?oid=' + row.oid,
 					cbForClose: function () {
-						that._requestUserManage(1);
+						that._requestUserManage(2);
 						that._requestTable();
 					}
 				});
@@ -761,6 +777,19 @@
 						});
 					}
 				});
+			},
+			getChildrenIds: function(currentNodeData){
+				var childrens=currentNodeData.children;
+				if(childrens==null){
+					this.unitIdList+=(currentNodeData.id+',');
+					return ;
+				}
+				for(var i=0;i<childrens.length;i++){
+					this.getChildrenIds(childrens[i]);
+				}
+				this.unitIdList+=currentNodeData.id+',';
+				console.log(this.unitIdList);
+				return ;
 			}
 		},
 	});
