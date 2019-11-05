@@ -511,7 +511,7 @@ function downloadDoc(eventid){
  *	@param eventid	选中记录的eventid
  */
 function Preview(type,eventid){
-	if (['jpg', 'png', 'gif'].indexOf(type) > -1) {
+	if (['jpg', 'png', 'gif','JPG', 'PNG', 'GIF','BMP','bmp','JPEG','jpeg'].indexOf(type) > -1) {
 		var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + eventid + "&token=" + localStorage.getItem("token");
 		top.viewPic(url);
 	} else {

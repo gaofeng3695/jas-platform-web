@@ -634,7 +634,7 @@ function viewPicOrPdf(fileType, docId, versionid) {
 		dataType: "json",
 		success: function (result) {
 			if (result.success == 1) {
-				if (['jpg', 'png', 'gif'].indexOf(fileType) > -1) {
+				if (['jpg', 'png', 'gif','JPG', 'PNG', 'GIF','BMP','bmp','JPEG','jpeg'].indexOf(fileType) > -1) {
 					var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + docId + "&token=" + localStorage.getItem("token");
 					top.viewPic(url);
 					// top.getDlg("view.html");
