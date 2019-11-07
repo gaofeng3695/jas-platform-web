@@ -37,9 +37,8 @@
 		html {
 			padding: 0px;
 			margin: 0px;
-			height:100%;
+			height: 100%;
 		}
-
 	</style>
 </head>
 
@@ -183,20 +182,20 @@
 		<a id="operation" name="operation" href="#" iconCls="icon-operation" plain="true">
 			<span key="file.operation" class="paltform-i18ni">操作</span></a>
 
-		<a id="uploadTemplate"  style="display: none" href="#" class="easyui-linkbutton" iconCls="icon-history"
-			plain="true" onclick="documentImport()"><span key="file.classify" class="paltform-i18n">文档导入</span></a>
+		<a id="uploadTemplate" style="display: none" href="#" class="easyui-linkbutton" iconCls="icon-history" plain="true"
+			onclick="documentImport()"><span key="file.classify" class="paltform-i18n">文档导入</span></a>
 		<a id="downTemplate" href="#" class="easyui-linkbutton" style="display: none" iconCls="icon-download" plain="true"
 			onclick="downloadTemplate()"><span key="" class="paltform-i18n">下载模板</span></a>
-			<a id="90" name="90"href="#" class="easyui-linkbutton"  iconCls="icon-edit" plain="true"
-			onclick="bathUpdateFile()" style="display:none"><span key="" class="paltform-i18n">批量修改</span></a>
+		<a id="90" name="90" href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="bathUpdateFile()"
+			style="display:none"><span key="" class="paltform-i18n">批量修改</span></a>
 		<!-- 文档查询输入框 -->
-		<a style="display:block;width: 20%;float: right;">
+		<a style="display:block;width: 20%;float: right;margin:0px">
 			<div id="platformlocalcon" style="width: 100%;">
 				<table style="width: 100%">
 					<tr>
 						<td style="width: 81%">
-							<input style="height:15px" id="searchstring" name='searchstring' class="easyui-validatebox input_bg"
-								maxlength="50" validtype="filename" />
+							<input style="height:20px;line-height: 20px;padding-left:1px" id="searchstring" name='searchstring'
+								class="easyui-validatebox input_bg" maxlength="50" validtype="filename" />
 						</td>
 						<td style="width: 5%" id="dddd">
 							<img id="imgid" onclick="showProvince()" src='../../common/images/minus.gif' style="cursor:hand" />

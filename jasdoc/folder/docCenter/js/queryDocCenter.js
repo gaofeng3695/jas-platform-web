@@ -634,7 +634,7 @@ function viewPicOrPdf(fileType, docId, versionid) {
 		dataType: "json",
 		success: function (result) {
 			if (result.success == 1) {
-				if (['jpg', 'png', 'gif','JPG', 'PNG', 'GIF','BMP','bmp','JPEG','jpeg'].indexOf(fileType) > -1) {
+				if (['jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF', 'BMP', 'bmp', 'JPEG', 'jpeg'].indexOf(fileType) > -1) {
 					var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + docId + "&token=" + localStorage.getItem("token");
 					top.viewPic(url);
 					// top.getDlg("view.html");
@@ -1479,7 +1479,7 @@ function bathUpdateFile() {
 		return;
 	}
 	for (var i = 0; i < rows.length; i++) {
-		var index=rows[i].filename.lastIndexOf('.') ;
+		var index = rows[i].filename.lastIndexOf('.');
 		var obj = {
 			eventid: rows[i].eventid,
 			filename: rows[i].filename.substring(0, index),
