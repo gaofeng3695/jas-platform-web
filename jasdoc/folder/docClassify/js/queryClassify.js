@@ -454,7 +454,7 @@ function clearQueryConditions() {
 
 
 function Preview(type, docid) {
-	if (['jpg', 'png', 'gif'].indexOf(type) > -1) {
+	if (['jpg', 'png', 'gif','JPG', 'PNG', 'GIF','BMP','bmp','JPEG','jpeg'].indexOf(type) > -1) {
 		var url = rootPath + "/jasdoc/folder/doccenter/downloadDoc.do?docId=" + docid + "&token=" + localStorage.getItem("token");
 		top.viewPic(url);
 	} else {
