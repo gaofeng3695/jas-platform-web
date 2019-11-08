@@ -456,12 +456,14 @@ Vue.component('jas-two-panel-resizer', {
 					height: this.panelShowed ? this._length : '0%',
 					minHeight: '0%',
 					maxHeight: '100%',
+					overflow: 'auto'
 				}
 			} else {
 				return {
 					width: this.panelShowed ? this._length : '0%',
 					minWidth: '0%',
 					maxWidth: '100%',
+					overflow: 'auto'
 				}
 			}
 		},
@@ -509,12 +511,14 @@ Vue.component('jas-two-panel-resizer', {
 		setPanelStyle: function () {
 			if (this.layout === 'horizontal') {
 				this.mainPanelStyle = {
+					overflow:'auto',
 					height: 0
 				};
 				this.closeClass = 'fa fa-angle-up';
 				this.openClass = 'fa fa-angle-down';
 			} else {
 				this.mainPanelStyle = {
+					overflow:'auto',
 					width: 0
 				};
 				this.closeClass = 'fa fa-angle-left';

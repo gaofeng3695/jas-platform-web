@@ -26,7 +26,7 @@
 		}
 
 		.orgtool {
-			height: 40px;
+			/* height: 68px; */
 			/* border-bottom:1px solid #e4e7ed; */
 			text-align: right;
 			padding: 0 10px;
@@ -53,43 +53,93 @@
 			flex: 1;
 			overflow: auto;
 		}
+
+		/* tabs寮�濮� */
+
+		.el-main {
+			padding: 0;
+		}
+
+		.tabswrapper {
+			box-sizing: border-box;
+			height: 100%;
+			width: 100%;
+			background: #fff;
+		}
+
+		.tabswrapper .el-tabs__header {
+			/* padding: 0 10px; */
+			box-sizing: border-box;
+			width: 100%;
+			margin: 0;
+			background: #fff;
+		}
+
+		.tabswrapper .el-tabs__content {
+			width: 100%;
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+		}
+
+		.tabswrapper .el-tabs__content .el-tab-pane {
+			height: 100%;
+		}
+
+		/* tabs寮�濮� */
 	</style>
 </head>
 
 <body>
 	<div id="app" v-cloak v-loading="loading.allLoading">
 
-		<jas-two-panel-resizer layout="vertical" length="300px">
+		<jas-two-panel-resizer layout="vertical" length="260px">
 			<template slot="closePanel">
 				<div class="filterapplication">
 					<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
 						@change="changeApplication(currentApplicationId)">
-						<el-option v-for="item in applications" :key="item.oid" :label="item.appName" :value="item.oid">
+						<el-option v-for="item,index in applications" :key="item.oid + index" :label="item.appName"
+							:value="item.oid">
 						</el-option>
 					</el-select>
 				</div>
 				<div class="orgtool">
-					<el-button type="text" @click="addNode">新增</el-button>
-					<el-button type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
-					<el-button type="text" @click="sortNode" :disabled="!currentNodeId">排序</el-button>
-					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId">删除</el-button>
-					<el-button type="text" @click="configPrivilege" :disabled="configDisabled">配置权限规则</el-button>
+					<el-button style="padding-bottom:6px;" type="text" @click="addNode">新增</el-button>
+					<el-button style="padding-bottom:6px;" type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
+					<el-button style="padding-bottom:6px;" type="text" @click="sortNode" :disabled="!currentNodeId">排序</el-button>
+					<el-button style="padding-bottom:6px;" type="text" @click="deleteNode" :disabled="!currentNodeId">删除
+					</el-button>
+					<!-- <el-button style="padding-top:6px;" type="text" @click="configPrivilege" :disabled="configDisabled">查询规则配置
+					</el-button>
+					<el-button style="padding-top:6px;" type="text" @click="configOrgPrivilege" :disabled="configDisabled">部门权限配置
+					</el-button> -->
 				</div>
 				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
 					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
 					:expand-on-click-node="false">
 					<span class="custom-tree-node" slot-scope="scope">
-						<!--<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>-->
+						<i v-if="scope.data.isParent" class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
+						<i v-else class="fa fa-bookmark" style="color:#99c8f8;" aria-hidden="true"></i>
 						<span>{{ scope.node.label }}</span>
 					</span>
 				</el-tree>
 			</template>
-			<div class="content" slot="mainPanel">
+			<div class="content tabswrapper" slot="mainPanel">
 				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
 					<el-tab-pane label="权限详情" name="details">
-						<div v-loading="loading.orgDetail">
+						<div style="padding-top:15px;" v-loading="loading.orgDetail" v-if="(activeName == 'details')">
 							<jas-detail-table :titles="detailTitle" :detail="detail" />
 						</div>
+					</el-tab-pane>
+					<el-tab-pane label="查询规则配置" name="queryRule">
+						<div style="padding:15px;" v-if="configDisabled">请在左侧权限列表中选择菜单项</div>
+						<iframe v-if="(activeName == 'queryRule') && !configDisabled" :src="queryRuleSrc"
+							style="height:calc( 100% - 10px );width:100%;" frameborder="0"></iframe>
+					</el-tab-pane>
+					<el-tab-pane label="部门权限配置" name="deptAuth">
+						<div style="padding:15px;" v-if="configDisabled">请在左侧权限列表中选择菜单项</div>
+						<iframe v-if="(activeName == 'deptAuth') && !configDisabled" :src="deptAuthSrc"
+							style="height:calc( 100% - 10px );width:100%;" frameborder="0"></iframe>
 					</el-tab-pane>
 				</el-tabs>
 			</div>
@@ -114,6 +164,8 @@
 					'background-color': '#f5f7fa ',
 				},
 				detail: null,
+				deptAuthSrc: '',
+				queryRuleSrc: '',
 				detailTitle: [{
 					name: '父权限ID',
 					field: 'parentId',
@@ -186,7 +238,16 @@
 
 		},
 		watch: {
-
+			currentNodeId: function () {
+				var that = this;
+				that.deptAuthSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/org-config.html?appId=' + that
+					.currentApplicationId + '&currentNodeId=' + that.currentNodeId;
+				localStorage.setItem("currentNodeId", that.currentNodeId);
+				that.queryRuleSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-template/base-template-new/base-template-new.html?appId=' + that
+					.currentApplicationId + '&currentNodeId=' + that.currentNodeId + '&pageCode=confiPrivilege';
+			},
 		},
 		mounted: function () {
 			// this.initApplications();
@@ -298,10 +359,10 @@
 			clicknode: function (node, b, c) {
 				this.currentNodeId = node.id;
 				this._requestOrgDetail(node.id);
-				if(node.isParent){
-					this.configDisabled=true;
-				}else{
-					this.configDisabled=false;
+				if (node.type != 1) {
+					this.configDisabled = true;
+				} else {
+					this.configDisabled = false;
 				}
 			},
 			addNode: function (row) {
@@ -326,14 +387,36 @@
 			},
 			configPrivilege: function () {
 				var that = this;
-				localStorage.setItem("currentNodeId",that.currentNodeId);
+				var node = that.$refs.orgtree.getCurrentNode();
+				localStorage.setItem("currentNodeId", that.currentNodeId);
 				top.jasTools.dialog.show({
 					width: '60%',
 					height: '80%',
-					title: '功能配置权限',
+					title: '【' + node.name + '】的查询规则配置',
 					src: jasTools.base.rootPath +
 						'/jasmvvm/pages/module-template/base-template-new/base-template-new.html?appId=' + that
-						.currentApplicationId + '&currentNodeId=' + that.currentNodeId+'&pageCode=confiPrivilege',
+						.currentApplicationId + '&currentNodeId=' + that.currentNodeId + '&pageCode=confiPrivilege',
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.refreshTree = false;
+							that.$nextTick(function () {
+								that.refreshTree = true;
+								that.currentNodeId = '';
+							})
+						}
+					}
+				});
+			},
+			configOrgPrivilege: function () {
+				var that = this;
+				var node = that.$refs.orgtree.getCurrentNode();
+				top.jasTools.dialog.show({
+					width: '800px',
+					height: '80%',
+					title: '【' + node.name + '】的部门权限配置',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/org-config.html?appId=' + that
+						.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
 							that.refreshTree = false;
@@ -365,7 +448,7 @@
 				});
 			},
 			sortNode: function (row) {
-				console.log(row)
+				// console.log(row)
 				var that = this;
 				var src = jasTools.base.setParamsToUrl('/jasmvvm/pages/module-template/common-dialogs/sort.html', {
 					modelId: 'cn.jasgroup.jasframework.security.dao.entity.Functionprivilege',
