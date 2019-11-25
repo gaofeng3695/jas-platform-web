@@ -137,8 +137,12 @@
 						userBo.unitName = unitName;
 						localStorage.setItem("user", JSON.stringify(userBo));
 						// location.href = "../page-index/index.html";
-						location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-platform-for-app/index.html";
-						return
+						var params = jasTools.base.getParamsInUrl(location.href);
+						console.log(params)
+						if(!params.v3){
+							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-platform-for-app/index.html";
+							return
+						}
 						if (data.multiProject) {
 							sessionStorage.setItem("multiProject", 1);
 							location.href = jasTools.base.rootPath + "/jasmvvm/pages/page-plateform/index.html";
