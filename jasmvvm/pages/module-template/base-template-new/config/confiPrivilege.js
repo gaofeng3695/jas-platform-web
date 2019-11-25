@@ -9,6 +9,20 @@ var pageConfig = {
   detailPath: '/jdbc/commonData/processRule/get.do',
   savePath: '/jdbc/commonData/processRule/save.do',
   updatePath: '/jdbc/commonData/processRule/update.do',
+  topBtns: [{
+    name: '新增', // 必填
+    icon: 'fa fa-plus', //选填，按钮的font图标，font-awesome类，仅在topBtns生效
+    isDefaultMethod: 'true', //选填，是否采用默认方法,需要搭配privilegeCode使用，仅在rowBtns生效
+    privilegeCode: 'bt_add', //选填，表明按钮的权限，仅在rowBtns生效
+  }, {
+    name: '排序', // 必填
+    icon: 'fa fa-sort', //选填，按钮的font图标，font-awesome类，仅在topBtns生效
+    method: 'sortItem'
+  }, {
+    name: '发布', // 必填
+    icon: 'el-icon-upload', //选填，按钮的font图标，font-awesome类，仅在topBtns生效
+    method: 'publish'
+  }],
   rowBtns: [{
     name: '详情',
     isTip: true,
@@ -77,7 +91,7 @@ var pageConfig = {
     conditionExpression: {
       name: '条件表达式',
       type: 'input',
-      isRequired: true
+      isRequired: false
     },
     description: {
       name: '描述',
@@ -89,6 +103,38 @@ var pageConfig = {
     },
   },
   methods: {
-
+    sortItem: function () {
+      var that = this;
+      var url = jasTools.base.rootPath + '/jasmvvm/pages/module-template/common-dialogs/sort-list.html';
+      url = jasTools.base.setParamsToUrl(url, {
+        businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId,
+        processType: "beforeAdvice",
+        modelId: 'cn.jasgroup.framework.process.entity.ProcessBusinessRef',
+        displayField: 'name',
+        rowIndexField: 'orderNum',
+      });
+      top.jasTools.dialog.show({
+        height: '70%',
+        width: '600px',
+        title: '排序',
+        src: url,
+        cbForClose: function (param) {
+          that.$refs.table.refresh();
+        }
+      });
+    },
+    publish: function () {
+      var that = this;
+      var url = jasTools.base.rootPath + "/processRule/publish.do";
+      jasTools.ajax.get(url, {
+        businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId
+      }, function (data) {
+				(top.jasTools || jasTools).dialog.close();
+        window.top.Vue.prototype.$message({
+          message: '发布成功',
+          type: 'success'
+        })
+      });
+    }
   }
 };

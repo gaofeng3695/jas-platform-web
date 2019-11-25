@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+	<style>
+		.is-grown>div {
+			height: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+
+		<jas-dialog-wrapper>
+
+			<jas-two-panel-resizer layout="vertical" length="300px">
+				<template slot="closePanel" style="overflow: hidden;">
+					<div style="overflow: hidden;min-width: 200px;">
+
+						<jas-base-group-title name="组织机构列表"></jas-base-group-title>
+						<el-tree ref="orgtree" :data="orgnData" node-key="id" default-expand-all :props="defaultProps"
+							:default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
+							:expand-on-click-node="false">
+							<span class="custom-tree-node" slot-scope="scope">
+								<i class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
+								<span>{{ scope.data.text }}</span>
+								<span style="color:#999;">{{ '（' + (scope.data.relationOrg.length || 0) + '个）'}}</span>
+							</span>
+						</el-tree>
+					</div>
+				</template>
+				<div slot="mainPanel" style="background: #fff;">
+					<div style="padding-left:15px;">
+
+						<jas-base-group-title :name="mytitle"></jas-base-group-title>
+
+						<el-tree ref="orgtree2" v-if="isRefresh" @check-change="checkChanged" :default-checked-keys="relationOrg"
+							:data="orgnData" show-checkbox :check-strictly="true" node-key="id" default-expand-all
+							:props="defaultProps" :expand-on-click-node="false" @node-click="clickRelanode"></el-tree>
+					</div>
+				</div>
+			</jas-two-panel-resizer>
+			<div slot="footer">
+				<!-- <el-button size="small" @click="cancel()">取 消</el-button> -->
+				<el-button size="small" :disabled="but_disabled" type="primary" @click="save">保 存</el-button>
+			</div>
+		</jas-dialog-wrapper>
+
+
+	</div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/vue-multipane/vue-multipane.js"></script>
+
+
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var app = new Vue({
+		el: "#app",
+		data: function () {
+			return {
+				but_disabled: false,
+				orgnData: [],
+				currentNodeName: '',
+				isRefresh: false,
+				currentNodeId: '',
+				relationOrg: [],
+				defaultProps: {
+					label: 'text',
+					orgnData: 'orgnData'
+				},
+
+			}
+		},
+		computed: {
+			mytitle: function () {
+				return '【' + this.currentNodeName + '】的权限关联'
+			}
+		},
+		mounted: function () {
+			var param = window.jasTools.base.getParamsInUrl(location.href);
+			this.businessId = param.currentNodeId;
+
+			this._requestTable();
+
+		},
+		methods: {
+			checkChanged: function (data, checked, c) {
+				var that = this;
+				// console.log(a, b, c)
+				if (checked) {
+					console.log(data)
+					that.setChildrenChecked([data]);
+				}
+				this.$nextTick(function () {
+					var arr = that.$refs.orgtree2.getCheckedKeys();
+					that.updateTreeNode(that.currentNodeId, arr)
+				})
+			},
+			setChildrenChecked: function (arr) {
+				var that = this;
+				arr.forEach(function (item) {
+					that.$refs.orgtree2.setChecked(item.id, true)
+					if (item.children) {
+						that.setChildrenChecked(item.children);
+					}
+				})
+			},
+			clickRelanode: function (node, data, c) {
+				if (data.checked) {
+					this.$refs.orgtree2.setChecked(data, false, true, true, true)
+				} else {
+					this.$refs.orgtree2.setChecked(data, true, true, true, true)
+				}
+			},
+			updateTreeNode: function (id, relationOrg) {
+				var done = false;
+				var getIt = function (arr) {
+					arr.forEach(function (item) {
+						if (item.id == id) {
+							done = true;
+							item.relationOrg = relationOrg;
+							return;
+						}
+						if (item.children && !done) {
+							getIt(item.children);
+						}
+
+					})
+				};
+				getIt(this.orgnData);
+			},
+			refreshRelaTree: function () {
+				var that = this;
+				this.isRefresh = false;
+				this.$nextTick(function () {
+					that.isRefresh = true;
+				});
+			},
+			_requestTable: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/unit/getLeftTree.do?isroot=true";
+				jasTools.ajax.get(url, {}, function (data) {
+					that.orgnData = that.formatOrgArr(data, {});
+					that.$nextTick(function () {
+						if (!that.currentNodeId) {
+							that.currentNodeId = data[0].id;
+							that.currentNodeName = data[0].text;
+						}
+						that.$refs.orgtree.setCurrentKey(that.currentNodeId);
+						that.getOrgRelationBusinessRef();
+					})
+				});
+			},
+			getOrgRelationBusinessRef: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/jdbc/commonData/orgRelationBusinessRef/getList.do";
+				jasTools.ajax.post(url, {
+					"businessId": that.businessId,
+					"businessType": "dataAuthOrg"
+				}, function (data) {
+					that.orgnData = that.formatOrgArr(that.orgnData, that.getRelationMap(data.rows));
+					that.relationOrg = that.orgnData[0].relationOrg;
+
+					// console.log(that.orgnData)
+					that.refreshRelaTree();
+				});
+			},
+			getRelationMap: function (aRela) {
+				var that = this;
+				var relaMap = {};
+				aRela.forEach(function (item) {
+					if (relaMap[item.orgId]) {
+						relaMap[item.orgId].push(item.friendOrgId);
+					} else {
+						relaMap[item.orgId] = [item.friendOrgId];
+					}
+				});
+				return relaMap;
+			},
+			formatOrgArr: function (aOrg, oMap) {
+				var formatter = function (arr) {
+					arr.forEach(function (item) {
+						item.relationOrg = oMap[item.id] || [];
+						if (item.children) {
+							formatter(item.children);
+						}
+					})
+				};
+				formatter(aOrg);
+				return aOrg;
+			},
+			clicknode: function (node, data) {
+				var that = this;
+				that.currentNodeId = node.id;
+				that.currentNodeName = node.text;
+				that.relationOrg = node.relationOrg;
+				that.refreshRelaTree();
+				// console.log(that.relationOrg)
+			},
+			formatForm: function (arr) {
+				var that = this;
+				var aRelas = [];
+				var format = function (arr) {
+					arr.forEach(function (item) {
+						// item
+						if (item.relationOrg && item.relationOrg.length > 0) {
+							item.relationOrg.forEach(function (orgId) {
+								aRelas.push({
+									orgId: item.id,
+									friendOrgId: orgId,
+									businessType: 'dataAuthOrg',
+									businessId: that.businessId,
+								});
+							});
+						}
+						if (item.children && item.children.length > 0) {
+							format(item.children);
+						}
+					})
+				};
+				format(arr);
+				return aRelas;
+			},
+			save: function () {
+				var that = this;
+				var url = jasTools.base.rootPath + "/orgRelationBusinessRef/update.do";
+
+				that.but_disabled = true;
+				jasTools.ajax.post(url, {
+					businessType: 'dataAuthOrg',
+					businessId: that.businessId,
+					orgRelationBusinessRefList: that.formatForm(that.orgnData)
+				}, function (data) {
+					that.but_disabled = false;
+					top.Vue.prototype.$message({
+						type: 'success',
+						message: '保存成功'
+					});
+					that.cancel();
+				}, function (data) {
+					that.but_disabled = false;
+				});
+			},
+			cancel: function (param) {
+				window.parent.jasTools.dialog.close(param);
+			}
+		},
+	});
+</script>
+
+</html>

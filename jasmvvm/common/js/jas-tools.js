@@ -297,10 +297,10 @@
 				}
 			}
 			if (error == 1) {
-				alert('AppId错误')
+				alert('前端AppId配置错误')
 			}
 			if (error == 2) {
-				alert('获取路径请求地址错误')
+				alert('platform.service.address配置错误')
 			}
 			// if (error == 3) {
 			// 	alert('无进入权限')
@@ -331,12 +331,28 @@
 				domId: '',
 				fileType: 'file', //pic
 				businessId: '',
-				cbSuccessed: function () {}
+				businessType: '',
+				maxSize: 500,
+				maxTotalSize: 1000,
+				maxCount: 20,
+				// filePreview: null,
+				// picPreview: null,
+				cbSuccessed: function () {},
+				cbfailed: function () {}
 			}, params);
 			var html = [
 				'<jas-file-upload-new ref="upload"',
 				'	:file-type="fileType" ',
 				'	:business-id="businessId" ',
+				'	:business-type="businessType" ',
+
+				'	:max-size="maxSize" ',
+				'	:max-total-size="maxTotalSize" ',
+				'	:max-count="maxCount" ',
+				'	:file-preview="filePreview" ',
+				'	:pic-preview="picPreview" ',
+
+				'	@fail="cbfailed" ',
 				'	@success="cbSuccessed">',
 				'</jas-file-upload-new>'
 			].join('');
@@ -346,10 +362,20 @@
 				data: {
 					fileType: obj.fileType,
 					businessId: obj.businessId,
+					businessType: obj.businessType,
+
+					maxSize: obj.maxSize,
+					maxTotalSize: obj.maxTotalSize,
+					maxCount: obj.maxCount,
+					filePreview: obj.filePreview,
+					picPreview: obj.picPreview,
 				},
 				methods: {
-					cbSuccessed: function (a, b, c) {
+					cbSuccessed: function () {
 						obj.cbSuccessed && obj.cbSuccessed()
+					},
+					cbfailed: function (a, b, c) {
+						obj.cbfailed && obj.cbfailed(a, b, c)
 					},
 					upload: function () {
 						this.$refs.upload.uploadFile();
@@ -368,13 +394,15 @@
 				domId: '',
 				fileType: 'file', //pic
 				businessId: '',
-				// cbSuccessed: function () {}
+				businessType: '',
+				// filePreview: function () {}
+				// picPreview: function () {}
 			}, params);
 			var picHtml = [
-				'<jas-pic-list :biz-id="bizId"></jas-pic-list>'
+				'<jas-pic-list :biz-id="bizId" :biz-type="businessType" :pic-preview="picPreview" :file-preview="filePreview"></jas-pic-list>'
 			].join('');
 			var fileHtml = [
-				'<jas-file-list-new :biz-id="bizId"></jas-file-list-new>'
+				'<jas-file-list-new :biz-id="bizId" :biz-type="businessType" :pic-preview="picPreview" :file-preview="filePreview"></jas-file-list-new>'
 			].join('');
 			var res = Vue.compile(obj.fileType == 'file' ? fileHtml : picHtml);
 			var inst = new Vue({
@@ -382,6 +410,9 @@
 				data: {
 					// fileType: obj.fileType,
 					bizId: obj.businessId,
+					businessType: obj.businessType,
+					filePreview: obj.filePreview,
+					picPreview: obj.picPreview,
 				},
 				methods: {},
 				render: res.render,
@@ -667,6 +698,7 @@
 					}
 				},
 				error: function () {
+					cb_fail && cb_fail(data);
 					window.top.Vue.prototype.$message({
 						message: '服务器连接失败，请稍后再试',
 						type: 'error'
