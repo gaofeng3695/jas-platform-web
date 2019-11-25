@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="expires" CONTENT="-1">
+<meta name="keywords" content="gis,web">
+<meta name="description" content="">
+<title></title>
+<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+
+<link rel="stylesheet"  type="text/css" href="../../common/css/common.css"></link>
+<link rel="stylesheet"  type="text/css" href="../../common/css/detail.css"></link>
+<script type="text/javascript" src="../../common/lib/js-xss/xss.min.js"></script>
+<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+<script type="text/javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="js/viewDomain.js"></script>
+<script type="text/javascript" src="" id="i18nEasyui"></script>
+<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+</head>
+<body>
+<!-- 权限编号 -->
+		<input type="hidden" id="menuid" value=""/>
+
+<!-- 主体内容块 -->
+	<div id="contentArea" class="content-area">
+		<form class="content-area-main">
+			<table class="detail-table">
+				<tr>
+					<th><span  class="paltform-i18n">阈名</span></th>
+					<td><span id="domainName"></span></td>
+					<th><span  class="paltform-i18n">阈值Id</span></th>
+					<td><span id="codeId"></span></td>
+				</tr>
+				<tr>
+					<th><span class="paltform-i18n">阈值名称</span></th>
+					<td><span id="codeName"></span></td>
+					<th><span  class="paltform-i18n">父阈值Id</span></th>
+					<td><span id="parentCodeId"></span></td>
+                </tr>
+                <tr>
+					<th><span class="paltform-i18n">序号</span></th>
+					<td><span id="ordinal"></span></td>
+					
+				</tr>
+			</table>
+		</form>
+	</div>
+
+<!-- 按钮区域 -->
+	<div class="button-area">
+		<table width="100%">
+			<tr>
+				<td>
+					<a href="#" class="easyui-linkbutton close-btn" onclick="closeDomain();">
+						<span  key="close" class="paltform-i18n">关闭</span>
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="pragma" content="no-cache" />
+<meta name="keywords" content="gis,web">
+<meta name="description" content="">
+<title></title>
+<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../common/lib/easyui/themes/icon.css">
+
+<link rel="stylesheet"  type="text/css" href="../../common/css/common.css"></link>
+<link rel="stylesheet" type="text/css" href="../../common/css/add.css">
+
+<script type="text/javascript" src="../../common/lib/jquery.min.js"></script>
+<script type="text/javascript" src="../../common/lib/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../common/js/validate_class.js"></script>
+<script type="text/javascript" src="../../common/js/AppConfig.js"></script>
+<script type="text/javascript" src="../../common/js/common.js"></script>
+<script type="text/javascript" src="" id="i18nEasyui"></script>
+<script type="text/javascript" src="../../common/i18n/i18n.js"></script>
+<script type="text/javascript" src="js/addDomain.js"></script>
+</head>
+<body>
+<div id="contentArea" class="content-area">
+		<!-- 权限编号 -->
+	<input type="hidden" id="menuid" value="P-PRI-0020" />
+	<form id="domainForm" method="post">
+	<!-- 数据eventid -->
+	<table align="center" class="edit-table">
+		<tr>
+			<td  width="20%"><span  class="paltform-i18n">阈名：</span></td>
+			<td  width="30%"><input name="domainName" class="easyui-validatebox input_bg"
+				required="true" id='domainName' validType="general" maxLength=50 /></td>
+
+			<td  width="20%"><span  class="paltform-i18n">阈值Id：</span></td>
+			<td  width="30%"><input name="codeId" class="easyui-validatebox input_bg"
+				required="true" id='codeId' validType="general"  /></td>
+		</tr>
+		<tr>
+			<td  width="20%"><span  class="paltform-i18n">阈值名称：</span></td>
+			<td  width="30%"><input name="codeName" class="easyui-validatebox input_bg"
+				required="true" id='codeName' validType="general" maxLength=50 /></td>
+
+			<td  width="20%"><span  class="paltform-i18n">父阈值Id：</span></td>
+			<td  width="30%"><input name="parentCodeId" class="easyui-validatebox input_bg"
+				 id='parentCodeId' validType="general"  /></td>
+        </tr>
+        <tr>
+			<td  width="20%"><span  class="paltform-i18n">排序号：</span></td>
+			<td  width="30%"><input name="ordinal" class="easyui-validatebox input_bg"
+				 id='ordinal' validType="general"  /></td>
+		</tr>
+		<tr>
+			<td colspan="1"><span class="paltform-i18n">描述：</span></td>
+			<td colspan="3"><textarea name="description" cols="25" rows="5"
+					id="description" class="easyui-validatebox"
+					validType="maxLength[300]"></textarea></td>
+		</tr>
+	</table>
+
+	</form>
+</div>
+<div class="button-area">
+		<table width="100%">
+			<tr>
+				<td colspan="4" align="center">
+					<a href="#" id="saveButton" class="easyui-linkbutton submit"  onclick="save()"> <span key="save" class="paltform-i18n">保存</span></a>
+					<a href="#" class="easyui-linkbutton cancel" onclick="closePanel()"> <span key="cancel" class="paltform-i18n">取消</span></a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
