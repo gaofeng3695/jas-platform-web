@@ -103,7 +103,10 @@ function initzTree(appId) {
 					simpleData: {
 						enable: true,
 						idKey: 'id'
-					}
+					},
+					key: {
+						url: "xUrl"
+					}						
 				},
 				callback: {
 					beforeExpand: zTreeBeforeExpand,

@@ -10,7 +10,7 @@ var apiProxy = proxy(function (pathname, req) {
     if (pathname.match('^/jasproxy/jasmvvm')) return false;
     return pathname.match('^/jasproxy');
 }, {
-    target: 'http://192.168.100.130:8083/',
+    target: 'http://192.168.100.45:8081/',
     changeOrigin: true,
     ws: true,
     pathRewrite: {
