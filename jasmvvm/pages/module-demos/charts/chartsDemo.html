@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>chartsDemo</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="./../../../common/css/main.css">
+
+</head>
+
+
+
+
+
+<body>
+  <div id="app" style="overflow:auto;">
+
+    <jas-two-panel-resizer layout="vertical" length="260px">
+      <template slot="closePanel">
+        <jas-two-panel-resizer layout="horizontal" length="370px">
+          <template slot="closePanel">
+            <jas-base-module-title name="管线数据" style="margin-bottom: 10px;"></jas-base-module-title>
+            <el-tree :data="treedata" class="is-grown" ref="treedata" node-key="label" :props="defaultProps"
+              :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode" icon-class="fa fa-file"
+              :expand-on-click-node="false" :default-expand-all="true">
+              <span class="custom-tree-node" slot-scope="scope">
+                <i class="fa fa-folder" v-if="scope.data.children" style="color:#f5cd09;" aria-hidden="true"></i>
+                <i class="fa fa-bookmark" v-else="scope.data.children" style="color:#94b0ff;" aria-hidden="true"></i>
+                <span>{{ scope.node.label }}</span>
+              </span>
+            </el-tree>
+          </template>
+          <div class="content" slot="mainPanel">
+            <jas-base-module-title name="对齐数据项" style="margin-bottom: 10px;"></jas-base-module-title>
+            <div style="padding-left:10px;">
+              <el-button type="plain" size="mini" @click="makeAllChart">生成图表</el-button>
+            </div>
+            <el-tree show-checkbox :data="chartdata" class="is-grown" ref="chartdata" node-key="label"
+              :props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current
+              @node-click="clickchartdatanode" icon-class="fa fa-file" :expand-on-click-node="false"
+              :default-expand-all="true" :default-checked-keys="showedKeys">
+              <span class="custom-tree-node" slot-scope="scope">
+                <i class="fa fa-folder" v-if="scope.data.children" style="color:#f5cd09;" aria-hidden="true"></i>
+                <i class="fa fa-bookmark" v-else="scope.data.children" style="color:#94b0ff;" aria-hidden="true"></i>
+                <span>{{ scope.node.label }}</span>
+              </span>
+            </el-tree>
+          </div>
+        </jas-two-panel-resizer>
+
+      </template>
+      <template class="content" slot="mainPanel">
+        <div style="height: 100%;">
+          <div>
+
+            <jas-base-module-title name="里程范围选择"></jas-base-module-title>
+            <div style="padding: 10px;overflow:hidden;">
+
+
+              <pipe-slider ref="myslider" :line="currentLine" @change="resetRange" :begin-val="start" :finish-val="end"
+                :min-val="linestart" :max-val="lineend">
+              </pipe-slider>
+
+            </div>
+          </div>
+          <div id="allwrap" style="height:calc( 100% - 149px );position: relative;">
+            <div style="height:100%;width:100%;position:absolute;z-index:-1;top:0;left:0; padding: 30px 46px 34px 110px;
+              box-sizing: border-box;">
+              <div id="linewrap" style="height: 100%;width: 100%;position: relative;"></div>
+            </div>
+
+            <div id="topline" style="margin-right: 17px;" class="guildline" style="height: 50px;"></div>
+            <div id="chartwrap" style="height:calc( 100% - 100px ); position: relative; overflow: auto;">
+              <div id="chartsubwrap" style="height: 105%;">
+
+                <div v-for="chart,index in charts" :key="Math.random()">
+                  <jas-base-module-title :name="chart.label"></jas-base-module-title>
+                  <div :id="'c'+index"></div>
+                </div>
+
+              </div>
+            </div>
+            <div id="btmline" style="margin-right: 17px;" class="guildline" style="height: 50px;"></div>
+          </div>
+        </div>
+      </template>
+
+    </jas-two-panel-resizer>
+
+
+  </div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/g2/g2.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="chartData.js"></script>
+<script>
+  Vue.component('pipe-slider', {
+    props: {
+      minVal: {
+        default: 0
+      },
+      maxVal: {
+        default: 3250
+      },
+      line: {},
+      beginVal: {},
+      finishVal: {},
+      minSpaceVal: {},
+
+    },
+    data: function () {
+      return {
+        min: 0,
+        max: 0,
+        begin: 0,
+        finish: 0,
+        minSpace: 0,
+        beginLeft: 0,
+        finishLeft: 0,
+        sites: [],
+      }
+    },
+    template: [
+      '<div>',
+      '<div style="margin: 0 40px 10px 45px;text-align: right;">',
+      '  <span style="float:left;">当前管线： {{line}} {{ "（" + this.min + "m - "+ this.max  +"m）"}}</span>',
+      '  <el-button-group>',
+      '    <el-button @click="goLastPart" type="primary" size="mini" plain icon="el-icon-arrow-left"></el-button>',
+      '    <el-button @click="goNextPart" type="primary" size="mini" plain icon="el-icon-arrow-right"></el-button>',
+      '  </el-button-group>',
+      '</div>',
+
+      '<div ref="pipe" style="position: relative;margin:0 40px;">',
+      '  <div style="height: 60px;background-color: #A8B4C0;background-image: linear-gradient(0deg,#A8B4C0 0%,#FFFFFF 50%,#A8B4C0 100%);">',
+      '  </div>',
+      '    <div v-for=" n in sites"  :style="{\'left\':n.left + \'px\'}" style="height:20px;width:20px;background:#f90;position:absolute;top:20px;border:1px solid #000;"><div style="width:10px;height:10px;margin:5px;background:#333;border-radius:50%;"></div></div>',
+
+      // '  <div><span style="float:left;margin-left:-6px;">{{min}}</span><span style="float:right;margin-right:-20px;">{{max}}</span><div>',
+      '  <div ref="mask":style="{\'left\':beginLeft + 4 +\'px\',\'width\':finishLeft - beginLeft  + \'px\'}" style="position: absolute; height: 70px;top:-5px;cursor: move;background: #409eff;opacity:0.3;"></div>  ',
+      '  <div ref="begin" class="_my_begin" :style="{\'left\':beginLeft + \'px\'}" style="position: absolute; height: 70px;top:-5px;cursor: e-resize; width: 8px;border-radius: 4px;background: #409eff;opacity:0.8;">',
+      '    <span style="padding-left:9px;">{{begin}}</span>',
+      '  </div>',
+      '  <div ref="finish" class="_my_finish" :style="{\'left\':finishLeft + \'px\'}" style="position: absolute; height: 70px;top:-5px;cursor: e-resize; width: 8px;border-radius: 4px;background: #409eff;opacity:0.8;">',
+      '    <span style="padding-left:9px;">{{finish}}</span>',
+      '  </div>',
+      '</div>',
+      '</div>',
+    ].join(''),
+    created: function () {
+      // this.init();
+    },
+    mounted: function () {
+      this.addBarEvent();
+    },
+    methods: {
+      setSites: function () {
+        var that = this;
+        var arr = makeData(this.min+1000,this.max-1000,1,8);
+        arr.forEach(function(item){
+          item.left = (item.mileage - that.min)/(that.max-that.min)*$(that.$refs.pipe).width();
+        });
+        that.sites = arr;
+        console.log(arr)
+      },
+      goLastPart: function () {
+        var that = this;
+        if (this.begin == this.min) return;
+        var distlength = this.finish - this.begin;
+        this.begin = this.begin - distlength;
+        this.begin = this.begin < this.min ? this.min : this.begin;
+        this.finish = this.begin + distlength;
+        this.$nextTick(function () {
+          that.setBarLeft();
+          that.$emit('change', [that.begin, that.finish]);
+        });
+      },
+      goNextPart: function () {
+        var that = this;
+        if (this.finish == this.max) return;
+        var distlength = this.finish - this.begin;
+        this.finish = this.finish + distlength;
+        this.finish = this.finish > this.max ? this.max : this.finish;
+        this.begin = this.finish - distlength;
+        this.$nextTick(function () {
+          that.setBarLeft();
+          that.$emit('change', [that.begin, that.finish]);
+        });
+      },
+      init: function (isCreated) {
+        var that = this;
+        this.min = this.minVal;
+        this.max = this.maxVal;
+        this.begin = this.beginVal || this.minVal;
+        this.finish = this.finishVal > this.maxVal ? this.maxVal : this.finishVal;
+        this.minSpace = this.minSpaceVal || 1000;
+
+        this.$nextTick(function () {
+          that.setSites();
+          that.setBarLeft();
+          that.$emit('change', [that.begin, that.finish]);
+        });
+      },
+      setBarLeft: function (type) { // begin finish
+        type = type === 'begin' ? 'begin' : 'finish'
+        var pipeL = this.$refs.pipe.clientWidth;
+        this.beginLeft = (this.begin - this.min) / (this.max - this.min) * pipeL;
+        this.finishLeft = (this.finish - this.min) / (this.max - this.min) * pipeL;
+      },
+      addBarEvent: function () {
+        var that = this;
+        $(that.$refs.finish).add(that.$refs.begin).add(that.$refs.mask).on('mousedown', function (e) {
+          var pipeLeft = $(that.$refs.pipe).offset().left;
+          var maskLeft = $(that.$refs.mask).offset().left;
+          var maskDragLeft = e.clientX - maskLeft;
+          var maskDragRight = $(that.$refs.mask).width() - (e.clientX - maskLeft);
+          var pipeL = that.$refs.pipe.clientWidth;
+          var thisDom = this;
+          $(document).on('mousemove', function (e) {
+            that.barmoved = true;
+            var left = e.clientX - pipeLeft;
+            var limit = 0;
+            if ($(thisDom).hasClass('_my_begin')) {
+              limit = (that.finish - that.min - that.minSpace) / (that.max - that.min) * pipeL;
+              left = left > limit ? limit : left;
+              left = left < 0 ? 0 : left;
+              that.begin = Math.floor(left / pipeL * (that.max - that.min) + that.min);
+              that.beginLeft = left;
+
+            } else if ($(thisDom).hasClass('_my_finish')) {
+              limit = (that.begin - that.min + that.minSpace) / (that.max - that.min) * pipeL;
+              left = left < limit ? limit : left;
+              left = left > pipeL ? pipeL : left;
+              that.finish = Math.floor(left / pipeL * (that.max - that.min) + that.min);
+              that.finishLeft = left;
+            } else {
+              var beginleft = left - maskDragLeft - 4;
+              var distVal = that.finish - that.begin;
+
+              if (beginleft < 0) {
+                that.begin = 0;
+                that.beginLeft = 0;
+                that.finish = that.begin + distVal;
+                that.finishLeft = (that.finish - that.min) / (that.max - that.min) * pipeL;
+              } else if (beginleft > pipeL - $(that.$refs.mask).width()) {
+                that.begin = that.max - distVal;
+                that.beginLeft = pipeL - $(that.$refs.mask).width();
+                that.finish = that.max;
+                that.finishLeft = pipeL;
+              } else {
+                that.begin = Math.floor(beginleft / pipeL * (that.max - that.min) + that.min);
+                that.beginLeft = beginleft;
+                that.finish = that.begin + distVal;
+                that.finishLeft = (that.finish - that.min) / (that.max - that.min) * pipeL;
+              }
+            }
+            // $(thisDom).css('left', left + 'px');
+            return false;
+          });
+
+          $(document).on('mouseup', function () {
+            $(document).unbind('mousemove');
+            $(document).unbind('mouseup');
+            if (that.barmoved) {
+              that.barmoved = false;
+              that.$emit('change', [that.begin, that.finish]);
+            }
+          });
+
+        });
+
+      },
+
+
+    }
+  });
+</script>
+
+<script>
+  var MarkLineObj = {
+    $line: $(
+      '<div style="height:100%;width:1px;background:#c1c1c1;position:absolute;left:50%;top:0;z-index:-1;"></div>'),
+    nowLeft: 0,
+    nowValue: 0,
+    init: function () {
+      var that = this;
+      that.addLineEvent('#allwrap');
+      // $(document).on('resize', function () {
+      //   that.resetVal();
+      // })
+    },
+    addLineEvent: function (domId) {
+      var that = this;
+      $(domId).on('click', function (e) {
+        // console.log(e)
+        var lineWidthReal = vm.end - vm.start;
+        var lineWidthWeb = $('#topline').width() - 141;
+        that.nowLeft = e.offsetX - 110;
+        that.nowLeft = that.nowLeft < 0 ? 0 : that.nowLeft;
+        that.nowLeft = that.nowLeft > lineWidthWeb ? lineWidthWeb : that.nowLeft;
+        that.$line.css('left', that.nowLeft + 'px');
+        that.nowValue = Math.floor(that.nowLeft * lineWidthReal / lineWidthWeb + vm.start);
+        that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue + '</span>')
+        $('#linewrap').append(that.$line)
+      });
+    },
+    resetVal: function () {
+      var that = this;
+      var lineWidthWeb = $('#topline').width() - 141;
+      var lineWidthReal = vm.end - vm.start;
+      that.nowValue = Math.floor(that.nowLeft * lineWidthReal / lineWidthWeb + vm.start);
+      that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue + '</span>')
+    }
+  };
+
+
+
+
+  window.vm = new Vue({
+    el: '#app',
+    data: function () {
+      return {
+
+
+        currentLine: '',
+        freshComp: true,
+        charts: [],
+        linestart: 0,
+        lineend: 0,
+        start: 0,
+        end: 0,
+        showedKeys: ['高后果区', '风险评价', '埋深', '本体缺陷', '腐蚀防护', '管道保护', '地灾防治', '管道设施'],
+        // showedKeys: ['高后果区', '风险评价'],
+        chartdata: Chartdata,
+        treedata: Treedata,
+        className: '',
+        currentNodeId: '',
+        defaultProps: {
+          label: 'label',
+          children: 'children',
+          isLeaf: function (data, node) {}
+        },
+      }
+    },
+    created: function () {
+      var that = this;
+
+    },
+    mounted: function () {
+      this.$refs.treedata.setCurrentKey('互联互通段');
+      this.currentLine = '互联互通段';
+
+      this.linestart = 0;
+      this.lineend = 38000;
+      this.start = 0;
+      this.end = 10000;
+      this.$nextTick(function () {
+        this.$refs.myslider.init();
+        MarkLineObj.init()
+      });
+
+      // this.makeAllChart();
+    },
+    methods: {
+      resetRange: function (range) {
+        this.start = range[0];
+        this.end = range[1];
+        this.makeAllChart();
+      },
+      clicknode: function (a, b) {
+        var that = this;
+        if (b.isLeaf) {
+          this.currentLine = a.label;
+          this.makeAllChart();
+          this.linestart = a.start || 0;
+          this.lineend = a.end || (Math.floor(Math.random() * 8000) + 1000) * 10;
+          this.start = this.linestart;
+          this.end = 10000 || this.lineend;
+          // this.freshComp = false;
+          this.$nextTick(function () {
+            this.$refs.myslider.init();
+            // that.freshComp = true;
+          })
+        }
+        console.log(a, b)
+      },
+      makeAllChart: function () {
+        var that = this;
+        this.charts = this.$refs.chartdata.getCheckedNodes(true);
+        this.$nextTick(function () {
+          drawbtmline()
+          drawtopline()
+          setTimeout(function () {
+            MarkLineObj.resetVal();
+          });
+          that.charts.forEach(function (item, index, arr) {
+            var config = item.config;
+
+            if (index === 0) var indexType = 'first';
+            if (index === arr.length - 1) var indexType = 'end';
+            if (config.type === 'line') {
+              makeLine('c' + index, config, that.start, that.end, indexType);
+            }
+            if (config.type === 'dot') {
+              makePoint('c' + index, config, that.start, that.end, indexType);
+            }
+            if (config.type === 'polyline') {
+              makePolyline('c' + index, config, that.start, that.end, indexType);
+            }
+          });
+        });
+      },
+
+
+      clickchartdatanode: function (node, e) {
+        this.$refs.chartdata.setChecked(node.label, !e.checked)
+      },
+    },
+  });
+
+
+  // make2()
+
+
+  function makeData(start, end, nStatus, total) {
+    total = total || 100;
+    nStatus = nStatus || 1;
+    var arr = [];
+    for (var i = 0; i < total; i++) {
+      arr.push({
+        mileage: Math.floor(Math.random() * (end - start) + start),
+        status: Math.floor(Math.random() * nStatus)
+      });
+    }
+    return arr;
+  }
+
+
+  function makeTickesRange(begin, end, n) {
+    n = n < 5 ? 5 : n;
+    var arr = [];
+    for (var i = 0; i < n; i++) {
+      arr.push(Math.floor(begin + (end - begin) / n * i));
+    }
+    arr.push(end)
+    return arr;
+  }
+
+  function drawbtmline() {
+    if (this.__chart) {
+      this.__chart.destroy()
+    }
+    this.__chart = chart = new G2.Chart({
+      container: 'btmline',
+      forceFit: true,
+      padding: [0, 30, 20, 110],
+      height: 40
+    });
+    chart.source([], {
+      mileage: {
+        ticks: makeTickesRange(vm.start, vm.end, 10),
+        min: vm.start,
+        max: vm.end
+      }
+    });
+    chart.tooltip(false);
+    chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+    chart.render();
+  }
+
+  function drawtopline() {
+    if (this.__chart2) {
+      this.__chart2.destroy()
+    }
+    this.__chart2 = chart = new G2.Chart({
+      container: 'topline',
+      forceFit: true,
+      padding: [30, 30, 0, 110],
+      height: 40
+    });
+    chart.source([], {
+      mileage: {
+        ticks: makeTickesRange(vm.start, vm.end, 10),
+        min: vm.start,
+        max: vm.end
+      }
+    });
+    chart.axis('mileage', {
+      position: 'top'
+    })
+    chart.tooltip(false);
+    chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+    chart.render();
+  }
+
+  function makePoint(domId, config, start, end, indexType) {
+
+    var rawData = []
+    config.series.forEach(function (item) {
+      var data = makeData(start, end, item.values.length, 20);
+      data.forEach(function (obj) {
+        obj.series = item.name;
+        obj.status = item.values[obj.status].name;
+        if (obj.series == '第三方活动') {
+          obj.reason = ['占压', '第三方施工', '碾压', '耕种'][Math.floor(Math.random() * 4)];
+          obj.result = ['水工保护损坏', '桩缺损', '泄露'][Math.floor(Math.random() * 3)];
+          obj.date = '2019-10-24'
+        } else if (obj.series == '管道及设施损坏') {
+          obj.reason = ['管道本体', '附属设施损坏', '泄漏'][Math.floor(Math.random() * 3)];
+          obj.result = ['本体损伤', '桩缺损', '泄漏'][Math.floor(Math.random() * 3)];
+          obj.date = '2019-10-24';
+        } else if (obj.series == '自然环境变化') {
+          obj.reason = '自然环境变化';
+          obj.result = ['滑坡', '泥石流', '坍塌'][Math.floor(Math.random() * 3)];
+          obj.date = '2019-10-24';
+        } else if (obj.series == '三桩一牌') {
+          obj.stickno = 'zhuang' + obj.mileage;
+        } else if (obj.series == '地下障碍物') {
+          obj.mindist = Math.floor(Math.random() * 10) + 'm';
+        } else if (obj.series == '地灾敏感点') {
+          obj.rsntype = ['滑坡', '崩塌', '水土流失'][Math.floor(Math.random() * 3)];
+          obj.dotype = ['监测预警', '工程治理', '简单处置', '生物措施'][Math.floor(Math.random() * 4)];
+          obj.rsltype = ['已治理', '治理中', '未治理'][Math.floor(Math.random() * 3)];
+        } else if (obj.series == '本体缺陷点') {
+          obj.no = 'NO.' + obj.mileage;
+          obj.position = ['内', '外'][Math.floor(Math.random() * 2)];
+          obj.clock = Math.floor(Math.random() * 360) + '度';
+          obj.length = Math.floor(Math.random() * 200);
+          obj.width = Math.floor(Math.random() * 200);
+          obj.depth = Math.floor(Math.random() * 100);
+          obj.percent = Math.floor(Math.random() * 80) + '%';
+        }
+
+
+      });
+
+
+
+      if (item.name == '本体缺陷点') {
+        window._datacache = data;
+      }
+      if (item.name == '开挖验证及修复') {
+        if (window._datacache) {
+          data = [];
+          window._datacache.forEach(function (obj, index) {
+            var newobj = JSON.parse(JSON.stringify(obj));
+            // console.log(newobj, '______')
+            if ([3, 6, 9].indexOf(index) > -1) {
+              newobj.series = item.name;
+              newobj.status = item.values[0].name;
+              data.push(newobj)
+            }
+          });
+        } else {
+
+        }
+        // console.log(data)
+      }
+      rawData = rawData.concat(data);
+    });
+    if (config.label == '') {}
+
+    const chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [20, 30, 20, 110],
+      height: 60 + config.series.length * 30
+    });
+    chart.source(rawData, {
+      mileage: {
+        ticks: makeTickesRange(start, end, 10),
+      }
+    });
+
+    chart.axis('mileage', false);
+
+    chart.axis('series', {
+      tickLine: true,
+      line: true,
+      grid: {
+        hideFirstLine: true,
+        hideLastLine: true,
+      },
+    });
+    chart.legend('status', {
+      position: 'top-right'
+    });
+    chart.coord().reflect('y')
+
+    var geom = chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+
+    if (config.tooltipfields) {
+      geom.tooltip(config.tooltipfields.join('*'), function (a, b, c, d, e, f, g, h, i, j, k) {
+        var obj = {};
+        var arr = [a, b, c, d, e, f, g, h, i, j, k]
+        config.tooltipfields.forEach(function (item, index) {
+          obj[item] = arr[index]
+        });
+        return obj;
+      });
+      var creatTips = function () {
+        var s = '';
+        config.tooltipfieldName.forEach(function (item, index) {
+          // console.log(config.tooltipfields[index])
+          s += '<span style="padding-left: 16px">' + item + '：{' + config.tooltipfields[index] + '}</span><br/>'
+        })
+        return s;
+      };
+      chart.tooltip({
+        showTitle: false,
+        itemTpl: [
+          '<li data-index={index} style="margin-bottom:4px;">',
+          // '<span style="background-color:{color};" class="g2-tooltip-marker"></span>',
+          // '{name}<br/>',
+          creatTips(),
+          // '<span style="padding-left: 16px">占比：{percent}</span><br/>',
+          '</li>'
+        ].join(''), // 支持的字段 index,color,name,value
+      });
+    }
+
+
+    chart.render();
+  }
+
+  function makeLine(domId, config, start, end, indexType) {
+    var rawData = [];
+
+    var colorMap = {};
+
+    config.series.forEach(function (item) {
+
+      item.values.forEach(function (value) {
+        colorMap[value.name] = value.color;
+      })
+
+      var data = makeDataRanger(start, end, item.values.length, 10);
+      data.forEach(function (obj, index) {
+        obj.range = [obj.start, obj.end];
+        obj.status = item.values[obj.status].name;
+        obj.series = item.name
+        if (obj.series == '风险等级') { //'status', 'range', 'happen', 'result', 'riskval'
+          var n = obj.status;
+          obj.happen = ['高', '较高', '中', '较低', '低'][Math.floor(Math.random() * 5)];
+          obj.result = ['一级', '二级', '三级', '四级', '五级'][Math.floor(Math.random() * 5)];
+          obj.riskval = '352分'
+        } else if (obj.series == '杂散电流干扰') { //'length', 'flowtype', 'fckdeph', 'fckwhere'
+          obj.length = obj.range[1] - obj.range[0];
+          obj.flowtype = ['交流', '直流'][Math.floor(Math.random() * 2)];
+          obj.fckdeph = ['强', '较强', '一般', '较弱', '弱'][Math.floor(Math.random() * 5)];
+          obj.fckwhere = '未知';
+
+        } else if (obj.series == '腐蚀强度') { //
+          var _omap = {
+            '强': Math.floor(Math.random() * 20),
+            '中': 20 + Math.floor(Math.random() * 30),
+            '弱': 50 + Math.floor(Math.random() * 40),
+          };
+          // console.log(obj.status)
+          obj.defend = _omap[obj.status]
+
+
+        }
+
+      })
+      rawData = rawData.concat(data);
+      if (config.label == '高后果区') {
+        rawData.splice(2, 1);
+        rawData.splice(6, 1);
+        rawData.splice(4, 1);
+      }
+    })
+
+    const chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [20, 30, 22, 110],
+      height: 60 + config.series.length * 30
+    });
+    chart.source(rawData, {
+      range: {
+        position: 'top',
+        ticks: makeTickesRange(start, end, 10),
+        min: start,
+        max: end,
+      }
+    });
+    chart.legend('status', {
+      position: 'top-right'
+    });
+    chart.axis('range', {
+      line: null,
+      label: null,
+      tickLine: null
+    });
+    chart.axis('series', {
+      line: null,
+      tickLine: null,
+    });
+    chart.coord().transpose();
+    var geom = chart.interval().position('series*range').color('status', function (status) {
+      return colorMap[status]
+    }).size(10);
+
+    if (config.tooltipfields) {
+      geom.tooltip(config.tooltipfields.join('*'), function (a, b, c, d, e, f, g, h, i, j, k) {
+        var obj = {};
+        var arr = [a, b, c, d, e, f, g, h, i, j, k]
+        config.tooltipfields.forEach(function (item, index) {
+          obj[item] = arr[index]
+        });
+        return obj;
+      });
+      var creatTips = function () {
+        var s = '';
+        config.tooltipfieldName.forEach(function (item, index) {
+          s += '<span style="padding-left: 16px">' + item + '：{' + config.tooltipfields[index] +
+            '}</span><br/>'
+        })
+        return s;
+      };
+      chart.tooltip({
+        showTitle: false,
+        shared: false,
+        itemTpl: [
+          '<li  style="margin-bottom:4px;">',
+          // '<span style="background-color:{color};" class="g2-tooltip-marker"></span>',
+          // '{name}<br/>',
+          creatTips(),
+          // '<span style="padding-left: 16px">占比：{percent}</span><br/>',
+          '</li>'
+        ].join(''), // 支持的字段 index,color,name,value
+      });
+    }
+
+
+
+
+
+
+
+
+    chart.render();
+  }
+
+  function makePolyline(domId, config, start, end, indexType) {
+    var rawData = [];
+
+    var colorMap = {};
+
+    config.series.forEach(function (item) {
+      item.values.forEach(function (value) {
+        colorMap[value.name] = value.color;
+      })
+
+      var data = makeData(start, end, item.values.length, 20);
+      data.forEach(function (obj, index) {
+        obj.value = Math.floor(Math.random() * 30) / 10;
+        obj.status = item.values[obj.status].name;
+        obj.series = item.name
+      })
+      rawData = rawData.concat(data);
+    })
+
+    const chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [30, 30, 22, 110],
+      height: 100 + config.series.length * 30
+    });
+    chart.source(rawData, {
+      mileage: {
+        ticks: makeTickesRange(start, end, 10),
+        min: start,
+        max: end,
+      }
+    });
+    chart.axis('mileage', false)
+    chart.legend('status', {
+      position: 'top-right'
+    });
+
+    var geom = chart.line().position('mileage*value').color('status', function (status) {
+        return colorMap[status]
+      })
+      .shape('hv')
+      .size(2);
+    chart.render();
+  }
+
+
+  function makeDataRanger(start, end, nStatus, total) {
+    total = total || 10;
+    nStatus = nStatus || 2;
+
+    var arr = [];
+
+    var aRaw = [];
+    for (var i = 0; i < total - 1; i++) {
+      aRaw.push(+(Math.random() * (end - start) + start).toFixed(0))
+    }
+    aRaw.sort(function (a, b) {
+      return a - b
+    });
+    var newA = [];
+    for (var s = 0; s < total; s++) {
+      newA.push({
+        start: s == 0 ? start : aRaw[s - 1],
+        end: s === total - 1 ? end : aRaw[s],
+        status: Math.floor(Math.random() * nStatus),
+      });
+    }
+    return newA;
+  }
+</script>
+<script>
+
+</script>
+
+
+</html>
