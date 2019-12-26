@@ -91,6 +91,10 @@ $(document).ready(function () {
 
 	// 关闭地图按钮
 	$("#closeMap").click(function(){
+		if( $('#innerNorth').hasClass('ui-layout-west') ){
+			innerLayout.close('west');
+			isHasOpen2d = false;
+		}			
 //		innerLayout.close('north');
 //		isHasOpen2d = false;
 		tab.delMapTab('2d');

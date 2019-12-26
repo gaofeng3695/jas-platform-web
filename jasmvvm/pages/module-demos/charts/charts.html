@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片预览</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" style="overflow:auto;">
+    <div style="overflow:hidden;position: relative;">
+
+      <div id="c4"></div>
+      <div id="c1"></div>
+      <div id="c2"></div>
+      <div id="c3"></div>
+      <div id="c5"></div>
+      <div id="c6"></div>
+    </div>
+
+  </div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/g2/g2.min.js"></script>
+<!-- <script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script> -->
+<script>
+  make1()
+  make2()
+  make3()
+  make4()
+  addLineEvent('#app');
+
+  function addLineEvent(domId) {
+    var line = '<div style="height:100%;width:1px;background:#111;position:absolute;left:50%;top:0;"></div>'
+    var $line = $(line);
+    $(domId).on('click', function (e) {
+      console.log(e)
+      $line.css('left', e.offsetX + 'px');
+      $(domId).append($line)
+    });
+  }
+
+  // makeDataRanger()
+
+  function makeDataRanger(total, nSerie) {
+    total = total || 10;
+    nSerie = nSerie || 1;
+
+    var arr = [];
+
+    var aRaw = [];
+    for (var i = 0; i < total * 2; i++) {
+      aRaw.push(+(Math.random() * 2000 + 250).toFixed(0))
+    }
+    aRaw.sort(function (a, b) {
+      return a - b
+    });
+
+    var newA = [];
+    for (var s = 0; s < total; s++) {
+      newA.push({
+        start: aRaw[s * 2],
+        end: aRaw[s * 2 + 1],
+        key: Math.random() > 0.5 ? '地貌' : '沙漠',
+        status: Math.random() > 0.5 ? 0 : 1,
+      });
+    }
+
+    console.log(newA)
+
+    return newA;
+  }
+
+  function makeData(total, series) {
+    total = total || 100;
+    var arr = [];
+    for (var i = 0; i < total; i++) {
+      arr.push({
+        mileage: Math.random() * 2000 + 250,
+        key: Math.random() > 0.5 ? 'series1' : 'series2',
+        value: Math.random() * 1000
+      });
+    }
+    return arr;
+  }
+
+  function makeTickesRange(begin, end, n) {
+    n = n < 5 ? 5 : n;
+    var arr = [];
+    for (var i = 0; i < n; i++) {
+      arr.push(begin + (end - begin) / n * i)
+    }
+    arr.push(end)
+    return arr;
+  }
+
+  function make1() {
+    const chart = new G2.Chart({
+      container: 'c1',
+      forceFit: true,
+      height: 300
+    });
+    chart.source(makeData(), {
+      mileage: {
+        // range: [, 1]
+        ticks: makeTickesRange(250, 2250, 10),
+      }
+    });
+    chart.tooltip({
+      crosshairs: {
+        type: 'line'
+      }
+    });
+    chart.line().position('mileage*value');
+    chart.point().position('mileage*value')
+      .size(4)
+      .shape('circle')
+      .style({
+        stroke: '#fff',
+        lineWidth: 1
+      });
+    chart.render();
+  }
+
+  function make2() {
+    const chart2 = new G2.Chart({
+      container: 'c2',
+      forceFit: true,
+      height: 300
+    });
+    chart2.source(makeData(20), {
+      mileage: {
+        ticks: makeTickesRange(250, 2250, 10),
+      }
+    });
+    chart2
+      .line()
+      .position('mileage*value')
+      .shape('hv')
+      .color('key');
+    chart2.render();
+  }
+
+  function make3() {
+    const chart = new G2.Chart({
+      container: 'c3',
+      forceFit: true,
+      height: 300
+    });
+    chart.source(makeData(100), {
+      mileage: {
+        ticks: makeTickesRange(250, 2250, 10),
+      }
+    });
+    chart.interval().position('mileage*value');
+    chart.render();
+  }
+
+  function make4() {
+    var data = makeDataRanger(10);
+    const values = ['运行成功', '运行失败', '运行成功2', '运行失败2'];
+    data.forEach(function (obj) {
+      obj.range = [obj.start, obj.end];
+      obj.status = values[obj.status];
+    });
+    const chart = new G2.Chart({
+      container: 'c4',
+      forceFit: true,
+      height: 300
+    });
+    chart.source(data, {
+      range: {
+        // type: 'line',
+        ticks: makeTickesRange(250, 2250, 10),
+        min: 250,
+        max: 2250,
+      }
+    });
+    chart.axis('range', {
+      line: {},
+    });
+    chart.coord().transpose();
+    chart.interval().position('key*range').color('status', ['#2FC25B', '#F04864', '#f90', '#c44']).size(20);
+    chart.render();
+  }
+
+
+  // window.vm = new Vue({
+  //   el: '#app',
+  //   data: function () {
+  //     return {
+  //       className: '',
+
+  //     }
+  //   },
+  //   created: function () {
+  //     var that = this;
+  //   },
+  //   mounted: function () {
+  //   },
+  //   methods: {
+  //     formatForm: function (fields) {
+  //       var obj = {};
+  //       fields.forEach(function (item) {
+  //         obj[item] = '';
+  //       });
+  //       return obj;
+  //     },
+  //   },
+  // });
+</script>
+<script>
+
+</script>
+
+
+</html>
