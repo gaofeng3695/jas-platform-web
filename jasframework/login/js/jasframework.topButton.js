@@ -10,6 +10,7 @@
  * 修改内容： 
  **********************************************************************
  */
+var _mapPosition = location.href.indexOf('home.mapleft.htm')>-1?"west":"north";
 
 	
 /** 
@@ -26,7 +27,7 @@ function showmap2d(){
 	}
 
 	if(currentPageLayout==1){
-		innerLayout.open("north");
+		innerLayout.open(_mapPosition);
 		innerNorthLayout.hide('east');
 		if(!isHasOpen2d){
 			isHasOpen2d=true;
@@ -79,7 +80,7 @@ function showmap2dAndLocation(locationData){
 		}
 	}else{
 		if(currentPageLayout==1){
-			innerLayout.open("north");
+			innerLayout.open(_mapPosition);
 			innerNorthLayout.hide('east');
 			if(!isHasOpen2d){
 				isHasOpen2d=true;
@@ -133,7 +134,7 @@ function showmap3d(){
 	}
 	var superEarthPageUrl = "../../superEarth/SuperEarth.htm";
 	if(currentPageLayout==1){
-		innerLayout.open("north");
+		innerLayout.open(_mapPosition);
 		if(!isHasOpen3d){
 			isHasOpen3d=true;
 			tab.addMapTab('3d','三维',superEarthPageUrl,true);
