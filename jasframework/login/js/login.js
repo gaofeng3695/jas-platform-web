@@ -69,7 +69,7 @@ function changeLanguage() {
  */
 function login() {
 	var loginNum = $("#loginNum").val();
-	var pass = $("#pass").val();
+	var pass = $("#pass").val().toString();
 	if(!loginNum || !pass){
 		$.messager.alert('提示',"请输入用户名或密码");
 		return;
@@ -81,7 +81,7 @@ function login() {
 	var formData = {
 			logintype : "0",// 0为普通用户登录（外网用户登录），1为域用户登录（内网用户登录）
 			loginNum : loginNum,
-			pass : pass,
+			pass : pass.txtEncryption(),
 			i18n : i18n,
 			appId:appId
 		}
