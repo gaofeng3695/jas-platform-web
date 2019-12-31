@@ -28,7 +28,7 @@
 
 	 <script type="text/javascript" src="../common/js/AppConfig.js"></script>
 
-  	<script type="text/javascript" src="js/jasframework.layout.js"></script>
+  	<script type="text/javascript" src="js/jasframework.layout.mapright.js"></script>
 	<script type="text/javascript" src="js/jasframework.functionMenu.js"></script>
 	<script type="text/javascript" src="js/jasframework.tab.js"></script>
 	<script type="text/javascript" src="js/jasframework.topButton.js"></script>
@@ -99,8 +99,7 @@
 						<i class="border-line"></i>
 					</li>
 					<li>
-						<a href="#" onclick="location.href = location.href.split('home.htm').join('home.mapright.htm')">
-						<!-- <a href="#" onclick="location.href = location.href.split('home.htm').join('home.mapleft.htm')"> -->
+						<a href="#" onclick="location.href = location.href.split('home.mapright.htm').join('home.htm')">
 							<span class="menu_icon fa fa-columns"></span>
 							<span>布局</span>
 						</a>
@@ -141,12 +140,12 @@
 		}
 	</style>
 	<div style="height:50px;width:4px;margin-top:-10px;background: #1066b5;position: absolute;top:50%;left:0;z-index:1;cursor: pointer;"
-		onclick="$('.ui-layout-toggler.ui-layout-toggler-west')[0].click()" title="展开菜单"></div>
+		onclick="$('.ui-layout-toggler.ui-layout-toggler-west')[1].click()" title="展开菜单"></div>
 
 <!-- 功能区 -->
   	<div id="outerCenter" class="ui-layout-center">
   	    <!-- map地图区域 -->
-	  	<div id="innerNorth" class="ui-layout-north">
+	  	<div id="innerNorth" class="ui-layout-east">
 	  		<div id="innerNorthCenter" class="ui-layout-center">
 	  			<div id="innerNorthCenterTab" class="tab_map" onresize="resizeDiv(this)">
 					<ul id="innerNorthCenterTabtag"></ul>

@@ -95,6 +95,10 @@ $(document).ready(function () {
 			innerLayout.close('west');
 			isHasOpen2d = false;
 		}			
+		if( $('#innerNorth').hasClass('ui-layout-east') ){
+			innerLayout.close('east');
+			isHasOpen2d = false;
+		}			
 //		innerLayout.close('north');
 //		isHasOpen2d = false;
 		tab.delMapTab('2d');
