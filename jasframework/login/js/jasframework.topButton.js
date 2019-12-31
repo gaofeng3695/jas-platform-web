@@ -11,6 +11,7 @@
  **********************************************************************
  */
 var _mapPosition = location.href.indexOf('home.mapleft.htm')>-1?"west":"north";
+_mapPosition = location.href.indexOf('home.mapright.htm')>-1?"east":_mapPosition;
 
 	
 /** 
