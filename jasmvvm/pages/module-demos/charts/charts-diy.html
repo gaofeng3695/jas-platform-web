@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片预览</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" style="overflow:auto;">
+    <div style="overflow:hidden;position: relative;">
+      <img src="../../../common/images/logo.png">
+      <div id="c1"></div>
+      <div id="c2"></div>
+      <div id="c3"></div>
+      <div id="c4"></div>
+      <div id="c5"></div>
+      <div id="c6"></div>
+    </div>
+
+  </div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/g2/g2.min.js"></script>
+<!-- <script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script> -->
+<script>
+  const Shape = G2.Shape;
+  Shape.registerShape('point', 'diypic', {
+    getPoints(cfg) {
+      console.log(cfg)
+      const x = cfg.x;
+      const y = cfg.y;
+      const y0 = cfg.y0;
+      const width = cfg.size;
+      return [{
+        x: x,
+        y: y
+      }];
+    },
+    draw(cfg, group) {
+      // 自定义最终绘制
+      const points = this.parsePoints(cfg.points); // 将0-1空间的坐标转换为画布坐标
+      console.log('___', points)
+      const polygon = group.addShape('image', {
+        attrs: {
+          width:50,
+          height:50,
+          x: points[0].x,
+          y: points[0].y,
+          url: '../../../common/images/logo.png'
+        }
+      });
+      console.log(polygon)
+      return polygon; // !必须返回 shape
+    },
+  });
+
+  const data = [{
+      genre: 'Sports',
+      sold: 27500
+    },
+    {
+      genre: 'Strategy',
+      sold: 11500
+    },
+    {
+      genre: 'Action',
+      sold: 6000
+    },
+    {
+      genre: 'Shooter',
+      sold: 3500
+    },
+    {
+      genre: 'Other',
+      sold: 1500
+    },
+  ];
+
+  const chart = new G2.Chart({
+    container: 'c1',
+    forceFit: true,
+    height: 400,
+    padding: [20, 80, 95, 80],
+  });
+
+  chart.source(data);
+  chart
+    .point()
+    .position('sold*genre')
+    .color('genre')
+    .shape('diypic');
+  chart.render();
+</script>
+
+
+</html>
