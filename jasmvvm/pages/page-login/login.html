@@ -126,7 +126,7 @@
 					jasTools.ajax.post(url, {
 						"logintype": "0",
 						"loginNum": that.ruleForm.userid,
-						"pass": that.ruleForm.pass,
+						"pass": jasTools.base.encryption(that.ruleForm.pass),
 						"i18n": "zh_CN",
 						"appId": jasTools.base.getAppId() || "402894a152681ba30152681e8b320003"
 					}, function (data) {

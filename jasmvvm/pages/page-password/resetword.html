@@ -103,8 +103,8 @@
 					if (valid) {
 						var url = jasTools.base.rootPath + '/jasframework/privilege/user/editPassword.do';
 						jasTools.ajax.post(url, {
-							oldPwd: that.form.oldPwd, //旧密码
-							newPwd: that.form.newPwd, //新密码
+							oldPwd: jasTools.base.encryption(that.form.oldPwd), //旧密码
+							newPwd: jasTools.base.encryption(that.form.newPwd), //新密码
 						}, function (data) {
 							if (data.status == 1) {
 								top.jasTools.dialog.close(1);
