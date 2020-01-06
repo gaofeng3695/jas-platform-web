@@ -422,6 +422,16 @@
 			return inst;
 		};
 
+		var encryption = function(txt){
+			var _str = txt;
+			var _strLength = _str.length;
+			var _strTarget = "";
+			for (var i = 0; i < _strLength; i++) {
+				_strTarget += String.fromCharCode(_str.charCodeAt(i) + (_strLength - i));
+			}
+			return escape(_strTarget);
+		};
+
 		return {
 			rootPath: getRootPath(),
 			setAppId: setAppId,
@@ -437,6 +447,7 @@
 			viewImg: viewImg,
 			fileUploader: fileUploader,
 			fileLister: fileLister,
+			encryption: encryption,
 		};
 	})();
 
