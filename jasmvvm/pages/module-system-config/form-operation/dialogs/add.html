@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../lib/codemirror/codemirror.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+	<link rel="stylesheet" href="./add.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="outer-wrap jas-flex-box is-vertical ">
+			<div class="title-wrap">
+				<el-steps :active="indexPage" finish-status="success" simple>
+					<el-step title="数据源配置"></el-step>
+					<el-step title="字段配置"></el-step>
+					<el-step title="UI类型"></el-step>
+					<el-step title="分组排序"></el-step>
+					<el-step title="唯一性验证"></el-step>
+				</el-steps>
+			</div>
+			<div class="is-grown">
+				<div class="sub-wrap jas-flex-box is-vertical ">
+					<div class="is-grown content-wrap">
+						<div class="content-wrap" v-show="indexPage===0">
+							<el-form v-loading="isLoadingSql" :model="ruleForm" :rules="firstRules" ref="ruleForm" label-width="80px" class="content01">
+
+								<el-row :gutter="40">
+									<el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
+										<el-form-item prop="name" label="功能名称">
+											<el-input v-model="ruleForm.name" placeholder="请输入功能名称"></el-input>
+										</el-form-item>
+									</el-col>
+
+									<el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
+										<el-form-item prop="source" label="数据来源">
+											<el-autocomplete suffix-icon="el-icon-arrow-down" v-model="ruleForm.source" :fetch-suggestions="renderTableSelect" placeholder="请输入数据库表名称"
+											  @select="chooseTableSelected"></el-autocomplete>
+										</el-form-item>
+									</el-col>
+
+									<el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
+										<el-form-item prop="ifAttachment" label="附件支持">
+											<!-- <el-input v-model="ruleForm.name" placeholder="请输入功能名称"></el-input> -->
+											<el-switch v-model="ruleForm.ifAttachment" inactive-value="0" active-value="1">
+											</el-switch>
+										</el-form-item>
+									</el-col>
+
+								</el-row>
+
+								<div>
+									<el-row :gutter="20" class="card_wrap">
+										<el-col :span="4" :offset="2">
+											<el-card class="sql_card" shadow="never" :class="{active:currentSql === 'add'}">
+												<div @click="selectSqlCard('add')">
+													<div class="sql_title">
+														新增依赖
+													</div>
+													<div class="sql_icon">
+														<i v-show="ruleForm.add" class="el-icon-success"></i>
+														<i v-show="!ruleForm.add" class="el-icon-question"></i>
+													</div>
+												</div>
+											</el-card>
+										</el-col>
+										<el-col :span="4">
+
+											<el-card class="sql_card" shadow="never" :class="{active:currentSql === 'update'}">
+												<div @click="selectSqlCard('update')">
+													<div class="sql_title">
+														修改依赖
+													</div>
+													<div class="sql_icon">
+														<i v-show="ruleForm.update" class="el-icon-success"></i>
+														<i v-show="!ruleForm.update" class="el-icon-question"></i>
+													</div>
+												</div>
+											</el-card>
+										</el-col>
+										<el-col :span="4">
+											<el-card class="sql_card" shadow="never" :class="{active:currentSql === 'delete'}">
+												<div @click="selectSqlCard('delete')">
+
+													<div class="sql_title">
+														删除依赖
+													</div>
+													<div class="sql_icon">
+														<i v-show="ruleForm.delete" class="el-icon-success"></i>
+														<i v-show="!ruleForm.delete" class="el-icon-question"></i>
+													</div>
+												</div>
+											</el-card>
+										</el-col>
+										<el-col :span="4">
+											<el-card class="sql_card" shadow="never" :class="{active:currentSql === 'detail'}">
+												<div @click="selectSqlCard('detail')">
+
+													<div class="sql_title">
+														详情依赖
+													</div>
+													<div class="sql_icon">
+														<i v-show="ruleForm.detail" class="el-icon-success"></i>
+														<i v-show="!ruleForm.detail" class="el-icon-question"></i>
+													</div>
+												</div>
+											</el-card>
+										</el-col>
+										<el-col :span="4">
+											<el-card class="sql_card" shadow="never" :class="{active:currentSql === 'select'}">
+												<div @click="selectSqlCard('select')">
+
+													<div class="sql_title">
+														查询依赖
+													</div>
+													<div class="sql_icon">
+														<i v-show="!ruleForm.select" class="el-icon-question"></i>
+														<i v-show="(ruleForm.select && ruleForm.isSqlError)" class="el-icon-error"></i>
+														<i v-show="(ruleForm.select && !ruleForm.isSqlError)" class="el-icon-success"></i>
+
+													</div>
+												</div>
+											</el-card>
+										</el-col>
+									</el-row>
+								</div>
+
+								<div v-show="currentSql === 'add'" class="input_wrap">
+									<div class="input_arrow n1"></div>
+									<div class="input_wrap_title">新增依赖</div>
+									<codemirror ref="cm_add" v-model="ruleForm.add" :options="mirrorConfig"></codemirror>
+									<!-- <el-input type="textarea" :autosize="{ minRows: 3}" v-model="ruleForm.add"></el-input> -->
+								</div>
+
+								<div v-show="currentSql === 'update'" class="input_wrap">
+									<div class="input_arrow n2"></div>
+									<div class="input_wrap_title">修改依赖</div>
+									<codemirror ref="cm_update" v-model="ruleForm.update" :options="mirrorConfig"></codemirror>
+									<!-- <el-input type="textarea" :autosize="{ minRows: 3}" v-model="ruleForm.update"></el-input> -->
+								</div>
+
+								<div v-show="currentSql === 'delete'" class="input_wrap">
+									<div class="input_arrow n3"></div>
+
+									<div class="input_wrap_title">删除依赖</div>
+									<codemirror ref="cm_delete" v-model="ruleForm.delete" :options="mirrorConfig"></codemirror>
+									<!-- <el-input type="textarea" :autosize="{ minRows: 3}" v-model="ruleForm.delete"></el-input> -->
+								</div>
+
+								<div v-show="currentSql === 'detail'" class="input_wrap">
+									<div class="input_arrow n4"></div>
+
+									<div class="input_wrap_title">详情依赖</div>
+									<codemirror ref="cm_detail" v-model="ruleForm.detail" :options="mirrorConfig"></codemirror>
+									<!-- <el-input type="textarea" :autosize="{ minRows: 3}" v-model="ruleForm.detail"></el-input> -->
+								</div>
+
+								<div v-show="currentSql === 'select'" class="input_wrap">
+									<div class="input_arrow n5"></div>
+									<div class="input_wrap_title">查询依赖</div>
+									<codemirror ref="cm_select" v-model="ruleForm.select" :options="mirrorConfig"></codemirror>
+									<!-- <el-input type="textarea" :autosize="{ minRows: 3}" v-model="ruleForm.select"></el-input> -->
+								</div>
+
+
+
+							</el-form>
+
+						</div>
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===1">
+							<el-table :data="privateTable" border :header-cell-style="headStyle" height="100%" style="width: 100%">
+								<el-table-column label="序号" type="index" align="center" width="50" fixed></el-table-column>
+
+								<el-table-column label="字段名称" align="center" width="200" prop="fieldName" fixed>
+									<template slot-scope="scope">
+										<span v-show="scope.row.ifPrimaryKey" style="color:#f56c6c;">{{scope.row.fieldName}} (主键)</span>
+										<span v-show="!scope.row.ifPrimaryKey">{{scope.row.fieldName}}</span>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="字段来源" align="center" prop="fieldSource">
+									<template slot-scope="scope">
+										<span v-text="scope.row.fieldSource === 'table'? '表字段' : '视图字段'"></span>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="字段别名" align="center" prop="fieldNameCn">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.fieldNameCn" placeholder="请输入字段别名" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="新增" align="center" :render-header="renderHeader" prop="ifSave">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifSave" @change="changeFieldIfAdd(scope.row)" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="修改" align="center" prop="ifUpdate">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifUpdate" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="详情" align="center" prop="ifDetails">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifDetails"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="列表" align="center" prop="ifList">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifList"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="搜索" align="center" prop="ifQuery">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifQuery" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+							</el-table>
+						</div>
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===2">
+							<el-table :data="filterTable" border :header-cell-style="headStyle" height="100%" style="width: 100%">
+								<el-table-column label="序号" type="index" align="center" width="50" fixed></el-table-column>
+
+								<el-table-column label="字段名称" align="center" min-width="120" prop="fieldNameCn" fixed>
+								</el-table-column>
+
+								<el-table-column label="字段类型" align="center" min-width="110" prop="fieldType">
+								</el-table-column>
+
+								<el-table-column label="UI类型" align="center" min-width="140px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.uiType" placeholder="请选择UI类型">
+											<el-option label="无" value=""></el-option>
+											<el-option v-for="option in uiTypeOption" :label="option.name" :value="option.id" :key="option.id"></el-option>
+										</el-select>
+									</template>
+								</el-table-column>
+								<el-table-column label="必填" align="center" width="80px">
+									<template slot-scope="scope">
+										<el-checkbox v-model="scope.row.ifRequired" true-label="1" false-label="0" v-show="isUi(scope.row.uiType)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="冻结修改" align="center" width="80px">
+									<template slot-scope="scope">
+										<el-checkbox v-model="scope.row.updateable" true-label="1" false-label="0" v-show="isUpdateable(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="输入提示" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.placeholder" v-show="isPlaceholder(scope.row)" placeholder="请输入提示信息" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="长度限制" align="center" min-width="100px">
+									<template slot-scope="scope">
+										<el-input-number style="width:80px;" v-model="scope.row.fieldLength" size="small" :controls="false" v-show="isText(scope.row.uiType)"></el-input-number>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="输入限制" align="center" min-width="220px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.regularExpression" placeholder="请选择输入限制" v-show="scope.row.uiType === 'UT_01'">
+											<el-option label="不限" value="01"></el-option>
+											<el-option v-for="option in regexpOption" :label="option.name" :value="option.id"></el-option>
+										</el-select>
+										<div v-show="isNumber(scope.row)">
+											<el-input-number style="width:60px;" v-model="scope.row.min" size="small" :controls="false" :precision="precision"></el-input-number>
+											/
+											<el-input-number style="width:60px;" v-model="scope.row.max" size="small" :controls="false" :precision="precision"></el-input-number>
+											/
+											<el-input-number style="width:40px;" placeholder="精度" :min="0" v-model="scope.row.precision" size="small" :controls="false"></el-input-number>
+										</div>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="阈值" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.domain" v-show="isSqlorJson(scope.row)" placeholder="阈值语句" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="级联子级" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.childFieldArr" multiple placeholder="" v-show="isSqlSelect1(scope.row)">
+											<!-- <el-option label="无" value=""></el-option> -->
+											<el-option v-for="option in filterTable" v-show="isSqlSelect(option.uiType)" :label="option.fieldNameCn" :value="option.fieldName"></el-option>
+										</el-select>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="级联url" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.requestPath" placeholder="输入请求路径" size="small" v-show="isUrl(scope.row)"></el-input>
+									</template>
+								</el-table-column>
+								<el-table-column label="是否小于今天" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-switch v-model="scope.row.ifLessToday" v-show="isSwitch(scope.row)"></el-switch>
+									</template>
+								</el-table-column>
+								<el-table-column label="小于日期" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.lessDateScopeArr" multiple placeholder="" v-show="isSwitch(scope.row)">
+											<!-- <el-option label="无" value=""></el-option> -->
+											<el-option v-for="option in filterTable" :label="option.fieldNameCn" v-show=isDate(option.uiType) :value="option.fieldName"></el-option>
+										</el-select>
+									</template>
+								</el-table-column>
+								<el-table-column label="大于日期" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.maxDateScopeArr" multiple placeholder="" v-show="isSwitch(scope.row)">
+											<!-- <el-option label="无" value=""></el-option> -->
+											<el-option v-for="option in filterTable" :label="option.fieldNameCn" v-show=isDate(option.uiType) :value="option.fieldName"></el-option>
+										</el-select>
+									</template>
+								</el-table-column>
+							</el-table>
+
+
+
+
+
+
+						</div>
+
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===3">
+							<el-tabs class="tabs_wrap" v-model="activeName" tab-position="left" type="border-card">
+								<el-tab-pane label="" name="first">
+									<div class="label_wrap" slot="label">
+										<div>新增</div>
+										<div>修改</div>
+										<div>详情</div>
+									</div>
+									<div class="sort-wrap unsortbox jas-flex-box is-vertical">
+										<div class="box-title">
+											<span>待分组字段</span>
+										</div>
+										<!-- <div class="sort-box "> -->
+										<draggable element="ul" class="list-group is-grown sort-box" style="min-height:100%;" v-model="unsortList" :options="dragOptions">
+											<li class="list-group-item" v-for="element,index in unsortList">
+												{{element.fieldNameCn}}
+												<span>{{ index+1}}</span>
+											</li>
+										</draggable>
+										<!-- </div> -->
+									</div>
+									<div class="allsortbox">
+										<template v-for="row,indexRow in rows">
+											<div class="sort-wrap">
+												<div class="box-title">
+													<span>分组{{indexRow+1}}</span>
+													<el-input size="mini" v-model="row.name" class="name-input" placeholder="请输入分组名"></el-input>
+													<el-button type="text" class="fr" @click="deleteSortRow(indexRow)">删除</el-button>
+												</div>
+												<div class="sort-box">
+													<draggable class="list-group" element="ul" v-model="row.list" :options="dragOptions" @end="">
+														<li class="list-group-item" v-for="element,index in row.list">
+															{{element.fieldNameCn}}
+															<span>{{ index+1}}</span>
+														</li>
+													</draggable>
+												</div>
+											</div>
+										</template>
+
+										<div class="sort-btn">
+											<el-button size="small" type="primary" @click="addSortRow">添加分组</el-button>
+										</div>
+									</div>
+								</el-tab-pane>
+								<el-tab-pane label="列表" name="second">
+									<div class="sort-wrap">
+										<div class="box-title">
+											<span>列表排序</span>
+										</div>
+										<div class="sort-box">
+											<draggable class="list-group" element="ul" v-model="listList">
+												<li class="list-group-item" v-for="element,index in listList">
+													{{element.fieldNameCn}}
+													<span>{{ index+1}}</span>
+												</li>
+											</draggable>
+										</div>
+									</div>
+								</el-tab-pane>
+								<el-tab-pane label="搜索" name="third">
+									<div class="sort-wrap">
+										<div class="box-title">
+											<span>列表排序</span>
+										</div>
+										<div class="sort-box">
+											<draggable class="list-group" element="ul" v-model="queryList">
+												<li class="list-group-item" v-for="element,index in queryList">
+													{{element.fieldNameCn}}
+													<span>{{ index+1}}</span>
+												</li>
+											</draggable>
+										</div>
+									</div>
+								</el-tab-pane>
+							</el-tabs>
+						</div>
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===4">
+							<div class="jas-flex-box is-vertical">
+								<div style="padding-bottom:10px;">
+									<el-button plain type="primary" @click="addUniqueField" size="small">新增</el-button>
+								</div>
+								<div style="height: 0;" class="is-grown">
+									<el-table :data="uniqueFileds" border :header-cell-style="headStyle" height="100%" style="width: 100%">
+										<el-table-column label="序号" type="index" align="center" width="50" fixed></el-table-column>
+
+										<el-table-column label="字段名称" align="center" min-width="120" width="200" prop="uniqueField" fixed>
+											<template slot-scope="scope">
+												<el-select size="small" v-model="scope.row.uniqueField" placeholder="请选择唯一性字段">
+													<el-option v-for="option in uniqueFieldOption" :label="option.name" :value="option.id" :key="option.id"></el-option>
+												</el-select>
+											</template>
+										</el-table-column>
+										<el-table-column label="关联字段" align="center" min-width="120" prop="uniqueCondition">
+											<template slot-scope="scope">
+												<el-select size="small" v-model="scope.row.formatUniqueCondition" multiple placeholder="关联限制字段">
+													<el-option v-for="option in uniqueFieldOption" :label="option.name" :value="option.id" :key="option.id"></el-option>
+												</el-select>
+											</template>
+
+										</el-table-column>
+										<el-table-column label="验证信息" align="center" min-width="120" prop="uniqueFieldMessage">
+											<template slot-scope="scope">
+												<el-input v-model="scope.row.uniqueFieldMessage" clearable placeholder="请输入验证提示信息" size="small"></el-input>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作" align="center" width="120">
+											<template slot-scope="scope">
+												<el-button @click="deleteUniqueItem(scope.row)" type="text" size="small">删除</el-button>
+											</template>
+										</el-table-column>
+									</el-table>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+					<div class="btn-wrap">
+						<div v-if="indexPage==0">
+							<!-- <el-button @click="close">上一步</el-button> -->
+							<el-button size="small" type="primary" @click="saveFunctionResource(1,$event)">保存并关闭</el-button>
+							<el-button size="small" type="primary" @click="saveFunctionResource(0,$event)">下一步</el-button>
+						</div>
+						<div v-if="indexPage==1">
+							<el-button size="small" @click="--indexPage">上一步</el-button>
+							<el-button size="small" type="primary" @click="goToUiTable">下一步</el-button>
+						</div>
+						<div v-if="indexPage==2">
+							<el-button size="small" @click="--indexPage">上一步</el-button>
+							<el-button size="small" type="primary" @click="goToSort">下一步</el-button>
+						</div>
+						<div v-if="indexPage==3">
+							<el-button size="small" type="primary" @click="saveFieldConfig(1)">保存并关闭</el-button>
+							<el-button size="small" @click="--indexPage">上一步</el-button>
+							<el-button size="small" type="primary" @click="saveFieldConfig(0)">下一步</el-button>
+						</div>
+						<div v-if="indexPage==4">
+							<el-button size="small" @click="--indexPage">上一步</el-button>
+							<el-button size="small" type="primary" @click="saveUnique">完成</el-button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+	</div>
+</body>
+<!-- import Vue before Element -->
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/vue-bar/vue-bar.js"></script>
+<script src="./../../../../lib/codemirror/codemirror.js"></script>
+<script src="./../../../../lib/codemirror/vue-codemirror.js"></script>
+<script src="./../../../../lib/codemirror/mode/sql.js"></script>
+<!-- import JavaScript -->
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../lib/vue-draggable/index.min.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script src="./add.js"></script>
+
+
+</html>

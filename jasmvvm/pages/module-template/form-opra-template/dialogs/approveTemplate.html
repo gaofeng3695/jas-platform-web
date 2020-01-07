@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../src/css/main.css">
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+    <jas-dialog-wrapper>
+      <div>
+        <el-form>
+          <el-form-item :label="'批量审批意见(共'+oids.length+'条)：'">
+            <el-input type="textarea" :autosize="{ minRows: 6, maxRows: 16 }" :rows="6" size="small" v-model="remarks"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer">
+        <el-button size="small" @click="close">取 消</el-button>
+        <el-button size="small" type="warning" @click="requestApprove(-1)">驳 回</el-button>
+        <el-button size="small" type="primary" @click="requestApprove(2)">通 过</el-button>
+      </div>
+    </jas-dialog-wrapper>
+  </div>
+</body>
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js "></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: function () {
+      return {
+        oids: [],
+        remarks: '',
+        className: '',
+        menuCode: "",
+        privilegeCode: ""
+      }
+    },
+    created: function () { //先请求要展示的字段，再请求字段的详情，最后请求附件
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.menuCode = param.menuCode;
+      this.className = param.className;
+      this.oids = param.oids.split(',');
+      this.privilegeCode = param.privilegeCode;
+    },
+    methods: {
+      requestApprove: function (status) {
+        var that = this;
+        if (status == -1 && !this.remarks) {
+          top.Vue.prototype.$message({
+            type: 'error',
+            message: '驳回状态下，审批意见必填'
+          });
+          return;
+        }
+
+        var url = jasTools.base.rootPath + '/daq/dataApprove/save.do';
+        jasTools.ajax.post(url, {
+          businessOid: this.oids,
+          approveOpinion: this.remarks,
+          approveStatus: status, //status 2 通过 -1 驳回
+          className: this.className,
+          functionCode: this.menuCode,
+          privilegeCode: this.privilegeCode,
+        }, function (data) {
+          top.Vue.prototype.$message({
+            type: 'success',
+            message: '审核成功'
+          });
+          top.jasTools.dialog.close('success');
+        });
+      },
+      close: function () {
+        top.jasTools.dialog.close();
+      },
+    },
+  });
+
+</script>
+
+</html>

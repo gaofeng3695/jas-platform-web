@@ -1,0 +1,27 @@
+{
+  "special": [{
+    "functionCode": "F000079",
+    "fieldConfig": {
+    "frozenFile":["pipe_cold_bending_code","pipe_length","pipe_diameter","wall_thickness"],
+    "pipe_oid":[{
+         "source":"pipe_cold_bending_code",
+         "value":"value",
+         "custom":"R"
+       },{
+         "source":"pipe_length",
+         "value":"length",
+         "custom":""
+       },
+       {
+         "source":"pipe_diameter",
+         "value":"pipe_diameter",
+         "custom":""
+       },
+       {
+         "source":"wall_thickness",
+         "value":"wall_thickness",
+         "custom":""
+       }]
+  }
+  }]
+}
