@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, :true,-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../src/css/main.css">
+  <style>
+    .outer-wrap {
+      height: 100%;
+    }
+
+    .dialog-footer {
+      padding-top: 10px;
+    }
+
+    .content {
+      overflow: auto;
+    }
+
+    .errContent {
+      width: 400px;
+      overflow: auto;
+      margin: 40px auto 0;
+    }
+
+    .upload-demo {
+      text-align: center;
+      width: 80%;
+      margin: 50px auto;
+    }
+
+    .errtitle {
+      color: #fb6060;
+      height: 60px;
+      line-height: 60px;
+      text-align: center;
+    }
+
+    .errtitle i {
+      display: inline-block;
+      line-height: 60px;
+      font-size: 40px;
+      height: 60px;
+    }
+
+    .errtitle span {
+      display: inline-block;
+      vertical-align: top;
+      padding-left: 15px;
+      font-size: 18px;
+    }
+
+    .txt-c {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <div class="outer-wrap jas-flex-box is-vertical ">
+      <el-steps :active="step" finish-status="success" simple style="margin: 20px">
+        <el-step title="选择文件"></el-step>
+        <el-step title="导入结果"></el-step>
+      </el-steps>
+      <div class="content is-grown">
+        <div class="jas-flex-box is-vertical" v-show="step===0">
+          <div class="content is-grown">
+            <el-upload ref="upload" accept=".xls,.xlsx" class="upload-demo " drag :action="uploadUrl" :limit="1" :on-change="onUpload"
+              :auto-upload="false" :on-exceed="onExceed">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或
+                <em>点击上传</em>
+              </div>
+              <div class="el-upload__tip" slot="tip">只能上传Excel模板文件，最多同时上传一个</div>
+            </el-upload>
+          </div>
+          <div class="dialog-footer" style="text-align: center">
+            <el-button size="small" @click="closeDialog">取 消</el-button>
+            <el-button size="small" @click="uploadExcel()" type="primary">导入</el-button>
+           <!--   <el-button size="small" @click="uploadExcel('update')" type="primary">更新导入</el-button>-->
+          </div>
+        </div>
+        <div class="jas-flex-box is-vertical" v-show="step===1">
+          <div class="errContent is-grown">
+
+            <div v-show="uploadStatus">
+              <div class="errtitle" style="color:#67c23a;">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <span>导入成功！</span>
+              </div>
+              <div class="txt-c">{{errorMsg}}</div>
+
+            </div>
+            <div v-show="!uploadStatus">
+              <div class="errtitle">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                <span>导入失败！</span>
+              </div>
+              <div class="txt-c" v-html="errorMsg"></div>
+            </div>
+          </div>
+          <div class="dialog-footer" style="text-align: center">
+            <el-button size="small" @click="returnUpload">重新导入</el-button>
+            <el-button size="small" @click="closeDialog" type="primary">完成</el-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<!-- import Vue before Element -->
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<!-- <script src="./../../../lib/vue-bar/vue-bar.js"></script> -->
+
+<!-- import JavaScript -->
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: function () {
+      return {
+        step: 0,
+        uploadStatus: 1,
+        baseUploadUrl: jasTools.base.rootPath + '/importExcelController/importExcelData.do?token=' + localStorage
+          .getItem(
+            'token') + '&templateCode=',
+        uploadUrl: '',
+        errorMsg: '', // 验证的错误信息
+      }
+    },
+    created: function () {
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.templateCode = param.templateCode;
+      this.baseUploadUrl += param.templateCode;
+      if(param.importUrl){
+    	  this.baseUploadUrl = jasTools.base.rootPath +param.importUrl+ '?token=' + localStorage.getItem('token') ;
+    }
+    console.log(this.baseUploadUrl)
+    },
+    methods: {
+      closeDialog: function () {
+        top.jasTools.dialog.close();
+      },
+      onExceed: function () {
+        top.Vue.prototype.$message({
+          type: 'info',
+          message: '最多上传一个模板'
+        })
+      },
+      returnUpload: function () {
+        this.$refs.upload.clearFiles();
+        this.step = 0;
+      },
+      onUpload: function (file) {
+        var that = this;
+        setTimeout(function () {
+          that.loading && that.loading.close();
+          if (file.status === 'success') {
+            that.step++;
+            var status = file.response.status;
+            if (status === -1) {
+              that.uploadStatus = 0;
+              that.errorMsg = file.response.msg;
+              if (file.response.data && file.response.data.length > 0) {
+                that.errorMsg = file.response.data.join('<br>');
+              }
+            } else {
+              that.uploadStatus = 1;
+              that.errorMsg = file.response.msg;
+            }
+          } else if (file.status === 'fail') {
+
+          }
+        }, 300);
+      },
+      uploadExcel: function () {
+        var that = this;
+        this.uploadUrl = this.baseUploadUrl;
+        console.log( this.uploadUrl);
+        this.$nextTick(function () {
+          that.$refs.upload.submit();
+        });
+      },
+
+    }
+  });
+</script>
+
+
+</html>

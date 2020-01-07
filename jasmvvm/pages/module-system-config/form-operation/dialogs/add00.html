@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../lib/codemirror/codemirror.css">
+	<link rel="stylesheet" href="./../../../src/css/main.css">
+	<style>
+		.CodeMirror {
+			border: 1px solid #dcdfe6;
+			/* min-height: 200px; */
+			height: 100%;
+			width: auto;
+			border-radius: 4px;
+		}
+
+		.el-tabs__content {
+			height: 100%;
+			box-sizing: border-box;
+		}
+
+		.el-tab-pane,
+		.vue-codemirror {
+			height: 100%;
+		}
+
+		.outer-wrap {
+			height: 100%;
+		}
+
+		.sub-wrap {
+			height: 100%;
+		}
+
+		.content-wrap {
+			height: 100%;
+			overflow: auto;
+		}
+
+		.title-wrap {
+			padding: 20px 20px 40px;
+		}
+
+		.btn-wrap {
+			/* border-top:1px solid #e4e7ed; */
+			text-align: center;
+			padding-top: 15px;
+		}
+
+		.table-icon-wrap {
+			padding: 0 0 10px;
+		}
+
+		.el-autocomplete {
+			width: 100%;
+		}
+
+		.content01 {
+			overflow: hidden;
+		}
+
+		.sort-wrap {
+			min-height: 100px;
+			border: 1px solid #dcdfe6;
+			margin-bottom: 10px;
+			border-radius: 4px;
+			min-height: 100%;
+			box-sizing: border-box;
+		}
+
+		.unsortbox {
+			width: 200px;
+			float: left;
+			margin-bottom: 0px;
+		}
+
+		.allsortbox {
+			padding-left: 210px;
+		}
+
+		.sort-box {
+			padding: 10px;
+
+		}
+
+		.sort-btn {
+			text-align: right;
+		}
+
+		.box-title {
+			background: #cee6ff;
+			height: 40px;
+			line-height: 38px;
+			padding: 0 10px;
+		}
+
+		.name-input {
+			width: 200px;
+		}
+
+		.list-group {
+			min-height: 100px;
+			overflow: hidden;
+		}
+
+		.unsortbox .list-group-item {
+			margin-right: 0px;
+			margin-bottom: 5px;
+		}
+
+		.list-group-item {
+			display: inline-block;
+			padding: 4px 8px;
+			border: 1px solid #dcdfe6;
+			background: #f5f7fa;
+			opacity: 0.8;
+			border-radius: 2px;
+			margin: 0px 8px 4px 0px;
+			cursor: move;
+			width: 162px;
+		}
+
+		.list-group-item span {
+			display: inline-block;
+			padding: 0px 6px;
+			background: #c90;
+			border-radius: 6px;
+			color: #fff;
+			float: right;
+		}
+
+		.card_wrap {
+			padding: 20px 0 16px;
+			width: 120%;
+			transform: translateX(-7.44%);
+			-webkit-transform: translateX(-7.44%);
+		}
+
+		.sql_card {
+			min-height: 100px;
+			cursor: pointer;
+		}
+
+		.sql_card.active {
+			border: 1px solid #409eff7a;
+		}
+
+		.sql_card .el-card__body {
+			padding: 0px;
+		}
+
+		.sql_icon {
+
+			font-size: 60px;
+			color: #67c23a;
+			text-align: center;
+			height: 140px;
+			padding: 0 10px 0;
+			line-height: 140px;
+		}
+
+		.sql_icon .el-icon-question {
+			line-height: 140px;
+			font-size: 70px;
+			color: #e6a23c;
+		}
+
+		.sql_icon .el-icon-error {
+			/* font-size: 70px; */
+			color: #f56c6c;
+		}
+
+		.sql_title {
+			font-size: 16px;
+			text-align: center;
+			line-height: 44px;
+			height: 40px;
+			/* border-bottom: 1px solid #dcdfe6; */
+			background: #f5f7fa;
+		}
+
+		.sql_btn {
+			text-align: right;
+			padding: 0 10px 0 0;
+		}
+
+		.input_wrap {
+			padding: 4px 10px 10px;
+			border: 1px solid #dcdfe6;
+			border-radius: 4px;
+			position: relative;
+		}
+
+		.input_arrow {
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			border: 1px solid #dcdfe6;
+			top: -7px;
+			transform: rotateZ(45deg);
+			background: white;
+			border-bottom: none;
+			border-right: none;
+			left: 90%;
+		}
+
+		.input_arrow.n1 {
+			left: 10%
+		}
+
+		.input_arrow.n2 {
+			left: 30%
+		}
+
+		.input_arrow.n3 {
+			left: 50%
+		}
+
+		.input_arrow.n4 {
+			left: 70%
+		}
+
+		.input_arrow.n5 {
+			left: 90%
+		}
+
+		.input_wrap_title {
+			text-align: center;
+			line-height: 34px;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="outer-wrap jas-flex-box is-vertical ">
+			<div class="title-wrap">
+				<el-steps :active="indexPage" finish-status="success" simple>
+					<el-step title="数据源配置"></el-step>
+					<el-step title="字段配置"></el-step>
+					<el-step title="UI配置"></el-step>
+					<el-step title="分组排序"></el-step>
+				</el-steps>
+			</div>
+			<div class="is-grown">
+				<div class="sub-wrap jas-flex-box is-vertical ">
+					<div class="is-grown content-wrap">
+						<div class="content-wrap jas-flex-box is-vertical " v-show="indexPage===0">
+
+							<el-form v-loading="isLoadingSql" :model="ruleForm" :rules="firstRules" ref="ruleForm" label-width="80px" class="content01">
+								<el-row :gutter="40">
+									<el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+										<el-form-item prop="name" label="功能名称">
+											<el-input v-model="ruleForm.name" placeholder="请输入功能名称"></el-input>
+										</el-form-item>
+
+									</el-col>
+									<el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+										<el-form-item prop="source" label="数据来源">
+											<el-autocomplete suffix-icon="el-icon-arrow-down" v-model="ruleForm.source" :fetch-suggestions="renderTableSelect" placeholder="请输入数据库表名称"
+											  @select="chooseTableSelected"></el-autocomplete>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form>
+
+							<el-tabs @tab-click="changeSql" type="border-card" tab-position="left" class="is-grown">
+								<el-tab-pane label="新增依赖">
+									<codemirror ref="cm_0" v-model="ruleForm.add" :options="mirrorConfig"></codemirror>
+								</el-tab-pane>
+								<el-tab-pane label="修改依赖">
+									<codemirror ref="cm_1" v-model="ruleForm.update" :options="mirrorConfig"></codemirror>
+								</el-tab-pane>
+								<el-tab-pane label="删除依赖">
+									<codemirror ref="cm_2" v-model="ruleForm.delete" :options="mirrorConfig"></codemirror>
+								</el-tab-pane>
+								<el-tab-pane label="详情依赖">
+									<codemirror ref="cm_3" v-model="ruleForm.detail" :options="mirrorConfig"></codemirror>
+								</el-tab-pane>
+								<el-tab-pane label="查询依赖">
+									<codemirror ref="cm_4" v-model="ruleForm.select" :options="mirrorConfig"></codemirror>
+								</el-tab-pane>
+							</el-tabs>
+
+
+
+						</div>
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===1">
+							<el-table :data="privateTable" border :header-cell-style="headStyle" height="100%" style="width: 100%">
+								<el-table-column label="序号" type="index" align="center" width="50" fixed></el-table-column>
+								<el-table-column label="字段名称" align="center" width="200" prop="fieldName" fixed>
+									<template slot-scope="scope">
+										<span v-show="scope.row.ifPrimaryKey" style="color:#f56c6c;">{{scope.row.fieldName}} (主键)</span>
+										<span v-show="!scope.row.ifPrimaryKey">{{scope.row.fieldName}}</span>
+									</template>
+								</el-table-column>
+								<el-table-column label="字段来源" align="center" prop="fieldSource">
+									<template slot-scope="scope">
+										<span v-text="scope.row.fieldSource === 'table'? '表字段' : '视图字段'"></span>
+									</template>
+								</el-table-column>
+								<el-table-column label="字段别名" align="center" prop="fieldNameCn">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.fieldNameCn" placeholder="请输入字段别名" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="新增权限" align="center" prop="ifSave">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifSave" @change="changeFieldIfAdd(scope.row)" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="修改权限" align="center" prop="ifUpdate">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifUpdate" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="详情权限" align="center" prop="ifDetails">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifDetails"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="列表权限" align="center" prop="ifList">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifList"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="搜索权限" align="center" prop="ifQuery">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifQuery" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+							</el-table>
+						</div>
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===2">
+							<el-table :data="filterTable" border :header-cell-style="headStyle" height="100%" style="width: 100%">
+								<el-table-column label="序号" type="index" align="center" width="50" fixed></el-table-column>
+
+								<el-table-column label="字段名称" align="center" min-width="120" prop="fieldNameCn" fixed>
+								</el-table-column>
+
+								<el-table-column label="字段类型" align="center" min-width="110" prop="fieldType">
+								</el-table-column>
+
+								<el-table-column label="UI类型" align="center" min-width="140px">
+									<template slot-scope="scope">
+										<!-- <el-cascader expand-trigger="hover" :options="options" v-model="scope.row.uiType"></el-cascader> -->
+
+										<el-select size="small" v-model="scope.row.uiType" placeholder="请选择UI类型">
+											<el-option label="无" value=""></el-option>
+											<el-option v-for="option in uiTypeOption" :label="option.name" :value="option.id" :key="option.id"></el-option>
+										</el-select>
+
+									</template>
+								</el-table-column>
+								<el-table-column label="必填" align="center" width="80px">
+									<template slot-scope="scope">
+										<el-checkbox v-model="scope.row.ifRequired" true-label="1" false-label="0" v-show="isUi(scope.row.uiType)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="冻结修改" align="center" width="80px">
+									<template slot-scope="scope">
+										<el-checkbox v-model="scope.row.updateable" true-label="1" false-label="0" v-show="isUpdateable(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="输入提示" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.placeholder" v-show="isPlaceholder(scope.row)" placeholder="请输入提示信息" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="长度限制" align="center" min-width="100px">
+									<template slot-scope="scope">
+										<el-input-number style="width:80px;" v-model="scope.row.fieldLength" size="small" :controls="false" v-show="isText(scope.row.uiType)"></el-input-number>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="输入限制" align="center" min-width="160px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.regularExpression" placeholder="请选择输入限制" v-show="scope.row.uiType === 'UT_01'">
+											<el-option label="不限" value=""></el-option>
+											<el-option v-for="option in regexpOption" :label="option.name" :value="option.id"></el-option>
+										</el-select>
+										<div v-show="isNumber(scope.row)">
+											<el-input-number style="width:60px;" v-model="scope.row.min" size="small" :controls="false"></el-input-number>
+											/
+											<el-input-number style="width:60px;" v-model="scope.row.max" size="small" :controls="false"></el-input-number>
+										</div>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="阈值" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.domain" v-show="isSql(scope.row) || isJson(scope.row)" placeholder="阈值语句" size="small"></el-input>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="级联子级" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-select size="small" v-model="scope.row.childField" placeholder="请选择活动区域" v-show="isSqlSelect(scope.row.uiType)">
+											<el-option label="无" value=""></el-option>
+											<el-option v-for="option in selectNames" :label="option.fieldNameCn" :value="option.fieldName"></el-option>
+										</el-select>
+									</template>
+								</el-table-column>
+
+								<el-table-column label="级联url" align="center" min-width="120px">
+									<template slot-scope="scope">
+										<el-input v-model="scope.row.requestPath" placeholder="输入请求路径" size="small" v-show="isUrl(scope.row)"></el-input>
+									</template>
+								</el-table-column>
+
+							</el-table>
+						</div>
+
+						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===3">
+							<div class="sort-wrap unsortbox jas-flex-box is-vertical">
+								<div class="box-title">
+									<span>待分组字段</span>
+								</div>
+								<!-- <div class="sort-box "> -->
+								<draggable element="ul" class="list-group is-grown sort-box" style="min-height:100%;" v-model="unsortList" :options="dragOptions">
+									<li class="list-group-item" v-for="element,index in unsortList">
+										{{element.fieldNameCn}}
+										<span>{{ index+1}}</span>
+									</li>
+								</draggable>
+								<!-- </div> -->
+							</div>
+							<div class="allsortbox">
+								<template v-for="row,indexRow in rows">
+									<div class="sort-wrap">
+										<div class="box-title">
+											<span>分组{{indexRow+1}}</span>
+											<el-input size="mini" v-model="row.name" class="name-input" placeholder="请输入分组名"></el-input>
+											<el-button type="text" class="fr" @click="deleteSortRow(indexRow)">删除</el-button>
+										</div>
+										<div class="sort-box">
+											<draggable class="list-group" element="ul" v-model="row.list" :options="dragOptions" @end="">
+												<li class="list-group-item" v-for="element,index in row.list">
+													{{element.fieldNameCn}}
+													<span>{{ index+1}}</span>
+												</li>
+											</draggable>
+										</div>
+									</div>
+								</template>
+
+								<div class="sort-btn">
+									<el-button size="small" type="primary" @click="addSortRow">添加分组</el-button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="btn-wrap">
+						<div v-if="indexPage==0">
+							<!-- <el-button @click="close">上一步</el-button> -->
+							<el-button type="primary" @click="saveFunctionResource">下一步</el-button>
+						</div>
+						<div v-if="indexPage==1">
+							<el-button @click="--indexPage">上一步</el-button>
+							<el-button type="primary" @click="goToUiTable">下一步</el-button>
+						</div>
+						<div v-if="indexPage==2">
+							<el-button @click="--indexPage">上一步</el-button>
+							<el-button type="primary" @click="goToSort">下一步</el-button>
+						</div>
+						<div v-if="indexPage==3">
+							<el-button @click="--indexPage">上一步</el-button>
+							<el-button type="primary" @click="saveFieldConfig">完 成</el-button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+	</div>
+</body>
+<!-- import Vue before Element -->
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-bar/vue-bar.js"></script>
+<script src="./../../../lib/codemirror/codemirror.js"></script>
+<script src="./../../../lib/codemirror/vue-codemirror.js"></script>
+<script src="./../../../lib/codemirror/mode/sql.js"></script>
+<!-- import JavaScript -->
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../lib/vue-draggable/index.min.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+
+
+<script>
+	Vue.use(window.VueCodemirror)
+
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				mirrorConfig: {
+					mode: 'text/x-sql',
+					lineWrapping: true,
+					indentWithTabs: true,
+					smartIndent: true,
+					lineNumbers: true,
+					matchBrackets: true,
+					extraKeys: {
+						"Ctrl-Space": "autocomplete"
+					},
+
+				},
+				indexPage: 0,
+				ruleForm: {
+					name: '',
+					source: '',
+					select: '',
+					delete: '',
+					add: '',
+					update: '',
+					detail: '',
+					isSqlError: false,
+				},
+				currentSql: '',
+				isLoadingSql: false,
+				isLoadingFieldInfo: false,
+				firstRules: {
+					name: [{
+						required: true,
+						message: '功能名称不能为空',
+					}],
+					source: [{
+						required: true,
+						message: '数据来源不能为空',
+					}]
+				},
+				headStyle: {
+					'background-color': '#f5f7fa ',
+				},
+				privateTable: [],
+				filterTable: [],
+				uiTypeOption: [],
+				regexpOption: [],
+				// 分组相关
+				unsortList: [],
+				rows: [ //
+					{
+						name: '基础表单',
+						list: [],
+					}
+				],
+				dragOptions: {
+					group: 'description',
+				}
+			}
+		},
+		computed: {
+			selectNames: function () {
+				var that = this;
+				return this.filterTable.filter(function (item) {
+					return that.isSqlSelect(item.uiType)
+				});
+			}
+		},
+		created: function () {
+			var that = this;
+
+			// 获取数据库字段替换配置
+			$.getJSON('./../js/functionConfig.json', function (json) {
+				that.fieldParams = json.fieldParams;
+				// console.log(json)
+			});
+
+			// 获取正则配置
+			$.getJSON('./../js/regexp.json', function (json) {
+				that.regexpOption = json.rows;
+			});
+
+			// 获取功能详情
+			this.functionId = jasTools.base.getParamsInUrl(location.href).functionId;
+			if (this.functionId) {
+				this._requestFunctionDetail(this.functionId);
+			}
+
+
+		},
+		mounted: function () {
+			var that = this;
+
+			jasTools.base.showLoading();
+		},
+		methods: {
+			isUi: function (type) {
+				return !!type;
+			},
+			isText: function (type) {
+				return type === 'UT_01' && this.isUi(type);
+			},
+			isSql: function (row) {
+				var type = row.uiType;
+				var sql = ['UT_05', 'UT_07', 'UT_09', 'UT_11'];
+				return sql.indexOf(type) !== -1 && this.isUi(type);
+			},
+			isUpdateable: function (row) {
+				var type = row.uiType;
+				return +row.ifUpdate && this.isUi(type);
+			},
+			isNumber: function (row) {
+				var type = row.uiType;
+				return type === 'UT_14' && this.isUi(type);
+			},
+			isPlaceholder: function (row) {
+				var type = row.uiType;
+				var selectBox = ['UT_05', 'UT_06', 'UT_07', 'UT_08'];
+				return selectBox.indexOf(type) === -1 && this.isUi(type);
+			},
+			isJson: function (row) {
+				var type = row.uiType;
+				var json = ['UT_06', 'UT_08', 'UT_10', 'UT_12'];
+				return json.indexOf(type) !== -1 && this.isUi(type);
+			},
+			isSqlSelect: function (type) {
+				return type === 'UT_11' && this.isUi(type);
+			},
+			isUrl: function (row) {
+				var type = row.uiType;
+				return this.isSqlSelect(type) && !!row.childField;
+			},
+			isTableSource: function (row) {
+				var type = row.fieldSource;
+				return type === 'table';
+			},
+			changeSql: function (card) {
+				this.$refs['cm_' + card.index].refresh();
+			},
+			_requestFunctionDetail: function (oid) { // 请求功能详情
+				var that = this;
+				jasTools.ajax.get(jasTools.base.rootPath + '/functionConfiguration/get.do', {
+					id: oid
+				}, function (data) {
+					that.ruleForm.name = data.data.functionName;
+					that.ruleForm.source = data.data.tableName;
+					that.ruleForm.select = data.data.querySql;
+					that.ruleForm.delete = data.data.deleteSql;
+					that.ruleForm.update = data.data.updateSql;
+					that.ruleForm.detail = data.data.detailsSql;
+					that.ruleForm.add = data.data.saveSql;
+				});
+
+			},
+			renderTableSelect: function (queryString, cb) { // 渲染数据来源可选项
+				var that = this;
+
+				var filterTableSourceArr = function (str, arr) {
+					if (str) {
+						var val01 = str.toUpperCase();
+						var val02 = str.toLowerCase();
+						return arr.filter(function (item) {
+							return item.value.indexOf(val01) !== -1 || item.value.indexOf(val02) !== -1;
+						});
+					} else {
+						return arr.slice(0, 20);
+					}
+				};
+
+				if (this.tableArr) {
+					var arr = filterTableSourceArr(queryString, this.tableArr);
+					cb(arr);
+				} else {
+					jasTools.ajax.get(jasTools.base.rootPath + '/tableInfo/getDbTableNames.do', {
+						keyword: ''
+					}, function (data) {
+						that.tableArr = data.data.map(function (item) {
+							return {
+								value: item
+							}
+						});
+						var arr = filterTableSourceArr(queryString, that.tableArr);
+						cb(arr);
+					});
+				}
+			},
+			chooseTableSelected: function (item) { // 选中数据来源,请求相关字段
+				var that = this;
+				that.isLoadingSql = true;
+				var tableName = item.value;
+				jasTools.ajax.get(jasTools.base.rootPath + '/tableField/getDbColumnInfo.do', {
+					tableName: tableName
+				}, function (data) {
+					that.isLoadingSql = false;
+					if (data.data.length > 0) {
+						that._formatSqlByFields(tableName, data.data);
+					} else {
+						window.top.Vue.prototype.$message({
+							message: '该数据库没有字段，请重新选择',
+							type: 'error'
+						});
+					}
+				});
+			},
+
+			_formatSqlByFields: function (tableName, fields) { // 通过字段数组，格式化sql
+				var that = this;
+				that.tableName = tableName;
+				var mainField = ''; //主键
+				that.fieldArr = fields.map(function (item) {
+					if (item.ifPrimaryKey) {
+						mainField = item.columnName;
+					}
+					return item.columnName
+				});
+
+				var modifyStr = that.fieldArr.map(function (item) {
+					var newItem = item;
+					if (that.fieldParams && that.fieldParams[item]) {
+						newItem = that.fieldParams[item];
+					}
+					return newItem;
+				});
+				var formatUpdateStr = function () {
+					var arr = that.fieldArr.map(function (field, index) {
+						return field + '=:' + modifyStr[index];
+					});
+					return arr.join(', ')
+				};
+
+				that.ruleForm.select = [
+					'SELECT ',
+					that.fieldArr.join(', '),
+					' FROM ',
+					tableName,
+					' WHERE 1 = 1 ',
+					that.fieldArr.indexOf('active') > -1 ? ' AND active = 1' : '',
+					that.fieldArr.indexOf('ACTIVE') > -1 ? ' AND ACTIVE = 1' : '',
+					' @where_append ',
+				].join('');
+
+				that.ruleForm.delete = [
+					'UPDATE ',
+					tableName,
+					' SET ',
+					that.fieldArr.indexOf('active') > -1 ? 'active' : 'ACTIVE',
+					' = 0',
+					' WHERE ',
+					mainField,
+					' = :',
+					mainField
+				].join('');
+
+				that.ruleForm.add = [
+					'INSERT INTO ',
+					tableName,
+					'( ',
+					that.fieldArr.join(', '),
+					' ) VALUES ( :',
+					modifyStr.join(', :'),
+					' )'
+				].join('');
+
+
+				that.ruleForm.update = [
+					'UPDATE ',
+					tableName,
+					' SET ',
+					formatUpdateStr(),
+					' WHERE ',
+					mainField,
+					' = :',
+					mainField,
+					that.fieldArr.indexOf('active') > -1 ? ' AND active = 1' : '',
+					that.fieldArr.indexOf('ACTIVE') > -1 ? ' AND ACTIVE = 1' : ''
+				].join('');
+
+				that.ruleForm.detail = [
+					'SELECT ',
+					that.fieldArr.join(', '),
+					' FROM ',
+					tableName,
+					' WHERE ',
+					mainField,
+					' = :',
+					mainField,
+					that.fieldArr.indexOf('active') > -1 ? ' AND active = 1' : '',
+					that.fieldArr.indexOf('ACTIVE') > -1 ? ' AND ACTIVE = 1' : ''
+				].join('');
+			},
+
+			saveFunctionResource: function () { // 保存功能数据源配置
+				var that = this;
+				var obj = this.ruleForm;
+				var oData = {
+					functionName: obj.name,
+					tableName: obj.source,
+					querySql: obj.select,
+					deleteSql: obj.delete,
+					saveSql: obj.add,
+					updateSql: obj.update,
+					detailsSql: obj.detail
+				};
+				this.$refs.ruleForm.validate(function (valid) {
+					if (valid) {
+						if (that.functionId) { // 修改
+							oData.oid = that.functionId;
+							jasTools.ajax.post(jasTools.base.rootPath + '/functionConfiguration/update.do', oData, function (data) {
+								that.functionId = data.data;
+								that.isLoadingFieldInfo = true;
+								that._getFunctionFieldInfo(that.functionId);
+								that.indexPage++;
+							});
+
+						} else { // 新增
+							jasTools.ajax.post(jasTools.base.rootPath + '/functionConfiguration/save.do', oData, function (data) {
+								that.functionId = data.data;
+								that.isLoadingFieldInfo = true;
+								that._getFunctionFieldInfo(that.functionId);
+								that.indexPage++;
+							});
+						}
+					} else {
+						return false;
+					}
+				});
+			},
+			_getFunctionFieldInfo: function (fId) { // 获取功能字段信息
+				var that = this;
+
+				jasTools.ajax.get(jasTools.base.rootPath + '/functionFields/getFunConfigurationFields.do', {
+					functionId: fId
+				}, function (data) {
+					that.isLoadingFieldInfo = false;
+					that.privateTable = data.data.map(function (obj) {
+						return {
+							functionId: fId,
+							fieldName: obj.fieldName,
+							fieldNameCn: obj.fieldNameCn,
+							fieldSource: obj.fieldSource,
+							ifSave: obj.ifSave || "0",
+							ifUpdate: obj.ifUpdate || "0",
+							ifQuery: obj.ifQuery || "0",
+							ifList: obj.ifList || "0",
+							ifDetails: obj.ifDetails || "0",
+							fieldLength: obj.fieldLength,
+							fieldType: obj.fieldType,
+							uiType: obj.uiType || "",
+							domain: obj.domain || null,
+							regularExpression: obj.regularExpression || null,
+							groupName: obj.groupName || null,
+							placeholder: obj.placeholder || "",
+							childField: obj.childField || null,
+							requestPath: obj.requestPath || null,
+							ifRequired: obj.ifRequired || "0",
+							ifPrimaryKey: obj.ifPrimaryKey,
+							groupIndex: obj.groupIndex,
+							ifPrimaryKey: obj.ifPrimaryKey,
+							rowIndex: obj.rowIndex,
+							updateable: obj.updateable,
+							min: obj.min,
+							max: obj.max,
+						};
+					});
+				});
+
+			},
+			changeFieldIfAdd: function (row) {
+				row.ifDetails = row.ifSave;
+				row.ifUpdate = row.ifSave;
+				row.ifList = row.ifSave;
+			},
+			goToUiTable: function () {
+
+				var arr = [];
+				var error = 0;
+				this.privateTable.forEach(function (item) {
+					if (+item.ifQuery || +item.ifSave || +item.ifUpdate) {
+						arr.push(item);
+					}
+					if (+item.ifQuery || +item.ifSave || +item.ifUpdate || +item.ifList || +item.ifDetails) {
+						if (!item.fieldNameCn) {
+							error = 1;
+						}
+					}
+				});
+				if (error) {
+					window.top.Vue.prototype.$message({
+						message: '需要展示的字段，字段别名不能为空',
+						type: 'error'
+					});
+					return;
+				}
+				this.indexPage++;
+				this.filterTable = arr;
+				this._requestUiTypes();
+			},
+			_requestUiTypes: function () { //获取ui类型阈值
+				var that = this;
+				jasTools.ajax.post(jasTools.base.rootPath + '/customDict/getListByDictType.do', {
+					dictTypeList: ['ui_type']
+				}, function (data) {
+					that.uiTypeOption = data.data.map(function (item) {
+						return {
+							id: item.dictCode,
+							name: item.dictValue,
+						}
+					});
+				});
+			},
+
+			goToSort: function () { // 前往字段分组排序页面
+				var error = 0;
+				//验证UI类型是否为空
+				this.filterTable.forEach(function (item) {
+					if (!item.uiType) error = 1;
+				});
+				if (error) {
+					window.top.Vue.prototype.$message({
+						message: 'UI类型为必填项',
+						type: 'error'
+					});
+					return;
+				}
+				this._formatSortArray();
+				this.indexPage++;
+			},
+
+			_formatSortArray: function () { // 整理分组列表
+				var arr = []; // 存放未分组的字段
+				var sortObj = {}; // 按组名对字段进行分组存放
+				var ifHasSortable = false;
+				this.privateTable.forEach(function (item) {
+					if (+item.ifDetails || +item.ifSave || +item.ifUpdate) {
+						var group = item.groupName;
+						if (!group) { // 整理未分组字段
+							arr.push({
+								fieldName: item.fieldName,
+								fieldNameCn: item.fieldNameCn,
+								rowIndex: item.rowIndex
+							});
+						} else { // 整理分组的字段
+							ifHasSortable = true;
+							if (sortObj[group]) {
+								sortObj[group].push({
+									fieldName: item.fieldName,
+									fieldNameCn: item.fieldNameCn,
+									rowIndex: item.rowIndex
+								});
+							} else {
+								sortObj[group] = [{
+									fieldName: item.fieldName,
+									fieldNameCn: item.fieldNameCn,
+									rowIndex: item.rowIndex
+								}];
+							}
+						}
+					}
+				});
+
+
+				// 未分组字段排序
+				arr.sort(function (a, b) {
+					return a.rowIndex - b.rowIndex
+				});
+				this.unsortList = arr;
+
+
+
+
+
+				// 格式化已分组的字段
+				if (ifHasSortable) {
+					this.rows = [];
+					for (var item in sortObj) {
+						if (sortObj.hasOwnProperty(item)) {
+							sortObj[item].sort(function (a, b) { // 字段排序
+								return a.rowIndex - b.rowIndex
+							});
+							this.rows.push({
+								name: item,
+								list: sortObj[item],
+							})
+						}
+					}
+					this.rows.sort(function (a, b) {
+						if (a.list[0] && b.list[0]) {
+							return b.list[0].groupIndex - a.list[0].groupIndex
+						}
+					});
+
+				} else {
+					this.rows = [{
+						name: '基础表单',
+						list: [],
+					}]
+				}
+
+			},
+			addSortRow: function () { // 添加分组
+				this.rows.push({
+					name: '',
+					list: [],
+				});
+			},
+			deleteSortRow: function (index) { // 删除分组
+				if (this.rows[index].list.length > 0) {
+					// this.unsortList.push.apply(null,this.rows[index].list);
+					this.unsortList = this.unsortList.concat(this.rows[index].list);
+				}
+				this.rows.splice(index, 1);
+			},
+
+			_formatSortInfo: function () { // 将分组信息合并到原始字段数据上
+				var that = this;
+				var error = false;
+				this.rows.forEach(function (row) {
+					if (!row.name) {
+						error = true;
+						window.top.Vue.prototype.$message({
+							message: '请填写分组名称',
+							type: 'error'
+						});
+					}
+				});
+				if (error) return false;
+
+				var rowIndexObj = {};
+
+				this.rows.forEach(function (row, groupIndex) {
+					row.list.forEach(function (item, rowIndex) {
+						rowIndexObj[item.fieldName] = rowIndex + 1;
+					});
+				});
+				this.unsortList.forEach(function (item, rowIndex) {
+					rowIndexObj[item.fieldName] = rowIndex + 1;
+				});
+
+				this.privateTable.forEach(function (item) {
+					var name = item.fieldName;
+					item.rowIndex = rowIndexObj[item.fieldName];
+					var isInRow = false;
+
+					that.rows.forEach(function (row, groupIndex) { // 判断字段在哪个分组里
+						if (JSON.stringify(row).indexOf(name) !== -1) {
+							item.groupName = row.name;
+							item.groupIndex = groupIndex + 1;
+							isInRow = true;
+						}
+					});
+
+					if (!isInRow) {
+						item.groupName = '';
+						item.groupIndex = '';
+						// item.rowIndex = '';
+					}
+
+				});
+				return true;
+			},
+			close: function () {
+				window.parent.jasTools.dialog.close();
+			},
+
+			saveFieldConfig: function () { // 保存字段配置信息
+				var isSort = this._formatSortInfo();
+				if (isSort) {
+					jasTools.ajax.post(jasTools.base.rootPath + '/functionFields/save.do', {
+						funFunctionFieldsForms: this.privateTable,
+					}, function (data) {
+						parent.window.jasTools.dialog.close(1);
+						window.top.Vue.prototype.$message({
+							message: '保存成功',
+							type: 'success'
+						});
+					});
+				}
+			},
+
+		},
+	});
+</script>
+
+</html>

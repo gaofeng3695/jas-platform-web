@@ -1,0 +1,20 @@
+{
+  "fieldParams" : {
+    "create_user_id" : "current_user_id",
+    "create_user_name" : "current_user_name",
+    "create_datetime" : "current_datetime",
+    "modify_user_id" : "current_user_id",
+    "modify_user_name" : "current_user_name",
+    "modify_datetime" : "current_datetime",
+    "CREATE_USER_ID" : "current_user_id",
+    "CREATE_USER_NAME" : "current_user_name",
+    "CREATE_TIME" : "current_datetime",
+    "CREATE_DATETIME" : "current_datetime",
+    "MODIFY_USER_ID" : "current_user_id",
+    "MODIFY_USER_NAME" : "current_user_name",
+    "MODIFY_TIME" : "current_datetime",
+    "MODIFY_DATETIME" : "current_datetime",
+    "AVTIVE" : "active",
+    "active":"active"
+  }
+}

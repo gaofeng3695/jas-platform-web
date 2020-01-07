@@ -1,0 +1,38 @@
+{
+    "tool": [{
+        "id": "bt_add",
+        "title": "增加",
+        "plain": "plain",
+        "icon": "el-icon-plus",
+        "size": "small",
+        "type": "primary"
+    }],
+    "search": {
+        "selectTigger": true
+    },
+    "form": {
+        "col": 2,
+        "width": "60%",
+        "height": "80%",
+        "labelwidth": "155px"
+    },
+    "view": {
+        "col": 2,
+        "width": "60%",
+        "height": "80%"
+    },
+    "table": {
+        "tableWidth": 210
+
+    },
+    "pageAttr": {
+        "isShow": true,
+        "pagesizes": [10, 20, 50, 100],
+        "pagesize": 10
+    },
+    "file": {
+        "autoUpload": false,
+        "limitNum": 2
+    }
+
+}

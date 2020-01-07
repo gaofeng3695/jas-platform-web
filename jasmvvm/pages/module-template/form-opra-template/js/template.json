@@ -1,0 +1,48 @@
+{
+    "tool": [{
+        "id": "add",
+        "title": "增加",
+        "plain": "plain",
+        "icon": "el-icon-plus",
+        "size": "small",
+        "type": "primary"
+    }, {
+        "id": "import",
+        "belongMenuCode": "F000001",
+        "title": "批量导入",
+        "plain": "plain",
+        "icon": "el-icon-plus",
+        "size": "small",
+        "type": "primary"
+    }],
+    "search": {
+        "selectTigger": true
+    },
+    "form": {
+        "col": 2,
+        "width": "80%",
+        "height": "80%",
+        "labelwidth":"155px"
+    },
+    "view": {
+        "col": 2,
+        "width": "60%",
+        "height": "80%"
+    },
+    "table": {
+        "tableWidth": 250
+
+    },
+    "pageAttr": {
+        "isShow": true,
+        "pagesizes": [10, 20, 50, 100],
+        "pagesize": 10
+    },
+    "file":{
+        "autoUpload":false,
+        "limitNum":2
+    }
+
+}
+
+

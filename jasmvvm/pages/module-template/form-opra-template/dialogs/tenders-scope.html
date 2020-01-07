@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../src/css/main.css">
+  <style>
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <jas-dialog-wrapper>
+      <div>
+        <el-tree ref="tree" :data="treeData" show-checkbox node-key="id" :default-expanded-keys="expandedKeys" :default-checked-keys="checkedKeys"
+          :props="defaultProps">
+        </el-tree>
+      </div>
+      <div slot="footer">
+        <el-button size="small" @click="cancel()">取 消</el-button>
+        <el-button size="small" type="primary" @click="submit">确 定</el-button>
+      </div>
+    </jas-dialog-wrapper>
+  </div>
+</body>
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js "></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: function () {
+      return {
+        treeData: [],
+        defaultProps: {
+          children: 'children',
+          label: 'text',
+        },
+        checkedKeys: [],
+        expandedKeys: []
+      }
+    },
+    mounted: function () {
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.tendersOid = param.oid;
+      this.requestTree(param.oid);
+    },
+    methods: {
+      requestTree: function (tenderId) {
+        var that = this;
+        var src = jasTools.base.rootPath + '/daq/tendersScope/getScopeDataTree.do';
+        jasTools.ajax.post(src, {
+          tendersOid: tenderId
+        }, function (data) {
+          that.treeData = [data.data];
+          that.expandedKeys = [data.data.id];
+          that.checkedKeys = that.getCheckedNodekeys(that.treeData);
+          console.log('gou________',that.checkedKeys)
+        });
+      },
+      requestSaveScope: function (checkedNodes) {
+        var that = this;
+        var src = jasTools.base.rootPath + '/daq/tendersScope/saveRef.do';
+        var arr = checkedNodes.map(function (item) {
+          return {
+            scopeOid: item.id,
+            pipelineOid: item.attributes.pipelineOid,
+            scopeType: item.attributes.type
+          };
+        });
+        jasTools.ajax.post(src, {
+          tendersOid: this.tendersOid, //标段oid
+          data: arr
+        }, function (data) {
+          top.Vue.prototype.$message({
+            type:'success',
+            message : '保存成功'
+          });
+          top.jasTools.dialog.close();
+        });
+      },
+      submit: function () {
+        var checkedNodes = this.$refs.tree.getCheckedNodes().filter(function (item) {
+          if (item.attributes && item.attributes.type > 0) return true;
+        });
+        this.requestSaveScope(checkedNodes);
+      },
+      cancel: function () {
+        top.jasTools.dialog.close();
+      },
+      getCheckedNodekeys : function(treeData){
+        var checkedKeys = [];
+        var getCheckedKeysFromArr = function(arr){
+          arr.forEach(function(item){
+            if(item.checked){
+              checkedKeys.push(item.id);
+            }
+            if(item.children){
+              getCheckedKeysFromArr(item.children);
+            }
+          })
+        };
+        getCheckedKeysFromArr(treeData);
+        return checkedKeys;
+      }
+    },
+  });
+</script>
+
+</html>

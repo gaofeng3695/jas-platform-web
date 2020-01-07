@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../../common/css/main.css">
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+    <jas-approve-dialog :type="approveType" :oid="bizId" :class-name="className" :function-code="menuCode">
+      <div>
+        <template v-for="group in formAttr">
+          <jas-base-group-title :name="group.groupName" v-show="group.groupName"></jas-base-group-title>
+          <jas-detail-table :titles="group.data" :detail="formData"></jas-detail-table>
+        </template>
+        <template v-if="isShowFiles">
+          <jas-base-group-title name="附件信息"></jas-base-group-title>
+          <jas-file-list :biz-id="bizId"></jas-file-list>
+        </template>
+      </div>
+    </jas-approve-dialog>
+  </div>
+</body>
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: function () {
+      return {
+        approveType: 0,
+        className: '',
+        loading: false,
+        tableData: [],
+        remarks: '',
+        bizId: '',
+        formData: {},
+        formAttr: [],
+        isQuery: {},
+        menuCode: "",
+        pk: "",
+        isShowFiles: false,
+      }
+    },
+    mounted: function () { //先请求要展示的字段，再请求字段的详情，最后请求附件
+
+      var that = this;
+      var param = window.jasTools.base.getParamsInUrl(location.href);
+      this.menuCode = param.menuCode;
+      this.approveType = +param.approveType;
+      delete param.menuCode;
+      this.isQuery = param;
+      this.requestFieldsConfig();
+    },
+    methods: {
+
+      _formatFieldsByGroup: function (aFields) { // 将字段进行分组格式化
+        var map = {};
+        var dest = [];
+        for (var i = 0; i < aFields.length; i++) {
+          var ai = aFields[i];
+          if (!map[ai.groupIndex || ai.groupName]) {
+            dest.push({
+              groupName: ai.groupName,
+              index: ai.groupIndex || '',
+              data: [ai]
+            });
+            map[ai.groupIndex || ai.groupName] = ai;
+          } else {
+            for (var j = 0; j < dest.length; j++) {
+              var dj = dest[j];
+              if ((dj.index == ai.groupIndex) || (dj.groupName == ai.groupName)) {
+                dj.data.push(ai);
+                break;
+              }
+            }
+          }
+        }
+        return this.isArrySort(dest);
+      },
+      requestFieldsConfig: function () {
+        var that = this;
+        var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
+        jasTools.ajax.get(url, {
+          functionCode: that.menuCode
+        }, function (data) {
+          var fieldsGrouped = that._formatFieldsByGroup(data.data.functionFieldsBoList);
+          that.isShowFiles = data.data.ifAttachment == 1;
+          that.getDetailField(fieldsGrouped);
+          that.requestDetail();
+        });
+      },
+      getDetailField: function (data) { // 组装展示的字段
+        var that = this;
+        data.forEach(function (group, index) {
+          var groupAttr = [];
+          group.data.forEach(function (item) {
+            var obj = {};
+            if (item.ifDetails == "1") {
+              obj = {
+                field: item.fieldName,
+                name: item.fieldNameCn,
+                type: item.uiType,
+                index: item.rowIndex || '',
+              };
+              groupAttr.push(obj);
+            }
+            if (item.ifPrimaryKey) {
+              that.pk = item.fieldName;
+            }
+          });
+          if (groupAttr.length > 0) {
+            that.formAttr.push({
+              groupName: group.groupName,
+              data: that.isArrySort(groupAttr)
+            });
+          }
+        });
+      },
+      requestDetail: function () { // 请求字段的详情
+        var that = this;
+        var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/get.do";
+        //该接口需要入参主键，因为主键不确定，所以全部传入表单对象
+        jasTools.ajax.post(url, that.isQuery, function (data) {
+          that.formData = data.data;
+          that.bizId = that.formData[that.pk];
+        });
+      },
+      cancel: function () {
+        window.parent.jasTools.dialog.close();
+      },
+      isArrySort: function (arry) {
+        for (var unfix = arry.length - 1; unfix > 0; unfix--) {
+          for (var i = 0; i < unfix; i++) {
+            if (arry[i].index > arry[i + 1].index) {
+              var temp = arry[i];
+              arry.splice(i, 1, arry[i + 1]);
+              arry.splice(i + 1, 1, temp);
+            }
+          }
+        }
+        return arry;
+      },
+    },
+  });
+</script>
+
+</html>
