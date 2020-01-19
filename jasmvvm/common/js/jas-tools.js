@@ -439,16 +439,16 @@
 		 * @param immediate true 表立即执行，false 表非立即执行
 		 */
 		var debounce = function (func, wait, immediate) {
-			let timeout;
+			var timeout;
 
 			return function () {
-				let context = this;
-				let args = arguments;
+				var context = this;
+				var args = arguments;
 
 				if (timeout) clearTimeout(timeout);
 				if (immediate) {
 					var callNow = !timeout;
-					timeout = setTimeout(() => {
+					timeout = setTimeout(function () {
 						timeout = null;
 					}, wait)
 					if (callNow) func.apply(context, args)
@@ -468,15 +468,15 @@
 		 */
 		var throttle = function (func, wait, type) {
 			if (type === 1) {
-				let previous = 0;
+				var previous = 0;
 			} else if (type === 2) {
-				let timeout;
+				var timeout;
 			}
 			return function () {
-				let context = this;
-				let args = arguments;
+				var context = this;
+				var args = arguments;
 				if (type === 1) {
-					let now = Date.now();
+					var now = Date.now();
 
 					if (now - previous > wait) {
 						func.apply(context, args);
@@ -484,7 +484,7 @@
 					}
 				} else if (type === 2) {
 					if (!timeout) {
-						timeout = setTimeout(() => {
+						timeout = setTimeout(function () {
 							timeout = null;
 							func.apply(context, args)
 						}, wait)
