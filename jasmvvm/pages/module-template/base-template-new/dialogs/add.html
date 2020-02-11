@@ -21,8 +21,25 @@
         <jas-form-items-group ref="mainForm" :form="form" :fields-config="fieldsConfig" :names-group="namesGroup"
           :fields-group="fieldsGroup"></jas-form-items-group>
 
-        <jas-base-group-title v-if="ifAttachment" name="附件信息"></jas-base-group-title>
-        <jas-file-upload v-if="ifAttachment" ref="upload" @success="uploadSuccess"></jas-file-upload>
+        <!-- <jas-base-group-title v-if="ifAttachment" name="附件信息"></jas-base-group-title>
+        <jas-file-upload v-if="ifAttachment" ref="upload" @success="uploadSuccess"></jas-file-upload> -->
+
+
+				<el-row>
+					<template v-if="ifAttachment">
+						<jas-base-group-title name="图片信息"></jas-base-group-title>
+						<jas-file-upload-new ref="uploadpic" :max-size="4" :max-total-size="5" file-type="pic"
+							:business-id="oid" @success="picSuccess" @fail="picFail" :business-type="bizType">
+						</jas-file-upload-new>
+						<jas-base-group-title name="附件信息"></jas-base-group-title>
+						<jas-file-upload-new ref="uploadfile" :max-size="4" :business-type="bizType" :max-total-size="5"
+							file-type="file" :business-id="oid" @success="fileSuccess" @fail="fileFail">
+						</jas-file-upload-new>
+					</template>
+
+				</el-row>
+
+
       </el-form>
       <div slot="footer">
         <el-button size="small" @click="cancel()">取 消</el-button>
@@ -59,6 +76,8 @@
         ifAttachment: false,
         loading: false,
         form: {},
+        oid:'',
+        bizType:'attachment',
         options: []
       }
     },
@@ -96,10 +115,41 @@
         this.form.oid = this.oid;
         this.isEdit = true;
         this.getDetailByObjectId();
-        this.ifAttachment && this.$refs.upload.requestFile(this.oid);
+				that.$nextTick(function () {
+					that.ifAttachment && that.$refs.uploadpic.requestFile(); // 触发附件请求
+					that.ifAttachment && that.$refs.uploadfile.requestFile(); // 触发附件请求
+				});        
       };
     },
     methods: {
+
+			savePic: function () {
+				this.$refs.uploadpic.uploadFile();
+
+			},
+			saveFile: function () {
+				this.$refs.uploadfile.uploadFile();
+			},
+			previewFile: function (oid) {
+				alert('自定义预览方法' + oid)
+			},
+			previewPic: function (url) {
+				alert('自定义预览方法' + url)
+			},
+			picSuccess: function () {
+				this.saveFile()
+			},
+			picFail: function () {
+				this.saveFile()
+			},
+			fileFail: function (errObj) {
+				// alert(1111)
+				console.log(errObj.msg)
+			},
+			fileSuccess: function () {
+				this.uploadSuccess()
+			},
+
       formatForm: function (fields) {
         var obj = {};
         fields.forEach(function (item) {
@@ -144,7 +194,10 @@
         this.loading = true;
         jasTools.ajax.post(url, that.form, function (data) {
           if (that.ifAttachment) {
-            that.$refs.upload.uploadFile(data.data || that.oid);
+            that.oid = that.oid || data.data;
+            that.$nextTick(function(){
+              that.savePic();
+            });
           } else {
             that.uploadSuccess();
           }
