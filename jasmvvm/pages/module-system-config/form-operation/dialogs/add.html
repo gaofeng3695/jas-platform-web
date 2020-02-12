@@ -226,6 +226,11 @@
 										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifQuery" v-show="isTableSource(scope.row)"></el-checkbox>
 									</template>
 								</el-table-column>
+								<el-table-column label="关键词搜索" align="center" prop="ifQuery">
+									<template slot-scope="scope">
+										<el-checkbox true-label="1" false-label="0" v-model="scope.row.ifKeyword" v-show="isTableSource(scope.row)"></el-checkbox>
+									</template>
+								</el-table-column>
 							</el-table>
 						</div>
 						<div class="content-wrap" v-loading="isLoadingFieldInfo" v-show="indexPage===2">
@@ -363,7 +368,8 @@
 												<div class="box-title">
 													<span>分组{{indexRow+1}}</span>
 													<el-input size="mini" v-model="row.name" class="name-input" placeholder="请输入分组名"></el-input>
-													<el-button type="text" class="fr" @click="deleteSortRow(indexRow)">删除</el-button>
+													<el-button style="margin:0 10px;" type="text" class="fr" @click="deleteSortRow(indexRow)"> 删除</el-button>
+													<el-button type="text" :disabled="unsortList.length == 0" class="fr" @click="setUnsortIn(indexRow)">一键分组 </el-button>
 												</div>
 												<div class="sort-box">
 													<draggable class="list-group" element="ul" v-model="row.list" :options="dragOptions" @end="">
@@ -457,25 +463,25 @@
 					<div class="btn-wrap">
 						<div v-if="indexPage==0">
 							<!-- <el-button @click="close">上一步</el-button> -->
-							<el-button size="small" type="primary" @click="saveFunctionResource(1,$event)">保存并关闭</el-button>
-							<el-button size="small" type="primary" @click="saveFunctionResource(0,$event)">下一步</el-button>
+							<el-button key="1231" size="small" type="primary" @click="saveFunctionResource(1,$event)">保存并关闭</el-button>
+							<el-button key="1232" size="small" type="primary" @click="saveFunctionResource(0,$event)">下一步</el-button>
 						</div>
 						<div v-if="indexPage==1">
-							<el-button size="small" @click="--indexPage">上一步</el-button>
-							<el-button size="small" type="primary" @click="goToUiTable">下一步</el-button>
+							<el-button key="1233" size="small" @click="--indexPage">上一步</el-button>
+							<el-button key="1234" size="small" type="primary" @click="goToUiTable">下一步</el-button>
 						</div>
 						<div v-if="indexPage==2">
-							<el-button size="small" @click="--indexPage">上一步</el-button>
-							<el-button size="small" type="primary" @click="goToSort">下一步</el-button>
+							<el-button key="1235" size="small" @click="--indexPage">上一步</el-button>
+							<el-button key="1236" size="small" type="primary" @click="goToSort">下一步</el-button>
 						</div>
 						<div v-if="indexPage==3">
-							<el-button size="small" type="primary" @click="saveFieldConfig(1)">保存并关闭</el-button>
-							<el-button size="small" @click="--indexPage">上一步</el-button>
-							<el-button size="small" type="primary" @click="saveFieldConfig(0)">下一步</el-button>
+							<el-button key="1237" size="small" type="primary" @click="saveFieldConfig(1)">保存并关闭</el-button>
+							<el-button key="1238" size="small" @click="--indexPage">上一步</el-button>
+							<el-button key="1239" size="small" type="primary" @click="saveFieldConfig(0)">下一步</el-button>
 						</div>
 						<div v-if="indexPage==4">
-							<el-button size="small" @click="--indexPage">上一步</el-button>
-							<el-button size="small" type="primary" @click="saveUnique">完成</el-button>
+							<el-button key="12310" size="small" @click="--indexPage">上一步</el-button>
+							<el-button key="12311" size="small" type="primary" @click="saveUnique">完成</el-button>
 						</div>
 					</div>
 				</div>
@@ -497,6 +503,7 @@
 <script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../../lib/vue-draggable/index.min.js"></script>
 <script src="./../../../../common/js/jas-tools.js"></script>
+<script src="./../js/default-field-conf.js"></script>
 <script src="./add.js"></script>
 
 

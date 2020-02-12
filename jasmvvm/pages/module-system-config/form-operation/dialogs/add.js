@@ -5,8 +5,8 @@ var vm = new Vue({
   data: function () {
     return {
       uniqueFileds: [],
-      precision:6,
-      allcheck: false, //表示全选
+      precision: 6,
+      allcheck: false, // 表示全选
       uniqueFieldOption: [],
       linkedFieldOption: [],
       mirrorConfig: {
@@ -71,20 +71,23 @@ var vm = new Vue({
     }
   },
   computed: {
-//    selectNames: function () {
-//      var that = this;
-//      return this.filterTable.filter(function (item) {
-//        return that.isSqlSelect(item.uiType)
-//      });
-//    }
+    // selectNames: function () {
+    // var that = this;
+    // return this.filterTable.filter(function (item) {
+    // return that.isSqlSelect(item.uiType)
+    // });
+    // }
   },
 
   created: function () {
     var that = this;
 
+    this.defaultFieldConf = window._defaultFieldConf || {};
+
     // 获取数据库字段替换配置
     $.getJSON('./../js/functionConfig.json', function (json) {
       that.fieldParams = json.fieldParams;
+      that.queryFieldParams = json.queryFieldParams;
       // console.log(json)
     });
 
@@ -110,29 +113,29 @@ var vm = new Vue({
       return !!type;
     },
     isText: function (type) {
-      var inputType=['UT_01','UT_13'];
-      return inputType.indexOf(type) !==-1 && this.isUi(type);
+      var inputType = ['UT_01', 'UT_13'];
+      return inputType.indexOf(type) !== -1 && this.isUi(type);
     },
-    isSqlorJson:function(row){
+    isSqlorJson: function (row) {
       var type = row.uiType;
-      var sql = ['UT_05', 'UT_07', 'UT_09', 'UT_11','UT_06', 'UT_08', 'UT_10', 'UT_12'];
-      var isShow=sql.indexOf(type) !== -1 && this.isUi(type);
-      if(!isShow) row.domain=null;
-      return isShow;	
+      var sql = ['UT_05', 'UT_07', 'UT_09', 'UT_11', 'UT_06', 'UT_08', 'UT_10', 'UT_12'];
+      var isShow = sql.indexOf(type) !== -1 && this.isUi(type);
+      if (!isShow) row.domain = null;
+      return isShow;
     },
     isUpdateable: function (row) {
       var type = row.uiType;
-      var isShow=+row.ifUpdate && this.isUi(type);
-      if(!isShow) row.updateable=null;
+      var isShow = +row.ifUpdate && this.isUi(type);
+      if (!isShow) row.updateable = null;
       return isShow;
     },
     isNumber: function (row) {
       var type = row.uiType;
-      var isShow=type === 'UT_14' && this.isUi(type);
-      if(!isShow) {
-        row.min=null;
-        row.max=null;
-        row.precision=0;
+      var isShow = type === 'UT_14' && this.isUi(type);
+      if (!isShow) {
+        row.min = null;
+        row.max = null;
+        row.precision = 0;
       }
       return isShow;
     },
@@ -146,31 +149,31 @@ var vm = new Vue({
       return type === 'UT_11' && this.isUi(type);
     },
     isSqlSelect1: function (row) {
-    	var type=row.uiType;
-    	var isShow = type === 'UT_11' && this.isUi(type);
-//    	console.log(isShow);
-//    	if(!isShow)  {
-//    		row.childFieldArr=[];
-//    		row.childField="";
-//    	}
-        return isShow;
-      },
-    isSwitch:function(row){
-    	var type=row.uiType;
-    	var isShow=(type==='UT_03'||type==='UT_04')&&this.isUi(type);
-//    	if(!isShow){
-//    		row.lessDateScopeArr=[];
-//    	}
-    	return isShow;
+      var type = row.uiType;
+      var isShow = type === 'UT_11' && this.isUi(type);
+      // console.log(isShow);
+      // if(!isShow) {
+      // row.childFieldArr=[];
+      // row.childField="";
+      // }
+      return isShow;
     },
-    isDate:function(type){
-    	return (type==='UT_03'||type==='UT_04')&&this.isUi(type);
+    isSwitch: function (row) {
+      var type = row.uiType;
+      var isShow = (type === 'UT_03' || type === 'UT_04') && this.isUi(type);
+      // if(!isShow){
+      // row.lessDateScopeArr=[];
+      // }
+      return isShow;
+    },
+    isDate: function (type) {
+      return (type === 'UT_03' || type === 'UT_04') && this.isUi(type);
     },
     isUrl: function (row) {
       var type = row.uiType;
-      var isShow=this.isSqlSelect(type) && row.childFieldArr && row.childFieldArr.length > 0;
-      if(!isShow) {
-    	  row.requestPath=null; 
+      var isShow = this.isSqlSelect(type) && row.childFieldArr && row.childFieldArr.length > 0;
+      if (!isShow) {
+        row.requestPath = null;
       }
       return isShow;
     },
@@ -257,31 +260,63 @@ var vm = new Vue({
     _formatSqlByFields: function (tableName, fields) { // 通过字段数组，格式化sql
       var that = this;
       that.tableName = tableName;
-      var mainField = ''; //主键
+      var mainField = ''; // 主键
+      var insertFieldArr = [];
+      var selectFieldArr = [];
+      var updateFieldArr=[];
       that.fieldArr = fields.map(function (item) {
         if (item.ifPrimaryKey) {
           mainField = item.columnName;
         }
+        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE"|| item.columnName=="SHAPE")) {
+          insertFieldArr.push(item.columnName);
+        }
+        if (item.columnName!="SHAPE") {
+        	selectFieldArr.push(item.columnName);
+        }
+        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE"|| item.columnName=="SHAPE" 
+        	|| item.columnName == "CREATE_DATETIME" || item.columnName == "CREATE_USER_ID" || item.columnName == "CREATE_USER_NAME" || item.columnName == "ACTIVE")) {
+        	updateFieldArr.push(item.columnName);
+        }
         return item.columnName
       });
 
-      var modifyStr = that.fieldArr.map(function (item) {
+      var insertStr = insertFieldArr.map(function (item) {
+        if (item == "OBJECTID") {
+          return 'sde.gdb_util.next_rowid(:JDBC_USER_NAME,:CURRENT_TABLE_NAME)';
+        }
         var newItem = item;
         if (that.fieldParams && that.fieldParams[item]) {
           newItem = that.fieldParams[item];
         }
-        return newItem;
+        return ":" + newItem;
       });
+      var updateStr = updateFieldArr.map(function (item) {
+    	  if (item == "OBJECTID") {
+    		  return 'sde.gdb_util.next_rowid(:JDBC_USER_NAME,:CURRENT_TABLE_NAME)';
+    	  }
+    	  var newItem = item;
+    	  if (that.fieldParams && that.fieldParams[item]) {
+    		  newItem = that.fieldParams[item];
+    	  }
+    	  return ":" + newItem;
+      });
+      
       var formatUpdateStr = function () {
-        var arr = that.fieldArr.map(function (field, index) {
-          return field + '=:' + modifyStr[index];
+        var arr = updateFieldArr.map(function (field, index) {
+          if (field != "OBJECTID") {
+            return field + '=' + updateStr[index];
+          }
+        });
+        arr = arr.filter(function (val) {
+          return !(!val || val === "");
         });
         return arr.join(', ')
       };
-
       that.ruleForm.select = [
         'SELECT ',
-        that.fieldArr.join(', '),
+//        that.fieldArr.join(', '),
+        selectFieldArr.join(', '),
         ' FROM ',
         tableName,
         ' WHERE 1 = 1 ',
@@ -289,7 +324,7 @@ var vm = new Vue({
         that.fieldArr.indexOf('ACTIVE') > -1 ? ' AND ACTIVE = 1' : '',
         ' @where_append ',
       ].join('');
-
+      
       that.ruleForm.delete = [
         'UPDATE ',
         tableName,
@@ -306,13 +341,14 @@ var vm = new Vue({
         'INSERT INTO ',
         tableName,
         '( ',
-        that.fieldArr.join(', '),
-        ' ) VALUES ( :',
-        modifyStr.join(', :'),
+//        that.fieldArr.join(', '),
+        insertFieldArr.join(', '),
+        ' ) VALUES ( ',
+        insertStr.join(', '),
         ' )'
       ].join('');
 
-
+      console.log();
       that.ruleForm.update = [
         'UPDATE ',
         tableName,
@@ -328,7 +364,8 @@ var vm = new Vue({
 
       that.ruleForm.detail = [
         'SELECT ',
-        that.fieldArr.join(', '),
+//        that.fieldArr.join(', '),
+        selectFieldArr.join(', '),
         ' FROM ',
         tableName,
         ' WHERE ',
@@ -403,22 +440,39 @@ var vm = new Vue({
         functionId: fId
       }, function (data) {
         that.isLoadingFieldInfo = false;
-        var result=data.data.filter(function(obj){
-        	if(!that.fieldParams[obj.fieldName]){
-        		return obj;
-        	}
+        var result = data.data.filter(function (obj) {
+          if (!that.queryFieldParams[obj.fieldName]) {
+            return obj;
+          }
         });
+        var defaultUiType = {
+          UT_01: ['varchar', 'VARCHAR2', 'NVARCHAR2'],
+          UT_02: ['TIMESTAMP', 'timestamp'],
+          UT_03: ['DATE', 'date'],
+          UT_14: ['numeric', 'int2', 'NUMBER'],
+        };
+
         that.privateTable = result.map(function (obj) {
-         var uiType="";
-         if(obj.fieldType=="varchar"){
-        	 uiType="UT_01";
-         }
-         if(obj.fieldType=="numeric"||obj.fieldType=="int2"){
-        	 uiType="UT_14";
-         }
-         if(obj.fieldType=="timestamp"){
-        	 uiType="UT_02";
-         }
+
+          // 使用字段的默认配置
+          var cfg = that.defaultFieldConf[obj.fieldName];
+          console.log(cfg)
+          if (cfg) {
+            for (var keys in obj) {
+              if ((!obj[keys] || obj[keys]=='0') && cfg[keys]) {
+                obj[keys] = cfg[keys]
+              }
+            }
+          }
+
+          // 默认选择ui类型
+          var uiType = "";
+          for (var key in defaultUiType) {
+            if (defaultUiType[key].indexOf(obj.fieldType) > -1) {
+              uiType = key;
+              break;
+            }
+          }
           return {
             functionId: fId,
             fieldName: obj.fieldName,
@@ -427,8 +481,9 @@ var vm = new Vue({
             ifSave: obj.ifSave || "0",
             ifUpdate: obj.ifUpdate || "0",
             ifQuery: obj.ifQuery || "0",
-            ifList: obj.ifList || (obj.fieldSource=="view"?"1":"0"),
-            ifDetails: obj.ifDetails || (obj.fieldSource=="view"?"1":"0"),
+            ifKeyword: obj.ifKeyword || "0",
+            ifList: obj.ifList || (obj.fieldSource == "view" ? "1" : "0"),
+            ifDetails: obj.ifDetails || (obj.fieldSource == "view" ? "1" : "0"),
             fieldLength: obj.fieldLength,
             fieldType: obj.fieldType,
             uiType: obj.uiType || uiType,
@@ -449,13 +504,14 @@ var vm = new Vue({
             updateable: obj.updateable,
             min: obj.min,
             max: obj.max,
-            precision:obj.precision||0,
+            precision: obj.precision || 0,
             ifLessToday: obj.ifLessToday == "1" ? true : false,
             lessDateScope: obj.lessDateScope || null,
             lessDateScopeArr: obj.lessDateScope ? obj.lessDateScope.split(",") : [],
             maxDateScope: obj.maxDateScope || null,
             maxDateScopeArr: obj.maxDateScope ? obj.maxDateScope.split(",") : [],
           };
+
         });
 
       });
@@ -506,7 +562,7 @@ var vm = new Vue({
       this.filterTable = arr;
       this._requestUiTypes();
     },
-    _requestUiTypes: function () { //获取ui类型阈值
+    _requestUiTypes: function () { // 获取ui类型阈值
       var that = this;
       jasTools.ajax.post(jasTools.base.rootPath + '/customDict/getListByDictType.do', {
         dictTypeList: ['ui_type']
@@ -522,7 +578,7 @@ var vm = new Vue({
 
     goToSort: function () { // 前往字段分组排序页面
       var error = 0;
-      //验证UI类型是否为空
+      // 验证UI类型是否为空
       this.filterTable.forEach(function (item) {
         if (!item.uiType) error = 1;
       });
@@ -645,6 +701,12 @@ var vm = new Vue({
       }
       this.rows.splice(index, 1);
     },
+    setUnsortIn: function (index) { // 将未分配的填入分组
+      if (this.unsortList.length > 0) {
+        this.rows[index].list = this.rows[index].list.concat(this.unsortList);
+        this.unsortList = [];
+      }
+    },
 
     _formatSortInfo: function () { // 将分组信息合并到原始字段数据上
       var that = this;
@@ -718,29 +780,29 @@ var vm = new Vue({
       var isSort = this._formatSortInfo();
       if (isSort) {
         var funFunctionFieldsForms = this.privateTable.map(function (item) {
-        	if(item.uiType=="UT_11"){
-        		 item.childField = item.childFieldArr.join(',');	
-        	}else{
-        		item.childFieldArr=[];
-        		item.childField="";
-        	}
-          if(item.uiType=="UT_03"||item.uiType=="UT_04"){
-        	  if (item.lessDateScopeArr) {
-                  item.lessDateScope = item.lessDateScopeArr.join(',');
-                }
-                if (item.maxDateScopeArr) {
-                  item.maxDateScope = item.maxDateScopeArr.join(',');
-                }
-                if (item.uiType == 'UT_03') {
-                  item.ifLessToday = item.ifLessToday ? "1" : "0";
-                }  
-          }else{
-        	  item.lessDateScope="";
-        	  item.maxDateScope="";
-        	  item.lessDateScopeArr=[];
-        	  item.maxDateScopeArr=[]; 
+          if (item.uiType == "UT_11") {
+            item.childField = item.childFieldArr.join(',');
+          } else {
+            item.childFieldArr = [];
+            item.childField = "";
           }
-        
+          if (item.uiType == "UT_03" || item.uiType == "UT_04") {
+            if (item.lessDateScopeArr) {
+              item.lessDateScope = item.lessDateScopeArr.join(',');
+            }
+            if (item.maxDateScopeArr) {
+              item.maxDateScope = item.maxDateScopeArr.join(',');
+            }
+            if (item.uiType == 'UT_03') {
+              item.ifLessToday = item.ifLessToday ? "1" : "0";
+            }
+          } else {
+            item.lessDateScope = "";
+            item.maxDateScope = "";
+            item.lessDateScopeArr = [];
+            item.maxDateScopeArr = [];
+          }
+
           return item;
         });
         jasTools.ajax.post(jasTools.base.rootPath + '/functionFields/save.do', {
@@ -784,7 +846,7 @@ var vm = new Vue({
         functionCode: functionCode
       }, function (data) {
         that.uniqueFileds = data.data.map(function (item) {
-          item.formatUniqueCondition = item.uniqueCondition.split(',');
+          item.formatUniqueCondition = (item.uniqueCondition || '').split(',');
           return item;
         });
       })
@@ -828,9 +890,9 @@ var vm = new Vue({
     },
     renderHeader: function (h, data) {
       var that = this;
-      return h("div", [ h("el-checkbox", {
+      return h("div", [h("el-checkbox", {
         props: {
-          value: that.allcheck //此处如何让数据双向绑定
+          value: that.allcheck // 此处如何让数据双向绑定
         },
         on: {
           change: function (val) {
@@ -857,7 +919,7 @@ var vm = new Vue({
           }
         },
 
-      }, "新增"),   ])
+      }, "新增"), ])
     }
   },
 });
