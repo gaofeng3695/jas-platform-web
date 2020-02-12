@@ -23,8 +23,12 @@
           <jas-detail-table :titles="formatFields(item.fields, fieldsConfig)" :detail="detail">
           </jas-detail-table>
         </template>
-        <jas-base-group-title v-if="ifAttachment" name="附件信息"></jas-base-group-title>
-        <jas-file-list v-if="ifAttachment" :biz-id="oid"></jas-file-list>
+        <template v-if="ifAttachment">
+          <jas-base-group-title name="图片信息"></jas-base-group-title>
+          <jas-pic-list v-if="oid" :biz-id="oid" :biz-type="bizType"></jas-pic-list>
+          <jas-base-group-title name="附件信息"></jas-base-group-title>
+          <jas-file-list-new v-if="oid" :biz-id="oid" :biz-type="bizType"></jas-file-list-new>          
+        </template>
       </div>
     </jas-approve-dialog>
   </div>
@@ -50,6 +54,7 @@
       var that = this;
       return {
         ifAttachment: false,
+        bizType:'attachment',
 
         detailFields: [],
         detail: {},
