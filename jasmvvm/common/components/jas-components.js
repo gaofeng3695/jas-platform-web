@@ -1213,8 +1213,8 @@ Vue.component('jas-file-upload-new', {
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
 				fileType: that.fileType,
-				businessType: businessType || this.businessType, 
-				businessId: bizId || this.businessId
+				businessType: businessType,
+				businessId: bizId
 			}, function (data) {
 				data.rows.forEach(function (item) {
 					var file = {

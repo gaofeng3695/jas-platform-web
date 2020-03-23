@@ -448,7 +448,7 @@
 				if (timeout) clearTimeout(timeout);
 				if (immediate) {
 					var callNow = !timeout;
-					timeout = setTimeout(function () {
+					timeout = setTimeout(function() {
 						timeout = null;
 					}, wait)
 					if (callNow) func.apply(context, args)
@@ -484,7 +484,7 @@
 					}
 				} else if (type === 2) {
 					if (!timeout) {
-						timeout = setTimeout(function () {
+						timeout = setTimeout(function() {
 							timeout = null;
 							func.apply(context, args)
 						}, wait)
