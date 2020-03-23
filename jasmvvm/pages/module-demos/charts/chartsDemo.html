@@ -58,7 +58,7 @@
 
         <div style="height: 100%;overflow: hidden;">
           <div>
-            <div style="height: 200px;background: url('bdmap.png') no-repeat;background-size: cover;">
+            <div id="mapWrap" style="height: 200px;background: url('bdmap.png') no-repeat;background-size: cover;">
             </div>
             <!-- <jas-base-module-title name="里程范围选择"></jas-base-module-title> -->
             <div style="padding: 10px;overflow:hidden;">
@@ -390,7 +390,7 @@
       '<div style="height:100%;width:1px;background:#ea7b7b;position:absolute;left:50%;top:0;z-index:-1;"></div>'),
     nowLeft: 0,
     nowValue: 0,
-    onChanged: function () { },
+    onChanged: function () {},
     init: function (obj) {
       var that = this;
       that.addLineEvent('#allwrap');
@@ -400,7 +400,7 @@
       that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue + '</span>');
 
 
-      that.onChanged = obj.onChanged || function () { };
+      that.onChanged = obj.onChanged || function () {};
       // $(document).on('resize', function () {
       //   that.resetVal();
       // })
@@ -458,7 +458,7 @@
         defaultProps: {
           label: 'label',
           children: 'children',
-          isLeaf: function (data, node) { }
+          isLeaf: function (data, node) {}
         },
       }
     },
@@ -493,42 +493,74 @@
     },
     methods: {
       outputImg: function (isPdf) {
-        console.log(isPdf)
         var that = this;
-        html2canvas(document.querySelector("#canvaswrap")).then(function (canvas) {
-          //document.body.appendChild(canvas);
-          if (isPdf) {
-            // 得到canvas画布的单位是px 像素单位
-            var contentWidth = canvas.width
-            var contentHeight = canvas.height
-
-            // console.log('contentWidth', contentWidth)
-            // console.log('contentHeight', contentHeight)
-            // 将canvas转为base64图片
-            var pageData = canvas.toDataURL('image/jpeg', 1.0)
-
-            // 设置pdf的尺寸，pdf要使用pt单位 已知 1pt/1px = 0.75   pt = (px/scale)* 0.75
-            // 1为上面的scale 缩放了1倍
-            var pdfX = (contentWidth + 10) / 1 * 0.75
-            var pdfY = (contentHeight + 10) / 1 * 0.75 // 500为底部留白
-
-            // 设置内容图片的尺寸，img是pt单位 
-            var imgX = pdfX;
-            var imgY = pdfY; //内容图片这里不需要留白的距离
-
-            // 初始化jspdf 第一个参数方向：默认''时为纵向，第二个参数设置pdf内容图片使用的长度单位为pt，第三个参数为PDF的大小，单位是pt
-            var PDF = new jsPDF('', 'pt', [pdfX, pdfY])
-
-            // 将内容图片添加到pdf中，因为内容宽高和pdf宽高一样，就只需要一页，位置就是 0,0
-            PDF.addImage(pageData, 'jpeg', 0, 0, imgX, imgY)
-            PDF.save('download.pdf')
-          } else {
-            var img = canvas.toDataURL("image/jpeg");
-            that.downloadFile('img', img)
-          }
+        html2canvas(document.querySelector("#canvaswrap")).then(function (chartcanvas) {
+          html2canvas(document.querySelector("#mapWrap")).then(function (mapcanvas) {
+            var newcanvas = that.combineCanvas([mapcanvas, chartcanvas])
+            if (isPdf) {
+              that.switchToPdf(newcanvas);
+            } else {
+              var img = newcanvas.toDataURL("image/jpeg");
+              var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+              that.downloadFile('对齐图' + sTime, img)
+            }
+          });
         });
       },
+      combineCanvas: function (aCanvas) {
+        var padding = 10; //上下的间隔
+        var canvas = document.createElement('canvas');
+        var width = 0;
+        var height = 0;
+        var aHeight = [];
+        aCanvas.forEach(function (item) {
+          var contentWidth = item.width;
+          var contentHeight = item.height;
+          aHeight.push(height);
+          width = width > contentWidth ? width : contentWidth;
+          height = height + contentHeight + padding;
+        });
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, width, height);
 
+        aCanvas.forEach(function (item, index) {
+          ctx.drawImage(item, (width - item.width) / 2, aHeight[index]);
+        });
+
+        return canvas;
+      },
+
+
+      switchToPdf: function (canvas) {
+        // 得到canvas画布的单位是px 像素单位
+        var contentWidth = canvas.width
+        var contentHeight = canvas.height
+
+        // console.log('contentWidth', contentWidth)
+        // console.log('contentHeight', contentHeight)
+        // 将canvas转为base64图片
+        var pageData = canvas.toDataURL('image/jpeg', 1.0)
+
+        // 设置pdf的尺寸，pdf要使用pt单位 已知 1pt/1px = 0.75   pt = (px/scale)* 0.75
+        // 1为上面的scale 缩放了1倍
+        var pdfX = (contentWidth + 10) / 1 * 0.75
+        var pdfY = (contentHeight + 10) / 1 * 0.75 // 500为底部留白
+
+        // 设置内容图片的尺寸，img是pt单位 
+        var imgX = pdfX;
+        var imgY = pdfY; //内容图片这里不需要留白的距离
+
+        // 初始化jspdf 第一个参数方向：默认''时为纵向，第二个参数设置pdf内容图片使用的长度单位为pt，第三个参数为PDF的大小，单位是pt
+        var PDF = new jsPDF('', 'pt', [pdfX, pdfY])
+
+        // 将内容图片添加到pdf中，因为内容宽高和pdf宽高一样，就只需要一页，位置就是 0,0
+        PDF.addImage(pageData, 'jpeg', 0, 0, imgX, imgY)
+        var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+        PDF.save('对齐图' + sTime + '.pdf');
+      },
 
       //下载
       downloadFile: function (fileName, content) {
@@ -545,18 +577,24 @@
           for (var i = 0; i < rawLength; ++i) {
             uInt8Array[i] = raw.charCodeAt(i);
           }
-          return new Blob([uInt8Array], { type: contentType });
+          return new Blob([uInt8Array], {
+            type: contentType
+          });
         };
 
         var aLink = document.createElement('a');
         var blob = base64ToBlob(content); //new Blob([content]);
 
         var evt = document.createEvent("HTMLEvents");
-        evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+        evt.initEvent("click", true, true); //initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
         aLink.download = fileName;
         aLink.href = URL.createObjectURL(blob);
 
-        aLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));//兼容火狐
+        aLink.dispatchEvent(new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        })); //兼容火狐
       },
 
 
@@ -763,7 +801,7 @@
       }
       rawData = rawData.concat(data);
     });
-    if (config.label == '') { }
+    if (config.label == '') {}
 
     const chart = new G2.Chart({
       container: domId,
@@ -992,8 +1030,8 @@
     });
 
     var geom = chart.line().position('mileage*value').color('status', function (status) {
-      return colorMap[status]
-    })
+        return colorMap[status]
+      })
       .shape('hv')
       .size(2);
     chart.render();
