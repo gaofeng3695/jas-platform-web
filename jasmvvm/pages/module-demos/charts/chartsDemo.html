@@ -58,7 +58,7 @@
 
         <div style="height: 100%;overflow: hidden;">
           <div>
-            <div style="height: 200px;background: url('bdmap.png') no-repeat;background-size: cover;">
+            <div id="mapWrap" style="height: 200px;background: url('bdmap.png') no-repeat;background-size: cover;">
             </div>
             <!-- <jas-base-module-title name="里程范围选择"></jas-base-module-title> -->
             <div style="padding: 10px;overflow:hidden;">
@@ -66,6 +66,12 @@
 
               <pipe-slider ref="myslider" :line="currentLine" @change="resetRange" :begin-val="start" :finish-val="end"
                 :min-val="linestart" :max-val="lineend">
+                <template>
+                  <el-button size="mini" @click="outputImg(0)">导出img</el-button>
+                  <el-button size="mini" @click="outputImg(1)">导出pdf</el-button>
+
+                </template>
+
               </pipe-slider>
 
             </div>
@@ -80,13 +86,13 @@
             <div id="chartwrap"
               style="height:calc( 100% - 100px ); position: relative; overflow-y: scroll;overflow-x: hidden;">
               <div id="chartsubwrap" style="height: 105%;">
-
-                <div style="background:#bbbbbb1f;margin-bottom:20px ;" v-for="chart,index in charts"
-                  :key="Math.random()">
-                  <jas-base-module-title :name="chart.label"></jas-base-module-title>
-                  <div :id="'c'+index"></div>
+                <div id="canvaswrap">
+                  <div style="background:#bbbbbb1f;margin-bottom:20px ;" v-for="chart,index in charts"
+                    :key="Math.random()">
+                    <jas-base-module-title :name="chart.label"></jas-base-module-title>
+                    <div :id="'c'+index"></div>
+                  </div>
                 </div>
-
               </div>
             </div>
             <div id="btmline" style="margin-right: 17px;" class="guildline" style="height: 50px;"></div>
@@ -106,6 +112,8 @@
 <script src="./../../../lib/g2/g2.min.js"></script>
 <script src="./../../../lib/vue/vue.js"></script>
 <script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+<script src="./../../../lib/html2canvas/html2canvas.min.js"></script>
+<script src="./../../../lib/jspdf/jspdf.min.js"></script>
 
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
@@ -147,6 +155,8 @@
       '<div @contextmenu.prevent="">',
       '<div style="margin: 0 40px 10px 45px;text-align: right;">',
       '  <span style="float:left;">当前管线： {{line}} {{ "（" + this.min + "m - "+ this.max  +"m）"}}</span>',
+
+      '<slot></slot>',
 
       '  <el-popover placement="bottom" width="173" v-model="popvisiable">',
       '    <div><span>起始：</span><el-input-number  v-model="beginset" :min="min" :max="finishset-minSpace" type="number" size="mini" placeholder="请输入内容"></el-input-number></div>',
@@ -482,6 +492,113 @@
       // this.makeAllChart();
     },
     methods: {
+      outputImg: function (isPdf) {
+        var that = this;
+        html2canvas(document.querySelector("#canvaswrap")).then(function (chartcanvas) {
+          html2canvas(document.querySelector("#mapWrap")).then(function (mapcanvas) {
+            var newcanvas = that.combineCanvas([mapcanvas, chartcanvas])
+            if (isPdf) {
+              that.switchToPdf(newcanvas);
+            } else {
+              var img = newcanvas.toDataURL("image/jpeg");
+              var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+              that.downloadFile('对齐图' + sTime, img)
+            }
+          });
+        });
+      },
+      combineCanvas: function (aCanvas) {
+        var padding = 10; //上下的间隔
+        var canvas = document.createElement('canvas');
+        var width = 0;
+        var height = 0;
+        var aHeight = [];
+        aCanvas.forEach(function (item) {
+          var contentWidth = item.width;
+          var contentHeight = item.height;
+          aHeight.push(height);
+          width = width > contentWidth ? width : contentWidth;
+          height = height + contentHeight + padding;
+        });
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, width, height);
+
+        aCanvas.forEach(function (item, index) {
+          ctx.drawImage(item, (width - item.width) / 2, aHeight[index]);
+        });
+
+        return canvas;
+      },
+
+
+      switchToPdf: function (canvas) {
+        // 得到canvas画布的单位是px 像素单位
+        var contentWidth = canvas.width
+        var contentHeight = canvas.height
+
+        // console.log('contentWidth', contentWidth)
+        // console.log('contentHeight', contentHeight)
+        // 将canvas转为base64图片
+        var pageData = canvas.toDataURL('image/jpeg', 1.0)
+
+        // 设置pdf的尺寸，pdf要使用pt单位 已知 1pt/1px = 0.75   pt = (px/scale)* 0.75
+        // 1为上面的scale 缩放了1倍
+        var pdfX = (contentWidth + 10) / 1 * 0.75
+        var pdfY = (contentHeight + 10) / 1 * 0.75 // 500为底部留白
+
+        // 设置内容图片的尺寸，img是pt单位 
+        var imgX = pdfX;
+        var imgY = pdfY; //内容图片这里不需要留白的距离
+
+        // 初始化jspdf 第一个参数方向：默认''时为纵向，第二个参数设置pdf内容图片使用的长度单位为pt，第三个参数为PDF的大小，单位是pt
+        var PDF = new jsPDF('', 'pt', [pdfX, pdfY])
+
+        // 将内容图片添加到pdf中，因为内容宽高和pdf宽高一样，就只需要一页，位置就是 0,0
+        PDF.addImage(pageData, 'jpeg', 0, 0, imgX, imgY)
+        var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+        PDF.save('对齐图' + sTime + '.pdf');
+      },
+
+      //下载
+      downloadFile: function (fileName, content) {
+
+        //base64转blob
+        var base64ToBlob = function (code) {
+          var parts = code.split(';base64,');
+          var contentType = parts[0].split(':')[1];
+          var raw = window.atob(parts[1]);
+          var rawLength = raw.length;
+
+          var uInt8Array = new Uint8Array(rawLength);
+
+          for (var i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+          }
+          return new Blob([uInt8Array], {
+            type: contentType
+          });
+        };
+
+        var aLink = document.createElement('a');
+        var blob = base64ToBlob(content); //new Blob([content]);
+
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("click", true, true); //initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+        aLink.download = fileName;
+        aLink.href = URL.createObjectURL(blob);
+
+        aLink.dispatchEvent(new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        })); //兼容火狐
+      },
+
+
+
       resetRange: function (range) {
         this.start = range[0];
         this.end = range[1];
