@@ -377,8 +377,8 @@
 					cbfailed: function (a, b, c) {
 						obj.cbfailed && obj.cbfailed(a, b, c)
 					},
-					upload: function () {
-						this.$refs.upload.uploadFile();
+					upload: function (oid) {
+						this.$refs.upload.uploadFile(oid);
 					}
 				},
 				render: res.render,
