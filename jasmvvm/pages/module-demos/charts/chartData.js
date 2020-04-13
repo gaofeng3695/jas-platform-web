@@ -214,7 +214,7 @@ var Chartdata = [ //
             {
               name: '腐蚀强度',
               values: [ //
-                {
+                { 
                   name: '强',
                   value: 0,
                   color: '#f44336'
