@@ -316,6 +316,7 @@
 					url = jasTools.base.rootPath + "/jasframework/privilege/privilege/update.do";
 				}
 				that.but_disabled = true;
+				delete that.tableFormData.childrenPrivilege;
 				jasTools.ajax.post(url, that.tableFormData, function (data) {
 					top.Vue.prototype.$message({
 						type: 'success',
