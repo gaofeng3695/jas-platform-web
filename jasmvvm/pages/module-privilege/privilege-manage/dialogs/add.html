@@ -87,13 +87,14 @@
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="ismenu">
 							<el-form-item label="默认子权限" prop="childrenPrivilege">
 								<el-select v-model="tableFormData.childrenPrivilege" multiple placeholder="请选择默认子权限" size="small">
-									<el-option label="新增" value="01#新增#bt_add"></el-option>
+									<el-option v-for="item in mybtns" :key="item.value" :label="item.value" :value="item.key"></el-option>								
+									<!-- <el-option label="新增" value="01#新增#bt_add"></el-option>
 									<el-option label="修改" value="02#修改#bt_update"></el-option>
 									<el-option label="删除" value="03#删除#bt_delete"></el-option>
 									<el-option label="查看" value="04#查看#bt_select"></el-option>
 									<el-option label="导出" value="05#导出#bt_export"></el-option>
 									<el-option label="导入" value="06#导入#bt_import"></el-option>
-									<el-option label="定位" value="07#定位#bt_position"></el-option>
+									<el-option label="定位" value="07#定位#bt_position"></el-option> -->
 								</el-select>
 							</el-form-item>
 						</el-col>
@@ -105,13 +106,13 @@
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8" v-show="isothers">
 							<el-form-item label="功能点类型" prop="functionType">
 								<el-select v-model="tableFormData.functionType" placeholder="请选择功能点类型" size="small">
-									<el-option label="新增" value="bt_add"></el-option>
-									<el-option label="修改" value="bt_update"></el-option>
+									<el-option v-for="item in mybtns" :key="item.value" :label="item.value" :value="item.key"></el-option>
+									<!-- <el-option label="修改" value="bt_update"></el-option>
 									<el-option label="删除" value="bt_delete"></el-option>
 									<el-option label="查看" value="bt_select"></el-option>
 									<el-option label="导出" value="bt_export"></el-option>
 									<el-option label="导入" value="bt_import"></el-option>
-									<el-option label="定位" value="bt_position"></el-option>
+									<el-option label="定位" value="bt_position"></el-option> -->
 								</el-select>
 							</el-form-item>
 						</el-col>
@@ -167,6 +168,7 @@
 		data: function () {
 			return {
 				but_disabled: false,
+				mybtns: [],
 				rules: {
 					privilegeType: [{
 						required: true,
@@ -243,8 +245,18 @@
 			this.tableFormData.privilegeType = "1";
 			this.tableFormData.icon = "fa fa-bookmark";
 			this.initApplications();
+			this.requestBtns();
 		},
 		methods: {
+			requestBtns: function () {
+				var that = this;
+				var url = jasTools.base.rootPath +
+					"/xmlQuery/getPriFunctionPrivilegeButtonList/simpleQuery.do";
+				jasTools.ajax.post(url, {}, function (data) {
+					// console.log(data)
+					that.mybtns = data.rows;
+				});
+			},			
 			initApplications: function () {
 				var that = this;
 				var url = jasTools.base.rootPath + "/jasframework/privilege/application/getUserAppsystem.do";
@@ -277,8 +289,10 @@
 					setTimeout(function () {
 						that.loading = false;
 					}, 300)
+					data.childrenPrivilege = data.childrenPrivilege || [];
 					that.tableFormData = data;
-					// that.tableFormData.childrenPrivilege = data;
+					that.privilegeTypeChange(that.tableFormData.privilegeType)
+					// that.tableFormData.childrenPrivilege = data.childrenPrivilege || [];
 				});
 			},
 			submit: function (formName) {

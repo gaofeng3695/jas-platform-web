@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>chartsDemo</title>
+  <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="./../../../common/css/main.css">
+
+</head>
+
+<body>
+  <div id="app" style="overflow:auto;">
+
+    <jas-two-panel-resizer layout="vertical" length="260px">
+      <template slot="closePanel">
+        <jas-two-panel-resizer layout="horizontal" length="370px">
+          <template slot="closePanel">
+            <jas-base-module-title name="管线数据" style="margin-bottom: 10px;"></jas-base-module-title>
+            <el-tree :data="treedata" class="is-grown" ref="treedata" node-key="id" :props="pipeProps"
+              :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clickPipenode"
+              icon-class="fa fa-file" :expand-on-click-node="false" :default-expand-all="true">
+              <span class="custom-tree-node" slot-scope="scope">
+                <i class="fa fa-folder" v-if="scope.data.children" style="color:#f5cd09;" aria-hidden="true"></i>
+                <i class="fa fa-bookmark" v-else="scope.data.children" style="color:#94b0ff;" aria-hidden="true"></i>
+                <span>{{ scope.node.label }}</span>
+              </span>
+            </el-tree>
+          </template>
+          <div class="content" slot="mainPanel">
+            <jas-base-module-title name="对齐数据项" style="margin-bottom: 10px;"></jas-base-module-title>
+            <div style="padding-left:10px;">
+              <el-button type="plain" size="mini" @click="makeAllChart">生成图表</el-button>
+            </div>
+            <el-tree show-checkbox :data="chartdata" class="is-grown" ref="chartdata" node-key="id"
+              :props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current
+              @node-click="clickchartdatanode" icon-class="fa fa-file" :expand-on-click-node="false"
+              :default-expand-all="true" :default-checked-keys="showedKeys">
+              <span class="custom-tree-node" slot-scope="scope">
+                <i class="fa fa-folder" v-if="scope.data.children" style="color:#f5cd09;" aria-hidden="true"></i>
+                <i class="fa fa-bookmark" v-else="scope.data.children" style="color:#94b0ff;" aria-hidden="true"></i>
+                <span>{{ scope.node.label }}</span>
+              </span>
+            </el-tree>
+          </div>
+        </jas-two-panel-resizer>
+
+      </template>
+      <template class="content" slot="mainPanel">
+
+        <div style="height: 100%;overflow: hidden;">
+          <div>
+            <div id="mapWrap" style="height: 200px;background: url('bdmap.png') no-repeat;background-size: cover;">
+              <iframe src="../../../../map_align/index.html" style="width: 100%;height: 100%;" frameborder="0"></iframe>
+            </div>
+            <!-- <jas-base-module-title name="里程范围选择"></jas-base-module-title> -->
+            <div style="padding: 10px;overflow:hidden;">
+
+
+              <pipe-slider ref="myslider" :line="currentLine" @change="resetRange" :begin-val="start" :finish-val="end"
+                :min-val="linestart" :max-val="lineend">
+                <template>
+                  <el-button size="mini" @click="outputImg(0)">导出img</el-button>
+                  <el-button size="mini" @click="outputImg(1)">导出pdf</el-button>
+
+                </template>
+
+              </pipe-slider>
+
+            </div>
+          </div>
+          <div id="allwrap" style="height:calc( 100% - 318px );position: relative;">
+            <div style="height:100%;width:100%;position:absolute;z-index:-1;top:0;left:0; padding: 30px 46px 34px 110px;
+                      box-sizing: border-box;">
+              <div id="linewrap" style="height: 100%;width: 100%;z-index:-1;position: relative;"></div>
+            </div>
+
+            <div id="topline" style="margin-right: 17px;" class="guildline" style="height: 50px;"></div>
+            <div id="chartwrap"
+              style="height:calc( 100% - 100px ); position: relative; overflow-y: scroll;overflow-x: hidden;">
+              <div id="chartsubwrap" style="height: 105%;">
+                <div id="canvaswrap">
+
+                  <div style="background:#bbbbbb1f;margin-bottom:20px ;" v-for="chart,index in charts"
+                    :key="Math.random()">
+                    <jas-base-module-title :name="chart.label"></jas-base-module-title>
+                    <div :id="'c'+index" style="min-height: 96px;"></div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div id="btmline" style="margin-right: 17px;" class="guildline" style="height: 50px;"></div>
+          </div>
+        </div>
+
+
+      </template>
+
+    </jas-two-panel-resizer>
+
+
+  </div>
+</body>
+
+<script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../lib/g2/g2.min.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/vue-multipane/vue-multipane.js"></script>
+<script src="./../../../lib/html2canvas/html2canvas.min.js"></script>
+<script src="./../../../lib/jspdf/jspdf.min.js"></script>
+
+<script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+
+<script src="silder.component.js"></script>
+<script src="chartData.js"></script>
+
+<script>
+  var MarkLineObj = {
+    $line: $(
+      '<div style="height:100%;width:1px;background:#ea7b7b;position:absolute;left:50%;top:0;z-index:-1;"></div>'),
+    nowLeft: 0,
+    nowValue: 0,
+    onChanged: function () {},
+    init: function (obj) {
+      var that = this;
+      that.addLineEvent('#allwrap');
+
+      $('#linewrap').append(that.$line);
+      that.$line.css('left', that.nowLeft + 'px');
+      that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue / 1000 + '</span>');
+
+
+      that.onChanged = obj.onChanged || function () {};
+      // $(document).on('resize', function () {
+      //   that.resetVal();
+      // })
+    },
+    addLineEvent: function (domId) {
+      var that = this;
+      $(domId).on('click', function (e) {
+        // console.log(e)
+        var lineWidthReal = vm.end - vm.start;
+        var lineWidthWeb = $('#topline').width() - 141;
+        that.nowLeft = e.offsetX - 110;
+        that.nowLeft = that.nowLeft < 0 ? 0 : that.nowLeft;
+        that.nowLeft = that.nowLeft > lineWidthWeb ? lineWidthWeb : that.nowLeft;
+        that.$line.css('left', that.nowLeft + 'px');
+        that.nowValue = Math.floor(that.nowLeft * lineWidthReal / lineWidthWeb + vm.start);
+        that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue / 1000 +
+          '</span>')
+        that.onChanged && that.onChanged(that.nowValue);
+        $('#linewrap').append(that.$line)
+      });
+    },
+    resetVal: function () {
+      var that = this;
+      var lineWidthWeb = $('#topline').width() - 141;
+      var lineWidthReal = vm.end - vm.start;
+      that.nowValue = Math.floor(that.nowLeft * lineWidthReal / lineWidthWeb + vm.start);
+      that.onChanged && that.onChanged(that.nowValue);
+      that.$line.html('<span style="padding:4px;font-size:12px;color:#666;">' + that.nowValue / 1000 + '</span>');
+
+    }
+  };
+
+  var html2imgObj = {
+    combineCanvas: function (aCanvas) {
+      var padding = 10; //上下的间隔
+      var canvas = document.createElement('canvas');
+      var width = 0;
+      var height = 0;
+      var aHeight = [];
+      aCanvas.forEach(function (item) {
+        var contentWidth = item.width;
+        var contentHeight = item.height;
+        aHeight.push(height);
+        width = width > contentWidth ? width : contentWidth;
+        height = height + contentHeight + padding;
+      });
+      canvas.width = width;
+      canvas.height = height;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, width, height);
+
+      aCanvas.forEach(function (item, index) {
+        ctx.drawImage(item, (width - item.width) / 2, aHeight[index]);
+      });
+
+      return canvas;
+    },
+
+    switchToPdf: function (canvas) {
+      // 得到canvas画布的单位是px 像素单位
+      var contentWidth = canvas.width
+      var contentHeight = canvas.height
+
+      // console.log('contentWidth', contentWidth)
+      // console.log('contentHeight', contentHeight)
+      // 将canvas转为base64图片
+      var pageData = canvas.toDataURL('image/jpeg', 1.0)
+
+      // 设置pdf的尺寸，pdf要使用pt单位 已知 1pt/1px = 0.75   pt = (px/scale)* 0.75
+      // 1为上面的scale 缩放了1倍
+      var pdfX = (contentWidth + 10) / 1 * 0.75
+      var pdfY = (contentHeight + 10) / 1 * 0.75 // 500为底部留白
+
+      // 设置内容图片的尺寸，img是pt单位 
+      var imgX = pdfX;
+      var imgY = pdfY; //内容图片这里不需要留白的距离
+
+      // 初始化jspdf 第一个参数方向：默认''时为纵向，第二个参数设置pdf内容图片使用的长度单位为pt，第三个参数为PDF的大小，单位是pt
+      var PDF = new jsPDF('', 'pt', [pdfX, pdfY])
+
+      // 将内容图片添加到pdf中，因为内容宽高和pdf宽高一样，就只需要一页，位置就是 0,0
+      PDF.addImage(pageData, 'jpeg', 0, 0, imgX, imgY)
+      var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+      PDF.save('对齐图' + sTime + '.pdf');
+    },
+
+    //下载
+    downloadFile: function (fileName, content) {
+
+      //base64转blob
+      var base64ToBlob = function (code) {
+        var parts = code.split(';base64,');
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+
+        var uInt8Array = new Uint8Array(rawLength);
+
+        for (var i = 0; i < rawLength; ++i) {
+          uInt8Array[i] = raw.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], {
+          type: contentType
+        });
+      };
+
+      var aLink = document.createElement('a');
+      var blob = base64ToBlob(content); //new Blob([content]);
+
+      var evt = document.createEvent("HTMLEvents");
+      evt.initEvent("click", true, true); //initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+      aLink.download = fileName;
+      aLink.href = URL.createObjectURL(blob);
+
+      aLink.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      })); //兼容火狐
+    },
+  }
+</script>
+
+
+
+<script>
+  window.vm = new Vue({
+    el: '#app',
+    data: function () {
+      return {
+        groupId: '07b0288a-721a-479e-b9a0-c7c3f617d4ea',
+        mytiplineval: 0,
+        currentLine: '',
+        freshComp: true,
+        charts: [],
+        linestart: 0,
+        lineend: 0,
+        start: 0,
+        end: 0,
+        showedKeys: [],
+        chartdata: [],
+        treedata: [],
+        className: '',
+        currentNodeId: '',
+        defaultProps: {
+          label: 'label',
+          children: 'children',
+          isLeaf: function (data, node) {}
+        },
+        pipeProps: {
+          label: 'text',
+          children: 'children',
+          isLeaf: function (data, node) {}
+        },
+      }
+    },
+    mounted: function () {
+      var that = this;
+
+      var params = window.jasTools.base.getParamsInUrl(location.href);
+      this.groupId = params.groupId || '07b0288a-721a-479e-b9a0-c7c3f617d4ea';
+
+      this.requestLines(function () {
+        that.setCurrentLine(that.treedata[0].children[0]);
+        that.requestChartsList(function () {
+          that.$nextTick(function () {
+            that.$refs.myslider.init();
+            MarkLineObj.init({
+              onChanged: function (tipval) {
+                setTimeout(function () {
+                  // that.mytiplineval = tipval;
+                  that.$refs.myslider.setTipline(tipval);
+                }, 0);
+              }
+            });
+            MarkLineObj.resetVal()
+          });
+
+        });
+
+      });
+
+    },
+    methods: {
+      requestLines: function (cb) {
+        var that = this;
+        var url = jasTools.base.rootPath + '/baselineloop/getTreeList.do';
+        jasTools.ajax.get(url, {}, function (data) {
+          that.treedata = data;
+          cb && cb();
+        });
+      },
+      requestChartsList: function (cb) {
+        var that = this;
+        var url = jasTools.base.rootPath + '/alignchart/getChartConfigs.do';
+        jasTools.ajax.get(url, {
+          groupId: this.groupId,
+        }, function (data) {
+          that.showedKeys = [];
+          that.chartdata = data.data.map(function (item) {
+            item.id = item.config.alignChartConfig.oid;
+            that.showedKeys.push(item.id);
+            return item;
+          });
+          console.log(that.chartdata)
+          cb && cb();
+        });
+      },
+      requestChartData: function (config, cb) {
+        var that = this;
+        var url = jasTools.base.rootPath + '/alignchart/getChartData.do';
+        jasTools.ajax.get(url, {
+          chartId: config.alignChartConfig.oid,
+          lineLoopId: that.currentLineId,
+          beginStation: that.start / 1000,
+          endStation: that.end / 1000,
+        }, function (data) {
+          console.log(data.data)
+          cb && cb(data.data);
+        });
+      },
+
+
+      setCurrentLine: function (oline) {
+        this.$refs.treedata.setCurrentKey(oline.id);
+        this.currentLine = oline.text;
+        this.currentLineId = oline.id;
+        this.linestart = 0;
+        this.lineend = oline.length * 1000;
+        this.start = 0;
+        this.end = Math.floor((this.lineend - this.linestart) / 5);
+      },
+      clickPipenode: function (data, node) {
+        var that = this;
+        if (node.isLeaf) {
+          this.setCurrentLine(data)
+          this.$nextTick(function () {
+            this.$refs.myslider.init();
+          })
+        }
+      },
+      outputImg: function (isPdf) {
+        var that = this;
+        html2canvas(document.querySelector("#canvaswrap")).then(function (chartcanvas) {
+          html2canvas(document.querySelector("#mapWrap")).then(function (mapcanvas) {
+            var newcanvas = html2imgObj.combineCanvas([mapcanvas, chartcanvas])
+            if (isPdf) {
+              html2imgObj.switchToPdf(newcanvas);
+            } else {
+              var img = newcanvas.toDataURL("image/jpeg");
+              var sTime = jasTools.base.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss");
+              html2imgObj.downloadFile('对齐图' + sTime, img)
+            }
+          });
+        });
+      },
+
+      resetRange: function (range) {
+        this.start = range[0];
+        this.end = range[1];
+        this.makeAllChart();
+
+        $('#mapWrap iframe')[0].contentWindow.jasMap.zoomPipeline(this.currentLineId, this.start, this.end)
+
+      },
+
+
+
+      makeAllChart: function () {
+        var that = this;
+        this.charts = this.$refs.chartdata.getCheckedNodes(true);
+        this.$nextTick(function () {
+          drawbtmline()
+          drawtopline()
+          setTimeout(function () {
+            MarkLineObj.resetVal();
+          });
+
+          that.charts.forEach(function (item, index, arr) {
+            var config = item.config;
+            var rawConfig = config.alignChartConfig;
+
+            config.tooltipfields = rawConfig.tipDataFields && rawConfig.tipDataFields.split(',');
+            config.tooltipfieldName = rawConfig.tipDataContents && rawConfig.tipDataContents.split(',');
+
+            if (index === 0) var indexType = 'first';
+            if (index === arr.length - 1) var indexType = 'end';
+
+            that.requestChartData(config, function (rawdata) {
+              if (rawConfig.type == 5) { // 甘特图
+                makeLine('c' + index, config, that.start, that.end, rawdata);
+              }
+            });
+
+
+            // if (rawConfig.type == 5) {
+            //   makePoint('c' + index, config, that.start, that.end, indexType);
+            // }
+            // if (rawConfig.type == 5) {
+            //   makePolyline('c' + index, config, that.start, that.end, indexType);
+            // }
+          });
+
+        });
+      },
+
+      clickchartdatanode: function (node, e) {
+        this.$refs.chartdata.setChecked(node.label, !e.checked)
+      },
+    },
+  });
+
+
+
+  function makeData(start, end, nStatus, total) {
+    total = total || 100;
+    nStatus = nStatus || 1;
+    var arr = [];
+    for (var i = 0; i < total; i++) {
+      arr.push({
+        mileage: Math.floor(Math.random() * (end - start) + start),
+        status: Math.floor(Math.random() * nStatus)
+      });
+    }
+    return arr;
+  }
+
+
+  function makeTickesRange(begin, end, n) {
+    n = n < 5 ? 5 : n;
+    begin = begin / 1000;
+    end = end / 1000;
+    var arr = [];
+    for (var i = 0; i < n; i++) {
+      arr.push(Math.floor(begin + (end - begin) / n * i));
+    }
+    arr.push(end)
+    return arr;
+  }
+
+  function drawbtmline() {
+    if (this.__chart) {
+      this.__chart.destroy()
+    }
+    this.__chart = chart = new G2.Chart({
+      container: 'btmline',
+      forceFit: true,
+      padding: [0, 30, 20, 110],
+      height: 40
+    });
+    chart.source([], {
+      mileage: {
+        ticks: makeTickesRange(vm.start, vm.end, 10),
+        min: vm.start / 1000,
+        max: vm.end / 1000
+      }
+    });
+    chart.tooltip(false);
+    chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+    chart.render();
+  }
+
+
+  function drawtopline() {
+    if (this.__chart2) {
+      this.__chart2.destroy()
+    }
+    this.__chart2 = chart = new G2.Chart({
+      container: 'topline',
+      forceFit: true,
+      padding: [30, 30, 0, 110],
+      height: 40
+    });
+    chart.source([], {
+      mileage: {
+        ticks: makeTickesRange(vm.start, vm.end, 10),
+        min: vm.start / 1000,
+        max: vm.end / 1000
+      }
+    });
+    chart.axis('mileage', {
+      position: 'top'
+    })
+    chart.tooltip(false);
+    chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+    chart.render();
+  }
+
+  function makePoint(domId, config, start, end, data) {
+
+    var rawData = [];
+    var rawCon = config.alignChartConfig;
+
+    [config.series].forEach(function (item) {
+      data.forEach(function (obj) {
+        obj.series = item.name;
+        obj.status = obj[rawCon.beginStationField]; 
+      });
+      rawData = rawData.concat(data);
+    });
+
+    if (config.label == '') {}
+
+    var chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [20, 30, 20, 110],
+      height: 60 + config.series.length * 30
+    });
+    chart.source(rawData, {
+      mileage: {
+        ticks: makeTickesRange(start, end, 10),
+      }
+    });
+
+    chart.axis('mileage', false);
+
+    chart.axis('series', {
+      tickLine: true,
+      line: true,
+      grid: {
+        hideFirstLine: true,
+        hideLastLine: true,
+      },
+    });
+    chart.legend('status', {
+      position: 'top-right'
+    });
+    chart.coord().reflect('y')
+
+    var geom = chart.point().position('mileage*series')
+      .color('status')
+      .size(6)
+      .shape('series', ['circle', 'square'])
+
+    if (config.tooltipfields) {
+      geom.tooltip(config.tooltipfields.join('*'), function (a, b, c, d, e, f, g, h, i, j, k) {
+        var obj = {};
+        var arr = [a, b, c, d, e, f, g, h, i, j, k]
+        config.tooltipfields.forEach(function (item, index) {
+          obj[item] = arr[index]
+        });
+        return obj;
+      });
+      var creatTips = function () {
+        var s = '';
+        config.tooltipfieldName.forEach(function (item, index) {
+          // console.log(config.tooltipfields[index])
+          s += '<span style="padding-left: 16px">' + item + '：{' + config.tooltipfields[index] + '}</span><br/>'
+        })
+        return s;
+      };
+      chart.tooltip({
+        showTitle: false,
+        itemTpl: [
+          '<li data-index={index} style="margin-bottom:4px;">',
+          // '<span style="background-color:{color};" class="g2-tooltip-marker"></span>',
+          // '{name}<br/>',
+          creatTips(),
+          // '<span style="padding-left: 16px">占比：{percent}</span><br/>',
+          '</li>'
+        ].join(''), // 支持的字段 index,color,name,value
+      });
+    }
+
+    chart.render();
+  }
+
+  function makeLine(domId, config, start, end, data) {
+    var rawData = [];
+
+    var colorMap = {};
+    var rawCon = config.alignChartConfig;
+
+    [config.series].forEach(function (item) {
+
+      item.values.forEach(function (value) {
+        colorMap[value.name] = value.color;
+      })
+
+      data.forEach(function (obj, index) {
+        obj[rawCon.beginStationField] = obj[rawCon.beginStationField] < start / 1000 ? start / 1000 : obj[rawCon
+          .beginStationField];
+        obj[rawCon.endStationField] = obj[rawCon.endStationField] > end / 1000 ? end / 1000 : obj[rawCon
+          .endStationField];
+        obj.range = [obj[rawCon.beginStationField], obj[rawCon.endStationField]];
+        obj.status = obj[rawCon.ydataField];
+        obj.series = item.name
+      })
+
+      rawData = rawData.concat(data);
+    })
+
+    var chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [20, 30, 22, 110],
+      height: 60 + [config.series].length * 30
+    });
+    chart.source(rawData, {
+      range: {
+        position: 'top',
+        ticks: makeTickesRange(start, end, 10),
+        min: start / 1000,
+        max: end / 1000,
+      }
+    });
+
+    chart.legend('status', {
+      position: 'top-right'
+    });
+    chart.axis('range', {
+      line: null,
+      label: null,
+      tickLine: null
+    });
+    chart.axis('series', {
+      line: null,
+      tickLine: null,
+    });
+    chart.coord().transpose();
+    var geom = chart.interval().position('series*range').color('status', function (status) {
+      return colorMap[status]
+    }).size(10);
+
+    if (config.tooltipfields) {
+      geom.tooltip(config.tooltipfields.join('*'), function (a, b, c, d, e, f, g, h, i, j, k) {
+        var obj = {};
+        var arr = [a, b, c, d, e, f, g, h, i, j, k]
+        config.tooltipfields.forEach(function (item, index) {
+          obj[item] = arr[index]
+        });
+        return obj;
+      });
+      var creatTips = function () {
+        var s = '';
+        config.tooltipfieldName.forEach(function (item, index) {
+          s += '<span style="padding-left: 16px">' + item + '：{' + config.tooltipfields[index] +
+            '}</span><br/>'
+        })
+        return s;
+      };
+      chart.tooltip({
+        showTitle: false,
+        shared: false,
+        itemTpl: [
+          '<li  style="margin-bottom:4px;">',
+          // '<span style="background-color:{color};" class="g2-tooltip-marker"></span>',
+          // '{name}<br/>',
+          creatTips(),
+          // '<span style="padding-left: 16px">占比：{percent}</span><br/>',
+          '</li>'
+        ].join(''), // 支持的字段 index,color,name,value
+      });
+    }
+
+    chart.render();
+  }
+
+  function makePolyline(domId, config, start, end, indexType) {
+    var rawData = [];
+
+    var colorMap = {};
+
+    config.series.forEach(function (item) {
+      item.values.forEach(function (value) {
+        colorMap[value.name] = value.color;
+      })
+
+      var data = makeData(start, end, item.values.length, 20);
+      data.forEach(function (obj, index) {
+        obj.value = Math.floor(Math.random() * 30) / 10;
+        obj.status = item.values[obj.status].name;
+        obj.series = item.name
+      })
+      rawData = rawData.concat(data);
+    })
+
+    var chart = new G2.Chart({
+      container: domId,
+      forceFit: true,
+      padding: [30, 30, 22, 110],
+      height: 100 + config.series.length * 30
+    });
+    chart.source(rawData, {
+      mileage: {
+        ticks: makeTickesRange(start, end, 10),
+        min: start,
+        max: end,
+      }
+    });
+    chart.axis('mileage', false)
+    chart.legend('status', {
+      position: 'top-right'
+    });
+
+    var geom = chart.line().position('mileage*value').color('status', function (status) {
+        return colorMap[status]
+      })
+      .shape('hv')
+      .size(2);
+    chart.render();
+  }
+
+  function makeDataRanger(start, end, nStatus, total) {
+    total = total || 10;
+    nStatus = nStatus || 2;
+
+    var arr = [];
+
+    var aRaw = [];
+    for (var i = 0; i < total - 1; i++) {
+      aRaw.push(+(Math.random() * (end - start) + start).toFixed(0))
+    }
+    aRaw.sort(function (a, b) {
+      return a - b
+    });
+    var newA = [];
+    for (var s = 0; s < total; s++) {
+      newA.push({
+        start: s == 0 ? start : aRaw[s - 1],
+        end: s === total - 1 ? end : aRaw[s],
+        status: Math.floor(Math.random() * nStatus),
+      });
+    }
+    return newA;
+  }
+</script>
+
+
+
+
+</html>

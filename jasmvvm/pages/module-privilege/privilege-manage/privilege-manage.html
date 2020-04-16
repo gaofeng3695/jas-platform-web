@@ -93,36 +93,44 @@
 <body>
 	<div id="app" v-cloak v-loading="loading.allLoading">
 
-		<jas-two-panel-resizer layout="vertical" length="260px">
-			<template slot="closePanel">
-				<div class="filterapplication">
-					<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
-						@change="changeApplication(currentApplicationId)">
-						<el-option v-for="item,index in applications" :key="item.oid + index" :label="item.appName"
-							:value="item.oid">
-						</el-option>
-					</el-select>
-				</div>
-				<div class="orgtool">
-					<el-button style="padding-bottom:6px;" type="text" @click="addNode">新增</el-button>
-					<el-button style="padding-bottom:6px;" type="text" @click="editNode" :disabled="!currentNodeId">修改</el-button>
-					<el-button style="padding-bottom:6px;" type="text" @click="sortNode" :disabled="!currentNodeId">排序</el-button>
-					<el-button style="padding-bottom:6px;" type="text" @click="deleteNode" :disabled="!currentNodeId">删除
-					</el-button>
-					<!-- <el-button style="padding-top:6px;" type="text" @click="configPrivilege" :disabled="configDisabled">查询规则配置
+		<jas-two-panel-resizer layout="vertical" length="310px">
+			<template slot="closePanel" >
+				<div class="jas-flex-box is-vertical">
+
+					<div class="filterapplication">
+						<el-select ref="selectApp" v-model="currentApplicationId" filterable placeholder="请选择应用系统" size="small"
+							@change="changeApplication(currentApplicationId)">
+							<el-option v-for="item,index in applications" :key="item.oid + index" :label="item.appName"
+								:value="item.oid">
+							</el-option>
+						</el-select>
+					</div>
+					<div class="orgtool">
+						<el-button style="padding-bottom:6px;" type="text" @click="addDefaultBtns">添加默认按钮</el-button>
+						<el-button style="padding-bottom:6px;" type="text" @click="addNode">新增</el-button>
+						<el-button style="padding-bottom:6px;" type="text" @click="editNode" :disabled="!currentNodeId">修改
+						</el-button>
+						<el-button style="padding-bottom:6px;" type="text" @click="sortNode" :disabled="!currentNodeId">排序
+						</el-button>
+						<el-button style="padding-bottom:6px;" type="text" @click="deleteNode" :disabled="!currentNodeId">删除
+						</el-button>
+						<!-- <el-button style="padding-top:6px;" type="text" @click="configPrivilege" :disabled="configDisabled">查询规则配置
 					</el-button>
 					<el-button style="padding-top:6px;" type="text" @click="configOrgPrivilege" :disabled="configDisabled">部门权限配置
 					</el-button> -->
+					</div>
+					<div class="is-grown" style="overflow: auto;">
+						<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
+							:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
+							:expand-on-click-node="false">
+							<span class="custom-tree-node" slot-scope="scope">
+								<i v-if="scope.data.isParent" class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
+								<i v-else class="fa fa-bookmark" style="color:#99c8f8;" aria-hidden="true"></i>
+								<span>{{ scope.node.label }}</span>
+							</span>
+						</el-tree>
+					</div>
 				</div>
-				<el-tree v-if="refreshTree" class="is-grown" ref="orgtree" :load="requestNode" lazy node-key="id"
-					:props="defaultProps" :default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
-					:expand-on-click-node="false">
-					<span class="custom-tree-node" slot-scope="scope">
-						<i v-if="scope.data.isParent" class="fa fa-folder" style="color:#f5cd09;" aria-hidden="true"></i>
-						<i v-else class="fa fa-bookmark" style="color:#99c8f8;" aria-hidden="true"></i>
-						<span>{{ scope.node.label }}</span>
-					</span>
-				</el-tree>
 			</template>
 			<div class="content tabswrapper" slot="mainPanel">
 				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
@@ -373,6 +381,26 @@
 					title: '新增权限',
 					src: jasTools.base.rootPath +
 						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/add.html?appId=' + that
+						.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
+					cbForClose: function (param) {
+						if (param == 1) {
+							that.refreshTree = false;
+							that.$nextTick(function () {
+								that.refreshTree = true;
+								that.currentNodeId = '';
+							})
+						}
+					}
+				});
+			},
+			addDefaultBtns: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					width: '60%',
+					height: '80%',
+					title: '为菜单添加默认按钮',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-privilege/privilege-manage/dialogs/default-btns.html?appId=' + that
 						.currentApplicationId + '&currentNodeId=' + that.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
