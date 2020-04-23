@@ -13,11 +13,12 @@
 		.title {
 			overflow: hidden;
 			width: 330px;
-			position: absolute;
+			/* position: absolute;
 			top: 0;
 			z-index: 10;
 			left: 50%;
-			margin-left: -162px;
+			margin-left: -162px; */
+			margin: 0 auto;
 		}
 	</style>
 </head>
@@ -30,7 +31,8 @@
 			<el-alert style="float:left;width:154px;margin:6px 3px 0;" title="红色表示正在办理" :closable="false" type="error">
 			</el-alert>
 		</div>
-		<div style="position: relative;overflow: auto;height: 100%;">
+		<!-- <div style="position: relative;overflow: auto;height: 100%;"> -->
+		<div style="position: relative;overflow: auto;height: calc( 100% - 43px );">
 			<image :src="imageSrc" />
 			<el-tooltip v-for="item in detail" placement="top">
 				<div slot="content">
