@@ -85,6 +85,7 @@
 						<template slot-scope="scope">
 							<el-button @click="see(scope.row)" type="text" size="small">预览</el-button>
 							<el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+							<el-button @click="processRule(scope.row)" type="text" size="small">前后置</el-button>
 							<el-button @click="deleteItem(scope.row)" type="text" size="small">删除</el-button>
 						</template>
 					</el-table-column>
@@ -215,6 +216,17 @@
 					cbForClose: function () {
 						//that.refresh();
 						that._requestTable();
+					}
+				});
+			},
+			processRule: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					title: '前后置处理',
+					width:'80%',
+					height:'90%',
+					src: jasTools.base.rootPath +  '/jasmvvm/pages/module-system-config/form-operation/dialogs/process-rule.html?functionId=' + row.functionCode,
+					cbForClose: function () {
 					}
 				});
 			},

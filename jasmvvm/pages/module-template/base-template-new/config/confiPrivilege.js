@@ -43,11 +43,11 @@ var pageConfig = {
   }],
   addParams: {
     businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId,
-    processType: "beforeAdvice"
+    processType: jasTools.base.getParamsInUrl(location.href).processType || 'beforeQueryAdvice'
   },
   searchParams: {
     businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId,
-    processType: "beforeAdvice"
+    processType: jasTools.base.getParamsInUrl(location.href).processType || 'beforeQueryAdvice'
   },
   searchFields: [
 
@@ -108,7 +108,7 @@ var pageConfig = {
       var url = jasTools.base.rootPath + '/jasmvvm/pages/module-template/common-dialogs/sort-list.html';
       url = jasTools.base.setParamsToUrl(url, {
         businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId,
-        processType: "beforeAdvice",
+        processType: jasTools.base.getParamsInUrl(location.href).processType || 'beforeAdvice',
         modelId: 'cn.jasgroup.framework.process.entity.ProcessBusinessRef',
         displayField: 'name',
         rowIndexField: 'orderNum',
@@ -125,9 +125,11 @@ var pageConfig = {
     },
     publish: function () {
       var that = this;
-      var url = jasTools.base.rootPath + "/processRule/publish.do";
+      var url = jasTools.base.rootPath + "/serviceMvc/processRule/publish.do";
       jasTools.ajax.get(url, {
-        businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId
+        businessId: jasTools.base.getParamsInUrl(location.href).currentNodeId,
+        processType: jasTools.base.getParamsInUrl(location.href).processType,
+        processRefreshStrategyName: jasTools.base.getParamsInUrl(location.href).processRefreshStrategyName
       }, function (data) {
 				(top.jasTools || jasTools).dialog.close();
         window.top.Vue.prototype.$message({

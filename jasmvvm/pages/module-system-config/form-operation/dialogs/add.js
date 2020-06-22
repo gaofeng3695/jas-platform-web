@@ -263,20 +263,20 @@ var vm = new Vue({
       var mainField = ''; // 主键
       var insertFieldArr = [];
       var selectFieldArr = [];
-      var updateFieldArr=[];
+      var updateFieldArr = [];
       that.fieldArr = fields.map(function (item) {
         if (item.ifPrimaryKey) {
           mainField = item.columnName;
         }
-        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE"|| item.columnName=="SHAPE")) {
+        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE" || item.columnName == "SHAPE")) {
           insertFieldArr.push(item.columnName);
         }
-        if (item.columnName!="SHAPE") {
-        	selectFieldArr.push(item.columnName);
+        if (item.columnName != "SHAPE") {
+          selectFieldArr.push(item.columnName);
         }
-        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE"|| item.columnName=="SHAPE" 
-        	|| item.columnName == "CREATE_DATETIME" || item.columnName == "CREATE_USER_ID" || item.columnName == "CREATE_USER_NAME" || item.columnName == "ACTIVE")) {
-        	updateFieldArr.push(item.columnName);
+        if (!(item.columnName == "GEO_STATE" || item.columnName == "APPROVE_STATE" || item.columnName == "APPROVE_GRADE" || item.columnName == "SHAPE" ||
+            item.columnName == "CREATE_DATETIME" || item.columnName == "CREATE_USER_ID" || item.columnName == "CREATE_USER_NAME" || item.columnName == "ACTIVE")) {
+          updateFieldArr.push(item.columnName);
         }
         return item.columnName
       });
@@ -292,16 +292,16 @@ var vm = new Vue({
         return ":" + newItem;
       });
       var updateStr = updateFieldArr.map(function (item) {
-    	  if (item == "OBJECTID") {
-    		  return 'sde.gdb_util.next_rowid(:JDBC_USER_NAME,:CURRENT_TABLE_NAME)';
-    	  }
-    	  var newItem = item;
-    	  if (that.fieldParams && that.fieldParams[item]) {
-    		  newItem = that.fieldParams[item];
-    	  }
-    	  return ":" + newItem;
+        if (item == "OBJECTID") {
+          return 'sde.gdb_util.next_rowid(:JDBC_USER_NAME,:CURRENT_TABLE_NAME)';
+        }
+        var newItem = item;
+        if (that.fieldParams && that.fieldParams[item]) {
+          newItem = that.fieldParams[item];
+        }
+        return ":" + newItem;
       });
-      
+
       var formatUpdateStr = function () {
         var arr = updateFieldArr.map(function (field, index) {
           if (field != "OBJECTID") {
@@ -315,7 +315,7 @@ var vm = new Vue({
       };
       that.ruleForm.select = [
         'SELECT ',
-//        that.fieldArr.join(', '),
+        //        that.fieldArr.join(', '),
         selectFieldArr.join(', '),
         ' FROM ',
         tableName,
@@ -324,7 +324,7 @@ var vm = new Vue({
         that.fieldArr.indexOf('ACTIVE') > -1 ? ' AND ACTIVE = 1' : '',
         ' @where_append ',
       ].join('');
-      
+
       that.ruleForm.delete = [
         'UPDATE ',
         tableName,
@@ -341,7 +341,7 @@ var vm = new Vue({
         'INSERT INTO ',
         tableName,
         '( ',
-//        that.fieldArr.join(', '),
+        //        that.fieldArr.join(', '),
         insertFieldArr.join(', '),
         ' ) VALUES ( ',
         insertStr.join(', '),
@@ -364,7 +364,7 @@ var vm = new Vue({
 
       that.ruleForm.detail = [
         'SELECT ',
-//        that.fieldArr.join(', '),
+        //        that.fieldArr.join(', '),
         selectFieldArr.join(', '),
         ' FROM ',
         tableName,
@@ -459,7 +459,7 @@ var vm = new Vue({
           console.log(cfg)
           if (cfg) {
             for (var keys in obj) {
-              if ((!obj[keys] || obj[keys]=='0') && cfg[keys]) {
+              if ((!obj[keys] || obj[keys] == '0') && cfg[keys]) {
                 obj[keys] = cfg[keys]
               }
             }
@@ -802,7 +802,21 @@ var vm = new Vue({
             item.lessDateScopeArr = [];
             item.maxDateScopeArr = [];
           }
-
+          //针对二次配置不一样的，将一些数据进行清空
+          if (item.ifSave == "0" && item.ifUpdate == "0") {
+            item.uiType = "";
+            item.updateable = "";
+            item.childField = "";
+            item.childFieldArr = [];
+            item.domain = null;
+            item.lessDateScope = "";
+            item.lessDateScopeArr = [];
+            item.max = null;
+            item.maxDateScope = "";
+            item.maxDateScopeArr = [];
+            item.min = null;
+            item.requestPath = null;
+          }
           return item;
         });
         jasTools.ajax.post(jasTools.base.rootPath + '/functionFields/save.do', {

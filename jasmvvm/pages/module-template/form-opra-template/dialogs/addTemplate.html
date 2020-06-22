@@ -78,42 +78,60 @@
 
 							<el-col v-if="item.type=='UT_13'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 								<el-form-item :prop="item.id" :label="item.name" :rules="item.verify">
-									<!--<textarea  v-if="item.type=='UT_13'"  rows="2" v-model="formData[item.id]"></textarea>-->
-									<el-input v-if="item.type=='UT_13'" :autosize="{ minRows: 2}" type="textarea" :rows="2" v-model.trim="formData[item.id]" :disabled="item.disabled"
-									  :maxLength="item.fieldLength" @change="changeRule($event,item)">
+									<el-input v-if="item.type=='UT_13'" :autosize="{ minRows: 2}" type="textarea" :rows="2"
+										v-model.trim="formData[item.id]" :disabled="item.disabled" :maxLength="item.fieldLength"
+										@change="changeRule($event,item)">
 									</el-input>
-									<p style="text-align:right;color:#999;">您还可以输入<span>{{item.fieldLength-formData[item.id].length}}</span>字</p>
+									<p style="text-align:right;color:#999;">
+										您还可以输入<span>{{item.fieldLength-formData[item.id].length}}</span>字</p>
 								</el-form-item>
 							</el-col>
-							<el-col v-else :xs="formConfig.xs" :sm="formConfig.sm" :md="formConfig.md" :lg="formConfig.lg" :xl="formConfig.xl" :class="{'height' : item.type=='UT_14'||item.type=='UT_05'||item.type=='UT_06'||item.type=='UT_07'||item.type=='UT_08' }">
+
+							<el-col v-else-if="'CITY_ID'== item.id" :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+								<el-form-item prop="myarea" label="所属区域" :rules="myarea_verify">
+									<nmg-county-cascader ref="myarea" v-model="formData.myarea"></nmg-county-cascader>
+								</el-form-item>
+							</el-col>
+							<el-col v-else-if="'COUNTY_ID'== item.id " :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+							</el-col>
+
+							<el-col v-else :xs="formConfig.xs" :sm="formConfig.sm" :md="formConfig.md" :lg="formConfig.lg"
+								:xl="formConfig.xl"
+								:class="{'height' : item.type=='UT_14'||item.type=='UT_05'||item.type=='UT_06'||item.type=='UT_07'||item.type=='UT_08' }">
 								<el-form-item :prop="item.id" :label="item.name" :rules="item.verify" initial="off">
-									<el-input v-if="item.type=='UT_01'" :placeholder="item.placeholder" v-model.trim="formData[item.id]" :size="item.size" :disabled="item.disabled"
-									  clearable @change="changeRule($event,item)">
+									<el-input v-if="item.type=='UT_01'" :placeholder="item.placeholder" v-model.trim="formData[item.id]"
+										:size="item.size" :disabled="item.disabled" clearable @change="changeRule($event,item)">
 									</el-input>
-									<el-select multiple v-if="isMultiSelect(item)" :ref="item.id" v-model="formData[item.id]" style="width:100%" :size="item.size"
-									  :disabled="item.disabled" clearable @visible-change="visibleChange($event,item)" @change="getChildOpts($event,item)">
+									<el-select multiple v-if="isMultiSelect(item)" :ref="item.id" v-model="formData[item.id]"
+										style="width:100%" :size="item.size" :disabled="item.disabled" clearable
+										@visible-change="visibleChange($event,item)" @change="getChildOpts($event,item)">
 										<template v-for="option in item.options">
 											<el-option :label="option.value" :value="option.key">
 											</el-option>
 										</template>
 									</el-select>
-									<el-select v-if="isSelect(item)" :ref="item.id" v-model="formData[item.id]" :disabled="item.disabled" style="width:100%"
-									  :size="item.size" clearable @visible-change="visibleChange($event,item)" @change="getChildOpts($event,item)">
+									<el-select v-if="isSelect(item)" :ref="item.id" v-model="formData[item.id]" :disabled="item.disabled"
+										style="width:100%" :size="item.size" clearable @visible-change="visibleChange($event,item)"
+										@change="getChildOpts($event,item)">
 										<template v-for="option in item.options">
 											<el-option :label="option.value" :value="option.key">
 											</el-option>
 										</template>
 									</el-select>
-									<el-time-picker v-if="item.type=='UT_02'" value-format="HH:mm:ss" :disabled="item.disabled" v-model="formData[item.id]" placeholder="任意时间点"
-									  :size="item.size">
+									<el-time-picker v-if="item.type=='UT_02'" value-format="HH:mm:ss" :disabled="item.disabled"
+										v-model="formData[item.id]" placeholder="任意时间点" :size="item.size">
 									</el-time-picker>
-									<el-date-picker v-if="item.type=='UT_04'" value-format="yyyy-MM-dd HH:mm:ss" v-model="formData[item.id]" type="datetime"
-									  placeholder="选择日期时间" :size="item.size" :disabled="item.disabled" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
+									<el-date-picker v-if="item.type=='UT_04'" value-format="yyyy-MM-dd HH:mm:ss"
+										v-model="formData[item.id]" type="datetime" placeholder="选择日期时间" :size="item.size"
+										:disabled="item.disabled" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
 									</el-date-picker>
-									<el-date-picker v-if="item.type=='UT_03'" value-format="yyyy-MM-dd" type="date" :placeholder="item.placeholder" v-model="formData[item.id]"
-									  :size="item.size" :disabled="item.disabled" style="width: 100%;" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
+									<el-date-picker v-if="item.type=='UT_03'" value-format="yyyy-MM-dd" type="date"
+										:placeholder="item.placeholder" v-model="formData[item.id]" :size="item.size"
+										:disabled="item.disabled" style="width: 100%;" :picker-options="item.pickerOptions"
+										@change=fieldChanged(item)>
 									</el-date-picker>
-									<el-radio-group v-if="isRadio(item)" border v-model="formData[item.id]" size="small" :disabled="item.disabled">
+									<el-radio-group v-if="isRadio(item)" border v-model="formData[item.id]" size="small"
+										:disabled="item.disabled">
 										<template v-for="radioItem in item.options">
 											<el-radio :label="radioItem.key" size="small">{{radioItem.value}}</el-radio>
 										</template>
@@ -123,20 +141,25 @@
 											<el-checkbox :label="checkboxItem.key">{{checkboxItem.value}}</el-checkbox>
 										</template>
 									</el-checkbox-group>
-									<el-input-number v-if="item.type=='UT_14'" :size="item.size" v-model="formData[item.id]" :disabled="item.disabled" controls-position="right"
-									  :min="item.min" :max="item.max" :precision="item.precision"></el-input-number>
+									<el-input-number v-if="item.type=='UT_14'" :size="item.size" v-model="formData[item.id]"
+										:disabled="item.disabled" controls-position="right" :min="item.min" :max="item.max"
+										:precision="item.precision" data-attr="负数"></el-input-number>
 								</el-form-item>
+
 							</el-col>
 						</template>
 					</el-row>
 				</template>
 				<el-row>
 					<template v-if="ifAttachment">
-
+						<jas-base-group-title name="图片信息"></jas-base-group-title>
+						<jas-file-upload-new ref="uploadpic" :max-size="4" :max-total-size="5" file-type="pic"
+							:business-id="formData[pkArray[0]]" @success="picSuccess" @fail="picFail" :business-type="bizType">
+						</jas-file-upload-new>
 						<jas-base-group-title name="附件信息"></jas-base-group-title>
-
-						<jas-file-upload ref="upload" @success="uploadSuccess"></jas-file-upload>
-
+						<jas-file-upload-new ref="uploadfile" :max-size="4" :business-type="bizType" :max-total-size="5"
+							file-type="file" :business-id="formData[pkArray[0]]" @success="fileSuccess" @fail="fileFail">
+						</jas-file-upload-new>
 					</template>
 
 				</el-row>
@@ -152,25 +175,25 @@
 <script src="./../../../../lib/vue/vue.js"></script>
 <script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../../common/components/jas-components.js "></script>
+<script src="./../../../../common/components/nmg-components.js "></script>
 <script src="./../../../../common/js/jas-tools.js"></script>
+<script src="./../js/form-rules.js"></script>
 <script>
 	var app = new Vue({
 		el: "#app",
 		data: function () {
 			return {
-				but_disabled : false,				
+				bizType: 'attachment',
+				but_disabled: false,
 				isLoading: true,
-				rules: [],
-				formData: {
-					remarks: "",
-					oid:""
-				}, // 表单字段详情对象
+				rules: formRules,
+				formData: {}, // 表单字段详情对象
 				formAttr: [], // 表单字段，分组排序，配置数组
 				// [{
 				// 	groupName: '分组名',
 				// 	data: that._sortArray(groupAttr)
 				// }]
-				labelwidth: "100",
+				labelwidth: "160px",
 				formConfig: {
 					xs: 24,
 					sm: 12,
@@ -187,12 +210,16 @@
 				ifAttachment: false,
 				progress: 0, //上传进度
 				pass: null, //是否上传成功
-				limitNum: 2,
+				limitNum: 10,
 				autoUpload: false,
-				actionURL: jasTools.base.rootPath + "/attachment/upload.do?token=" + localStorage.getItem("token"),
 				fieldRuleObj: {},
-				_fieldsGrouped:{},
+				_fieldsGrouped: {},
+				myarea_verify: []
 			}
+		},
+
+		created: function () {
+			this.setConfig(2);
 		},
 		mounted: function () {
 			var param = window.jasTools.base.getParamsInUrl(location.href);
@@ -203,108 +230,37 @@
 			delete param.privilegeCode;
 			this.formDetail = param;
 			this.isAddPage = JSON.stringify(this.formDetail) == '{}'; // 根据URL中传入的数据判断该页面是否处于编辑页面
-			this.requestConfig();
-			this.requestRule();
-			this.requestFieldRule();
-			// this.requestFieldConfigByOid();
-		},
-		beforeCreate: function () {
-			var that = this;
-			var param = window.jasTools.base.getParamsInUrl(location.href);
-			if (param.menuCode) {
-				that.menuCode = param.menuCode;
-			}
-			delete param.menuCode;
-			that.isAddPage = JSON.stringify(this.formDetail) == '{}';
-			var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
-			jasTools.ajax.get(url, {
-				functionCode: that.menuCode
-			}, function (data) {
-				that.isLoading = false;
-				that.ifAttachment = !!(data.data.ifAttachment == 1); //是否存在附件
-				that._fieldsGrouped = data.data.functionFieldsBoList;
-				var fieldsGrouped = that._formatFieldsByGroup(data.data.functionFieldsBoList);
-				if (data.data.functionFieldsBoList && data.data.functionFieldsBoList.length > 0) {
-					if (that.isAddPage) {
-						data.data.functionFieldsBoList.forEach(function (item) {
-							if (item.uiType) {
-								if(item.fieldName=='construct_unit'){
-									that.$set(that.formData, item.fieldName, JSON.parse(localStorage.getItem("user")).unitId);	
-								}else{
-									that.$set(that.formData, item.fieldName, '');	
-								}
-							}
-						});
-						that.getAddField(fieldsGrouped);
-					} else {
-						data.data.functionFieldsBoList.forEach(function (item) {
-							that.$set(that.formData, item.fieldName, '');
-						});
-						that.requestDetailByObj(fieldsGrouped); //请求表单详情
-					}
-				}
-			});
-		},
-		watch: {
 
+			this.requestFieldConfigByOid();
 		},
+
 		methods: {
-			requestFieldRule: function () {
-				var that = this;
-				$.ajax({
-					type: "get",
-					url: "../js/addSpecialField.json",
-					dataType: "json",
-					async: true,
-					success: function (data) {
-						if (data.special.length > 0) {
-							var s = 0;
-							for (var i = 0; i < data.special.length; i++) {
-								if (data.special[i].functionCode == that.menuCode) {
-									s++;
-									that.fieldRuleObj = data.special[i].fieldConfig;
-								}
-								if (s > 0) {
-									break;
-								}
-							}
-						}
-					}
-				});
+			savePic: function () {
+				this.$refs.uploadpic.uploadFile();
 
 			},
-			requestConfig: function () {
-				var that = this;
-				$.ajax({
-					type: "get",
-					url: "../js/template.json",
-					dataType: "json",
-					async: true,
-					success: function (data) {
-						if (data.form.col) {
-							that.setConfig(data.form.col);
-							that.labelwidth = data.form.labelwidth;
-						}
-						that.autoUpload = data.file.autoUpload;
-						that.limitNum = data.file.limitNum;
-					}
-				});
+			saveFile: function () {
+				this.$refs.uploadfile.uploadFile();
 			},
-			requestRule: function () { //显示请求规则，成功之后再去请求所有的
-				var that = this;
-				$.ajax({
-					type: "get",
-					url: "../js/rule.json",
-					dataType: "json",
-					async: true,
-					success: function (data) {
-						if (data.rows) {
-							that.rules = data.rows;
-						}
-					}
-				});
+			previewFile: function (oid) {
+				alert('自定义预览方法' + oid)
 			},
-
+			previewPic: function (url) {
+				alert('自定义预览方法' + url)
+			},
+			picSuccess: function () {
+				this.saveFile()
+			},
+			picFail: function () {
+				this.saveFile()
+			},
+			fileFail: function (errObj) {
+				// alert(1111)
+				console.log(errObj.msg)
+			},
+			fileSuccess: function () {
+				this.uploadSuccess()
+			},
 			requestFieldConfigByOid: function () { // 获取各个字段的配置信息
 				var that = this;
 				var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
@@ -312,7 +268,14 @@
 					functionCode: that.menuCode
 				}, function (data) {
 					that.isLoading = false;
+					if (!data.data.functionFieldsBoList || data.data.functionFieldsBoList.length == 0) return;
 					that.ifAttachment = !!(data.data.ifAttachment == 1); //是否存在附件
+					that._fieldsGrouped = data.data.functionFieldsBoList;
+					data.data.functionFieldsBoList.forEach(function (item) {
+						if (item.uiType) {
+							that.$set(that.formData, item.fieldName, '');
+						}
+					});
 					var fieldsGrouped = that._formatFieldsByGroup(data.data.functionFieldsBoList);
 					if (that.isAddPage) {
 						that.getAddField(fieldsGrouped);
@@ -377,7 +340,7 @@
 								verify: [],
 								requestUrl: item.requestPath,
 								childField: item.childField,
-								min: item.min,
+								min: item.min == null ? -Infinity : item.min,
 								max: item.max || Infinity,
 								precision: item.precision || 0,
 								index: item.rowIndex,
@@ -385,10 +348,11 @@
 								lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
 								maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
 								fieldLength: item.fieldLength || 200,
-								disabled:item.fieldName=='construct_unit'?true:false,
+								disabled: item.fieldName == 'construct_unit' ? true : false,
 								fieldRule: that.fieldRuleObj && that.fieldRuleObj[item.fieldName]
 							};
-							if (that.fieldRuleObj && that.fieldRuleObj.frozenFile && that.fieldRuleObj.frozenFile.indexOf(obj.id) > -
+							if (that.fieldRuleObj && that.fieldRuleObj.frozenFile && that.fieldRuleObj.frozenFile
+								.indexOf(obj.id) > -
 								1) {
 								obj.disabled = true;
 							}
@@ -398,6 +362,12 @@
 									message: item.placeholder || '该字段为必填项',
 								});
 
+							}
+							if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
+								that.myarea_verify.push({
+									required: true,
+									message: '请选择所属区域',
+								});
 							}
 							if (item.uiType == 'UT_01') { // 文本域
 								that.rules.forEach(function (ruleItem) {
@@ -443,19 +413,19 @@
 							}
 							if (item.uiType == 'UT_14') {
 								// 如果是数字，增加默认值
-								if (!obj.min && obj.min!=0) {
+								if (!obj.min && obj.min != 0) {
 									obj.min = -10000;
-									that.$set(that.formData, item.fieldName, 0);
+									// that.$set(that.formData, item.fieldName, 0);
 								} else {
-									if(obj.min < 0){
-										that.$set(that.formData, item.fieldName, 0);	
-									}else{
-										that.$set(that.formData, item.fieldName, obj.min);	
+									if (obj.min < 0) {
+										// that.$set(that.formData, item.fieldName, 0);
+									} else {
+										that.$set(that.formData, item.fieldName, obj.min);
 									}
 								}
 							}
 							if (item.uiType == 'UT_11' || item.uiType == 'UT_12') {
-								that._isInit(obj.id, obj.options,true);
+								that._isInit(obj.id, obj.options, true);
 							}
 							groupAttr.push(obj);
 						}
@@ -465,9 +435,6 @@
 						data: that._sortArray(groupAttr)
 					});
 				});
-				that.actionURL = jasTools.base.rootPath + "/attachment/upload.do?token=" + localStorage.getItem("token") +
-					"&businessId=" +
-					that.formData[that.pkArray[0]] + "&businessType=file";
 			},
 			getEditField: function (data) {
 				var that = this;
@@ -490,7 +457,7 @@
 						}
 
 						if (item.ifUpdate == '1') {
-
+							console.log(item.min);
 							obj = {
 								id: item.fieldName,
 								name: item.fieldNameCn,
@@ -502,10 +469,10 @@
 								requestUrl: item.requestPath,
 								childField: item.childField,
 								index: item.rowIndex,
-								min: item.min,
+								min: item.min == null ? -Infinity : item.min,
 								max: item.max || Infinity,
 								precision: item.precision || 0,
-								disabled:item.fieldName=='construct_unit'?true:false,
+								disabled: item.fieldName == 'construct_unit' ? true : false,
 								ifLessToday: item.ifLessToday, //读取配置接口，暂时写死
 								lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
 								maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
@@ -520,6 +487,12 @@
 								obj.verify.push({
 									required: true,
 									message: item.placeholder
+								});
+							}
+							if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
+								that.myarea_verify.push({
+									required: true,
+									message: '请选择所属区域',
 								});
 							}
 							if (item.uiType == 'UT_01') {
@@ -567,11 +540,13 @@
 							if (item.uiType == 'UT_14') {
 								// 如果是数字，增加默认值
 								if (!that.formData[obj.id]) {
-									if (obj.min||obj.min==0) {
-										that.$set(that.formData, item.fieldName, obj.min);
+									if (obj.min || obj.min == 0) {
+										console.log("设置了最小值" + obj.min);
+										// that.$set(that.formData, item.fieldName, obj.min);
 									} else {
+										console.log("如果没有最小值")
 										obj.min = -10000;
-										that.$set(that.formData, item.fieldName, 0);
+										// that.$set(that.formData, item.fieldName, 0);
 									}
 								} else {
 									that.$set(that.formData, item.fieldName, that.formData[obj.id]);
@@ -594,23 +569,22 @@
 						data: that._sortArray(groupAttr)
 					});
 				});
-				that.actionURL = jasTools.base.rootPath + "/attachment/upload.do?token=" + localStorage.getItem("token") +
-					"&businessId=" + that.formData[that.pkArray[0]] + "&businessType=file";
 				that.$nextTick(function () {
-					that.ifAttachment && that.$refs.upload.requestFile(that.formData[that.pkArray[0]]); // 触发附件请求
+					that.ifAttachment && that.$refs.uploadpic.requestFile(); // 触发附件请求
+					that.ifAttachment && that.$refs.uploadfile.requestFile(); // 触发附件请求
 				});
-
 			},
 			requestDetailByObj: function (fieldsGrouped) { //请求表单详情
 				var that = this;
 				var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/get.do";
 				jasTools.ajax.post(url, this.formDetail, function (data) {
-					if(data && data.data){
-						for (var key in that.formData) {
+					if (data && data.data) {
+						for (var key in data.data) {
 							if (data.data[key] || data.data[key] == 0) {
 								that.formData[key] = data.data[key];
 							}
 						}
+						that.formData.myarea = data.data.COUNTY_ID || data.data.CITY_ID || '';
 					}
 					that.getEditField(fieldsGrouped);
 				});
@@ -631,35 +605,80 @@
 					}
 				});
 			},
-			_requestSaveFormData: function () {
+			_formatFormData: function () {
 				var that = this;
-
-				var str = that.isAddPage ? "save" : "update";
-				var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/" + str + ".do"
-				/*属性里面是数组的进行转换成字符串*/
-				//console.log(that.formData);
-				var obj={};
+				var obj = {};
+				var map = that.getSelectFieldMap();
 				for (var key in that.formData) {
-					if (that.formData[key] instanceof Array) {
-						obj[key] = that.formData[key].length>0?that.formData[key].join(","):that.formData[key]
+					if (key === 'CREATE_USER_UNIT_ID' || key === 'CREATE_USER_UNIT_NAME' || key === 'create_user_unit_id' ||
+						key === 'create_user_unit_name') {
+						continue;
+					} else if (that.formData[key] instanceof Array) {
+						obj[key] = that.formData[key].length > 0 ? that.formData[key].join(",") : that.formData[key]
 					} else if (that.formData[key] === '') {
 						obj[key] = null;
-					}else{
-						obj[key]=that.formData[key]
+					} else if (key === 'myarea' && that.$refs.myarea) {
+						// console.log(JSON.stringify(that.$refs.myarea[0].value_datas))
+						var ids = that.$refs.myarea[0].value_datas;
+						var names = that.$refs.myarea[0].cLabel;
+						if (ids.length == 0 && names.length == 0) {
+							obj.CITY_ID = that.formData.CITY_ID;
+							obj.COUNTY_ID = that.formData.COUNTY_ID;
+							obj.CITY_NAME = that.formData.CITY_NAME;
+							obj.COUNTY_NAME = that.formData.COUNTY_NAME;
+						} else {
+							obj.CITY_ID = ids[0];
+							obj.COUNTY_ID = ids[1];
+							obj.CITY_NAME = ids[0] ? names[0] : undefined;
+							obj.COUNTY_NAME = ids[1] ? names[1] : undefined;
+
+						}
+					} else {
+						obj[key] = that.formData[key]
 					}
 				}
+
+				for (var key in that.formData) {
+					if (map[key]) { // 是下拉选字段，存储name
+						if (that.formData[key]) {
+							obj[map[key]] = that.$refs[key][0].selectedLabel;
+						} else {
+							obj[map[key]] = '';
+						}
+					}
+				}
+				return obj;
+			},
+			_requestSaveFormData: function () {
+				var that = this;
+				var str = that.isAddPage ? "save" : "update";
+				var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/" + str + ".do"
 				this.but_disabled = true;
+				var obj = that._formatFormData();
 				jasTools.ajax.post(url, obj, function (data) {
 					if (that.ifAttachment) {
-					 	that.$refs.upload.uploadFile(that.formData[that.pkArray[0]],that.formData["project_oid"]); //触发上传附件
+						// that.$refs.upload.uploadFile(that.formData[that.pkArray[0]], that.formData.project_oid);
+						that.savePic();
 					} else {
 						that.uploadSuccess();
 					}
-				},function(data){
-					if(data.status==-1){
-						that.but_disabled = false;
+				}, function (data) {
+					that.but_disabled = false;
+				});
+			},
+			getSelectFieldMap: function () {
+				var that = this;
+				var obj = {};
+				this._fieldsGrouped.forEach(function (item) {
+					if (item.uiType == "UT_11" && ['CITY_ID', 'COUNTY_ID'].indexOf(item.fieldName) < 0) {
+						//var name = item.fieldName.replace('ID', 'NAME');
+						var name = item.fieldName.replace(/(.*)ID/, '$1NAME');
+						//name = name.replace('id', 'name');
+						name = name.replace(/(.*)id/, '$1name');
+						obj[item.fieldName] = name;
 					}
 				});
+				return obj;
 			},
 			uploadSuccess: function () {
 				top.Vue.prototype.$message({
@@ -689,13 +708,13 @@
 								} else {
 									child.options = []; // 清空下拉选项
 								}
-								if (!isInit && childField!='construct_unit') { // 不是初始化
+								if (!isInit && childField != 'construct_unit') { // 不是初始化
 									that.$set(that.formData, child.id, ""); // 清空子级联的value
 								}
 								//if (options.length === 1) { //只有一个选项就自动复制
 								//that.$set(that.formData, child.id, options[0].key); // 赋值 子级联的value
 								//	}
-								that._isInit(child.id, options,false);
+								that._isInit(child.id, options, false);
 								that.$refs[child.id][0].$emit('change', { // 触发子级联的change事件
 									value: that.formData[child.id],
 									isInit: isInit
@@ -707,41 +726,47 @@
 
 				var getAndSet = function (childField, requestUrl) {
 					if (requestUrl && value) { //进行子级的查找 后台请求
-						var key = jasTools.base.switchToCamelCase(oFieldConfig.id);
+						console.log(oFieldConfig.id);
+						var key = jasTools.base.switchToLowerCaseAndCamelCase(oFieldConfig.id);
+						console.log(key);
 						var obj = {
 							"rows": 100,
 							"page": 1,
 						};
 						obj[key] = value;
 						jasTools.ajax.post(jasTools.base.rootPath + "/" + requestUrl, obj, function (data) {
-							if(!that.isAddPage){
+							if (!that.isAddPage) {
 								var isExistsItem = false;
-								for(var k in data.rows){
-									if(data.rows[k].key==that.formData[childField]){
+								for (var k in data.rows) {
+									if (data.rows[k].key == that.formData[childField]) {
 										isExistsItem = true;
 										break;
 									}
 								}
-								if(!isExistsItem){
+								if (!isExistsItem) {
 									var fieldNameCn;
 									var fieldName;
-									for(var i in that._fieldsGrouped){
-										if(childField==that._fieldsGrouped[i].fieldName){
+									for (var i in that._fieldsGrouped) {
+										if (childField == that._fieldsGrouped[i].fieldName) {
 											fieldNameCn = that._fieldsGrouped[i].fieldNameCn;
 											break;
 										}
 									}
-									for(var j in that._fieldsGrouped){
-										if(fieldNameCn==that._fieldsGrouped[j].fieldNameCn && childField!=that._fieldsGrouped[j].fieldName ){
+									for (var j in that._fieldsGrouped) {
+										if (fieldNameCn == that._fieldsGrouped[j].fieldNameCn && childField != that
+											._fieldsGrouped[j].fieldName) {
 											fieldName = that._fieldsGrouped[j].fieldName;
 											break;
 										}
 									}
-									var item = {
-											"value":that.formData[fieldName],
-											"key":that.formData[childField]
-									};
-									data.rows.push(item);
+									/**用于修改自定义表单级联出现下拉选赋值错误问题-2020-04-24**/
+									if (that.formData[fieldName] && that.formData[childField]) {
+										var item = {
+											"value": that.formData[fieldName],
+											"key": that.formData[childField]
+										};
+										data.rows.push(item);
+									}
 								}
 							}
 							setChildOptionsAndValue(childField, data.rows)
@@ -751,7 +776,7 @@
 					}
 				};
 
-				oFieldConfig.childField.split(',').forEach(function (childField, index) {
+				oFieldConfig.childField && oFieldConfig.childField.split(',').forEach(function (childField, index) {
 					if (!oFieldConfig.requestUrl) return;
 					var urls = oFieldConfig.requestUrl.split(',');
 					var url = urls[index] || urls[0];
@@ -761,6 +786,26 @@
 			},
 			changeRule: function ($event, item) {
 				var that = this;
+				/**根据最新配置，满足根据选择值的不同，表单进行适配**/
+				if (configSet[that.menuCode] && item.id == configSet[that.menuCode].key) {
+					if (that.formData[item.id] == configSet[that.menuCode].selectVal) {
+						that.formAttr.forEach(function (item) {
+							item.data.forEach(function (child) {
+								if (child.id == configSet[that.menuCode].childKey) {
+									child.verify.push(configSet[that.menuCode].childRule);
+								}
+							});
+						});
+					} else {
+						that.formAttr.forEach(function (item) {
+							item.data.forEach(function (child) {
+								if (child.id == configSet[that.menuCode].childKey) {
+									child.verify = [];
+								}
+							});
+						});
+					}
+				}
 				if (!item.fieldRule) {
 					return;
 				}
@@ -782,7 +827,7 @@
 				if (falg) {
 					that.formAttr.forEach(function (parent, index) {
 						parent.data.forEach(function (child) {
-							if (child.childField.indexOf(",") > -1) {
+							if (child.childField && child.childField.indexOf(",") > -1) {
 								if (child.childField.indexOf(item.id) > -1) {
 									if (!that.formData[child.id]) {
 										top.Vue.prototype.$message({
@@ -915,7 +960,8 @@
 												if (!that.formData[obj.id]) {
 													return time.getTime() > new Date().getTime()
 												}
-												return time.getTime() < new Date(day).getTime() || time.getTime() > new Date().getTime();
+												return time.getTime() < new Date(day).getTime() || time.getTime() > new Date()
+													.getTime();
 
 												//return time.getTime() < new Date(that.formData[obj.id]).getTime() || time.getTime() > new Date().getTime();
 											}
@@ -941,7 +987,8 @@
 												if (!that.formData[obj.id]) {
 													return time.getTime() > new Date().getTime()
 												}
-												return time.getTime() > new Date(that.formData[obj.id]).getTime() || time.getTime() > new Date().getTime();
+												return time.getTime() > new Date(that.formData[obj.id]).getTime() || time
+													.getTime() > new Date().getTime();
 											}
 											return time.getTime() > new Date(that.formData[obj.id]).getTime();
 										}
@@ -953,20 +1000,22 @@
 					});
 				}
 			},
-			_isInit: function (id, options,isChange) {
+			_isInit: function (id, options, isChange) {
 				var that = this;
-				var initArry = ['project_oid', 'pipeline_oid', 'tenders_oid', 'pipe_segment_or_cross_oid','pipe_station_oid'];
+				var initArry = ['project_oid', 'pipeline_oid', 'tenders_oid', 'pipe_segment_or_cross_oid',
+					'pipe_station_oid'
+				];
 				if (initArry.indexOf(id) > -1 && options.length > 0) {
-					if(!that.formData[id]) that.$set(that.formData, id, options[0].key);
-					if(isChange){
+					if (!that.formData[id]) that.$set(that.formData, id, options[0].key);
+					if (isChange) {
 						setTimeout(function () {
-							that.$refs[id][0].$emit('change', {//进行change事件的触发
+							that.$refs[id][0].$emit('change', { //进行change事件的触发
 								value: options[0].key,
-						isInit: true,
+								isInit: true,
 							});
-						});	
+						});
 					}
-					
+
 				}
 			}
 		},
