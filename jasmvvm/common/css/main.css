@@ -441,13 +441,3 @@ html {
     scrollbar-arrow-color: #676767;
     /*箭头颜色*/
 }
-
-.el-tabs__content,
-#pane-second,
-#pane-first {
-    height: 100%;
-}
-
-.el-tabs__header .is-top {
-    padding: 0px 10px;
-}

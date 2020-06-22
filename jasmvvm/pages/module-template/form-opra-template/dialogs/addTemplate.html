@@ -2,76 +2,85 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
-	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
-	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
-	<link rel="stylesheet" href="./../../../../common/css/main.css">
-	<style>
-		html,
-		body {
-			width: 100%;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+    <link rel="stylesheet" href="./../../../../common/css/main.css">
+    <style>
+        html,
+        body {
+            width: 100%;
+        }
+        
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .dialog-footer {
+            background: #fff;
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            z-index: 190;
+            height: 40px;
+            line-height: 40px;
+        }
+        
+        .el-date-editor,
+        .el-input-number {
+            width: 100% !important;
+            /*height: 31px;*/
+        }
+        
+        .el-picker-panel {
+            z-index: 3007 !important;
+        }
+        
+        .el-input__inner {
+            text-align: left !important;
+        }
+        
+        .el-form-item {
+            margin-bottom: 15px !important;
+        }
+        
+        .el-radio-group {
+            line-height: 46px !important;
+        }
+        
+        .height {
+            height: 56px;
 		}
-
-		#app {
-			width: 100%;
+		.el-tabs__content,
+		#pane-second,
+		#pane-first {
 			height: 100%;
-			position: relative;
-			overflow: hidden;
 		}
 
-		.content {
-			height: calc(100% - 40px);
-			overflow-y: auto;
-			overflow-x: hidden;
+		.el-tabs__header .is-top {
+			padding: 0px 10px;
 		}
-
-		.dialog-footer {
-			background: #fff;
-			width: 100%;
-			position: absolute;
-			bottom: 0px;
-			z-index: 190;
-			height: 40px;
-			line-height: 40px;
-		}
-
-		.el-date-editor,
-		.el-input-number {
-			width: 100% !important;
-			/*height: 31px;*/
-		}
-
-		.el-picker-panel {
-			z-index: 3007 !important;
-		}
-
-		.el-input__inner {
-			text-align: left !important;
-		}
-
-		.el-form-item {
-			margin-bottom: 15px !important;
-		}
-
-		.el-radio-group {
-			line-height: 46px !important;
-		}
-
-		.height {
-			height: 56px;
-		}
-	</style>
+    </style>
 </head>
 
 <body>
-	<div id="app" v-cloak v-loading="isLoading">
+    <div id="app" v-cloak v-loading="isLoading">
 
-		<jas-dialog-wrapper>
-			<el-form ref="formData" :model="formData" :label-width="labelwidth">
-				<template v-for="group in formAttr">
+        <jas-dialog-wrapper>
+            <el-form ref="formData" :model="formData" :label-width="labelwidth">
+                <template v-for="group in formAttr">
 					<jas-base-group-title v-if="group.groupName" :name="group.groupName"></jas-base-group-title>
 					<el-row>
 						<template v-for="(item,index) in group.data">
@@ -109,49 +118,38 @@
 											<el-option :label="option.value" :value="option.key">
 											</el-option>
 										</template>
-									</el-select>
-									<el-select v-if="isSelect(item)" :ref="item.id" v-model="formData[item.id]" :disabled="item.disabled"
-										style="width:100%" :size="item.size" clearable @visible-change="visibleChange($event,item)"
-										@change="getChildOpts($event,item)">
-										<template v-for="option in item.options">
+                </el-select>
+                <el-select v-if="isSelect(item)" :ref="item.id" v-model="formData[item.id]" :disabled="item.disabled" style="width:100%" :size="item.size" clearable @visible-change="visibleChange($event,item)" @change="getChildOpts($event,item)">
+                    <template v-for="option in item.options">
 											<el-option :label="option.value" :value="option.key">
 											</el-option>
 										</template>
-									</el-select>
-									<el-time-picker v-if="item.type=='UT_02'" value-format="HH:mm:ss" :disabled="item.disabled"
-										v-model="formData[item.id]" placeholder="任意时间点" :size="item.size">
-									</el-time-picker>
-									<el-date-picker v-if="item.type=='UT_04'" value-format="yyyy-MM-dd HH:mm:ss"
-										v-model="formData[item.id]" type="datetime" placeholder="选择日期时间" :size="item.size"
-										:disabled="item.disabled" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
-									</el-date-picker>
-									<el-date-picker v-if="item.type=='UT_03'" value-format="yyyy-MM-dd" type="date"
-										:placeholder="item.placeholder" v-model="formData[item.id]" :size="item.size"
-										:disabled="item.disabled" style="width: 100%;" :picker-options="item.pickerOptions"
-										@change=fieldChanged(item)>
-									</el-date-picker>
-									<el-radio-group v-if="isRadio(item)" border v-model="formData[item.id]" size="small"
-										:disabled="item.disabled">
-										<template v-for="radioItem in item.options">
+                </el-select>
+                <el-time-picker v-if="item.type=='UT_02'" value-format="HH:mm:ss" :disabled="item.disabled" v-model="formData[item.id]" placeholder="任意时间点" :size="item.size">
+                </el-time-picker>
+                <el-date-picker v-if="item.type=='UT_04'" value-format="yyyy-MM-dd HH:mm:ss" v-model="formData[item.id]" type="datetime" placeholder="选择日期时间" :size="item.size" :disabled="item.disabled" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
+                </el-date-picker>
+                <el-date-picker v-if="item.type=='UT_03'" value-format="yyyy-MM-dd" type="date" :placeholder="item.placeholder" v-model="formData[item.id]" :size="item.size" :disabled="item.disabled" style="width: 100%;" :picker-options="item.pickerOptions" @change=fieldChanged(item)>
+                </el-date-picker>
+                <el-radio-group v-if="isRadio(item)" border v-model="formData[item.id]" size="small" :disabled="item.disabled">
+                    <template v-for="radioItem in item.options">
 											<el-radio :label="radioItem.key" size="small">{{radioItem.value}}</el-radio>
 										</template>
-									</el-radio-group>
-									<el-checkbox-group v-if="isCheckbox(item)" v-model="formData[item.id]" :disabled="item.disabled">
-										<template v-for="checkboxItem in item.options">
+                </el-radio-group>
+                <el-checkbox-group v-if="isCheckbox(item)" v-model="formData[item.id]" :disabled="item.disabled">
+                    <template v-for="checkboxItem in item.options">
 											<el-checkbox :label="checkboxItem.key">{{checkboxItem.value}}</el-checkbox>
 										</template>
-									</el-checkbox-group>
-									<el-input-number v-if="item.type=='UT_14'" :size="item.size" v-model="formData[item.id]"
-										:disabled="item.disabled" controls-position="right" :min="item.min" :max="item.max"
-										:precision="item.precision" data-attr="负数"></el-input-number>
-								</el-form-item>
+                </el-checkbox-group>
+                <el-input-number v-if="item.type=='UT_14'" :size="item.size" v-model="formData[item.id]" :disabled="item.disabled" controls-position="right" :min="item.min" :max="item.max" :precision="item.precision" data-attr="负数"></el-input-number>
+                </el-form-item>
 
-							</el-col>
-						</template>
-					</el-row>
-				</template>
-				<el-row>
-					<template v-if="ifAttachment">
+                </el-col>
+                </template>
+                </el-row>
+                </template>
+                <el-row>
+                    <template v-if="ifAttachment">
 						<jas-base-group-title name="图片信息"></jas-base-group-title>
 						<jas-file-upload-new ref="uploadpic" :max-size="4" :max-total-size="5" file-type="pic"
 							:business-id="formData[pkArray[0]]" @success="picSuccess" @fail="picFail" :business-type="bizType">
@@ -162,14 +160,14 @@
 						</jas-file-upload-new>
 					</template>
 
-				</el-row>
-			</el-form>
-			<div slot="footer">
-				<el-button size="small" @click="cancel()">取 消</el-button>
-				<el-button size="small" type="primary" :disabled="but_disabled" @click="submit('formData')">确 定</el-button>
-			</div>
-		</jas-dialog-wrapper>
-	</div>
+                </el-row>
+            </el-form>
+            <div slot="footer">
+                <el-button size="small" @click="cancel()">取 消</el-button>
+                <el-button size="small" type="primary" :disabled="but_disabled" @click="submit('formData')">确 定</el-button>
+            </div>
+        </jas-dialog-wrapper>
+    </div>
 </body>
 <script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../../lib/vue/vue.js"></script>
@@ -179,863 +177,863 @@
 <script src="./../../../../common/js/jas-tools.js"></script>
 <script src="./../js/form-rules.js"></script>
 <script>
-	var app = new Vue({
-		el: "#app",
-		data: function () {
-			return {
-				bizType: 'attachment',
-				but_disabled: false,
-				isLoading: true,
-				rules: formRules,
-				formData: {}, // 表单字段详情对象
-				formAttr: [], // 表单字段，分组排序，配置数组
-				// [{
-				// 	groupName: '分组名',
-				// 	data: that._sortArray(groupAttr)
-				// }]
-				labelwidth: "160px",
-				formConfig: {
-					xs: 24,
-					sm: 12,
-					md: 6,
-					lg: 6,
-					xl: 6
-				},
-				fileListlength: 0,
-				menuCode: "",
-				formDetail: {},
-				fileList: [],
-				fileListStatus: [],
-				pkArray: [],
-				ifAttachment: false,
-				progress: 0, //上传进度
-				pass: null, //是否上传成功
-				limitNum: 10,
-				autoUpload: false,
-				fieldRuleObj: {},
-				_fieldsGrouped: {},
-				myarea_verify: []
-			}
-		},
+    var app = new Vue({
+        el: "#app",
+        data: function() {
+            return {
+                bizType: 'attachment',
+                but_disabled: false,
+                isLoading: true,
+                rules: formRules,
+                formData: {}, // 表单字段详情对象
+                formAttr: [], // 表单字段，分组排序，配置数组
+                // [{
+                // 	groupName: '分组名',
+                // 	data: that._sortArray(groupAttr)
+                // }]
+                labelwidth: "160px",
+                formConfig: {
+                    xs: 24,
+                    sm: 12,
+                    md: 6,
+                    lg: 6,
+                    xl: 6
+                },
+                fileListlength: 0,
+                menuCode: "",
+                formDetail: {},
+                fileList: [],
+                fileListStatus: [],
+                pkArray: [],
+                ifAttachment: false,
+                progress: 0, //上传进度
+                pass: null, //是否上传成功
+                limitNum: 10,
+                autoUpload: false,
+                fieldRuleObj: {},
+                _fieldsGrouped: {},
+                myarea_verify: []
+            }
+        },
 
-		created: function () {
-			this.setConfig(2);
-		},
-		mounted: function () {
-			var param = window.jasTools.base.getParamsInUrl(location.href);
-			if (param.menuCode) {
-				this.menuCode = param.menuCode;
-			}
-			delete param.menuCode;
-			delete param.privilegeCode;
-			this.formDetail = param;
-			this.isAddPage = JSON.stringify(this.formDetail) == '{}'; // 根据URL中传入的数据判断该页面是否处于编辑页面
+        created: function() {
+            this.setConfig(2);
+        },
+        mounted: function() {
+            var param = window.jasTools.base.getParamsInUrl(location.href);
+            if (param.menuCode) {
+                this.menuCode = param.menuCode;
+            }
+            delete param.menuCode;
+            delete param.privilegeCode;
+            this.formDetail = param;
+            this.isAddPage = JSON.stringify(this.formDetail) == '{}'; // 根据URL中传入的数据判断该页面是否处于编辑页面
 
-			this.requestFieldConfigByOid();
-		},
+            this.requestFieldConfigByOid();
+        },
 
-		methods: {
-			savePic: function () {
-				this.$refs.uploadpic.uploadFile();
+        methods: {
+            savePic: function() {
+                this.$refs.uploadpic.uploadFile();
 
-			},
-			saveFile: function () {
-				this.$refs.uploadfile.uploadFile();
-			},
-			previewFile: function (oid) {
-				alert('自定义预览方法' + oid)
-			},
-			previewPic: function (url) {
-				alert('自定义预览方法' + url)
-			},
-			picSuccess: function () {
-				this.saveFile()
-			},
-			picFail: function () {
-				this.saveFile()
-			},
-			fileFail: function (errObj) {
-				// alert(1111)
-				console.log(errObj.msg)
-			},
-			fileSuccess: function () {
-				this.uploadSuccess()
-			},
-			requestFieldConfigByOid: function () { // 获取各个字段的配置信息
-				var that = this;
-				var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
-				jasTools.ajax.get(url, {
-					functionCode: that.menuCode
-				}, function (data) {
-					that.isLoading = false;
-					if (!data.data.functionFieldsBoList || data.data.functionFieldsBoList.length == 0) return;
-					that.ifAttachment = !!(data.data.ifAttachment == 1); //是否存在附件
-					that._fieldsGrouped = data.data.functionFieldsBoList;
-					data.data.functionFieldsBoList.forEach(function (item) {
-						if (item.uiType) {
-							that.$set(that.formData, item.fieldName, '');
-						}
-					});
-					var fieldsGrouped = that._formatFieldsByGroup(data.data.functionFieldsBoList);
-					if (that.isAddPage) {
-						that.getAddField(fieldsGrouped);
-					} else {
-						that.requestDetailByObj(fieldsGrouped); //请求表单详情
-					}
-				})
-			},
-			_formatFieldsByGroup: function (aFields) { // 将字段进行分组格式化
-				var map = {};
-				var dest = [];
-				for (var i = 0; i < aFields.length; i++) {
-					var ai = aFields[i];
-					if (!map[ai.groupIndex || ai.groupName]) {
-						dest.push({
-							groupName: ai.groupName,
-							index: ai.groupIndex || '',
-							data: [ai]
-						});
-						map[ai.groupIndex || ai.groupName] = ai;
-					} else {
-						for (var j = 0; j < dest.length; j++) {
-							var dj = dest[j];
-							if ((dj.index == ai.groupIndex) || (dj.groupName == ai.groupName)) {
-								dj.data.push(ai);
-								break;
-							}
-						}
-					}
+            },
+            saveFile: function() {
+                this.$refs.uploadfile.uploadFile();
+            },
+            previewFile: function(oid) {
+                alert('自定义预览方法' + oid)
+            },
+            previewPic: function(url) {
+                alert('自定义预览方法' + url)
+            },
+            picSuccess: function() {
+                this.saveFile()
+            },
+            picFail: function() {
+                this.saveFile()
+            },
+            fileFail: function(errObj) {
+                // alert(1111)
+                console.log(errObj.msg)
+            },
+            fileSuccess: function() {
+                this.uploadSuccess()
+            },
+            requestFieldConfigByOid: function() { // 获取各个字段的配置信息
+                var that = this;
+                var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
+                jasTools.ajax.get(url, {
+                    functionCode: that.menuCode
+                }, function(data) {
+                    that.isLoading = false;
+                    if (!data.data.functionFieldsBoList || data.data.functionFieldsBoList.length == 0) return;
+                    that.ifAttachment = !!(data.data.ifAttachment == 1); //是否存在附件
+                    that._fieldsGrouped = data.data.functionFieldsBoList;
+                    data.data.functionFieldsBoList.forEach(function(item) {
+                        if (item.uiType) {
+                            that.$set(that.formData, item.fieldName, '');
+                        }
+                    });
+                    var fieldsGrouped = that._formatFieldsByGroup(data.data.functionFieldsBoList);
+                    if (that.isAddPage) {
+                        that.getAddField(fieldsGrouped);
+                    } else {
+                        that.requestDetailByObj(fieldsGrouped); //请求表单详情
+                    }
+                })
+            },
+            _formatFieldsByGroup: function(aFields) { // 将字段进行分组格式化
+                var map = {};
+                var dest = [];
+                for (var i = 0; i < aFields.length; i++) {
+                    var ai = aFields[i];
+                    if (!map[ai.groupIndex || ai.groupName]) {
+                        dest.push({
+                            groupName: ai.groupName,
+                            index: ai.groupIndex || '',
+                            data: [ai]
+                        });
+                        map[ai.groupIndex || ai.groupName] = ai;
+                    } else {
+                        for (var j = 0; j < dest.length; j++) {
+                            var dj = dest[j];
+                            if ((dj.index == ai.groupIndex) || (dj.groupName == ai.groupName)) {
+                                dj.data.push(ai);
+                                break;
+                            }
+                        }
+                    }
 
-				}
-				return this._sortArray(dest);
-			},
-			getAddField: function (data) {
-				var that = this;
-				data.forEach(function (group, index) { // 针对组数进行循环
-					var groupAttr = [];
-					group.data.forEach(function (item) { // 针对组内的每一项进行循环
-						var obj = {};
-						var options = [];
-						if (item.ifPrimaryKey) { // 找出oid的字段，创建uuid
-							that.pkArray.push(item.fieldName);
-							that.formData[item.fieldName] = jasTools.base.createuuid();
-						}
-						if (item.domainList) { // 字段是阈值下拉选的
-							item.domainList.forEach(function (child) {
-								var obj = {};
-								for (var key in child) {
-									obj[key.toLowerCase()] = child[key];
-								}
-								options.push(obj);
-							});
-						}
-						if (item.ifSave == '1') {
-							obj = {
-								id: item.fieldName,
-								name: item.fieldNameCn,
-								type: item.uiType,
-								size: "small",
-								placeholder: item.placeholder || "请输入" + item.fieldNameCn,
-								options: options,
-								verify: [],
-								requestUrl: item.requestPath,
-								childField: item.childField,
-								min: item.min == null ? -Infinity : item.min,
-								max: item.max || Infinity,
-								precision: item.precision || 0,
-								index: item.rowIndex,
-								ifLessToday: item.ifLessToday, //读取配置接口，暂时写死
-								lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
-								maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
-								fieldLength: item.fieldLength || 200,
-								disabled: item.fieldName == 'construct_unit' ? true : false,
-								fieldRule: that.fieldRuleObj && that.fieldRuleObj[item.fieldName]
-							};
-							if (that.fieldRuleObj && that.fieldRuleObj.frozenFile && that.fieldRuleObj.frozenFile
-								.indexOf(obj.id) > -
-								1) {
-								obj.disabled = true;
-							}
-							if (item.ifRequired == '1') {
-								obj.verify.push({
-									required: true,
-									message: item.placeholder || '该字段为必填项',
-								});
+                }
+                return this._sortArray(dest);
+            },
+            getAddField: function(data) {
+                var that = this;
+                data.forEach(function(group, index) { // 针对组数进行循环
+                    var groupAttr = [];
+                    group.data.forEach(function(item) { // 针对组内的每一项进行循环
+                        var obj = {};
+                        var options = [];
+                        if (item.ifPrimaryKey) { // 找出oid的字段，创建uuid
+                            that.pkArray.push(item.fieldName);
+                            that.formData[item.fieldName] = jasTools.base.createuuid();
+                        }
+                        if (item.domainList) { // 字段是阈值下拉选的
+                            item.domainList.forEach(function(child) {
+                                var obj = {};
+                                for (var key in child) {
+                                    obj[key.toLowerCase()] = child[key];
+                                }
+                                options.push(obj);
+                            });
+                        }
+                        if (item.ifSave == '1') {
+                            obj = {
+                                id: item.fieldName,
+                                name: item.fieldNameCn,
+                                type: item.uiType,
+                                size: "small",
+                                placeholder: item.placeholder || "请输入" + item.fieldNameCn,
+                                options: options,
+                                verify: [],
+                                requestUrl: item.requestPath,
+                                childField: item.childField,
+                                min: item.min == null ? -Infinity : item.min,
+                                max: item.max || Infinity,
+                                precision: item.precision || 0,
+                                index: item.rowIndex,
+                                ifLessToday: item.ifLessToday, //读取配置接口，暂时写死
+                                lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
+                                maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
+                                fieldLength: item.fieldLength || 200,
+                                disabled: item.fieldName == 'construct_unit' ? true : false,
+                                fieldRule: that.fieldRuleObj && that.fieldRuleObj[item.fieldName]
+                            };
+                            if (that.fieldRuleObj && that.fieldRuleObj.frozenFile && that.fieldRuleObj.frozenFile
+                                .indexOf(obj.id) > -
+                                1) {
+                                obj.disabled = true;
+                            }
+                            if (item.ifRequired == '1') {
+                                obj.verify.push({
+                                    required: true,
+                                    message: item.placeholder || '该字段为必填项',
+                                });
 
-							}
-							if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
-								that.myarea_verify.push({
-									required: true,
-									message: '请选择所属区域',
-								});
-							}
-							if (item.uiType == 'UT_01') { // 文本域
-								that.rules.forEach(function (ruleItem) {
-									if (ruleItem.id == item.regularExpression) {
-										obj.verify.push({
-											pattern: eval(ruleItem.regexp),
-											message: ruleItem.tip
-										});
-									}
-								});
-							}
-							if (item.fieldLength && item.uiType == 'UT_01') { // 添加长度限制
-								obj.verify.push({
-									min: "0",
-									max: item.fieldLength,
-									message: "不能超过" + item.fieldLength + "字"
-								});
-							}
-							if (item.regularExpression == '4' && item.min && item.max) {
-								obj.verify.push({
-									validator: validateNumber,
-									trigger: 'blur'
-								});
-							}
-							if (item.uiType == "UT_03" || item.uiType == "UT_04") { //表示时间类型
-								if (item.ifLessToday == "1") { //表示是否小于今天，默认为true
-									obj.pickerOptions = {
-										disabledDate: function (time) {
-											return time.getTime() > new Date().getTime()
-										}
-									};
-								} else {
-									obj.pickerOptions = {};
-								}
-							}
-							if (item.uiType == "UT_07" || item.uiType == "UT_08") {
-								that.$set(that.formData, item.fieldName, []);
-							}
-							if (item.uiType == "UT_05" || item.uiType == "UT_06") {
-								if (obj.options.length > 0) {
-									that.$set(that.formData, item.fieldName, obj.options[0].key);
-								}
-							}
-							if (item.uiType == 'UT_14') {
-								// 如果是数字，增加默认值
-								if (!obj.min && obj.min != 0) {
-									obj.min = -10000;
-									// that.$set(that.formData, item.fieldName, 0);
-								} else {
-									if (obj.min < 0) {
-										// that.$set(that.formData, item.fieldName, 0);
-									} else {
-										that.$set(that.formData, item.fieldName, obj.min);
-									}
-								}
-							}
-							if (item.uiType == 'UT_11' || item.uiType == 'UT_12') {
-								that._isInit(obj.id, obj.options, true);
-							}
-							groupAttr.push(obj);
-						}
-					});
-					that.formAttr.push({
-						groupName: group.groupName,
-						data: that._sortArray(groupAttr)
-					});
-				});
-			},
-			getEditField: function (data) {
-				var that = this;
-				data.forEach(function (group, index) {
-					var groupAttr = [];
-					group.data.forEach(function (item) {
-						var obj = {};
-						var options = [];
-						if (item.ifPrimaryKey) {
-							that.pkArray.push(item.fieldName);
-						}
-						if (item.domainList) {
-							item.domainList.forEach(function (child) {
-								var obj = {};
-								for (var key in child) {
-									obj[key.toLowerCase()] = child[key];
-								}
-								options.push(obj);
-							});
-						}
+                            }
+                            if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
+                                that.myarea_verify.push({
+                                    required: true,
+                                    message: '请选择所属区域',
+                                });
+                            }
+                            if (item.uiType == 'UT_01') { // 文本域
+                                that.rules.forEach(function(ruleItem) {
+                                    if (ruleItem.id == item.regularExpression) {
+                                        obj.verify.push({
+                                            pattern: eval(ruleItem.regexp),
+                                            message: ruleItem.tip
+                                        });
+                                    }
+                                });
+                            }
+                            if (item.fieldLength && item.uiType == 'UT_01') { // 添加长度限制
+                                obj.verify.push({
+                                    min: "0",
+                                    max: item.fieldLength,
+                                    message: "不能超过" + item.fieldLength + "字"
+                                });
+                            }
+                            if (item.regularExpression == '4' && item.min && item.max) {
+                                obj.verify.push({
+                                    validator: validateNumber,
+                                    trigger: 'blur'
+                                });
+                            }
+                            if (item.uiType == "UT_03" || item.uiType == "UT_04") { //表示时间类型
+                                if (item.ifLessToday == "1") { //表示是否小于今天，默认为true
+                                    obj.pickerOptions = {
+                                        disabledDate: function(time) {
+                                            return time.getTime() > new Date().getTime()
+                                        }
+                                    };
+                                } else {
+                                    obj.pickerOptions = {};
+                                }
+                            }
+                            if (item.uiType == "UT_07" || item.uiType == "UT_08") {
+                                that.$set(that.formData, item.fieldName, []);
+                            }
+                            if (item.uiType == "UT_05" || item.uiType == "UT_06") {
+                                if (obj.options.length > 0) {
+                                    that.$set(that.formData, item.fieldName, obj.options[0].key);
+                                }
+                            }
+                            if (item.uiType == 'UT_14') {
+                                // 如果是数字，增加默认值
+                                if (!obj.min && obj.min != 0) {
+                                    obj.min = -10000;
+                                    // that.$set(that.formData, item.fieldName, 0);
+                                } else {
+                                    if (obj.min < 0) {
+                                        // that.$set(that.formData, item.fieldName, 0);
+                                    } else {
+                                        that.$set(that.formData, item.fieldName, obj.min);
+                                    }
+                                }
+                            }
+                            if (item.uiType == 'UT_11' || item.uiType == 'UT_12') {
+                                that._isInit(obj.id, obj.options, true);
+                            }
+                            groupAttr.push(obj);
+                        }
+                    });
+                    that.formAttr.push({
+                        groupName: group.groupName,
+                        data: that._sortArray(groupAttr)
+                    });
+                });
+            },
+            getEditField: function(data) {
+                var that = this;
+                data.forEach(function(group, index) {
+                    var groupAttr = [];
+                    group.data.forEach(function(item) {
+                        var obj = {};
+                        var options = [];
+                        if (item.ifPrimaryKey) {
+                            that.pkArray.push(item.fieldName);
+                        }
+                        if (item.domainList) {
+                            item.domainList.forEach(function(child) {
+                                var obj = {};
+                                for (var key in child) {
+                                    obj[key.toLowerCase()] = child[key];
+                                }
+                                options.push(obj);
+                            });
+                        }
 
-						if (item.ifUpdate == '1') {
-							console.log(item.min);
-							obj = {
-								id: item.fieldName,
-								name: item.fieldNameCn,
-								type: item.uiType,
-								size: "small",
-								placeholder: item.placeholder || "请输入" + item.fieldNameCn,
-								options: options,
-								verify: [],
-								requestUrl: item.requestPath,
-								childField: item.childField,
-								index: item.rowIndex,
-								min: item.min == null ? -Infinity : item.min,
-								max: item.max || Infinity,
-								precision: item.precision || 0,
-								disabled: item.fieldName == 'construct_unit' ? true : false,
-								ifLessToday: item.ifLessToday, //读取配置接口，暂时写死
-								lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
-								maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
-								fieldLength: item.fieldLength || 200,
-								fieldRule: that.fieldRuleObj && that.fieldRuleObj[item.fieldName]
-							};
+                        if (item.ifUpdate == '1') {
+                            console.log(item.min);
+                            obj = {
+                                id: item.fieldName,
+                                name: item.fieldNameCn,
+                                type: item.uiType,
+                                size: "small",
+                                placeholder: item.placeholder || "请输入" + item.fieldNameCn,
+                                options: options,
+                                verify: [],
+                                requestUrl: item.requestPath,
+                                childField: item.childField,
+                                index: item.rowIndex,
+                                min: item.min == null ? -Infinity : item.min,
+                                max: item.max || Infinity,
+                                precision: item.precision || 0,
+                                disabled: item.fieldName == 'construct_unit' ? true : false,
+                                ifLessToday: item.ifLessToday, //读取配置接口，暂时写死
+                                lessDateScope: item.lessDateScope && item.lessDateScope.split(","), //小于日期
+                                maxDateScope: item.maxDateScope && item.maxDateScope.split(","), //表示需要大于的日期
+                                fieldLength: item.fieldLength || 200,
+                                fieldRule: that.fieldRuleObj && that.fieldRuleObj[item.fieldName]
+                            };
 
-							if (item.updateable == '1') {
-								obj.disabled = true;
-							}
-							if (item.ifRequired == '1') {
-								obj.verify.push({
-									required: true,
-									message: item.placeholder
-								});
-							}
-							if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
-								that.myarea_verify.push({
-									required: true,
-									message: '请选择所属区域',
-								});
-							}
-							if (item.uiType == 'UT_01') {
-								that.rules.forEach(function (ruleItem) {
-									if (ruleItem.id == item.regularExpression) {
-										obj.verify.push({
-											pattern: eval(ruleItem.regexp),
-											message: ruleItem.tip
-										});
-									}
-								});
-							}
-							if (item.fieldLength && item.uiType == 'UT_01') {
-								obj.verify.push({
-									min: "0",
-									max: item.fieldLength,
-									message: "不能超过" + item.fieldLength + "字"
-								});
-							}
-							if (item.uiType == "UT_03" || item.uiType == "UT_04") { //表示时间类型
-								if (item.ifLessToday == "1") { //表示是否小于今天，默认为true
-									obj.pickerOptions = {
-										disabledDate: function (time) {
-											return time.getTime() > new Date().getTime()
-										}
-									};
-								} else {
-									obj.pickerOptions = {};
-								}
-								that.initFieldChanged(obj);
+                            if (item.updateable == '1') {
+                                obj.disabled = true;
+                            }
+                            if (item.ifRequired == '1') {
+                                obj.verify.push({
+                                    required: true,
+                                    message: item.placeholder
+                                });
+                            }
+                            if (item.fieldName == 'CITY_ID' && item.ifRequired == '1') {
+                                that.myarea_verify.push({
+                                    required: true,
+                                    message: '请选择所属区域',
+                                });
+                            }
+                            if (item.uiType == 'UT_01') {
+                                that.rules.forEach(function(ruleItem) {
+                                    if (ruleItem.id == item.regularExpression) {
+                                        obj.verify.push({
+                                            pattern: eval(ruleItem.regexp),
+                                            message: ruleItem.tip
+                                        });
+                                    }
+                                });
+                            }
+                            if (item.fieldLength && item.uiType == 'UT_01') {
+                                obj.verify.push({
+                                    min: "0",
+                                    max: item.fieldLength,
+                                    message: "不能超过" + item.fieldLength + "字"
+                                });
+                            }
+                            if (item.uiType == "UT_03" || item.uiType == "UT_04") { //表示时间类型
+                                if (item.ifLessToday == "1") { //表示是否小于今天，默认为true
+                                    obj.pickerOptions = {
+                                        disabledDate: function(time) {
+                                            return time.getTime() > new Date().getTime()
+                                        }
+                                    };
+                                } else {
+                                    obj.pickerOptions = {};
+                                }
+                                that.initFieldChanged(obj);
 
-							}
-							if (item.regularExpression == '4' && item.min && item.max) {
-								obj.verify.push({
-									validator: validateNumber,
-									trigger: 'blur'
-								});
-							}
-							if (item.uiType == "UT_07" || item.uiType == "UT_08") {
-								that.$set(that.formData, item.fieldName, that.formData[item.fieldName].split(","));
-							}
-							if (item.uiType == "UT_09" || item.uiType == "UT_10") {
-								that.$set(that.formData, item.fieldName, that.formData[item.fieldName].split(","));
-							}
-							if (item.uiType == 'UT_14') {
-								// 如果是数字，增加默认值
-								if (!that.formData[obj.id]) {
-									if (obj.min || obj.min == 0) {
-										console.log("设置了最小值" + obj.min);
-										// that.$set(that.formData, item.fieldName, obj.min);
-									} else {
-										console.log("如果没有最小值")
-										obj.min = -10000;
-										// that.$set(that.formData, item.fieldName, 0);
-									}
-								} else {
-									that.$set(that.formData, item.fieldName, that.formData[obj.id]);
-								}
-							}
-							groupAttr.push(obj);
+                            }
+                            if (item.regularExpression == '4' && item.min && item.max) {
+                                obj.verify.push({
+                                    validator: validateNumber,
+                                    trigger: 'blur'
+                                });
+                            }
+                            if (item.uiType == "UT_07" || item.uiType == "UT_08") {
+                                that.$set(that.formData, item.fieldName, that.formData[item.fieldName].split(","));
+                            }
+                            if (item.uiType == "UT_09" || item.uiType == "UT_10") {
+                                that.$set(that.formData, item.fieldName, that.formData[item.fieldName].split(","));
+                            }
+                            if (item.uiType == 'UT_14') {
+                                // 如果是数字，增加默认值
+                                if (!that.formData[obj.id]) {
+                                    if (obj.min || obj.min == 0) {
+                                        console.log("设置了最小值" + obj.min);
+                                        // that.$set(that.formData, item.fieldName, obj.min);
+                                    } else {
+                                        console.log("如果没有最小值")
+                                        obj.min = -10000;
+                                        // that.$set(that.formData, item.fieldName, 0);
+                                    }
+                                } else {
+                                    that.$set(that.formData, item.fieldName, that.formData[obj.id]);
+                                }
+                            }
+                            groupAttr.push(obj);
 
-							if (item.requestPath && item.childField) {
-								setTimeout(function () {
-									that.$refs[item.fieldName][0].$emit('change', {
-										value: that.formData[item.fieldName],
-										isInit: true,
-									});
-								});
-							}
-						}
-					});
-					that.formAttr.push({
-						groupName: group.groupName,
-						data: that._sortArray(groupAttr)
-					});
-				});
-				that.$nextTick(function () {
-					that.ifAttachment && that.$refs.uploadpic.requestFile(); // 触发附件请求
-					that.ifAttachment && that.$refs.uploadfile.requestFile(); // 触发附件请求
-				});
-			},
-			requestDetailByObj: function (fieldsGrouped) { //请求表单详情
-				var that = this;
-				var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/get.do";
-				jasTools.ajax.post(url, this.formDetail, function (data) {
-					if (data && data.data) {
-						for (var key in data.data) {
-							if (data.data[key] || data.data[key] == 0) {
-								that.formData[key] = data.data[key];
-							}
-						}
-						that.formData.myarea = data.data.COUNTY_ID || data.data.CITY_ID || '';
-					}
-					that.getEditField(fieldsGrouped);
-				});
-			},
-			cancel: function () {
-				this.closeForm();
-			},
-			closeForm: function () {
-				top.jasTools.dialog.close();
-			},
-			submit: function (formName) {
-				var that = this;
-				this.$refs[formName].validate(function (valid) { //
-					if (valid) {
-						that._requestSaveFormData();
-					} else {
-						return false;
-					}
-				});
-			},
-			_formatFormData: function () {
-				var that = this;
-				var obj = {};
-				var map = that.getSelectFieldMap();
-				for (var key in that.formData) {
-					if (key === 'CREATE_USER_UNIT_ID' || key === 'CREATE_USER_UNIT_NAME' || key === 'create_user_unit_id' ||
-						key === 'create_user_unit_name') {
-						continue;
-					} else if (that.formData[key] instanceof Array) {
-						obj[key] = that.formData[key].length > 0 ? that.formData[key].join(",") : that.formData[key]
-					} else if (that.formData[key] === '') {
-						obj[key] = null;
-					} else if (key === 'myarea' && that.$refs.myarea) {
-						// console.log(JSON.stringify(that.$refs.myarea[0].value_datas))
-						var ids = that.$refs.myarea[0].value_datas;
-						var names = that.$refs.myarea[0].cLabel;
-						if (ids.length == 0 && names.length == 0) {
-							obj.CITY_ID = that.formData.CITY_ID;
-							obj.COUNTY_ID = that.formData.COUNTY_ID;
-							obj.CITY_NAME = that.formData.CITY_NAME;
-							obj.COUNTY_NAME = that.formData.COUNTY_NAME;
-						} else {
-							obj.CITY_ID = ids[0];
-							obj.COUNTY_ID = ids[1];
-							obj.CITY_NAME = ids[0] ? names[0] : undefined;
-							obj.COUNTY_NAME = ids[1] ? names[1] : undefined;
+                            if (item.requestPath && item.childField) {
+                                setTimeout(function() {
+                                    that.$refs[item.fieldName][0].$emit('change', {
+                                        value: that.formData[item.fieldName],
+                                        isInit: true,
+                                    });
+                                });
+                            }
+                        }
+                    });
+                    that.formAttr.push({
+                        groupName: group.groupName,
+                        data: that._sortArray(groupAttr)
+                    });
+                });
+                that.$nextTick(function() {
+                    that.ifAttachment && that.$refs.uploadpic.requestFile(); // 触发附件请求
+                    that.ifAttachment && that.$refs.uploadfile.requestFile(); // 触发附件请求
+                });
+            },
+            requestDetailByObj: function(fieldsGrouped) { //请求表单详情
+                var that = this;
+                var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/get.do";
+                jasTools.ajax.post(url, this.formDetail, function(data) {
+                    if (data && data.data) {
+                        for (var key in data.data) {
+                            if (data.data[key] || data.data[key] == 0) {
+                                that.formData[key] = data.data[key];
+                            }
+                        }
+                        that.formData.myarea = data.data.COUNTY_ID || data.data.CITY_ID || '';
+                    }
+                    that.getEditField(fieldsGrouped);
+                });
+            },
+            cancel: function() {
+                this.closeForm();
+            },
+            closeForm: function() {
+                top.jasTools.dialog.close();
+            },
+            submit: function(formName) {
+                var that = this;
+                this.$refs[formName].validate(function(valid) { //
+                    if (valid) {
+                        that._requestSaveFormData();
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            _formatFormData: function() {
+                var that = this;
+                var obj = {};
+                var map = that.getSelectFieldMap();
+                for (var key in that.formData) {
+                    if (key === 'CREATE_USER_UNIT_ID' || key === 'CREATE_USER_UNIT_NAME' || key === 'create_user_unit_id' ||
+                        key === 'create_user_unit_name') {
+                        continue;
+                    } else if (that.formData[key] instanceof Array) {
+                        obj[key] = that.formData[key].length > 0 ? that.formData[key].join(",") : that.formData[key]
+                    } else if (that.formData[key] === '') {
+                        obj[key] = null;
+                    } else if (key === 'myarea' && that.$refs.myarea) {
+                        // console.log(JSON.stringify(that.$refs.myarea[0].value_datas))
+                        var ids = that.$refs.myarea[0].value_datas;
+                        var names = that.$refs.myarea[0].cLabel;
+                        if (ids.length == 0 && names.length == 0) {
+                            obj.CITY_ID = that.formData.CITY_ID;
+                            obj.COUNTY_ID = that.formData.COUNTY_ID;
+                            obj.CITY_NAME = that.formData.CITY_NAME;
+                            obj.COUNTY_NAME = that.formData.COUNTY_NAME;
+                        } else {
+                            obj.CITY_ID = ids[0];
+                            obj.COUNTY_ID = ids[1];
+                            obj.CITY_NAME = ids[0] ? names[0] : undefined;
+                            obj.COUNTY_NAME = ids[1] ? names[1] : undefined;
 
-						}
-					} else {
-						obj[key] = that.formData[key]
-					}
-				}
+                        }
+                    } else {
+                        obj[key] = that.formData[key]
+                    }
+                }
 
-				for (var key in that.formData) {
-					if (map[key]) { // 是下拉选字段，存储name
-						if (that.formData[key]) {
-							obj[map[key]] = that.$refs[key][0].selectedLabel;
-						} else {
-							obj[map[key]] = '';
-						}
-					}
-				}
-				return obj;
-			},
-			_requestSaveFormData: function () {
-				var that = this;
-				var str = that.isAddPage ? "save" : "update";
-				var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/" + str + ".do"
-				this.but_disabled = true;
-				var obj = that._formatFormData();
-				jasTools.ajax.post(url, obj, function (data) {
-					if (that.ifAttachment) {
-						// that.$refs.upload.uploadFile(that.formData[that.pkArray[0]], that.formData.project_oid);
-						that.savePic();
-					} else {
-						that.uploadSuccess();
-					}
-				}, function (data) {
-					that.but_disabled = false;
-				});
-			},
-			getSelectFieldMap: function () {
-				var that = this;
-				var obj = {};
-				this._fieldsGrouped.forEach(function (item) {
-					if (item.uiType == "UT_11" && ['CITY_ID', 'COUNTY_ID'].indexOf(item.fieldName) < 0) {
-						//var name = item.fieldName.replace('ID', 'NAME');
-						var name = item.fieldName.replace(/(.*)ID/, '$1NAME');
-						//name = name.replace('id', 'name');
-						name = name.replace(/(.*)id/, '$1name');
-						obj[item.fieldName] = name;
-					}
-				});
-				return obj;
-			},
-			uploadSuccess: function () {
-				top.Vue.prototype.$message({
-					message: this.isAddPage ? "增加成功" : "修改成功",
-					type: 'success'
-				});
-				this.closeForm();
-			},
-			getChildOpts: function (oParam, oFieldConfig) {
-				// 获取级联下拉选的选项
-				// oParam: value值或者obj对象
-				// item: 当前字段的配置信息
-				// 第一次触发（isInit），不会清空value值,其他的会清空value值
-				var that = this;
-				var isInit = false;
-				var value = oParam;
-				if ((typeof oParam) === 'object') {
-					isInit = oParam.isInit;
-					value = oParam.value;
-				}
-				var setChildOptionsAndValue = function (childField, options) { // 入参下拉选项
-					that.formAttr.forEach(function (parent, index) {
-						parent.data.forEach(function (child) { // 遍历字段
-							if (childField === child.id) { // 确认是级联子集字段
-								if (value) { // 父级有值
-									child.options = options; // 赋值下拉选项
-								} else {
-									child.options = []; // 清空下拉选项
-								}
-								if (!isInit && childField != 'construct_unit') { // 不是初始化
-									that.$set(that.formData, child.id, ""); // 清空子级联的value
-								}
-								//if (options.length === 1) { //只有一个选项就自动复制
-								//that.$set(that.formData, child.id, options[0].key); // 赋值 子级联的value
-								//	}
-								that._isInit(child.id, options, false);
-								that.$refs[child.id][0].$emit('change', { // 触发子级联的change事件
-									value: that.formData[child.id],
-									isInit: isInit
-								});
-							}
-						});
-					});
-				};
+                for (var key in that.formData) {
+                    if (map[key]) { // 是下拉选字段，存储name
+                        if (that.formData[key]) {
+                            obj[map[key]] = that.$refs[key][0].selectedLabel;
+                        } else {
+                            obj[map[key]] = '';
+                        }
+                    }
+                }
+                return obj;
+            },
+            _requestSaveFormData: function() {
+                var that = this;
+                var str = that.isAddPage ? "save" : "update";
+                var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/" + str + ".do"
+                this.but_disabled = true;
+                var obj = that._formatFormData();
+                jasTools.ajax.post(url, obj, function(data) {
+                    if (that.ifAttachment) {
+                        // that.$refs.upload.uploadFile(that.formData[that.pkArray[0]], that.formData.project_oid);
+                        that.savePic();
+                    } else {
+                        that.uploadSuccess();
+                    }
+                }, function(data) {
+                    that.but_disabled = false;
+                });
+            },
+            getSelectFieldMap: function() {
+                var that = this;
+                var obj = {};
+                this._fieldsGrouped.forEach(function(item) {
+                    if (item.uiType == "UT_11" && ['CITY_ID', 'COUNTY_ID'].indexOf(item.fieldName) < 0) {
+                        //var name = item.fieldName.replace('ID', 'NAME');
+                        var name = item.fieldName.replace(/(.*)ID/, '$1NAME');
+                        //name = name.replace('id', 'name');
+                        name = name.replace(/(.*)id/, '$1name');
+                        obj[item.fieldName] = name;
+                    }
+                });
+                return obj;
+            },
+            uploadSuccess: function() {
+                top.Vue.prototype.$message({
+                    message: this.isAddPage ? "增加成功" : "修改成功",
+                    type: 'success'
+                });
+                this.closeForm();
+            },
+            getChildOpts: function(oParam, oFieldConfig) {
+                // 获取级联下拉选的选项
+                // oParam: value值或者obj对象
+                // item: 当前字段的配置信息
+                // 第一次触发（isInit），不会清空value值,其他的会清空value值
+                var that = this;
+                var isInit = false;
+                var value = oParam;
+                if ((typeof oParam) === 'object') {
+                    isInit = oParam.isInit;
+                    value = oParam.value;
+                }
+                var setChildOptionsAndValue = function(childField, options) { // 入参下拉选项
+                    that.formAttr.forEach(function(parent, index) {
+                        parent.data.forEach(function(child) { // 遍历字段
+                            if (childField === child.id) { // 确认是级联子集字段
+                                if (value) { // 父级有值
+                                    child.options = options; // 赋值下拉选项
+                                } else {
+                                    child.options = []; // 清空下拉选项
+                                }
+                                if (!isInit && childField != 'construct_unit') { // 不是初始化
+                                    that.$set(that.formData, child.id, ""); // 清空子级联的value
+                                }
+                                //if (options.length === 1) { //只有一个选项就自动复制
+                                //that.$set(that.formData, child.id, options[0].key); // 赋值 子级联的value
+                                //	}
+                                that._isInit(child.id, options, false);
+                                that.$refs[child.id][0].$emit('change', { // 触发子级联的change事件
+                                    value: that.formData[child.id],
+                                    isInit: isInit
+                                });
+                            }
+                        });
+                    });
+                };
 
-				var getAndSet = function (childField, requestUrl) {
-					if (requestUrl && value) { //进行子级的查找 后台请求
-						console.log(oFieldConfig.id);
-						var key = jasTools.base.switchToLowerCaseAndCamelCase(oFieldConfig.id);
-						console.log(key);
-						var obj = {
-							"rows": 100,
-							"page": 1,
-						};
-						obj[key] = value;
-						jasTools.ajax.post(jasTools.base.rootPath + "/" + requestUrl, obj, function (data) {
-							if (!that.isAddPage) {
-								var isExistsItem = false;
-								for (var k in data.rows) {
-									if (data.rows[k].key == that.formData[childField]) {
-										isExistsItem = true;
-										break;
-									}
-								}
-								if (!isExistsItem) {
-									var fieldNameCn;
-									var fieldName;
-									for (var i in that._fieldsGrouped) {
-										if (childField == that._fieldsGrouped[i].fieldName) {
-											fieldNameCn = that._fieldsGrouped[i].fieldNameCn;
-											break;
-										}
-									}
-									for (var j in that._fieldsGrouped) {
-										if (fieldNameCn == that._fieldsGrouped[j].fieldNameCn && childField != that
-											._fieldsGrouped[j].fieldName) {
-											fieldName = that._fieldsGrouped[j].fieldName;
-											break;
-										}
-									}
-									/**用于修改自定义表单级联出现下拉选赋值错误问题-2020-04-24**/
-									if (that.formData[fieldName] && that.formData[childField]) {
-										var item = {
-											"value": that.formData[fieldName],
-											"key": that.formData[childField]
-										};
-										data.rows.push(item);
-									}
-								}
-							}
-							setChildOptionsAndValue(childField, data.rows)
-						});
-					} else {
-						setChildOptionsAndValue(childField, []);
-					}
-				};
+                var getAndSet = function(childField, requestUrl) {
+                    if (requestUrl && value) { //进行子级的查找 后台请求
+                        console.log(oFieldConfig.id);
+                        var key = jasTools.base.switchToLowerCaseAndCamelCase(oFieldConfig.id);
+                        console.log(key);
+                        var obj = {
+                            "rows": 100,
+                            "page": 1,
+                        };
+                        obj[key] = value;
+                        jasTools.ajax.post(jasTools.base.rootPath + "/" + requestUrl, obj, function(data) {
+                            if (!that.isAddPage) {
+                                var isExistsItem = false;
+                                for (var k in data.rows) {
+                                    if (data.rows[k].key == that.formData[childField]) {
+                                        isExistsItem = true;
+                                        break;
+                                    }
+                                }
+                                if (!isExistsItem) {
+                                    var fieldNameCn;
+                                    var fieldName;
+                                    for (var i in that._fieldsGrouped) {
+                                        if (childField == that._fieldsGrouped[i].fieldName) {
+                                            fieldNameCn = that._fieldsGrouped[i].fieldNameCn;
+                                            break;
+                                        }
+                                    }
+                                    for (var j in that._fieldsGrouped) {
+                                        if (fieldNameCn == that._fieldsGrouped[j].fieldNameCn && childField != that
+                                            ._fieldsGrouped[j].fieldName) {
+                                            fieldName = that._fieldsGrouped[j].fieldName;
+                                            break;
+                                        }
+                                    }
+                                    /**用于修改自定义表单级联出现下拉选赋值错误问题-2020-04-24**/
+                                    if (that.formData[fieldName] && that.formData[childField]) {
+                                        var item = {
+                                            "value": that.formData[fieldName],
+                                            "key": that.formData[childField]
+                                        };
+                                        data.rows.push(item);
+                                    }
+                                }
+                            }
+                            setChildOptionsAndValue(childField, data.rows)
+                        });
+                    } else {
+                        setChildOptionsAndValue(childField, []);
+                    }
+                };
 
-				oFieldConfig.childField && oFieldConfig.childField.split(',').forEach(function (childField, index) {
-					if (!oFieldConfig.requestUrl) return;
-					var urls = oFieldConfig.requestUrl.split(',');
-					var url = urls[index] || urls[0];
-					getAndSet(childField, url);
-				});
-				that.changeRule(oParam, oFieldConfig);
-			},
-			changeRule: function ($event, item) {
-				var that = this;
-				/**根据最新配置，满足根据选择值的不同，表单进行适配**/
-				if (configSet[that.menuCode] && item.id == configSet[that.menuCode].key) {
-					if (that.formData[item.id] == configSet[that.menuCode].selectVal) {
-						that.formAttr.forEach(function (item) {
-							item.data.forEach(function (child) {
-								if (child.id == configSet[that.menuCode].childKey) {
-									child.verify.push(configSet[that.menuCode].childRule);
-								}
-							});
-						});
-					} else {
-						that.formAttr.forEach(function (item) {
-							item.data.forEach(function (child) {
-								if (child.id == configSet[that.menuCode].childKey) {
-									child.verify = [];
-								}
-							});
-						});
-					}
-				}
-				if (!item.fieldRule) {
-					return;
-				}
-				if (item.options.length > 0) {
-					for (var i = 0; i < item.options.length; i++) {
-						if (item.options[i].key == that.formData[item.id]) {
-							item.fieldRule.forEach(function (ruleItem) {
-								that.formData[ruleItem.source] = item.options[i][ruleItem.value] + ruleItem.custom;
-							});
-							break;
-						}
-					}
-					return;
-				}
-				that.formData[item.fieldRule.source] = that.formData[item.id] + item.fieldRule.custom;
-			},
-			visibleChange: function (falg, item) {
-				var that = this;
-				if (falg) {
-					that.formAttr.forEach(function (parent, index) {
-						parent.data.forEach(function (child) {
-							if (child.childField && child.childField.indexOf(",") > -1) {
-								if (child.childField.indexOf(item.id) > -1) {
-									if (!that.formData[child.id]) {
-										top.Vue.prototype.$message({
-											message: '请先选择' + child.name,
-											type: 'warning'
-										});
-									}
-									return;
-								}
-							} else {
-								if (child.childField == item.id) {
-									if (!that.formData[child.id]) {
-										top.Vue.prototype.$message({
-											message: '请先选择' + child.name,
-											type: 'warning'
-										});
-									}
-									return;
-								}
-							}
-						})
-					});
-				}
-			},
-			setConfig: function (col) {
-				if (col == 4) {
-					this.formConfig.xs = 24;
-					this.formConfig.sm = 12;
-					this.formConfig.md = 6;
-					this.formConfig.lg = 6;
-					this.formConfig.xl = 6;
-				}
-				if (col == 3) {
-					this.formConfig.xs = 24;
-					this.formConfig.sm = 12;
-					this.formConfig.md = 8;
-					this.formConfig.lg = 8;
-					this.formConfig.xl = 8;
-				}
-				if (col == 2) {
-					this.formConfig.xs = 24;
-					this.formConfig.sm = 12;
-					this.formConfig.md = 12;
-					this.formConfig.lg = 12;
-					this.formConfig.xl = 12;
-				}
-				if (col == 1) {
-					this.formConfig.xs = 24;
-					this.formConfig.sm = 24;
-					this.formConfig.md = 24;
-					this.formConfig.lg = 24;
-					this.formConfig.xl = 24;
-				}
-			},
-			isSelect: function (item) {
-				if (item.type == "UT_11" || item.type == "UT_12") {
-					return true;
-				}
-				return false;
-			},
-			isMultiSelect: function (item) {
-				if (item.type == "UT_09" || item.type == "UT_10") {
-					return true;
-				}
-				return false;
-			},
-			isRadio: function (item) {
-				if (item.type == "UT_05" || item.type == "UT_06") {
-					return true;
-				}
-				return false;
-			},
-			isCheckbox: function (item) {
-				if (item.type == "UT_07" || item.type == "UT_08") {
-					return true;
-				}
-				return false
-			},
+                oFieldConfig.childField && oFieldConfig.childField.split(',').forEach(function(childField, index) {
+                    if (!oFieldConfig.requestUrl) return;
+                    var urls = oFieldConfig.requestUrl.split(',');
+                    var url = urls[index] || urls[0];
+                    getAndSet(childField, url);
+                });
+                that.changeRule(oParam, oFieldConfig);
+            },
+            changeRule: function($event, item) {
+                var that = this;
+                /**根据最新配置，满足根据选择值的不同，表单进行适配**/
+                if (configSet[that.menuCode] && item.id == configSet[that.menuCode].key) {
+                    if (that.formData[item.id] == configSet[that.menuCode].selectVal) {
+                        that.formAttr.forEach(function(item) {
+                            item.data.forEach(function(child) {
+                                if (child.id == configSet[that.menuCode].childKey) {
+                                    child.verify.push(configSet[that.menuCode].childRule);
+                                }
+                            });
+                        });
+                    } else {
+                        that.formAttr.forEach(function(item) {
+                            item.data.forEach(function(child) {
+                                if (child.id == configSet[that.menuCode].childKey) {
+                                    child.verify = [];
+                                }
+                            });
+                        });
+                    }
+                }
+                if (!item.fieldRule) {
+                    return;
+                }
+                if (item.options.length > 0) {
+                    for (var i = 0; i < item.options.length; i++) {
+                        if (item.options[i].key == that.formData[item.id]) {
+                            item.fieldRule.forEach(function(ruleItem) {
+                                that.formData[ruleItem.source] = item.options[i][ruleItem.value] + ruleItem.custom;
+                            });
+                            break;
+                        }
+                    }
+                    return;
+                }
+                that.formData[item.fieldRule.source] = that.formData[item.id] + item.fieldRule.custom;
+            },
+            visibleChange: function(falg, item) {
+                var that = this;
+                if (falg) {
+                    that.formAttr.forEach(function(parent, index) {
+                        parent.data.forEach(function(child) {
+                            if (child.childField && child.childField.indexOf(",") > -1) {
+                                if (child.childField.indexOf(item.id) > -1) {
+                                    if (!that.formData[child.id]) {
+                                        top.Vue.prototype.$message({
+                                            message: '请先选择' + child.name,
+                                            type: 'warning'
+                                        });
+                                    }
+                                    return;
+                                }
+                            } else {
+                                if (child.childField == item.id) {
+                                    if (!that.formData[child.id]) {
+                                        top.Vue.prototype.$message({
+                                            message: '请先选择' + child.name,
+                                            type: 'warning'
+                                        });
+                                    }
+                                    return;
+                                }
+                            }
+                        })
+                    });
+                }
+            },
+            setConfig: function(col) {
+                if (col == 4) {
+                    this.formConfig.xs = 24;
+                    this.formConfig.sm = 12;
+                    this.formConfig.md = 6;
+                    this.formConfig.lg = 6;
+                    this.formConfig.xl = 6;
+                }
+                if (col == 3) {
+                    this.formConfig.xs = 24;
+                    this.formConfig.sm = 12;
+                    this.formConfig.md = 8;
+                    this.formConfig.lg = 8;
+                    this.formConfig.xl = 8;
+                }
+                if (col == 2) {
+                    this.formConfig.xs = 24;
+                    this.formConfig.sm = 12;
+                    this.formConfig.md = 12;
+                    this.formConfig.lg = 12;
+                    this.formConfig.xl = 12;
+                }
+                if (col == 1) {
+                    this.formConfig.xs = 24;
+                    this.formConfig.sm = 24;
+                    this.formConfig.md = 24;
+                    this.formConfig.lg = 24;
+                    this.formConfig.xl = 24;
+                }
+            },
+            isSelect: function(item) {
+                if (item.type == "UT_11" || item.type == "UT_12") {
+                    return true;
+                }
+                return false;
+            },
+            isMultiSelect: function(item) {
+                if (item.type == "UT_09" || item.type == "UT_10") {
+                    return true;
+                }
+                return false;
+            },
+            isRadio: function(item) {
+                if (item.type == "UT_05" || item.type == "UT_06") {
+                    return true;
+                }
+                return false;
+            },
+            isCheckbox: function(item) {
+                if (item.type == "UT_07" || item.type == "UT_08") {
+                    return true;
+                }
+                return false
+            },
 
-			_sortArray: function (arry) { // 数组冒泡排序
-				for (var unfix = arry.length - 1; unfix > 0; unfix--) {
-					for (var i = 0; i < unfix; i++) {
-						if (arry[i].index > arry[i + 1].index) {
-							var temp = arry[i];
-							arry.splice(i, 1, arry[i + 1]);
-							arry.splice(i + 1, 1, temp);
-						}
-					}
-				}
-				return arry;
-			},
-			initFieldChanged: function (obj) {
-				var that = this;
-				if (obj.lessDateScope && obj.lessDateScope.length > 0) {
-					obj.lessDateScope.forEach(function (item) {
-						if (that.formData[item]) { //有值  表示需要小于的
-							obj.pickerOptions = Object.assign({}, obj.pickerOptions, {
-								disabledDate: function (time) {
-									return time.getTime() > new Date(that.formData[item]).getTime();
-								}
-							});
-						}
-					});
-				}
-				if (obj.maxDateScope && obj.maxDateScope.length > 0) {
-					obj.maxDateScope.forEach(function (item) {
-						if (that.formData[item]) { //有值  表示需要小于的
-							obj.pickerOptions = Object.assign({}, obj.pickerOptions, {
-								disabledDate: function (time) {
-									return time.getTime() < new Date(that.formData[item]).getTime();
-								}
-							});
-						}
-					});
-				}
-			},
-			fieldChanged: function (obj) { //formAttr配置数组
+            _sortArray: function(arry) { // 数组冒泡排序
+                for (var unfix = arry.length - 1; unfix > 0; unfix--) {
+                    for (var i = 0; i < unfix; i++) {
+                        if (arry[i].index > arry[i + 1].index) {
+                            var temp = arry[i];
+                            arry.splice(i, 1, arry[i + 1]);
+                            arry.splice(i + 1, 1, temp);
+                        }
+                    }
+                }
+                return arry;
+            },
+            initFieldChanged: function(obj) {
+                var that = this;
+                if (obj.lessDateScope && obj.lessDateScope.length > 0) {
+                    obj.lessDateScope.forEach(function(item) {
+                        if (that.formData[item]) { //有值  表示需要小于的
+                            obj.pickerOptions = Object.assign({}, obj.pickerOptions, {
+                                disabledDate: function(time) {
+                                    return time.getTime() > new Date(that.formData[item]).getTime();
+                                }
+                            });
+                        }
+                    });
+                }
+                if (obj.maxDateScope && obj.maxDateScope.length > 0) {
+                    obj.maxDateScope.forEach(function(item) {
+                        if (that.formData[item]) { //有值  表示需要小于的
+                            obj.pickerOptions = Object.assign({}, obj.pickerOptions, {
+                                disabledDate: function(time) {
+                                    return time.getTime() < new Date(that.formData[item]).getTime();
+                                }
+                            });
+                        }
+                    });
+                }
+            },
+            fieldChanged: function(obj) { //formAttr配置数组
 
-				var that = this;
-				if (obj.lessDateScope && obj.lessDateScope.length > 0) {
-					obj.lessDateScope.forEach(function (item) {
-						aa: for (var i = 0; i < that.formAttr.length; i++) {
-							var groupArr = that.formAttr[i].data;
-							for (var j = 0; j < groupArr.length; j++) {
-								if (groupArr[j].id == item) {
-									groupArr[j].pickerOptions = Object.assign({}, groupArr[j].pickerOptions, {
-										disabledDate: function (time) {
-											var day = new Date(that.formData[obj.id]).getTime() - 1000 * 24 * 60 * 60; //获取天数
-											if (groupArr[j].ifLessToday == "1") {
-												if (!that.formData[obj.id]) {
-													return time.getTime() > new Date().getTime()
-												}
-												return time.getTime() < new Date(day).getTime() || time.getTime() > new Date()
-													.getTime();
+                var that = this;
+                if (obj.lessDateScope && obj.lessDateScope.length > 0) {
+                    obj.lessDateScope.forEach(function(item) {
+                        aa: for (var i = 0; i < that.formAttr.length; i++) {
+                            var groupArr = that.formAttr[i].data;
+                            for (var j = 0; j < groupArr.length; j++) {
+                                if (groupArr[j].id == item) {
+                                    groupArr[j].pickerOptions = Object.assign({}, groupArr[j].pickerOptions, {
+                                        disabledDate: function(time) {
+                                            var day = new Date(that.formData[obj.id]).getTime() - 1000 * 24 * 60 * 60; //获取天数
+                                            if (groupArr[j].ifLessToday == "1") {
+                                                if (!that.formData[obj.id]) {
+                                                    return time.getTime() > new Date().getTime()
+                                                }
+                                                return time.getTime() < new Date(day).getTime() || time.getTime() > new Date()
+                                                    .getTime();
 
-												//return time.getTime() < new Date(that.formData[obj.id]).getTime() || time.getTime() > new Date().getTime();
-											}
-											return time.getTime() < new Date(day).getTime();
-											//return time.getTime() < new Date(that.formData[obj.id]).getTime();
-										}
-									});
-									break aa;
-								}
-							}
-						}
-					});
-				}
-				if (obj.maxDateScope && obj.maxDateScope.length > 0) {
-					obj.maxDateScope.forEach(function (item) {
-						aa: for (var i = 0; i < that.formAttr.length; i++) {
-							var groupArr = that.formAttr[i].data;
-							for (var j = 0; j < groupArr.length; j++) {
-								if (groupArr[j].id == item) {
-									groupArr[j].pickerOptions = Object.assign({}, groupArr[j].pickerOptions, {
-										disabledDate: function (time) {
-											if (groupArr[j].ifLessToday == "1") {
-												if (!that.formData[obj.id]) {
-													return time.getTime() > new Date().getTime()
-												}
-												return time.getTime() > new Date(that.formData[obj.id]).getTime() || time
-													.getTime() > new Date().getTime();
-											}
-											return time.getTime() > new Date(that.formData[obj.id]).getTime();
-										}
-									});
-									break aa;
-								}
-							}
-						}
-					});
-				}
-			},
-			_isInit: function (id, options, isChange) {
-				var that = this;
-				var initArry = ['project_oid', 'pipeline_oid', 'tenders_oid', 'pipe_segment_or_cross_oid',
-					'pipe_station_oid'
-				];
-				if (initArry.indexOf(id) > -1 && options.length > 0) {
-					if (!that.formData[id]) that.$set(that.formData, id, options[0].key);
-					if (isChange) {
-						setTimeout(function () {
-							that.$refs[id][0].$emit('change', { //进行change事件的触发
-								value: options[0].key,
-								isInit: true,
-							});
-						});
-					}
+                                                //return time.getTime() < new Date(that.formData[obj.id]).getTime() || time.getTime() > new Date().getTime();
+                                            }
+                                            return time.getTime() < new Date(day).getTime();
+                                            //return time.getTime() < new Date(that.formData[obj.id]).getTime();
+                                        }
+                                    });
+                                    break aa;
+                                }
+                            }
+                        }
+                    });
+                }
+                if (obj.maxDateScope && obj.maxDateScope.length > 0) {
+                    obj.maxDateScope.forEach(function(item) {
+                        aa: for (var i = 0; i < that.formAttr.length; i++) {
+                            var groupArr = that.formAttr[i].data;
+                            for (var j = 0; j < groupArr.length; j++) {
+                                if (groupArr[j].id == item) {
+                                    groupArr[j].pickerOptions = Object.assign({}, groupArr[j].pickerOptions, {
+                                        disabledDate: function(time) {
+                                            if (groupArr[j].ifLessToday == "1") {
+                                                if (!that.formData[obj.id]) {
+                                                    return time.getTime() > new Date().getTime()
+                                                }
+                                                return time.getTime() > new Date(that.formData[obj.id]).getTime() || time
+                                                    .getTime() > new Date().getTime();
+                                            }
+                                            return time.getTime() > new Date(that.formData[obj.id]).getTime();
+                                        }
+                                    });
+                                    break aa;
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+            _isInit: function(id, options, isChange) {
+                var that = this;
+                var initArry = ['project_oid', 'pipeline_oid', 'tenders_oid', 'pipe_segment_or_cross_oid',
+                    'pipe_station_oid'
+                ];
+                if (initArry.indexOf(id) > -1 && options.length > 0) {
+                    if (!that.formData[id]) that.$set(that.formData, id, options[0].key);
+                    if (isChange) {
+                        setTimeout(function() {
+                            that.$refs[id][0].$emit('change', { //进行change事件的触发
+                                value: options[0].key,
+                                isInit: true,
+                            });
+                        });
+                    }
 
-				}
-			}
-		},
-	});
-	var validateNumber = function (rule, value, callback) {
-		app.formAttr.forEach(function (parent) {
-			parent.data.forEach(function (item) {
-				if (item.id == rule.field) {
-					if (value < item.min) {
-						callback(new Error("值不能小于" + item.min));
-					} else if (value > item.max) {
-						callback(new Error("值不能大于" + item.max));
-					} else {
-						callback();
-					}
-					return
-				}
-			});
-		});
-	}
+                }
+            }
+        },
+    });
+    var validateNumber = function(rule, value, callback) {
+        app.formAttr.forEach(function(parent) {
+            parent.data.forEach(function(item) {
+                if (item.id == rule.field) {
+                    if (value < item.min) {
+                        callback(new Error("值不能小于" + item.min));
+                    } else if (value > item.max) {
+                        callback(new Error("值不能大于" + item.max));
+                    } else {
+                        callback();
+                    }
+                    return
+                }
+            });
+        });
+    }
 </script>
 
 </html>
