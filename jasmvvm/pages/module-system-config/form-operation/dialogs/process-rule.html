@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./../../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+	<link rel="stylesheet" href="./../../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../../common/css/main.css">
+
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="jas-flex-box is-vertical ">
+			<div style="text-align: center;padding: 15px 0 0;">
+				<el-radio-group v-model="processType" @change="setMyUrl">
+
+					<el-radio-button label="beforeSaveAdvice">保存前置处理</el-radio-button>
+					<el-radio-button label="afterSaveAdvice">保存后置处理</el-radio-button>
+
+					<el-radio-button label="beforeUpdateAdvice">更新前置处理</el-radio-button>
+					<el-radio-button label="afterUpdateAdvice">更新后置处理</el-radio-button>
+
+					<el-radio-button label="beforeDeleteAdvice">删除前置处理</el-radio-button>
+					<el-radio-button label="afterDeleteAdvice">删除后置处理</el-radio-button>
+
+					<el-radio-button label="beforeQueryAdvice">查询前置处理</el-radio-button>
+					<el-radio-button label="afterQueryAdvice">查询后置处理</el-radio-button>
+
+				</el-radio-group>
+
+			</div>
+			<div class="is-grown">
+				<iframe name="" :src="myUrl" frameborder="0" height="100%" width="100%"></iframe>
+			</div>
+		</div>
+
+	</div>
+</body>
+<!-- import Vue before Element -->
+<script src="./../../../../lib/jquery/jquery-1.12.4.min.js"></script>
+<script src="./../../../../lib/vue/vue.js"></script>
+<!-- import JavaScript -->
+<script src="./../../../../lib/element-ui/v2.4.1/index.min.js"></script>
+<script src="./../../../../common/components/jas-components.js"></script>
+<script src="./../../../../common/js/jas-tools.js"></script>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: function () {
+			return {
+				processType: 'beforeSaveAdvice',
+				myUrl: '',
+			}
+		},
+		created: function () {
+			this.setMyUrl();
+		},
+		methods: {
+
+			setMyUrl: function () {
+				var url = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-template/base-template-new/base-template-new.html';
+				var params = jasTools.base.getParamsInUrl(location.href);
+				this.myUrl = jasTools.base.setParamsToUrl(url, {
+					appId: '402894a152681ba30152681e8b320003',
+					currentNodeId: params.functionId,
+					pageCode: 'confiPrivilege',
+					processType: this.processType,
+					processRefreshStrategyName:"bizAutomationProcessRuleParseStrategy"
+				})
+			},
+			change:function(){
+
+			},
+			add: function () {
+				var that = this;
+				top.jasTools.dialog.show({
+					title: '增加功能',
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-system-config/form-operation/dialogs/add.html',
+					cbForClose: function () {
+						that.refresh()
+					}
+				});
+			},
+			search: function () {
+				this.currentPage = 1;
+				this._requestTable();
+			},
+			reset: function () {
+				this.topSearch.name = '';
+				this.topSearch.source = '';
+				this.search();
+			},
+			refresh: function () {
+				this.search();
+			},
+			see: function (row) {
+				top.jasTools.mask.show({
+					window: window, // 要在哪个window对象里面插入dom
+					params: {
+						menuCode: row.functionCode
+					},
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-template/form-opra-template/template-privilege.html',
+					title: '功能预览：' + row.functionName,
+					cbForClose: function (a) {
+						// window.top.Vue.prototype.$message({
+						// 	message: '关闭成功，参数为' + a,
+						// 	type: 'success'
+						// });
+					}
+				});
+			},
+			edit: function (row) {
+				var that = this;
+				top.jasTools.dialog.show({
+					title: '修改功能',
+					src: jasTools.base.rootPath +
+						'/jasmvvm/pages/module-system-config/form-operation/dialogs/add.html?functionId=' + row.oid,
+					cbForClose: function () {
+						//that.refresh();
+						that._requestTable();
+					}
+				});
+			},
+		},
+	});
+</script>
+
+</html>

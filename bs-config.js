@@ -6,20 +6,20 @@ var proxy = require('http-proxy-middleware');
 
 // http://192.168.100.130:8080/jasframework-demo
 
-var apiProxy = proxy(function (pathname, req) {
+var apiProxy = proxy(function(pathname, req) {
     if (pathname.match('^/jasproxy/jasmvvm')) return false;
     return pathname.match('^/jasproxy');
 }, {
-    target: 'http://192.168.50.137:8080/',
+    target: 'http://192.168.100.45:8081/',
     changeOrigin: true,
     ws: true,
     pathRewrite: {
         // '^/jasproxy': '/jasframework-platform',
-        '^/jasproxy': '/jasframework-platform',
+        '^/jasproxy': '/pipeline-supervise-platform',
     }
 });
 
-var apiProxyToRisk = proxy(function (pathname, req) {
+var apiProxyToRisk = proxy(function(pathname, req) {
     if (pathname.match('^/jasproxy/jasmvvm')) return false;
     return pathname.match('^/jasproxy');
 }, {
@@ -31,7 +31,7 @@ var apiProxyToRisk = proxy(function (pathname, req) {
     }
 });
 
-var iframeProxy = proxy(function (pathname, req) {
+var iframeProxy = proxy(function(pathname, req) {
     return pathname.match('^/jasproxy/jasmvvm');
 }, {
     target: 'http://localhost:3030/',
@@ -41,7 +41,7 @@ var iframeProxy = proxy(function (pathname, req) {
         '^/jasproxy/jasmvvm': '/jasmvvm',
     }
 });
-var iframeProxy2 = proxy(function (pathname, req) {
+var iframeProxy2 = proxy(function(pathname, req) {
     return pathname.match('^/jasframework/jasframework');
 }, {
     target: 'http://localhost:3030/',
@@ -51,7 +51,7 @@ var iframeProxy2 = proxy(function (pathname, req) {
         '^/jasframework/jasframework': '/jasframework',
     }
 });
-var iframeProxy3 = proxy(function (pathname, req) {
+var iframeProxy3 = proxy(function(pathname, req) {
     return pathname.match('^/jasframework/jasmvvm');
 }, {
     target: 'http://localhost:3030/',
@@ -61,7 +61,7 @@ var iframeProxy3 = proxy(function (pathname, req) {
         '^/jasframework/jasmvvm': '/jasmvvm',
     }
 });
-var iframeProxy4 = proxy(function (pathname, req) {
+var iframeProxy4 = proxy(function(pathname, req) {
     return pathname.match('^/jasframework/jasdoc');
 }, {
     target: 'http://localhost:3030/',

@@ -14,15 +14,18 @@
 <body>
   <div id="app" v-cloak>
 
-    <jas-approve-dialog :type="approveType" :oid="bizId" :class-name="className" :function-code="menuCode">
+    <jas-approve-dialog :type="approveType" :proid="proInstId" :oid="bizId" :class-name="className"
+      :function-code="menuCode">
       <div>
         <template v-for="group in formAttr">
           <jas-base-group-title :name="group.groupName" v-show="group.groupName"></jas-base-group-title>
           <jas-detail-table :titles="group.data" :detail="formData"></jas-detail-table>
         </template>
         <template v-if="isShowFiles">
+          <jas-base-group-title name="图片信息"></jas-base-group-title>
+          <jas-pic-list v-if="bizId" :biz-id="bizId" :biz-type="bizType"></jas-pic-list>
           <jas-base-group-title name="附件信息"></jas-base-group-title>
-          <jas-file-list :biz-id="bizId"></jas-file-list>
+          <jas-file-list-new v-if="bizId" :biz-id="bizId" :biz-type="bizType"></jas-file-list-new>
         </template>
       </div>
     </jas-approve-dialog>
@@ -38,7 +41,9 @@
     el: "#app",
     data: function () {
       return {
+        bizType: 'attachment',
         approveType: 0,
+        proInstId: "",
         className: '',
         loading: false,
         tableData: [],
@@ -52,12 +57,16 @@
         isShowFiles: false,
       }
     },
-    mounted: function () { //先请求要展示的字段，再请求字段的详情，最后请求附件
+    created: function () { //先请求要展示的字段，再请求字段的详情，最后请求附件
 
       var that = this;
       var param = window.jasTools.base.getParamsInUrl(location.href);
       this.menuCode = param.menuCode;
-      this.approveType = +param.approveType;
+      this.bizId = param.OID;
+      this.proInstId = param.proInstId
+      if (param.proInstId || param.approveType) {
+        that.approveType = 1;
+      }
       delete param.menuCode;
       this.isQuery = param;
       this.requestFieldsConfig();

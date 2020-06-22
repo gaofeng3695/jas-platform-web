@@ -511,14 +511,14 @@ Vue.component('jas-two-panel-resizer', {
 		setPanelStyle: function () {
 			if (this.layout === 'horizontal') {
 				this.mainPanelStyle = {
-					overflow:'auto',
+					overflow: 'auto',
 					height: 0
 				};
 				this.closeClass = 'fa fa-angle-up';
 				this.openClass = 'fa fa-angle-down';
 			} else {
 				this.mainPanelStyle = {
-					overflow:'auto',
+					overflow: 'auto',
 					width: 0
 				};
 				this.closeClass = 'fa fa-angle-left';
@@ -1213,8 +1213,8 @@ Vue.component('jas-file-upload-new', {
 			var url = jasTools.base.rootPath + "/attachment/getInfo.do";
 			jasTools.ajax.get(url, {
 				fileType: that.fileType,
-				businessType: businessType,
-				businessId: bizId
+				businessType: businessType || this.businessType,
+				businessId: bizId || this.businessId
 			}, function (data) {
 				data.rows.forEach(function (item) {
 					var file = {
@@ -1337,7 +1337,7 @@ Vue.component('jas-file-upload-new', {
 					return;
 				}
 
-				// 判断待上传文件总大小	
+				// 判断待上传文件总大小
 				var total = 0;
 				fileList.filter(function (item) {
 					if (item.status === "ready") {
@@ -1692,10 +1692,10 @@ Vue.component('jas-table-for-list', {
 		upcallPath: {
 			type: String,
 		},
-		isSearchBtn: { //是否带有搜索的 收缩按钮 
+		isSearchBtn: { //是否带有搜索的 收缩按钮
 			default: true,
 		},
-		isHideBtnCol: { //是否带有搜索的 收缩按钮 
+		isHideBtnCol: { //是否带有搜索的 收缩按钮
 			default: false,
 		},
 		deletePath: {
@@ -2120,10 +2120,10 @@ Vue.component('jas-table-for-list-new', {
 		upcallPath: {
 			type: String,
 		},
-		isSearchBtn: { //是否带有搜索的 收缩按钮 
+		isSearchBtn: { //是否带有搜索的 收缩按钮
 			default: true,
 		},
-		isHideBtnCol: { //是否带有搜索的 收缩按钮 
+		isHideBtnCol: { //是否带有搜索的 收缩按钮
 			default: false,
 		},
 		deletePath: {
@@ -2584,7 +2584,7 @@ Vue.component('jas-import-export-btns', {
 	methods: {
 		bt_import: function () { // 导入
 			var that = this;
-			var src = './pages/template/dialogs/upload.html?templateCode=' + this.templateCode;
+			var src = jasTools.base.rootPath + '/jasmvvm/pages/module-template/form-opra-template/dialogs/upload.html?templateCode=' + this.templateCode;
 			if (that.importConfig && that.importConfig.importUrl) {
 				src += "&importUrl=" + that.importConfig.importUrl;
 			}
@@ -3265,6 +3265,9 @@ Vue.component('jas-approve-dialog', {
 		oid: {
 			type: String
 		},
+		proid: {
+			type: String
+		},
 		type: {
 			type: Number, // 0 无审批功能 1 查看审批  2 审核审批
 			default: 0
@@ -3281,6 +3284,7 @@ Vue.component('jas-approve-dialog', {
 			total: 0,
 			_oid: this.oid,
 			_type: 0,
+			_proid: this._proid,
 			_className: this.className,
 			_functionCode: this.functionCode,
 			searchform: {
@@ -3334,14 +3338,15 @@ Vue.component('jas-approve-dialog', {
 		'    <div class="jas-flex-box is-vertical" style="margin: 0 20px;">',
 		'      <el-table v-loading="loading.table" class="is-grown" :data="tableData" height="100" style="width: 100%;" :header-cell-style="headStyle" border stripe>',
 		'        <el-table-column type="index" label="序号" width="50" align="center" fixed></el-table-column>',
-		'        <el-table-column prop="approveStatus" :formatter="formatter" label="操作类型" width="120" align="center"></el-table-column>',
-		'        <el-table-column prop="approveOpinion" label="审批意见" align="center"></el-table-column>',
-		'        <el-table-column prop="createDatetime" label="操作时间" width="160" align="center"></el-table-column>',
-		'        <el-table-column prop="createUserName" label="操作人员" width="160" align="center"></el-table-column>',
+		'        <el-table-column prop="taskName" label="节点名称" width="140" align="center"></el-table-column>',
+		'        <el-table-column prop="operating" label="操作" width="140" align="center"></el-table-column>',
+		'        <el-table-column prop="content" label="审批意见" align="center"></el-table-column>',
+		'        <el-table-column prop="approveUserName" label="操作人员" width="140" align="center"></el-table-column>',
+		'        <el-table-column prop="approveTime" label="操作时间" width="160" align="center"></el-table-column>',
 		'      </el-table>',
-		'      <el-pagination style="text-align: right;margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange" ',
-		'        :current-page="searchform.page" :page-sizes="[10,20,50,100]" :page-size="searchform.rows" layout="total, sizes, prev, pager, next, jumper" :total="total">',
-		'      </el-pagination>',
+		// '      <el-pagination style="text-align: right;margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange" ',
+		// '        :current-page="searchform.page" :page-sizes="[10,20,50,100]" :page-size="searchform.rows" layout="total, sizes, prev, pager, next, jumper" :total="total">',
+		// '      </el-pagination>',
 		'    </div>',
 		'  </el-tab-pane>',
 		'</el-tabs>',
@@ -3349,9 +3354,11 @@ Vue.component('jas-approve-dialog', {
 	created: function () {
 		var param = window.jasTools.base.getParamsInUrl(location.href);
 		this._oid = param.oid || this.oid;
-		this._type = param.approveType || this.type;
+		//		this._type = param.approveType || this.type;
+		this._type = this.type;
 		this._className = param.className || this.className;
 		this._functionCode = param.menuCode || this.functionCode;
+		this._proid = this.proid
 	},
 	mounted: function () {
 
@@ -3378,9 +3385,10 @@ Vue.component('jas-approve-dialog', {
 		requestTableList: function () {
 			var that = this;
 			that.loading.table = true;
-			var url = jasTools.base.rootPath + '/jdbc/commonData/dataApprove/getPage.do';
-			jasTools.ajax.post(url, {
-				businessOid: this._oid
+			var url = jasTools.base.rootPath + '/jasframework/workflow/instance/getComments.do';
+			jasTools.ajax.postForm(url, {
+				businessKey: this._oid,
+				proInstId: that.proInstId
 			}, function (data) {
 				setTimeout(function () {
 					that.loading.table = false;

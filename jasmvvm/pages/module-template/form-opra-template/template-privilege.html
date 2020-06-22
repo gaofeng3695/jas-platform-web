@@ -2,1024 +2,1176 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
-	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.css">
-	<link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
-	<link rel="stylesheet" href="./../../../common/css/main.css">
-	<style>
-		.el-form-item {
-			margin-bottom: 0px;
-		}
-
-		.search-wrap {
-			padding-bottom: 10px;
-			border-bottom: 1px solid #e4e7ed;
-		}
-
-		.table-wrapper {
-			padding: 0 15px 15px;
-			height: 100%;
-			box-sizing: border-box;
-		}
-
-		.el-range-editor {
-			width: 100% !important;
-		}
-
-		.el-checkbox-group {
-			height: 41px;
-		}
-
-		input::-webkit-outer-spin-button,
-		input::-webkit-inner-spin-button {
-			-webkit-appearance: none !important;
-			margin: 0;
-		}
-
-		.height {
-			height: 41px;
-		}
-		.el-tag--medium{
-		    display:inline-block;
-		    text-align:center;
-		    width:60px;
-		}
-		.el-tag{
-		    padding:0 !important
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="./../../../lib/element-ui/v2.4.1/theme-chalk/index.min.css">
+    <link rel="stylesheet" href="./../../../common/css/main.css">
+    <style>
+        .el-form-item {
+            margin-bottom: 0px;
+        }
+        
+        .search-wrap {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e4e7ed;
+        }
+        
+        .table-wrapper {
+            padding: 0 15px 15px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        
+        .el-range-editor {
+            width: 100% !important;
+        }
+        
+        .el-checkbox-group {
+            height: 41px;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none !important;
+            margin: 0;
+        }
+        
+        .height {
+            height: 41px;
+        }
+        
+        .el-tag--medium {
+            display: inline-block;
+            text-align: center;
+            width: 60px;
+        }
+        
+        .el-tag--large {
+            display: inline-block;
+            text-align: center;
+            width: 90px;
+        }
+        
+        .el-tag {
+            padding: 0 !important
+        }
+    </style>
 </head>
 
 <body>
-	<div id="app" v-cloak>
-		<div class="table-wrapper  jas-flex-box is-vertical">
-			<!--搜索区域-->
-			<div class="search-wrap" ref="searchWrapper" v-if="isShowSearch" style="overflow: hidden;">
-				<el-row :gutter="10" style="padding-top: 15px;">
-					<el-form ref="searchTable" :model="searchTable" label-width="120px">
-						<template v-for="item in searchData">
-							<el-col v-if="item.type!='opertion'" :xs="24" :sm="12" :md="12" :lg="6" :xl="6" :class="{'height' : item.type=='UT_03'||item.type=='UT_04'||item.type=='UT_02'||item.type=='UT_14'||item.type=='UT_05'||item.type=='UT_06'||item.type=='UT_07'||item.type=='UT_08' }">
+    <div id="app" v-cloak>
+        <div class="table-wrapper  jas-flex-box is-vertical">
+            <!--搜索区域-->
+            <div class="search-wrap" ref="searchWrapper" v-if="isShowSearch" style="overflow: hidden;">
+                <el-form ref="searchTable" :model="searchTable" label-width="120px">
+
+                    <el-row :gutter="10" style="padding-top: 15px;">
+                        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8">
+                            <el-form-item v-if="isShowArea" label="行政区域">
+                                <nmg-county-cascader ref="myarea" v-model="mycity"></nmg-county-cascader>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :xs="12" :sm="12" :md="8" :lg="8" :xl="8">
+                            <el-col v-if="keywordData.show==1" :xs="24">
+                                <el-form-item :label="keywordData.label">
+                                    <el-input size="small" clearable :placeholder="keywordData.placeholder" v-model="searchTable.keyword">
+                                    </el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-col>
+                        <el-col style="float: right;" :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                            <el-form-item style="text-align: right;">
+
+                                <el-button type="primary" size="small" @click="requestTableList">查询</el-button>
+                                <el-button type="" size="small" @click="resetSearchForm">重置</el-button>
+                                <el-tooltip v-if="searchData.length" v-show="isClosed" class="item" content="展开高级搜索" placement="top">
+                                    <el-button size="small" icon="el-icon-arrow-down" @click="isClosed=!isClosed"></el-button>
+                                </el-tooltip>
+                                <el-tooltip v-if="searchData.length" v-show="!isClosed" class="item" content="收起高级搜索" placement="top">
+                                    <el-button size="small" icon="el-icon-arrow-up" @click="isClosed=!isClosed"></el-button>
+                                </el-tooltip>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row v-show="!isClosed" v-if="searchData.length" :gutter="10" style="padding-top: 15px;">
+                        <template v-for="item in searchData">
+							<el-col v-if="item.type!='opertion'" :xs="8" :sm="8" :md="8" :lg="8" :xl="8"
+								:class="{'height' : item.type=='UT_03'||item.type=='UT_04'||item.type=='UT_02'||item.type=='UT_14'||item.type=='UT_05'||item.type=='UT_06'||item.type=='UT_07'||item.type=='UT_08' }">
 								<el-form-item :label="item.name">
-									<el-input v-if="item.type=='UT_01'" :placeholder="item.placeholder" v-model="searchTable[item.id]" size="small" clearable >
+									<el-input v-if="item.type=='UT_01'" :placeholder="item.placeholder" v-model="searchTable[item.id]"
+										size="small" clearable>
 									</el-input>
-									<el-select v-model="searchTable[item.id]" v-if="isSelect(item)" style="width:100%" size="small" @change="selectChange(item)"
-									  @visible-change="isChangeParent($event,item)" clearable>
+									<el-select v-model="searchTable[item.id]" v-if="isSelect(item)" style="width:100%" size="small"
+										@change="selectChange(item)" @visible-change="isChangeParent($event,item)" clearable>
 										<template v-for="option in item.options">
 											<el-option :key="option.value" :label="option.value" :value="option.key">
 											</el-option>
 										</template>
-									</el-select>
-									<el-select v-model="searchTable[item.id]" multiple v-if="isMultiSelect(item)" style="width:100%" size="small" @change="selectChange(item)"
-									  clearable>
-										<template v-for="option in item.options">
+                        </el-select>
+                        <el-select v-model="searchTable[item.id]" multiple v-if="isMultiSelect(item)" style="width:100%" size="small" @change="selectChange(item)" clearable>
+                            <template v-for="option in item.options">
 											<el-option :key="option.value" :label="option.value" :value="option.key">
 											</el-option>
 										</template>
-									</el-select>
-									<el-date-picker v-if="item.type=='UT_03'" v-model="searchTable[item.id]" size="small" type="daterange" range-separator="至"
-									  start-placeholder="开始日期" end-placeholder="结束日期" placeholder="item.placeholder" value-format="yyyy-MM-dd" clearable
-									  @change="selectChange()">
-									</el-date-picker>
-									<el-time-picker v-if="item.type=='UT_02'" is-range range-separator="至" size="small" start-placeholder="开始时间" value-format="HH:mm:ss"
-									  end-placeholder="结束时间" placeholder="选择时间范围" v-model="searchTable[item.id]" placeholder="任意时间点" @change="selectChange()">
-									</el-time-picker>
-									<el-date-picker v-if="item.type=='UT_04'" v-model="searchTable[item.id]" size="small" type="datetimerange" range-separator="至"
-									  start-placeholder="开始日期" end-placeholder="结束日期" placeholder="item.placeholder" value-format="yyyy-MM-dd HH:mm:ss"
-									  clearable @change="selectChange()">
-									</el-date-picker>
-									<el-checkbox-group v-if="isCheckbox(item)" v-model="searchTable[item.id]" clearable>
-										<template v-for="child in item.options">
+                        </el-select>
+                        <el-date-picker v-if="item.type=='UT_03'" v-model="searchTable[item.id]" size="small" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" placeholder="item.placeholder" value-format="yyyy-MM-dd" clearable @change="selectChange()">
+                        </el-date-picker>
+                        <el-time-picker v-if="item.type=='UT_02'" is-range range-separator="至" size="small" start-placeholder="开始时间" value-format="HH:mm:ss" end-placeholder="结束时间" placeholder="选择时间范围" v-model="searchTable[item.id]" placeholder="任意时间点" @change="selectChange()">
+                        </el-time-picker>
+                        <el-date-picker v-if="item.type=='UT_04'" v-model="searchTable[item.id]" size="small" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" placeholder="item.placeholder" value-format="yyyy-MM-dd HH:mm:ss" clearable
+                            @change="selectChange()">
+                        </el-date-picker>
+                        <el-checkbox-group v-if="isCheckbox(item)" v-model="searchTable[item.id]" clearable>
+                            <template v-for="child in item.options">
 											<el-checkbox :label="child.key">{{child.value}}</el-checkbox>
 										</template>
-									</el-checkbox-group>
-									<el-radio-group v-if="isRadio(item)" v-model="searchTable[item.id]">
-										<template v-for="child in item.options">
+                        </el-checkbox-group>
+                        <el-radio-group v-if="isRadio(item)" v-model="searchTable[item.id]">
+                            <template v-for="child in item.options">
 											<el-radio :label="child.key">{{child.value}}</el-radio>
 										</template>
-									</el-radio-group>
+                        </el-radio-group>
 
-									<div v-if="item.type=='UT_14'" style="height:41px;">
-										<div class="el-date-editor el-range-editor el-input__inner el-date-editor--datetimerange el-range-editor--small">
-											</i>
-											<input placeholder="最小值" v-model="searchTable[item.id].min" class="el-range-input" type="number" >
-											<span class="el-range-separator">至</span>
-											<input v-model="searchTable[item.id].max" placeholder="最大值" class="el-range-input" type="number">
-											<i class="el-input__icon el-range__close-icon"></i>
-										</div>
-									</div>
-								</el-form-item>
-							</el-col>
-							<el-col v-if="item.type=='opertion'" :xs="24" :sm="btnxs" :md="btnxs" :lg="btnlg" :xl="btnlg" style="text-align: right;height:41px;line-height:41px">
-								<template v-for="child in item.options">
-									<el-button :type="child.type" size="small" @click="child.click">{{child.name}}</el-button>
-								</template>
-								<!-- <el-button size="small" type="text" @click="isClosed=!isClosed" >收起</el-button> -->
-							</el-col>
+                        <div v-if="item.type=='UT_14'" style="height:41px;">
+                            <div class="el-date-editor el-range-editor el-input__inner el-date-editor--datetimerange el-range-editor--small">
+                                </i>
+                                <input placeholder="最小值" v-model="searchTable[item.id].min" class="el-range-input" type="number">
+                                <span class="el-range-separator">至</span>
+                                <input v-model="searchTable[item.id].max" placeholder="最大值" class="el-range-input" type="number">
+                                <i class="el-input__icon el-range__close-icon"></i>
+                            </div>
+                        </div>
+                        </el-form-item>
+                        </el-col>
+
+                        </template>
+
+
+                    </el-row>
+                </el-form>
+
+            </div>
+            <!--按钮区域-->
+            <el-row style="padding:15px 0px">
+                <el-button size="small" plain v-if="privilege.join('').indexOf('bt_add')>-1" type="primary" icon="fa fa-plus" @click="bt_add">新增</el-button>
+
+                <el-button size="small" plain type="primary" icon="fa fa-level-up" v-if="isApprove&&privilege.join('').indexOf('bt_report')>-1" :disabled="reportRows.length<1 || upcall_disalbed" @click="upcall">上报</el-button>
+                <!-- <el-button size="small" plain type="primary" icon="fa fa-level-up"
+					v-if="isApprove&&privilege.join('').indexOf('bt_report')>-1"
+					:disabled="reportRows.length<2 || upcallAll_disalbed" @click="upcallAll">批量上报</el-button> -->
+                <el-button size="small" plain type="primary" icon="fa fa-check" v-if="isApprove&&privilege.join('').indexOf('bt_approve')>-1" :disabled="approveRows.length!=1" @click="approve">审批</el-button>
+                <el-button size="small" plain type="primary" icon="fa fa-check" v-if="isApprove&&privilege.join('').indexOf('bt_approve')>-1" :disabled="approveRows.length<2" @click="approveAll">批量审批</el-button>
+                <el-button size="small" plain type="primary" icon="fa fa-check" v-if="(isApprove&&privilege.join('').indexOf('bt_approve')>-1) ||isApprove&&privilege.join('').indexOf('bt_report')>-1" :disabled="showWorkFlowRows.length!=1" @click="showWorkFlowChart">流程图</el-button>
+
+                <jas-import-export-btns @refreshtable="refresh" :is-import="privilege.join('').indexOf('bt_import')>-1" :is-export="privilege.join('').indexOf('bt_export')>-1" :form="searchform" :oids="oids" :template-code="templateCode" :function-code="menuCode" :export-template-code="exportTemplateCode"></jas-import-export-btns>
+
+                <div style="display:inline-block;float:right">
+
+                    <el-tooltip class="item" content="刷新" placement="top">
+                        <el-button size="small" icon="el-icon-refresh" @click="refresh"></el-button>
+                    </el-tooltip>
+
+
+                </div>
+            </el-row>
+            <!--表格区域-->
+            <el-table ref="mytable" class="is-grown" v-loading="loading" @selection-change="handleSelectionChange" :data="tableData" height='100' style="width: 100%;" :header-cell-style="headStyle" border stripe @row-dblclick="viewRow" @row-click="checkRow" @sort-change="sortChange">
+                <el-table-column type="selection" width="55" align="center" fixed></el-table-column>
+                <el-table-column type="index" label="序号" width="50" align="center" fixed></el-table-column>
+                <template v-for="item,index in tableColumn">
+					<el-table-column :key="item.id" v-if="item.id=='GEO_STATE'" fixed :prop="item.id" :label="item.name"
+						align="center" min-width="80px">
+						<template slot-scope="scope">
+							<el-tooltip v-if="scope.row[item.id]&&scope.row[item.id].indexOf('异常')>-1" effect="dark"
+								:content="scope.row[item.id]" placement="top">
+								<i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:#eb3030;font-size: 16px;"></i>
+							</el-tooltip>
+
+							<!-- <span v-else>{{scope.row[item.id]}}</span> -->
+							<i v-else class="fa fa-check-circle" aria-hidden="true" style="color:#46cc73;font-size: 18px;"></i>
 						</template>
-					</el-form>
-				</el-row>
-				<!-- <el-row v-show="isClosed">
-					<div style="float:left;">搜索栏</div>
-					<div style="float:right;">
-						<el-button size="small" type="text" @click="isClosed=!isClosed" style="padding:0;">展开</el-button>
-					</div>
-				</el-row> -->
-			</div>
-			<!--按钮区域-->
-			<el-row style="padding:15px 0px">
-				<template v-for="item in btns">
-					<el-button :size="item.size" v-if="privilege.join('').indexOf(item.id)>-1" :type="item.type" :plain="item.plain" :icon="item.icon"
-					  @click="item.functionName">{{item.title}}</el-button>
-				</template>
-				<el-button size="small" plain type="primary" icon="fa fa-level-up" v-if="privilege.join('').indexOf('bt_submit')>-1"
-				  :disabled="reportRows.length==0" @click="upSubmit">提交</el-button>
-				<el-button size="small" plain type="primary" icon="fa fa-level-up" v-if="isApprove&&privilege.join('').indexOf('bt_report')>-1"
-				  :disabled="reportRows.length==0" @click="upcall">上报</el-button>
-				<el-button size="small" plain type="primary" icon="fa fa-check" v-if="isApprove&&privilege.join('').indexOf('bt_approve')>-1"
-				  :disabled="approveRows.length==0" @click="approve">审核</el-button>
+                </el-table-column>
+                <el-table-column :key="item.id" v-else :fixed="index===0?true:false" :prop="item.id" :label="item.name" align="center" :min-width="item.name.length*14+80 + 'px'" show-overflow-tooltip sortable="custom">
+                    <template slot-scope="scope">
+							<div v-if="item.id=='APPROVE_STATE' || item.id=='approve_state'">
+								<div>
+									<div v-if="scope.row.approve_state!=null">
+										<el-tag v-if="scope.row.approve_state=='0' || scope.row.approve_state==null" type="info"
+											size="medium">
+											未提交
+										</el-tag>
+										<el-tag v-if="scope.row.approve_state=='1'" type="warning" size="medium">
+											审核中</el-tag>
+										<el-tag v-if="scope.row.approve_state=='2'" type="success" size="medium">
+											已通过</el-tag>
+										<el-tag v-if="scope.row.approve_state=='-1'" type="danger" size="medium">
+											已驳回</el-tag>
+									</div>
+									<div v-else>
+										<el-tag v-if="scope.row.APPROVE_STATE=='0' || scope.row.APPROVE_STATE==null" type="info"
+											size="medium">
+											未提交
+										</el-tag>
+										<el-tag v-if="scope.row.APPROVE_STATE=='1'" type="warning" size="medium">
+											审核中</el-tag>
+										<el-tag v-if="scope.row.APPROVE_STATE=='2'" type="success" size="medium">
+											已通过</el-tag>
+										<el-tag v-if="scope.row.APPROVE_STATE=='-1'" type="danger" size="medium">
+											已驳回</el-tag>
+									</div>
+								</div>
+							</div>
+							<span v-else>{{scope.row[item.id]}}</span>
+						</template>
+                </el-table-column>
 
-
-				<jas-import-export-btns  @refreshtable="refresh" :is-import="privilege.join('').indexOf('bt_import')>-1" :is-export="privilege.join('').indexOf('bt_export')>-1"
-				  :form="searchform" :oids="oids" :template-code="templateCode" :function-code="menuCode" :export-template-code="exportTemplateCode"
-				  :class-name="className" :is-scanner="isScanner" :export-scanner-template-code="exportScannerTemplateCode"></jas-import-export-btns>
-				  
-				  <span style="margin-left: 5px;">
-				  	<el-button size="small" plain type="primary" icon="fa fa-qrcode" v-if="isScanner" @click="scanner">二维码下载</el-button>
-				  </span>
-				
-				<!-- <el-dropdown placement="bottom">
-				  <el-button size="small" plain type="primary" icon="fa fa-qrcode">导出<i class="el-icon-arrow-down el-icon--right"></i></el-button>
-				  <el-dropdown-menu slot="dropdown" >
-				    <el-dropdown-item ><el-button size="small" plain type="primary" icon="fa fa-mail-reply-all" @click="handleCommand">导&#8197;出&#8197;全&#8197;部</el-button></el-dropdown-item>
-				    <el-dropdown-item ><el-button size="small" plain type="primary" icon="fa fa-mail-reply">导&#8197;出&#8197;已&#8197;选</el-button></el-dropdown-item>
-				    <el-dropdown-item ><el-button size="small" plain type="primary" icon="fa fa-qrcode">导出二维码</el-button></el-dropdown-item>
-				  </el-dropdown-menu>
-				</el-dropdown> -->
-				<div style="display:inline-block;float:right">
-
-
-					<el-tooltip class="item" content="刷新" placement="top">
-						<el-button size="small" icon="el-icon-refresh" @click="refresh"></el-button>
-					</el-tooltip>
-					<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
-						<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
-					</el-tooltip>
-					<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
-						<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
-					</el-tooltip>
-
-
-
-				</div>
-			</el-row>
-			<!--表格区域-->
-			<el-table ref="mytable" class="is-grown" v-loading="loading" @selection-change="handleSelectionChange" :data="tableData"
-			  height='100' style="width: 100%;" :header-cell-style="headStyle" border stripe @row-dblclick="viewRow" @row-click="checkRow" @sort-change="sortChange">
-				<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
-				<el-table-column type="index" label="序号" width="50" align="center" fixed></el-table-column>
-				<el-table-column v-for="item,index in tableColumn" :fixed="index===0?true:false" :prop="item.id" :label="item.name" :key="item.id"
-				  align="center" min-width="160px" show-overflow-tooltip sortable="custom">
-				     <template slot-scope="scope" >
-				     <div  v-if="item.id=='approve_status_name'">
-				      <el-tag  v-if="scope.row.approve_status=='0'"  type="info" size="medium">{{ scope.row.approve_status_name }}</el-tag>
-					   <el-tag  v-if="scope.row.approve_status=='1'"  type="warning" size="medium">{{ scope.row.approve_status_name }}</el-tag>
-					   <el-tag  v-if="scope.row.approve_status=='2'"  type="success" size="medium">{{ scope.row.approve_status_name }}</el-tag>
-					   <el-tag  v-if="scope.row.approve_status=='-1'" type="danger" size="medium">{{ scope.row.approve_status_name }}</el-tag>
-				     </div>
-					   <span v-else>{{scope.row[item.id]}}</span>
-					  </template>
-				</el-table-column>
-				<el-table-column fixed="right" label="操作" :width="config.table.tableWidth" align="center">
-					<template slot-scope="scope">
-						<el-button @click="locateRow(scope.row)" v-if="privilege.indexOf('bt_position')>-1" type="text" size="small">定位</el-button>
-						<el-button @click="scopeRow(scope.row)" v-if="privilege.indexOf('bt_tenders_scope')>-1" type="text" size="small">范围</el-button>
-						<el-button @click="viewRow(scope.row)" v-if="privilege.indexOf('bt_select')>-1" type="text" size="small">查看</el-button>
-						<el-button @click="editRow(scope.row)" v-if="privilege.indexOf('bt_update')>-1" type="text" :disabled="frozenBtn(scope.row)"
-						  size="small">编辑</el-button>
-						<el-button @click="delRow(scope.row)" v-if="privilege.indexOf('bt_delete')>-1" type="text" :disabled="frozenBtn(scope.row)"
-						  size="small">删除</el-button>
+                </template>
+                <el-table-column fixed="right" label="操作" width="175px" align="center">
+                    <template slot-scope="scope">
+						<el-button @click.stop="locateRow(scope.row)" v-if="privilege.indexOf('bt_position')>-1" type="text"
+							size="small">定位</el-button>
+						<el-button @click.stop="viewRow(scope.row)" v-if="privilege.indexOf('bt_select')>-1" type="text"
+							size="small">查看
+						</el-button>
+						<el-button @click.stop="editRow(scope.row)" v-if="privilege.indexOf('bt_update')>-1" type="text"
+							:disabled="frozenBtn(scope.row)" size="small">修改</el-button>
+						<el-button @click.stop="delRow(scope.row)" v-if="privilege.indexOf('bt_delete')>-1" type="text"
+							:disabled="frozenBtn(scope.row)" size="small">删除</el-button>
 					</template>
-				</el-table-column>
-			</el-table>
-			<!--分页区域-->
-			<el-pagination v-if="config.pageAttr.isShow" style="text-align: right;margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-			  :current-page="searchform.page" :page-sizes="config.pageAttr.pagesizes" :page-size="config.pageAttr.pagesize" layout="total, sizes, prev, pager, next, jumper"
-			  :total="total">
-			</el-pagination>
-		</div>
-	</div>
+                </el-table-column>
+            </el-table>
+            <!--分页区域-->
+            <el-pagination style="text-align: right;margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="searchform.page" :page-sizes="[10, 20, 50, 100]" :page-size="searchform.rows" layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+            </el-pagination>
+        </div>
+    </div>
 </body>
 <script src="./../../../lib/jquery/jquery-1.12.4.min.js"></script>
 <script src="./../../../lib/vue/vue.js"></script>
 <script src="./../../../lib/element-ui/v2.4.1/index.min.js"></script>
 <script src="./../../../common/components/jas-components.js "></script>
+<script src="./../../../common/components/nmg-components.js "></script>
 <script src="./../../../common/js/jas-tools.js"></script>
-<script src="js/userDefinedFunction.js"></script>
 
 <script>
-	var app = new Vue({
-		el: "#app",
-		data: function () {
-			return {
-				headStyle: {
-					'background-color': '#f5f7fa ',
-				},
-				isClosed: false,
-				templateCode: "",
-				exportTemplateCode: "",
-				exportScannerTemplateCode: "",
-				className: '',
-				isApprove: '',
-				isScanner: false,
-				privilege: [], //权限数组 bt_add,bt_update,bt_delete,bt_select,bt_export,bt_import,bt_position
-				btnxs: 12,
-				btnlg: 6,
-				searchTable: {},
-				searchform: {
-					page: 1,
-					rows: 10,
-				},
-				searchData: [],
-				btns: [],
-				oids: [],
-				rows: [],
-				tableData: [], //表格数据
-				tableColumn: [], //表示列
-				tableColumns: [], //排序过渡列
-				config: {
-					pageAttr: {},
-					too1: {},
-					search: {},
-					form: {},
-					view: {},
-					table: {}
-				},
-				total: 0,
-				loading: true,
-				menuCode: "",
-				searchUi: [],
-				isShowSearch: false,
-				privilegeCode:"",
-				sortName: null,
-				sortOrder: null,
-				primaryKey:"oid",
-			}
-		},
-		computed: {
-			reportRows: function () {
-				var that = this;
-				return this.rows.filter(function (row) {
-					return !that.frozenBtn(row);
-				});
-			},
-			approveRows: function () {
-				var that = this;
-				return this.rows.filter(function (row) {
-					return row.approve_status == 1;
-				});
-			},scannerRows: function(){
-				var that = this;
-				return this.rows.filter(function (row) {
-					return true;
-				});
-			}
-		},
-		created: function () {
-			var param = window.jasTools.base.getParamsInUrl(location.href);
-			this.menuCode = param.menuCode;
-			this.isApprove = param.isApprove;
-			this.isScanner = param.isScanner==null?false:true;
-			this.templateCode = param.templateCode;
-			this.exportTemplateCode = param.exportTemplateCode;
-			this.exportScannerTemplateCode = param.exportScannerTemplateCode;
-			this.className = param.className;
-			//进行后台数据的请求
-			if (param.privilegeCode) {
-				this._requestPrivilege(param.privilegeCode); //请求权限
-			} else {
-				this.privilege = ['bt_add', 'bt_update', 'bt_delete', 'bt_select', 'bt_export', 'bt_import'];
-				this.requestConfig(); //请求模板的配置文件
-			}
-			this.privilegeCode=param.privilegeCode||"";
-		},
-		mounted: function () {
+    var app = new Vue({
+        el: "#app",
+        data: function() {
+            return {
+                headStyle: {
+                    'background-color': '#f5f7fa ',
+                },
+                isClosed: false,
+                templateCode: "",
+                exportTemplateCode: "",
+                className: '',
+                isApprove: '',
+                privilege: [], //权限数组 bt_add,bt_update,bt_delete,bt_select,bt_export,bt_import,bt_position
+                isShowArea: false,
+                searchTable: {
+                    keyword: ''
+                },
+                searchform: {
+                    page: 1,
+                    rows: 10,
+                },
+                searchData: [],
+                mycity: '',
 
-		},
-		methods: { //方法的写法
-			toggleSearch: function () {
-				if (this.isClosed) {
-					this.isClosed = false;
-					this.$refs.searchWrapper.style.height = 'auto';
-					this.$refs.searchWrapper.style.borderBottom = '1px solid #e4e7ed';
-				} else {
-					this.isClosed = true;
-					this.$refs.searchWrapper.style.borderBottom = 'none';
-					this.$refs.searchWrapper.style.height = 0;
-				}
-			},
+                keywordData: {
+                    item: "",
+                    placeholder: "请输入",
+                    label: "关键词搜索",
+                    show: 1
+                },
 
+                oids: [],
+                rows: [],
+                tableData: [], //表格数据
+                tableColumn: [], //表示列
+                tableColumns: [], //排序过渡列
+                total: 0,
+                loading: true,
+                menuCode: "",
+                searchUi: [],
+                isShowSearch: false,
+                privilegeCode: "",
+                sortName: null,
+                sortOrder: null,
+                primaryKey: "oid",
+                upcall_disalbed: false,
+                upcallAll_disalbed: false,
+                functionName: ''
+            }
+        },
+        computed: {
+            reportRows: function() {
+                var that = this;
+                return this.rows.filter(function(row) {
+                    return !that.frozenBtn(row);
+                });
+            },
+            approveRows: function() {
+                var that = this;
+                return this.rows.filter(function(row) {
+                    return (row.approve_status == 1) || (row.APPROVE_STATE === 1);
+                });
+            },
+            showWorkFlowRows: function() {
+                var that = this;
+                return this.rows.filter(function(row) {
+                    return row.APPROVE_STATE !== '0';
+                });
+            }
+        },
+        created: function() {
+            var that = this;
+            var param = window.jasTools.base.getParamsInUrl(location.href);
+            this.menuCode = param.menuCode;
+            this.isApprove = param.isApprove;
+            this.templateCode = param.templateCode;
+            this.exportTemplateCode = param.exportTemplateCode;
+            this.className = param.className;
+            this.privilegeCode = param.privilegeCode || "";
+            this.processKey = param.processKey || "";
 
-			frozenBtn: function (row) {
-				if (row.approve_status > 0 || row.approve_status == '审核通过' || row.approve_status == '待审核') {
-					return true;
-				}
-				if(row.commit_status&&row.commit_status=='1'){
-					return true;
-				}
-				return false;
-			},
-			upSubmit:function(){
-				var that = this;
-				var oids = this.reportRows.map(function (item) {
-					return item.oid;
-				});
-				if (oids.length === 0) return;
-				var url = jasTools.base.rootPath + '/daq/daqcommit/changeCommitStatus.do';
-				jasTools.ajax.post(url, {
-					businessOid: oids,
-					className: this.className,
-					functionCode: this.menuCode,
-				}, function (data) {
-					top.Vue.prototype.$message({
-						type: 'success',
-						message: '提交成功'
-					});
-					that.refresh();
-				});	
-			},
-			upcall: function () {
-				var that = this;
-				var oids = this.reportRows.map(function (item) {
-					return item.oid;
-				});
-				if (oids.length === 0) return;
-				var url = jasTools.base.rootPath + '/daq/dataApprove/save.do';
-				jasTools.ajax.post(url, {
-					businessOid: oids,
-					approveStatus: 1, //status 2 通过 -1 驳回
-					className: this.className,
-					functionCode: this.menuCode,
-					privilegeCode:this.privilegeCode,
-				}, function (data) {
-					top.Vue.prototype.$message({
-						type: 'success',
-						message: '上报成功'
-					});
-				//	top.app.requestNumber("","refresh");
-					that.refresh();
-				});
-			},
-			approve: function () {
-				var that = this;
-				var oids = this.approveRows.map(function (item) {
-					return item.oid;
-				});
-				if (oids.length === 0) {
-					return;
-				} else if (oids.length === 1) {
-					var src = './pages/template/dialogs/viewTemplate.html?menuCode=' + that.menuCode;
-					src += '&approveType=2&privilegeCode='+that.privilegeCode;
-					var url = jasTools.base.setParamsToUrl(src, this.approveRows[0]);
-					top.jasTools.dialog.show({
-						width: '60%',
-						height: '80%',
-						title: '审核',
-						src: url,
-						cbForClose: function (param) {
-							if (param == 'success') {
-								top.app.requestNumber("refresh");
-								that.refresh();
-							}
-						}
-					});
-				} else {
-					var src = './pages/template/dialogs/approveTemplate.html?menuCode=' + that.menuCode;
-					var url = jasTools.base.setParamsToUrl(src, {
-						oids: oids.join(','),
-						privilegeCode:that.privilegeCode,
-					});
-					top.jasTools.dialog.show({
-						width: '600px',
-						height: '400px',
-						title: '批量审核',
-						src: url,
-						cbForClose: function (param) {
-							if (param == 'success') {
-								top.app.requestNumber("refresh");
-								that.refresh();
-							}
-						}
-					});
-				}
+            that.getPrivilege(function() { //	1. 请求权限
+                that.requestFieldsConfig(function() { // 2. 请求自定义表单配置
+                    that.$nextTick(function() {
+                        that.requestTableList(); // 3. 请求业务列表
+                    });
+                });
+            });
+        },
+        mounted: function() {},
+        methods: { //方法的写法
+            getPrivilege: function(cb) {
+                var that = this;
+                if (this.privilegeCode) {
+                    var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/getFunctionConfig.do";
+                    jasTools.ajax.get(url, {
+                        privilegeCode: this.privilegeCode, //菜单权限编号
+                        appId: "402894a152681ba30152681e8b320003" //应用id，值默认
+                    }, function(data) {
+                        that.privilege = data.rows.map(function(item) {
+                            return item.functionType;
+                        });
+                        cb && cb();
+                    });
+                } else {
+                    alert('请在权限配置的url中传入权限编码，例： privilegeCode=P-PBDM-0002')
+                    this.privilege = ['bt_add', 'bt_update', 'bt_delete', 'bt_select', 'bt_export', 'bt_import'];
+                    // this.privilege = ['bt_add', 'bt_update', 'bt_delete', 'bt_select', 'bt_export', 'bt_import'];
+                    cb && cb();
+                }
+            },
+            frozenBtn: function(row) {
 
-			},
-			scanner:function(){
-				var that = this;
-				var oids = this.scannerRows.map(function (item) {
-					return item.oid;
-				});
-			//	console.log(oids);
-				var url = jasTools.base.rootPath + "/daq/materialPipe/produceScanner.do";
-				jasTools.ajax.post(url, {oids:oids,functionCode:this.menuCode}, function (data) {
-				//	console.log(data);
-					if(data.status){
-						jasTools.ajax.downloadByIframe('post', jasTools.base.rootPath + "/daq/materialPipe/downloadScanner.do", {
-							fileOid: data.data
-						});
-					}else{
-						top.Vue.prototype.$message({
-							message: data.msg,
-							type: 'warning'
-						});
-					}
-				});
-			},
-			handleSelectionChange: function (val) {
-				this.rows = val;
-				this.oids = val.map(function (item) {
-					return item.oid;
-				});
-			},
-			_requestPrivilege: function (privilegeCode) {
-				var that = this;
-				var url = jasTools.base.rootPath + "/jasframework/privilege/privilege/getFunctionConfig.do";
-				jasTools.ajax.get(url, {
-					privilegeCode: privilegeCode, //菜单权限编号
-					appId: "402894a152681ba30152681e8b320003" //应用id，值默认
-				}, function (data) {
-					that.privilege = data.rows.map(function (item) {
-						return item.functionType;
-					});
-					that.requestConfig(); //请求模板的配置文件
-				});
-			},
-			requestConfig: function () {
-				var that = this;
-				$.ajax({
-					type: "get",
-					url: "js/template-privilege.json",
-					dataType: "json",
-					async: true,
-					success: function (data) {
-						if (data.tool.length > 0) {
-							that.initPageSizes = data.pageAttr.pagesizes;
-							that.config = data;
-							data.tool.forEach(function (item, index) {
-								if (!item.belongMenuCode || item.belongMenuCode == that.menuCode) {
-									item.functionName = function () {
-										if (typeof that[item.id] == "function") {
-											that[item.id]();
-										} else {
-											definedFunction[item.id]();
-										}
-									}
-									that.btns.push(item);
-								}
-							});
-							that.requestFieldsConfig(); //根据选中的是那个功能的id 进行页面的绘制
-						}
-						that.searchform.rows = data.pageAttr.pagesize;
-					}
-				});
-			},
-			requestFieldsConfig: function () {
-				var that = this;
-				var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do"
-				jasTools.ajax.get(url, {
-					functionCode: that.menuCode
-				}, function (data) {
-					if (data.data.functionFieldsBoList.length == 0) {
-						window.top.Vue.prototype.$message({
-							message: '请给此功能配置相应的字段',
-							type: 'warning'
-						});
-						that.loading = false;
-						return;
-					}else{
-						for(var i in data.data.functionFieldsBoList){
-							var obj = data.data.functionFieldsBoList[i];
-							if(obj.ifPrimaryKey){
-								that.primaryKey = obj.fieldName;
-								break;
-							}
-						}
-					}
+                if (row.approve_state > 0 || row.approve_state === '审核通过' || row.approve_state === '待审核' || row
+                    .APPROVE_STATE > 0 || row.APPROVE_STATE === '审核通过' || row.APPROVE_STATE === '待审核') {
+                    return true;
+                }
+                if (row.commit_status && row.commit_status === '1') {
+                    return true;
+                }
+                return false;
+            },
+            requestFieldsConfig: function(cb) {
+                var that = this;
+                var url = jasTools.base.rootPath + "/functionConfiguration/getDetailByCode.do";
+                jasTools.ajax.get(url, {
+                    functionCode: that.menuCode
+                }, function(data) {
+                    if (data.data.functionFieldsBoList.length == 0) {
+                        window.top.Vue.prototype.$message({
+                            message: '请给此功能配置相应的字段',
+                            type: 'warning'
+                        });
+                        that.loading = false;
+                        return;
+                    } else {
+                        for (var i in data.data.functionFieldsBoList) {
+                            var obj = data.data.functionFieldsBoList[i];
+                            if (obj.ifPrimaryKey) {
+                                that.primaryKey = obj.fieldName;
+                                break;
+                            }
+                        }
+                    }
+                    that.functionName = data.data.functionName;
+                    that._formatSearchConfig(data.data);
+                    that.tableColumn = that.tableColumns.sort(that.sortByIndex('listIndex'));
+                    cb && cb();
+                });
+            },
+            _formatSearchConfig: function(data) {
+                var that = this;
+                var searchData = [];
+                var childAndparent = {};
+                that.tableName = data.tableName;
+                data.functionFieldsBoList.forEach(function(item) {
+                    if (item.ifQuery == "1" && item.childField) {
+                        if (item.childField.split(",")) {
+                            item.childField.split(",").forEach(function(s) {
+                                var obj = {
+                                    id: "",
+                                    name: ""
+                                };
+                                obj.id = item.fieldName;
+                                obj.name = item.fieldNameCn;
+                                childAndparent[s] = obj;
+                            });
+                        }
+                    }
+                }); //寻找子父之间关系
 
-					that.getSearchFieldAndList(data.data);
-				});
-			},
-			getSearchFieldAndList: function (data) {
-				var that = this;
-				var searchData = [];
-				var childAndparent = {};
-				data.functionFieldsBoList.forEach(function (item) {
-					if (item.ifQuery == "1" && item.childField) {
-						if (item.childField.split(",")) {
-							item.childField.split(",").forEach(function (s) {
-								var obj = {
-									id: "",
-									name: ""
-								};
-								obj.id = item.fieldName;
-								obj.name = item.fieldNameCn;
-								childAndparent[s] = obj;
-							});
-						}
-					}
-				}); //寻找子父之间关系
+                data.functionFieldsBoList.forEach(function(item) {
+                    var options = [];
+                    var optionsOrgin = "domain";
+                    if (item.domainList) {
+                        item.domainList.forEach(function(child) {
+                            var obj = {};
+                            for (key in child) {
+                                obj[key.toLowerCase()] = child[key];
+                            }
+                            options.push(obj);
+                        });
+                    } else {
+                        optionsOrgin = "select";
+                    }
+                    if (item.ifKeyword == "1") {
+                        that.keywordData.placeholder += " " + item.fieldNameCn
+                        that.keywordData.show = 1;
+                    }
+                    if (item.ifQuery == "1") {
+                        if (['CITY_ID', 'COUNTY_ID', 'CITY_NAME', 'COUNTY_NAME'].indexOf(item.fieldName) < 0) {
+                            var obj = {
+                                id: item.fieldName,
+                                name: item.fieldNameCn,
+                                type: item.uiType,
+                                placeholder: item.placeholder,
+                                options: options,
+                                optionsOrgin: optionsOrgin,
+                                queryIndex: item.queryIndex,
+                                childField: item.childField,
+                                requestPath: item.requestPath,
+                                // isPartant:
+                            };
+                            if (childAndparent[item.fieldName]) {
+                                obj.isPartant = childAndparent[item.fieldName].id;
+                                obj.isPartantName = childAndparent[item.fieldName].name;
+                            }
+                            that.searchData.push(obj);
+                            that.searchUi.push({
+                                id: item.fieldName,
+                                type: item.uiType
+                            });
+                            if (item.uiType == 'UT_14') {
+                                var obj = {
+                                    min: 0,
+                                    max: 0
+                                };
+                                that.searchTable[item.fieldName] = obj;
+                            }
+                            if (item.uiType == "UT_07" || item.uiType == "UT_08") {
+                                that.$set(that.searchTable, item.fieldName, []);
+                            }
+                        } else {
+                            that.isShowArea = true;
+                        }
+                    }
+                    if (item.ifList == "1") {
+                        that.tableColumns.push({
+                            id: item.fieldName, //需要把此处的下划线 噶爱成驼峰
+                            name: item.fieldNameCn,
+                            align: 'center',
+                            listIndex: item.listIndex
+                        });
+                    }
 
-				data.functionFieldsBoList.forEach(function (item) {
-					var options = [];
-					var optionsOrgin="domain";
-					if (item.domainList) {
-						item.domainList.forEach(function (child) {
-							var obj = {};
-							for (key in child) {
-								obj[key.toLowerCase()] = child[key];
-							}
-							options.push(obj);
-						});
-					}else{
-						optionsOrgin="select";
-					}
-					if (item.ifQuery == "1") {
-						var obj = {
-							id: item.fieldName,
-							name: item.fieldNameCn,
-							type: item.uiType,
-							placeholder: item.plplaceholder,
-							options: options,
-							optionsOrgin:optionsOrgin,
-							queryIndex: item.queryIndex,
-							childField: item.childField,
-							requestPath: item.requestPath,
-							// isPartant:
-						};
-						if (childAndparent[item.fieldName]) {
-							obj.isPartant = childAndparent[item.fieldName].id;
-							obj.isPartantName = childAndparent[item.fieldName].name;
-						}
-						that.searchData.push(obj);
-						that.searchUi.push({
-							id: item.fieldName,
-							type: item.uiType
-						});
-						if (item.uiType == 'UT_14') {
-							var obj = {
-								min: 0,
-								max: 0
-							};
-							that.searchTable[item.fieldName] = obj;
-						}
-						if (item.uiType == "UT_07" || item.uiType == "UT_08") {
-							that.$set(that.searchTable, item.fieldName, []);
-						}
-					}
-					if (item.ifList == "1") {
-						that.tableColumns.push({
-							id: item.fieldName, //需要把此处的下划线 噶爱成驼峰
-							name: item.fieldNameCn,
-							align: 'center',
-							listIndex: item.listIndex
-						});
-					}
-				});
-				if (that.searchData.length > 1) {
-					that.isShowSearch = true;
-					that.searchData = that.searchData.sort(that.sortByIndex('queryIndex'));
-				}
-				that.searchData.push({
-					type: "opertion",
-					options: [{
-						type: 'primary',
-						name: '查询',
-						id: "query",
-						click: function () { //此时通过参数的形式，进行方法的传递
-							that.formatFormAndSearch();
+                });
+                if (that.searchData.length > 1) {
+                    that.isShowSearch = true;
+                    that.searchData = that.searchData.sort(that.sortByIndex('queryIndex'));
+                } else if (that.isShowArea || that.keywordData.show == 1) {
+                    that.isShowSearch = true;
 
-						}
-					}, {
-						type: '',
-						name: '重置',
-						click: function () {
-							that.searchform = {
-								page: 1,
-								rows: 10
-							};
-							for (var key in that.searchTable) {
-								if (typeof that.searchTable[key] == 'object') {
-									if (that.searchTable[key].min) {
-										that.searchTable[key].min = 0;
-										that.searchTable[key].max = 0;
-									} else {
-										that.searchTable[key] = "";
-									}
-								} else {
-									that.searchTable[key] = "";
-								}
-							}
-							for(var key in that.searchData){
-								if(that.searchData[key].type!='opertion'&&that.searchData[key].optionsOrgin!="domain"){
-									that.searchData[key].options=[];
-								}
+                }
+            },
+            resetSearchForm: function() {
+                var that = this;
+                that.searchform = {
+                    page: 1,
+                    rows: 10
+                };
+                for (var key in that.searchTable) {
+                    if (typeof that.searchTable[key] == 'object') {
+                        if (that.searchTable[key].min) {
+                            that.searchTable[key].min = 0;
+                            that.searchTable[key].max = 0;
+                        } else {
+                            that.searchTable[key] = "";
+                        }
+                    } else {
+                        that.searchTable[key] = "";
+                    }
+                }
+                for (var key in that.searchData) {
+                    if (that.searchData[key].optionsOrgin != "domain") {
+                        that.searchData[key].options = [];
+                    }
+                }
+                if (that.isShowArea) {
+                    that.mycity = '';
+                    var ids = that.$refs.myarea._value;
+                    var names = that.$refs.myarea.cLabel;
+                    that.searchform.CITY_ID = undefined;
+                    that.searchform.COUNTY_ID = undefined;
+                    that.searchform.CITY_NAME = undefined;
+                    that.searchform.COUNTY_NAME = undefined;
+                }
+                that.$nextTick(function() {
+                    that.requestTableList();
+                });
+            },
+            formatSearchForm: function() {
+                var that = this;
+                for (key in that.searchTable) {
+                    that.searchUi.forEach(function(item) {
+                        if (key == item.id) {
+                            if (item.type == "UT_01" && that.searchTable[key]) {
+                                that.searchform[key] = "%" + that.searchTable[key] + "%";
+                                return;
+                            }
+                            if (item.type == "UT_14") {
+                                if (Number(that.searchTable[key].max) > 0) {
+                                    that.searchform[key] = [Number(that.searchTable[key].min), Number(that.searchTable[key]
+                                        .max)];
+                                    return;
+                                } else {
+                                    delete that.searchform[key];
+                                    return;
+                                }
 
-							}
+                            }
+                            if (item.type == "UT_07" || item.type == "UT_08") {
+                                if (that.searchTable[key].length != 0) {
+                                    that.searchform[key] = that.searchTable[key];
+                                    return;
+                                } else {
+                                    delete that.searchform[key];
+                                    return;
+                                }
+                            }
+                            if (that.searchTable[key]) {
+                                that.searchform[key] = that.searchTable[key];
+                                return;
+                            } else {
+                                delete that.searchform[key];
+                                return;
+                            }
+                        }
+                    });
+                }
+                that.searchform["keyword"] = that.searchTable.keyword ? "%" + that.searchTable.keyword + "%" :
+                    undefined;
+                if (that.isShowArea) {
+                    var ids = that.$refs.myarea._value;
+                    var names = that.$refs.myarea.cLabel;
+                    that.searchform.CITY_ID = ids[0];
+                    that.searchform.COUNTY_ID = ids[1];
+                    that.searchform.CITY_NAME = ids[0] ? names[0] : undefined;
+                    that.searchform.COUNTY_NAME = ids[1] ? names[1] : undefined;
+                }
+                return that.searchform;
+            },
+            requestTableList: function() {
+                var that = this;
+                that.loading = true;
+                var obj = jasTools.base.extend({}, {
+                    sortOrder: this.sortOrder,
+                    sortName: this.sortName,
+                }, that.formatSearchForm());
+                var url = jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/getPage.do";
+                jasTools.ajax.post(url, obj, function(data) {
+                    setTimeout(function() {
+                        that.loading = false;
+                    }, 300)
+                    that.tableData = data.rows;
+                    that.total = data.total;
+                });
+            },
+            sortChange: function(column, prop, order) {
+                var that = this;
+                this.sortName = column.prop || '';
+                this.sortOrder = column.order === 'ascending' ? 'asc' : 'desc';
+                this.sortOrder = column.prop ? this.sortOrder : '';
+                that.requestTableList();
+            },
 
-							that.requestTableList();
-						}
-					}]
-				});
-				that.calculate();
-				that.repeatComplate();
-			},
-			tranfrom: function (x) {
-				var s = x.split("_");
-				var o = s[0].toLowerCase();
-				for (var i = 1; i < s.length; i++) {
-					o = o + s[i].slice(0, 1).toUpperCase() + s[i].slice(1).toLowerCase();
-				}
-				return o;
-			},
-			requestTableList: function () {
-				var that = this;
-				that.loading = true;
-				var obj = jasTools.base.extend({}, {
-					pageNo: this.currentPage,
-					pageSize: this.pageSize,
-					sortOrder:this.sortOrder,
-					sortName:this.sortName,
-				}, that.searchform);
-				$.ajax({
-					type: "POST",
-					url: jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/getPage.do?token=" + localStorage.getItem(
-						"token"),
-					dataType: "json",
-					contentType: "application/json",
-					data: JSON.stringify(obj),
-					async: true,
-					success: function (data) {
-						setTimeout(function () {
-							that.loading = false;
-						}, 300)
-						if (data.status == 1) {
-							that.tableData = data.rows;
-							that.total = data.total;
-						} else {
-							window.top.Vue.prototype.$message({
-								message: '服务异常，请稍候尝试',
-								type: 'error'
-							});
-						}
-					}
-				});
-			},
-			sortChange:function(column, prop, order){
-				var sortName = null;
-				var sortOrder = null;
-				if(column.prop!=null){
-					sortName = column.prop;
-					sortOrder=column.order==='ascending'?'asc':'desc';
-				}
-				this.sortName = sortName;
-				this.sortOrder = sortOrder;
-		        var that = this;
-				that.loading = true;
-				var obj = jasTools.base.extend({}, {
-					pageNo: this.currentPage,
-					pageSize: this.pageSize,
-					sortOrder:sortOrder,
-					sortName:sortName,
-				}, that.searchform);
-				$.ajax({
-					type: "POST",
-					url: jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/getPage.do?token=" + localStorage.getItem(
-						"token"),
-					dataType: "json",
-					contentType: "application/json",
-					data: JSON.stringify(obj),
-					async: true,
-					success: function (data) {
-						setTimeout(function () {
-							that.loading = false;
-						}, 300)
-						if (data.status == 1) {
-							that.tableData = data.rows;
-							that.total = data.total;
-						} else {
-							window.top.Vue.prototype.$message({
-								message: '服务异常，请稍候尝试',
-								type: 'error'
-							});
-						}
-					}
-				});
-			},
-			repeatComplate: function (data) {
-				var that = this;
-				that.tableColumn = that.tableColumns.sort(that.sortByIndex('listIndex'));
-				//console.log(that.tableColumn);
-				that.requestTableList();
-			},
-			sortByIndex: function (name) {
-				return function (object1, object2) {
-					var value1 = object1[name];
-					var value2 = object2[name];
-					if (value2 > value1) {
-						return -1;
-					} else if (value2 < value1) {
-						return 1;
-					} else {
-						return 0;
-					}
-				}
-			},
-			bt_add: function () {
-				var that = this;
-				top.jasTools.dialog.show({
-					title: '增加',
-					width: that.config.form.width,
-					height: that.config.form.height,
-					src: jasTools.base.rootPath +  '/jasmvvm/pages/module-template/form-opra-template/dialogs/addTemplate.html?menuCode=' + that.menuCode+"&privilegeCode="+this.privilegeCode,
-					cbForClose: function () {
-						that.refresh();
-					}
-				});
-			},
+            sortByIndex: function(name) {
+                return function(object1, object2) {
+                    var value1 = object1[name];
+                    var value2 = object2[name];
+                    if (value2 > value1) {
+                        return -1;
+                    } else if (value2 < value1) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            },
+
+            /* 按钮操作--开始 */
+            bt_add: function() {
+                var that = this;
+                top.jasTools.dialog.show({
+                    title: '增加',
+                    width: '60%',
+                    height: '80%',
+                    src: jasTools.base.rootPath +
+                        '/jasmvvm/pages/module-template/form-opra-template/dialogs/addTemplate.html?menuCode=' + that
+                        .menuCode + "&privilegeCode=" + this.privilegeCode,
+                    cbForClose: function() {
+                        that.refresh();
+                    }
+                });
+            },
+            locateRow: function(row) {
+                var that = this;
+                var code = that.tableName;
+                if (row.GEO_STATE && row.GEO_STATE.indexOf('异常') > -1) {
+                    window.top.Vue.prototype.$message({
+                        message: '定位' + row.GEO_STATE,
+                        type: 'error'
+                    });
+                } else {
+                    top.app.locate(row.OBJECTID || row.objectid, code);
+                }
+            },
+            checkRow: function(row) {
+                this.$refs['mytable'].toggleRowSelection(row)
+            },
+            viewRow: function(row) {
+                var that = this;
+                var url = jasTools.base.rootPath + "/jasframework/workflow/instance/get.do";
+                jasTools.ajax.postForm(url, {
+                    businessKey: row.OID
+                }, function(res) {
+                    var id = "";
+                    if (res.status == 1 && res.data) {
+                        id = res.data.proInstId;
+                    }
+                    that.view(row, id); //查看
+                });
+            },
+            view: function(row, id) {
+                var that = this;
+                var src = jasTools.base.rootPath +
+                    '/jasmvvm/pages/module-template/form-opra-template/dialogs/viewTemplate.html?menuCode=' + that
+                    .menuCode;
+                if (id) {
+                    src += '&proInstId=' + id;
+                }
+                src += '&' + this.primaryKey + '=' + row[this.primaryKey];
+                top.jasTools.dialog.show({
+                    title: '查看',
+                    width: '60%',
+                    height: '80%',
+                    src: src,
+                    cbForClose: function() {
+
+                    }
+                });
+            },
+            delRow: function(row) {
+                var that = this;
+                window.top.Vue.prototype.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                    type: 'warning',
+                    callback: function(action) {
+                        if (action === 'confirm') {
+                            that.delRowToServer(row);
+                        } else {
+                            top.Vue.prototype.$message({
+                                type: 'info',
+                                message: '已取消删除'
+                            });
+                        }
+                    }
+                });
+            },
+            delRowToServer: function(row) {
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/delete.do?token=" +
+                        localStorage
+                        .getItem(
+                            "token"),
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(row),
+                    success: function(data) {
+                        if (data.status == 1) {
+                            top.Vue.prototype.$message({
+                                type: 'success',
+                                message: '删除成功'
+                            });
+                            that.refresh();
+                        } else {
+                            top.Vue.prototype.$message({
+                                type: 'info',
+                                message: '服务异常，请稍候尝试'
+                            });
+                        }
+                    }
+                });
+            },
+            editRow: function(row) {
+                var that = this;
+                var src = jasTools.base.rootPath +
+                    '/jasmvvm/pages/module-template/form-opra-template/dialogs/addTemplate.html?menuCode=' + that
+                    .menuCode +
+                    "&privilegeCode=" + this.privilegeCode;
+                /* for (var key in row) {
+                	src += "&" + key + '=' + row[key];
+                } */
+                src += '&' + this.primaryKey + '=' + row[this.primaryKey];
+                top.jasTools.dialog.show({
+                    title: '修改',
+                    width: '60%',
+                    height: '80%',
+                    src: src,
+                    cbForClose: function() {
+                        that.refresh();
+                    }
+                });
+            },
 
 
-			clickFunction: function (row, name) {
-				definedFunction[name](row);
-			},
-			locateRow: function (row) {
-				var that = this;
-			    var code="daq_"+that.templateCode;
-				top.app.locate(row.oid,code);
-			},
-			scopeRow: function (row) {
-				var that = this;
-				var src = './pages/template/dialogs/tenders-scope.html';
-				top.jasTools.dialog.show({
-					title: '范围选择',
-					width: that.config.view.width,
-					height: that.config.view.height,
-					src: jasTools.base.setParamsToUrl(src, row),
-				});
-			},
-			checkRow: function (row) {
-				this.$refs['mytable'].toggleRowSelection(row)
-			},
-			viewRow: function (row) {
-				var that = this;
-				var src = jasTools.base.rootPath +  '/jasmvvm/pages/module-template/form-opra-template/dialogs/viewTemplate.html?menuCode=' + that.menuCode;
-				if (this.isApprove) {
-					src += '&approveType=1';
-				}
-				/* for (var key in row) {
-					src += "&" + key + '=' + row[key];
-				} */
-				src += '&'+ this.primaryKey + '=' + row[this.primaryKey];
-				top.jasTools.dialog.show({
-					title: '查看',
-					width: that.config.view.width,
-					height: that.config.view.height,
-					src: src,
-					cbForClose: function () {
+            refresh: function() {
+                this.requestTableList();
+            },
+            handleSizeChange: function(val) {
+                this.searchform.rows = val;
+                this.requestTableList();
+            },
+            handleCurrentChange: function(val) {
+                this.searchform.page = val;
+                this.requestTableList();
+            },
+            handleSelectionChange: function(val) {
+                this.rows = val;
+                this.oids = val.map(function(item) {
+                    return item.oid || item.OID;
+                });
+            },
 
-					}
-				});
-			},
-			delRow: function (row) {
-				var that = this;
-				window.top.Vue.prototype.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-					type: 'warning',
-					callback: function (action) {
-						if (action === 'confirm') {
-							that.delRowToServer(row);
-						} else {
-							top.Vue.prototype.$message({
-								type: 'info',
-								message: '已取消删除'
-							});
-						}
-					}
-				});
-			},
-			delRowToServer: function (row) {
-				var that = this;
-				$.ajax({
-					type: "POST",
-					url: jasTools.base.rootPath + "/map/commonData/" + that.menuCode + "/delete.do?token=" + localStorage.getItem(
-						"token"),
-					dataType: "json",
-					contentType: "application/json",
-					data: JSON.stringify(row),
-					success: function (data) {
-						if (data.status == 1) {
-							top.Vue.prototype.$message({
-								type: 'success',
-								message: '删除成功'
-							});
-							that.refresh();
-						} else {
-							top.Vue.prototype.$message({
-								type: 'info',
-								message: '服务异常，请稍候尝试'
-							});
-						}
-					}
-				});
-			},
-			editRow: function (row) {
-				var that = this;
-				var src = jasTools.base.rootPath +  '/jasmvvm/pages/module-template/form-opra-template/dialogs/addTemplate.html?menuCode=' + that.menuCode+"&privilegeCode="+this.privilegeCode;
-				/* for (var key in row) {
-					src += "&" + key + '=' + row[key];
-				} */
-				src += '&'+ this.primaryKey + '=' + row[this.primaryKey];
-				top.jasTools.dialog.show({
-					title: '修改',
-					src: src,
-					cbForClose: function () {
-						that.refresh();
-					}
-				});
-			},
 
-			refresh: function () {
-				this.requestTableList();
-			},
-			handleSizeChange: function (val) {
-				this.searchform.rows = val;
-				this.requestTableList();
-			},
-			handleCurrentChange: function (val) {
-				this.searchform.page = val;
-				this.requestTableList();
-			},
-			isChangeParent: function (e, item) {
-				var that = this;
-				if (e && item.isPartant && !that.searchTable[item.isPartant]) {
-					top.Vue.prototype.$message({
-						type: 'warning',
-						message: '请先选择' + item.isPartantName
-					});
-				}
-			},
-			selectChange: function (item) { // 选择类型的控件触发的change事件
-				var that = this;
-				if (item.childField && item.requestPath) {
-					var aRequestPath = item.requestPath.split(',');
-					item.childField.split(',').forEach(function (childFieldItem, index, arr) {
-						var url = aRequestPath[index] || aRequestPath[0];
-						that.setChildSelectOption(item.id, childFieldItem, url, function () {
-							if (index === arr.length - 1) {
-								that.formatFormAndSearch();
-							}
-						});
-					});
-				} else {
-					that.formatFormAndSearch();
-				}
-			},
-			setClearChildValue: function (fatherField) {
-				var that=this;
-			//	if (!that.searchTable[fatherField]) { //该父级没有值
-					that.searchData.forEach(function (item) {
-						if (item.id == fatherField) { //查询它的子集id
-							if (item.childField) {
-								item.childField.split(",").forEach(function (child) {
-									that.searchData.forEach(function (childItem) {
-										if (child == childItem.id) {
-											childItem.options = [];
-											that.searchTable[childItem.id] = '';
-											that.setClearChildValue(childItem.id);//对子集继续寻找子集
-										}
+            /* 搜索栏内部方法--开始 */
 
-									});
-								});
-							}
-						}
-					});
-				//}
-			}, //清除子集的值
-			setChildSelectOption: function (fatherField, childField, requestPath, fn) {
-				var that = this;
-				/*数据清空 临时增加  此时方法有可能消耗时间，快速就是增加配置*/
-				that.setClearChildValue(fatherField);
-				/*数据清空 临时增加*/
-				var setOptionsAndValue = function (options) {
-					that.searchData.forEach(function (item) {
-						if (childField.indexOf(item.id) !== -1) { // 子集字段
-							item.options = options || [];
-							that.searchTable[item.id] = '';
-						}
-					});
-					fn && fn();
-				};
-				if (that.searchTable[fatherField]) { //进行子级的查找 后台请求
-					var key = jasTools.base.switchToCamelCase(fatherField);
-					var obj = {
-						"rows": 100,
-						"page": 1,
-					};
-					obj[key] = that.searchTable[fatherField];
-					jasTools.ajax.post(jasTools.base.rootPath + "/" + requestPath, obj, function (data) {
-						setOptionsAndValue(data.rows)
-					});
-				} else {
-					setOptionsAndValue();
-				}
-			},
-			calculate: function () {
-				var count = this.searchData.length % 4;
-				if (count == 1) {
-					this.btnxs = 24;
-					this.btnlg = 24
-				}
-				if (count == 2) {
-					this.btnxs = 12;
-					this.btnlg = 18
-				}
-				if (count == 3) {
-					this.btnxs = 24;
-					this.btnlg = 12
-				}
-			},
-			isSelect: function (item) {
-				if (item.type == "UT_11" || item.type == "UT_12") {
-					return true;
-				}
-				return false;
-			},
-			isMultiSelect: function (item) {
-				if (item.type == "UT_09" || item.type == "UT_10") {
-					return true;
-				}
-				return false;
-			},
-			isRadio: function (item) {
-				if (item.type == "UT_05" || item.type == "UT_06") {
-					return true;
-				}
-				return false;
-			},
-			isCheckbox: function (item) {
-				if (item.type == "UT_07" || item.type == "UT_08") {
-					return true;
-				}
-				return false
-			},
-			changeSearchTable:function(){
-				this.formatFormAndSearch();
-			},
-			formatFormAndSearch: function () {
-				var that = this;
-				for (key in that.searchTable) {
-					that.searchUi.forEach(function (item) {
-						if (key == item.id) {
-							if (item.type == "UT_01" && that.searchTable[key]) {
-								that.searchform[key] = "%" + that.searchTable[key] + "%";
-								return;
-							}
-							if (item.type == "UT_14") {
-								if (Number(that.searchTable[key].max) > 0) {
-									that.searchform[key] = [Number(that.searchTable[key].min), Number(that.searchTable[key].max)];
-									return;
-								} else {
-									delete that.searchform[key];
-									return;
-								}
+            isChangeParent: function(e, item) {
+                var that = this;
+                if (e && item.isPartant && !that.searchTable[item.isPartant]) {
+                    top.Vue.prototype.$message({
+                        type: 'warning',
+                        message: '请先选择' + item.isPartantName
+                    });
+                }
+            },
+            selectChange: function(item) { // 选择类型的控件触发的change事件
+                var that = this;
+                if (item.childField && item.requestPath) {
+                    var aRequestPath = item.requestPath.split(',');
+                    item.childField.split(',').forEach(function(childFieldItem, index, arr) {
+                        var url = aRequestPath[index] || aRequestPath[0];
+                        that.setChildSelectOption(item.id, childFieldItem, url, function() {
+                            if (index === arr.length - 1) {
+                                that.requestTableList();
+                            }
+                        });
+                    });
+                } else {
+                    that.requestTableList();
+                }
+            },
+            setClearChildValue: function(fatherField) {
+                var that = this;
+                //	if (!that.searchTable[fatherField]) { //该父级没有值
+                that.searchData.forEach(function(item) {
+                    if (item.id == fatherField) { //查询它的子集id
+                        if (item.childField) {
+                            item.childField.split(",").forEach(function(child) {
+                                that.searchData.forEach(function(childItem) {
+                                    if (child == childItem.id) {
+                                        childItem.options = [];
+                                        that.searchTable[childItem.id] = '';
+                                        that.setClearChildValue(childItem.id); //对子集继续寻找子集
+                                    }
 
-							}
-							if (item.type == "UT_07" || item.type == "UT_08") {
-								if (that.searchTable[key].length != 0) {
-									that.searchform[key] = that.searchTable[key];
-									return;
-								} else {
-									delete that.searchform[key];
-									return;
-								}
-							}
-							if (that.searchTable[key]) {
-								that.searchform[key] = that.searchTable[key];
-								return;
-							} else {
-								delete that.searchform[key];
-								return;
-							}
-						}
-					});
-				}
-				that.requestTableList();
-			},
-			handleCommand : function (command){
-				console.log(command);
-			}
-		}
-	});
+                                });
+                            });
+                        }
+                    }
+                });
+                //}
+            }, //清除子集的值
+            setChildSelectOption: function(fatherField, childField, requestPath, fn) {
+                var that = this;
+                /*数据清空 临时增加  此时方法有可能消耗时间，快速就是增加配置*/
+                that.setClearChildValue(fatherField);
+                /*数据清空 临时增加*/
+                var setOptionsAndValue = function(options) {
+                    that.searchData.forEach(function(item) {
+                        if (childField.indexOf(item.id) !== -1) { // 子集字段
+                            item.options = options || [];
+                            that.searchTable[item.id] = '';
+                        }
+                    });
+                    fn && fn();
+                };
+                if (that.searchTable[fatherField]) { //进行子级的查找 后台请求
+                    var key = jasTools.base.switchToCamelCase(fatherField);
+                    var obj = {
+                        "rows": 100,
+                        "page": 1,
+                    };
+                    obj[key] = that.searchTable[fatherField];
+                    jasTools.ajax.post(jasTools.base.rootPath + "/" + requestPath, obj, function(data) {
+                        setOptionsAndValue(data.rows)
+                    });
+                } else {
+                    setOptionsAndValue();
+                }
+            },
+
+            isSelect: function(item) {
+                if (item.type == "UT_11" || item.type == "UT_12") {
+                    return true;
+                }
+                return false;
+            },
+            isMultiSelect: function(item) {
+                if (item.type == "UT_09" || item.type == "UT_10") {
+                    return true;
+                }
+                return false;
+            },
+            isRadio: function(item) {
+                if (item.type == "UT_05" || item.type == "UT_06") {
+                    return true;
+                }
+                return false;
+            },
+            isCheckbox: function(item) {
+                if (item.type == "UT_07" || item.type == "UT_08") {
+                    return true;
+                }
+                return false
+            },
+            getInstance: function(dataId, callback) {
+                var url = jasTools.base.rootPath + "/jasframework/workflow/instance/get.do";
+                jasTools.ajax.postForm(url, {
+                    businessKey: dataId
+                }, function(data) {
+                    if (JSON.stringify(data.data) === "{}") {
+                        return;
+                    }
+                    if (callback != void 0) {
+                        callback(data.data);
+                    }
+                }, function() {});
+            },
+            openApproveDialog: function(instanceData) {
+                var that = this;
+                var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/approve-dialog.html';
+                var src = jasTools.base.setParamsToUrl(baseSrc, {
+                    proInstId: instanceData.proInstId,
+                    isEdit: 1,
+                    taskId: instanceData.currentTasks[0].taskId,
+                    businessKey: instanceData.businessKey,
+                    //carbonId: row.oid
+                });
+                top.jasTools.dialog.show({
+                    width: '60%',
+                    height: '80%',
+                    title: '审批任务',
+                    src: src,
+                    cbForClose: function() {
+                        that.refresh();
+                    }
+                });
+            },
+            approve: function() {
+                var that = this;
+                var oids = this.approveRows.map(function(item) {
+                    /*if(item.APPROVE_STATE !== '1') {
+                    	top.Vue.prototype.$message({
+                    		type: 'warning',
+                    		message: "请选择审核中的数据！"
+                    	});
+                    	return;
+                    }*/
+                    that.getInstance(item.OID, that.openApproveDialog);
+                    //return item[that.primaryKey];
+                });
+            },
+            upcall: function() {
+                var that = this;
+                var length = that.reportRows.length;
+                if (length > 1) {
+                    that.upcallAll();
+                    return;
+                }
+                var oids = this.reportRows.map(function(item) {
+                    if (item.APPROVE_STATE && item.APPROVE_STATE !== '0' && item.APPROVE_STATE !== '-1') {
+                        top.Vue.prototype.$message({
+                            type: 'warning',
+                            message: "请选择未上报的数据！"
+                        });
+                        return;
+                    }
+                    that.upcall_disalbed = true;
+                    var businessKey = item.OID;
+                    var processKey = that.processKey; //要发起的流程key，使用最新版本的流程定义
+                    // var subject = "管道基础数据上报流程"; //流程主题，使用具有意义的名称
+                    // if ("governmentDataReview" === that.processKey) {
+                    // 	subject = "管道安全监管数据上报流程";
+                    // }
+                    var subject = '【' + JSON.parse(localStorage.getItem("user")).unitName + '】' + that.functionName + '数据上报';
+                    var autoPassFirstNode = true; //是否自动通过第一个节点：是
+                    var auditContent = "请审核"; //自动通过第一个节点的审核意见，即提交意见
+                    //流程变量：作用于整个流程
+                    var createUserId = JSON.parse(localStorage.getItem("user")).oid;
+                    var flowVars = {
+                        createUser: createUserId,
+                        creator: createUserId,
+                        dataUnitId: item.CREATE_USER_UNIT_ID,
+                        menuCode: that.menuCode,
+                        globalViewDataPageUrl: "",
+                        pageUrlKey: ""
+                    };
+                    //发起流程
+                    if (item.APPROVE_STATE === '-1') {
+                        that.getInstance(item.OID, that.queryOutflows);
+                    } else {
+                        that.startWorkflow(businessKey, processKey, subject, autoPassFirstNode, auditContent, that
+                            .workflowCallback, flowVars);
+                    }
+                    //return item[that.primaryKey];
+                });
+            },
+            queryOutflows: function(instanceData) {
+                var that = this;
+                var url = jasTools.base.rootPath + "/jasframework/workflow/task/getOutflows.do";
+                jasTools.ajax.get(url, {
+                    taskId: instanceData.currentTasks[0].taskId
+                }, function(data) {
+                    for (p in data.data.outflows) {
+                        console.log(data.data.outflows[p]);
+                        if (data.data.outflows[p] && data.data.outflows[p].pass === "true") {
+                            that.requestApprove(data.data.outflows[p], instanceData.currentTasks[0].taskId);
+                        }
+                    }
+                });
+            },
+            requestApprove: function(outflow, taskId) {
+                var that = this;
+                var url = jasTools.base.rootPath + '/jasframework/workflow/task/approve.do';
+                var flowVars = jasTools.base.extend({
+                    auditContent: "请审核"
+                }, outflow);
+                console.log(flowVars);
+                jasTools.ajax.post(url, {
+                    flowVars: flowVars,
+                    taskId: taskId
+                }, function(data) {
+                    // that.form.toUsers = ["1df621c3346c4a8bac91d1238afc8400"];
+                    top.Vue.prototype.$message.success('上报成功!');
+                    that.upcall_disalbed = false;
+                    that.refresh();
+                });
+            },
+            showWorkFlowChart: function() {
+                var that = this;
+                var oids = this.showWorkFlowRows.map(function(item) {
+                    if (!item.APPROVE_STATE || item.APPROVE_STATE === '0') {
+                        top.Vue.prototype.$message({
+                            type: 'warning',
+                            message: "请选择完成上报的数据查看流程！"
+                        });
+                        return;
+                    }
+                    var baseSrc = jasTools.base.rootPath +
+                        '/jasmvvm/pages/module-workflow/common/dialogs/workflow-viewer.html';
+                    var src = jasTools.base.setParamsToUrl(baseSrc, {
+                        businessKey: item.OID
+                    });
+                    top.jasTools.dialog.show({
+                        width: '80%',
+                        height: '80%',
+                        title: '流程图',
+                        src: src,
+                    });
+                    //return item[that.primaryKey];
+                });
+            },
+            //流程回调函数
+            workflowCallback: function(result) {
+                if (result.status == -1) {
+                    top.Vue.prototype.$message({
+                        type: 'error',
+                        message: "发起流程失败:" + result.msg
+                    });
+                    return;
+                }
+                top.Vue.prototype.$message({
+                    type: 'success',
+                    message: "发起流程成功，流程实例：" + result.data
+                });
+                this.upcall_disalbed = false;
+                this.refresh();
+            },
+            startWorkflow: function(businessKey, processKey, subject, autoPassFirstNode, auditContent, callback,
+                flowVars) {
+                var that = this;
+                if (businessKey == void 0 || typeof(businessKey) == "undefined") {
+                    top.showAlert(getLanguageValue('tip'), "param businessKey should not be empty!", 'info');
+                    return;
+                }
+                if (processKey == void 0 || typeof(processKey) == "undefined") {
+                    top.showAlert(getLanguageValue('tip'), "param processKey should not be empty!", 'info');
+                    return;
+                }
+                //参数预处理
+                if (true == autoPassFirstNode || 'true' == autoPassFirstNode) {
+                    autoPassFirstNode = true;
+                } else {
+                    autoPassFirstNode = false;
+                }
+                if (subject == void 0 || typeof(subject) == "undefined") {
+                    subject = "";
+                }
+                if (auditContent == void 0 || typeof(auditContent) == "undefined") {
+                    auditContent = "";
+                }
+                flowVars = flowVars || {};
+                flowVars["auditContent"] = auditContent;
+                //流程启动参数 (json对象)
+                var initParamsVars = {
+                    "businessKey": businessKey, //业务主键
+                    "processKey": processKey, //工作流key
+                    "proInstName": subject, //流程主题
+                    "autoPassFirstNode": autoPassFirstNode, //是否自动审核第一个流程任务节点
+                    "flowVars": flowVars //其他流程变量
+                };
+                var url = jasTools.base.rootPath + "/jasframework/workflow/instance/start.do";
+                jasTools.ajax.post(url, initParamsVars, function(data) {
+                    if (callback != void 0) {
+                        callback(data);
+                    }
+                }, function() {});
+            },
+            upcallAll: function() {
+                var that = this;
+                var length = that.reportRows.length;
+                var trueLength = 0;
+                var error = false;
+                that.reportRows.map(function(currentValue) {
+                    console.log(currentValue);
+                    if (!error && currentValue.APPROVE_STATE && currentValue.APPROVE_STATE !== '0' && currentValue.APPROVE_STATE !== '-1') {
+                        error = true;
+                    }
+                });
+                if (error) {
+                    top.Vue.prototype.$message({
+                        type: 'warning',
+                        message: "请选择未上报的数据！"
+                    });
+                    return;
+                }
+
+                for (var i = 0; i < length; i++) {
+                    var item = that.reportRows[i];
+                    that.upcallAll_disalbed = true;
+                    var businessKey = item.OID;
+                    var processKey = that.processKey; //要发起的流程key，使用最新版本的流程定义
+                    // var subject = "管道基础数据上报流程"; //流程主题，使用具有意义的名称
+                    // if ("governmentDataReview" === that.processKey) {
+                    // 	subject = "管道安全监管数据上报流程";
+                    // }
+                    var subject = '【' + JSON.parse(localStorage.getItem("user")).unitName + '】' + that.functionName + '数据上报';
+                    var autoPassFirstNode = true; //是否自动通过第一个节点：是
+                    var auditContent = "请审核"; //自动通过第一个节点的审核意见，即提交意见
+                    //流程变量：作用于整个流程
+                    var createUserId = JSON.parse(localStorage.getItem("user")).oid;
+                    var flowVars = {
+                        createUser: createUserId,
+                        creator: createUserId,
+                        dataUnitId: item.CREATE_USER_UNIT_ID,
+                        menuCode: that.menuCode,
+                        globalViewDataPageUrl: "",
+                        pageUrlKey: ""
+                    };
+                    //发起流程
+                    if (item.APPROVE_STATE === '-1') {
+                        /* top.Vue.prototype.$message({
+                        	type: 'warning',
+                        	message: "驳回的数据不能批量上报！"
+                        }); */
+                        continue;
+                        //that.getInstance(item.OID, that.queryOutflows);
+                    } else {
+                        /* that.startWorkflow(businessKey, processKey, subject, autoPassFirstNode, auditContent, that
+                        	.workflowCallback, flowVars); */
+                        that.startWorkflow(businessKey, processKey, subject, autoPassFirstNode, auditContent, function(result) {
+                            that.upcallAll_disalbed = false;
+                            that.refresh();
+                        }, flowVars);
+                    }
+                }
+                var errorLength = length - trueLength;
+                var message = "上报成功";
+                top.Vue.prototype.$message({
+                    type: 'success',
+                    message: message
+                });
+            },
+            approve: function() {
+                var that = this;
+                var oids = this.approveRows.map(function(item) {
+                    /*if(item.APPROVE_STATE !== '1') {
+                    	top.Vue.prototype.$message({
+                    		type: 'warning',
+                    		message: "请选择审核中的数据！"
+                    	});
+                    	return;
+                    }*/
+                    that.getInstance(item.OID, that.openApproveDialog);
+                    //return item[that.primaryKey];
+                });
+            },
+            approveAll: function() {
+                var that = this;
+                window.parent.app.approveRows = this.approveRows;
+                var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-workflow/common/dialogs/approve-all-dialog.html?fromTable=1';
+                top.jasTools.dialog.show({
+                    width: '40%',
+                    height: '50%',
+                    title: '审批任务',
+                    src: baseSrc,
+                    cbForClose: function() {
+                        that.refresh();
+                    }
+                });
+            }
+        }
+    });
 </script>
 
 </html>

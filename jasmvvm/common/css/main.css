@@ -9,6 +9,7 @@
 * @gf 2019/1/21
 */
 
+
 /** basic-css--start ********************************************************************************************************************/
 
 * {
@@ -130,10 +131,11 @@ input:-webkit-autofill {
 /** basic-css--end ********************************************************************************************************************/
 
 
-
 /** element-css-fix--begin ********************************************************************************************************************/
 
+
 /* font-awesome+element font fix */
+
 .el-menu-item [class^=fa] {
     margin-right: 5px;
     width: 20px;
@@ -155,7 +157,6 @@ input:-webkit-autofill {
 .el-button [class*=fa-]+span {
     margin-left: 5px;
 }
-
 
 .el-cascader {
     width: 100%;
@@ -190,10 +191,8 @@ input:-webkit-autofill {
     padding: 8px 0;
 }
 
+
 /** element-css-fix--end ********************************************************************************************************************/
-
-
-
 
 
 /** 3rd-part-module-css-fix--begin ********************************************************************************************************************/
@@ -278,7 +277,9 @@ input:-webkit-autofill {
     opacity: 0.7;
 }
 
+
 /* multipane */
+
 
 /* v-bar */
 
@@ -322,17 +323,18 @@ input:-webkit-autofill {
     background-color: rgba(48, 121, 244, .5);
 }
 
+
 /* v-bar */
 
+
 /** 3rd-part-module-css-fix--end ********************************************************************************************************************/
-
-
 
 
 /** jas-compoennts-css--start ********************************************************************************************************************/
 
 
 /* jas-iframe-dialog */
+
 .jas-iframe-dialog .el-dialog__header {
     padding: 10px 0 10px;
     border-bottom: 1px solid #e4e7ed;
@@ -367,6 +369,7 @@ input:-webkit-autofill {
 
 
 /* jas-detail-table */
+
 .jas-detail-table .table_wrap {
     width: 100%;
     table-layout: fixed;
@@ -393,7 +396,9 @@ input:-webkit-autofill {
     text-align: right
 }
 
+
 /* jas-file-list */
+
 .jas-file-list .tipBtn {
     position: absolute;
     top: 5px;
@@ -407,21 +412,42 @@ input:-webkit-autofill {
     opacity: 1;
 }
 
-/** jas-compoennts-css--end ********************************************************************************************************************/
 
+/** jas-compoennts-css--end ********************************************************************************************************************/
 
 
 /** customer-main-css--start ********************************************************************************************************************/
 
 
-
-
-
 /** customer-main-css--end ********************************************************************************************************************/
 
-
-ul,li{
-    padding:0px;
-    margin:0px;
+ul,
+li {
+    padding: 0px;
+    margin: 0px;
     list-style: none;
+}
+
+
+/*IE滚动条颜色*/
+
+html {
+    scrollbar-track-color: #f0f0f0;
+    /*背景颜色*/
+    scrollbar-face-color: #cdcdcd;
+    /*滑块颜色*/
+    scrollbar-Shadow-color: #cdcdcd;
+    /*滑块边色*/
+    scrollbar-arrow-color: #676767;
+    /*箭头颜色*/
+}
+
+.el-tabs__content,
+#pane-second,
+#pane-first {
+    height: 100%;
+}
+
+.el-tabs__header .is-top {
+    padding: 0px 10px;
 }
