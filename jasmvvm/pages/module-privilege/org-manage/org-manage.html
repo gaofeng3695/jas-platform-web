@@ -78,7 +78,7 @@
 				<el-tabs v-model="activeName" class="jas-flex-box is-vertical" style="height:100%;overflow: auto">
 					<el-tab-pane label="部门详情" name="details">
 						<div v-loading="loading.orgDetail">
-							<jas-detail-table :titles="detailTitle" :detail="detail" />
+							<jas-detail-table :titles="Name" :detail="detail" />
 						</div>
 					</el-tab-pane>
 					<el-tab-pane label="实施范围" name="scale" v-if="isMultiProject">
@@ -235,7 +235,7 @@
 					checkedKeys: [],
 					expandedKeys: []
 				},
-				detailTitle: [{
+				Name: [{
 					name: '上级组织机构',
 					field: 'parentName',
 				}, {
@@ -252,10 +252,10 @@
 					field: 'unitType',
 				}, {
 					name: '部门经理',
-					field: 'manager',
+					field: 'managerName',
 				}, {
 					name: '分管领导',
-					field: 'leader',
+					field: 'leaderName',
 				}, {
 					name: '联系电话',
 					field: 'phone',
