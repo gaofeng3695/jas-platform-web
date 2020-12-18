@@ -41,6 +41,10 @@
 			height: 100%;
 			padding: 0 10px;
 		}
+		.el-tab-pane {
+			height: 100%;
+			/* padding: 0 10px; */
+		}
 
 		.content .el-tabs__content {
 			width: 100%;
@@ -66,117 +70,135 @@
 					<el-button type="text" @click="editNode" :disabled="!currentNodeId || isFixed">修改</el-button>
 					<el-button type="text" @click="deleteNode" :disabled="!currentNodeId || isFixed">删除</el-button>
 				</div>
-				<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" default-expand-all :props="defaultProps" :default-expanded-keys="[currentNodeId]"
-				  highlight-current @node-click="clicknode"  :expand-on-click-node="false" :filter-node-method="filterNode"></el-tree>
+				<el-tree class="is-grown" ref="orgtree" :data="orgnData" node-key="id" default-expand-all :props="defaultProps"
+					:default-expanded-keys="[currentNodeId]" highlight-current @node-click="clicknode"
+					:expand-on-click-node="false" :filter-node-method="filterNode"></el-tree>
 			</template>
 			<div class="content" slot="mainPanel">
-				<el-tabs v-model="activeName" class="jas-flex-box" style="height:100%;overflow: auto">
+				<el-tabs v-model="activeName" class="jas-flex-box is-vertical" style="height:100%;overflow: auto">
 					<el-tab-pane label="部门详情" name="details">
 						<div v-loading="loading.orgDetail">
 							<jas-detail-table :titles="detailTitle" :detail="detail" />
 						</div>
 					</el-tab-pane>
-					<el-tab-pane label="实施范围" name="scale" v-if = "isMultiProject">
+					<el-tab-pane label="实施范围" name="scale" v-if="isMultiProject">
 						<div v-loading="loading.scopeTree" v-show="!isFixed">
 							<div style="border-bottom: 1px solid #ececec;padding:0 0 10px;">
 								<el-button size="small" type="primary" @click="requestSaveScope">保存</el-button>
 							</div>
-							<el-tree ref="tree" :data="scopeData.treeData" show-checkbox node-key="id" :default-expanded-keys="scopeData.expandedKeys"
-							  :default-checked-keys="scopeData.checkedKeys" :props="scopeData.defaultProps">
+							<el-tree ref="tree" :data="scopeData.treeData" show-checkbox node-key="id"
+								:default-expanded-keys="scopeData.expandedKeys" :default-checked-keys="scopeData.checkedKeys"
+								:props="scopeData.defaultProps">
 							</el-tree>
 						</div>
 					</el-tab-pane>
 					<el-tab-pane label="用户管理" name="users">
-						<div v-loading="loading.userManage">
-							<div style="height:800px;">
-								<jas-list-wrapper ref="mylist" style="padding:0;">
-									<div slot="search">
-										<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
-											<el-row>
-												<el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-													<el-form-item label="用户名" prop="loginName" style="margin-bottom: 15px ">
-														<el-input v-model="form.loginName" :placeholder="'请输入用户名'" size="small" clearable></el-input>
-													</el-form-item>
-												</el-col>
-												<el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-													<el-form-item label="姓名" prop="userName" style="margin-bottom: 15px ">
-														<el-input v-model="form.userName" :placeholder="'请输入姓名'" size="small" clearable></el-input>
-													</el-form-item>
-												</el-col>
-												<el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-													<el-form-item label="显示用户范围" prop="userName" style="margin-bottom: 15px; ">
-														<el-switch  v-model="form.userRange"  active-text="显示所有子部门" inactive-text="只显示本部门" @change="_requestUserManage(2)"></el-switch>
-													</el-form-item>
-												</el-col>
-												<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
-													<el-form-item style="float:right;margin-bottom: 0px;">
-														<el-button size="small" @click="_requestUserManage(1)">重置</el-button>
-														<el-button size="small" type="primary" @click="_requestUserManage(2)">查询</el-button>
-													</el-form-item>
-												</el-col>
-											</el-row>
-										</el-form>
-									</div>
-									<div slot="list" class="jas-flex-box is-vertical is-grown">
-										<div style="padding: 15px 0;">
-											<el-button @click="createNewUser" size="small" plain type="primary" icon="fa fa-plus" :disabled="!currentNodeId">新增</el-button>
-											<el-button @click="resetPwd" size="small" plain type="primary" icon="fa fa-eraser" :disabled="selectedRowOids.length==0">重置密码</el-button>
-											<el-button @click="setUserRole" size="small" plain type="primary" icon="fa fa-cog" :disabled="selectedRowOids.length!=1">角色分配</el-button>
-											<el-button @click="deleteUsers" size="small" plain plain type="primary" icon="fa fa-minus" :disabled="selectedRowOids.length==0">删除</el-button>
-											<span class="fr">
-												<el-tooltip class="item" content="刷新" placement="top">
-													<el-button size="small" icon="el-icon-refresh" @click="_requestUserManage"></el-button>
-												</el-tooltip>
-												<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
-													<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
-												</el-tooltip>
-												<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
-													<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
-												</el-tooltip>
-											</span>
-										</div>
-										<div class="is-grown">
-											<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="getDetail" @row-click="checkRow"
-													height="100%" :data="tableData" border :header-cell-style="headStyle" style="width: 100%"
-												stripe>
-												<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
-												<el-table-column label="序号" type="index" align="center" width="50" fixed>
-												</el-table-column>
-												<el-table-column label="用户名" prop="loginName" min-width="70px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="姓名" prop="userName" min-width="70px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="角色名称" prop="roleNames" min-width="80px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="部门名称" prop="unitName"  min-width="80px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="电话" prop="phone" min-width="80px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="Email" prop="email" min-width="80px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="描述" prop="description" min-width="100px" show-overflow-tooltip align="center">
-												</el-table-column>
-												<el-table-column label="操作" align="center" width="270" fixed="right">
-													<template slot-scope="scope">
-														<el-button @click="getDetail(scope.row)" type="text" size="small">详情</el-button>
-														<el-button @click="editUser(scope.row)" type="text" size="small">修改</el-button>
-														<el-button @click="copyRole(scope.row)" type="text" size="small" v-if="!isMulti">复制角色</el-button>
-														<el-button @click="confirmPasteRole(scope.row)" type="text" size="small" v-if="!isMulti">粘贴角色</el-button>
-														<el-button @click="deleteUser(scope.row)" type="text" size="small">删除</el-button>
-													</template>
-												</el-table-column>
-											</el-table>
-										</div>
-										<div style="padding: 15px 0 ;" class="clearfix">
-											<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
-												:page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
-											</el-pagination>
-										</div>
-									</div>
 
-								</jas-list-wrapper>
-							</div>
+						<div v-loading="loading.userManage" style="height:100%;">
+							<jas-list-wrapper ref="mylist" style="padding:0;">
+								<div slot="search">
+									<el-form v-show="!isClosed" class="jas-search-for-list" :model="form" label-width="120px">
+										<el-row>
+											<el-col :xs="24" :sm="24" :md="12" :lg="6" :xl="6">
+												<el-form-item label="用户名" prop="loginName" style="margin-bottom: 15px ">
+													<el-input v-model="form.loginName" :placeholder="'请输入用户名'" size="small" clearable></el-input>
+												</el-form-item>
+											</el-col>
+											<el-col :xs="24" :sm="24" :md="12" :lg="6" :xl="6">
+												<el-form-item label="姓名" prop="userName" style="margin-bottom: 15px ">
+													<el-input v-model="form.userName" :placeholder="'请输入姓名'" size="small" clearable></el-input>
+												</el-form-item>
+											</el-col>
+											<el-col :xs="24" :sm="24" :md="12" :lg="6" :xl="6">
+												<el-form-item label="" prop="userName" style="margin-bottom: 15px; ">
+													<el-switch v-model="form.userRange" active-text="显示所有子部门" inactive-text="只显示本部门"
+														@change="_requestUserManage(2)"></el-switch>
+												</el-form-item>
+											</el-col>
+											<el-col :xs="24" :sm="btnSize.sm" :md="btnSize.md" :lg="btnSize.lg" :xl="btnSize.xl">
+												<el-form-item style="float:right;margin-bottom: 0px;">
+													<el-button size="small" @click="_requestUserManage(1)">重置</el-button>
+													<el-button size="small" type="primary" @click="_requestUserManage(2)">查询</el-button>
+												</el-form-item>
+											</el-col>
+										</el-row>
+									</el-form>
+								</div>
+								<div slot="list" class="jas-flex-box is-vertical is-grown">
+									<div style="padding: 15px 0;">
+										<el-button @click="createNewUser" size="small" plain type="primary" icon="fa fa-plus"
+											:disabled="!currentNodeId">新增</el-button>
+										<el-button @click="resetPwd" size="small" plain type="primary" icon="fa fa-eraser"
+											:disabled="selectedRowOids.length==0">重置密码</el-button>
+										<el-button @click="setUserRole" size="small" plain type="primary" icon="fa fa-cog"
+											:disabled="selectedRowOids.length!=1">角色分配</el-button>
+										<el-button @click="deleteUsers" size="small" plain plain type="primary" icon="fa fa-minus"
+											:disabled="selectedRowOids.length==0">删除</el-button>
+										<span class="fr">
+											<el-tooltip class="item" content="刷新" placement="top">
+												<el-button size="small" icon="el-icon-refresh" @click="_requestUserManage"></el-button>
+											</el-tooltip>
+											<el-tooltip v-show="isClosed" class="item" content="展开搜索" placement="top">
+												<el-button size="small" icon="el-icon-arrow-down" @click="toggleSearch"></el-button>
+											</el-tooltip>
+											<el-tooltip v-show="!isClosed" class="item" content="收起搜索" placement="top">
+												<el-button size="small" icon="el-icon-arrow-up" @click="toggleSearch"></el-button>
+											</el-tooltip>
+										</span>
+									</div>
+									<div class="is-grown">
+										<el-table ref="mytable" @selection-change="handleSelectionChange" @row-dblclick="getDetail"
+											@row-click="checkRow" height="100%" :data="tableData" border :header-cell-style="headStyle"
+											style="width: 100%" stripe>
+											<el-table-column type="selection" width="55" align="center" fixed></el-table-column>
+											<el-table-column label="序号" type="index" align="center" width="50" fixed>
+											</el-table-column>
+											<el-table-column label="用户名" prop="loginName" min-width="70px" show-overflow-tooltip
+												align="center">
+											</el-table-column>
+											<el-table-column label="姓名" prop="userName" min-width="70px" show-overflow-tooltip align="center">
+											</el-table-column>
+											<el-table-column label="角色名称" prop="roleNames" min-width="80px" show-overflow-tooltip
+												align="center">
+											</el-table-column>
+											<el-table-column label="部门名称" prop="unitName" min-width="80px" show-overflow-tooltip
+												align="center">
+											</el-table-column>
+											<el-table-column label="职位" prop="position" min-width="80px" show-overflow-tooltip align="center">
+											</el-table-column>
+											<el-table-column label="排序" prop="orderNum" min-width="80px" show-overflow-tooltip align="center">
+											</el-table-column>
+											<el-table-column label="电话" prop="phone" min-width="80px" show-overflow-tooltip align="center">
+											</el-table-column>
+											<el-table-column label="Email" prop="email" min-width="80px" show-overflow-tooltip align="center">
+											</el-table-column>
+											<el-table-column label="描述" prop="description" min-width="100px" show-overflow-tooltip
+												align="center">
+											</el-table-column>
+											<el-table-column label="操作" align="center" width="270" fixed="right">
+												<template slot-scope="scope">
+													<el-button @click="getDetail(scope.row)" type="text" size="small">详情</el-button>
+													<el-button @click="editUser(scope.row)" type="text" size="small">修改</el-button>
+													<el-button @click="copyRole(scope.row)" type="text" size="small" v-if="!isMulti">复制角色
+													</el-button>
+													<el-button @click="confirmPasteRole(scope.row)" type="text" size="small" v-if="!isMulti">粘贴角色
+													</el-button>
+													<el-button @click="deleteUser(scope.row)" type="text" size="small">删除</el-button>
+												</template>
+											</el-table-column>
+										</el-table>
+									</div>
+									<div style="padding: 15px 0 ;" class="clearfix">
+										<el-pagination class="fr" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+											:current-page="currentPage" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+											layout="total, sizes, prev, pager, next, jumper" :total="total">
+										</el-pagination>
+									</div>
+								</div>
+
+							</jas-list-wrapper>
 						</div>
+
 					</el-tab-pane>
 				</el-tabs>
 			</div>
@@ -213,38 +235,42 @@
 					checkedKeys: [],
 					expandedKeys: []
 				},
-				detailTitle: [
-					{
-						name: '上级组织机构',
-						field: 'parentName',
-					}, {
-						name: '组织机构名称',
-						field: 'unitName',
-					}, {
-						name: '组织机构编号',
-						field: 'unitCode',
-					}, {
-						name: '顺序编号',
-						field: 'orderNum',
-					}, {
-						name: '组织机构类型',
-						field: 'unitType',
-					}, {
-						name: '联系电话',
-						field: 'phone',
-					}, {
-						name: '地址',
-						field: 'address',
-					}, {
-						name: '组织机构描述',
-						field: 'description',
-					},
-				],
+				detailTitle: [{
+					name: '上级组织机构',
+					field: 'parentName',
+				}, {
+					name: '组织机构名称',
+					field: 'unitName',
+				}, {
+					name: '组织机构编号',
+					field: 'unitCode',
+				}, {
+					name: '顺序编号',
+					field: 'orderNum',
+				}, {
+					name: '组织机构类型',
+					field: 'unitType',
+				}, {
+					name: '部门经理',
+					field: 'manager',
+				}, {
+					name: '分管领导',
+					field: 'leader',
+				}, {
+					name: '联系电话',
+					field: 'phone',
+				}, {
+					name: '地址',
+					field: 'address',
+				}, {
+					name: '组织机构描述',
+					field: 'description',
+				}, ],
 				loading: {
 					allLoading: false,
 					orgDetail: false,
 					scopeTree: false,
-					userManage:false
+					userManage: false
 				},
 				panelMoving: false,
 				panelShowed: true,
@@ -252,7 +278,7 @@
 				filterText: '',
 				currentNode: '',
 				currentNodeId: '',
-				unitIdList:'',
+				unitIdList: '',
 				orgnData: [],
 				defaultProps: {
 					label: 'text',
@@ -275,8 +301,8 @@
 				total: 0,
 				isMultiProject: true,
 				copyObj: {
-					oid:'',
-					userName:''
+					oid: '',
+					userName: ''
 				},
 				isMulti: null
 			}
@@ -308,9 +334,9 @@
 		},
 		mounted: function () {
 			var isMulti = sessionStorage.getItem("multiProject");
-			if(isMulti == 1){
+			if (isMulti == 1) {
 				this.isMultiProject = false;
-			}else{
+			} else {
 				this.isMultiProject = false;
 			}
 
@@ -428,7 +454,8 @@
 					width: '60%',
 					height: '80%',
 					title: '新增组织机构',
-					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?pid=' + this.currentNodeId,
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?pid=' +
+						this.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
 							that._requestTable();
@@ -442,7 +469,8 @@
 					width: '60%',
 					height: '80%',
 					title: '修改组织机构',
-					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?oid=' + this.currentNodeId,
+					src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/add.html?oid=' +
+						this.currentNodeId,
 					cbForClose: function (param) {
 						if (param == 1) {
 							that._requestTable();
@@ -520,8 +548,8 @@
 				var nFields = 3;
 				this.btnSize.sm = 24 - (24 * nFields) % 24;
 				this.btnSize.md = 24 - (12 * nFields) % 24;
-				this.btnSize.lg = 24 - (6* nFields) % 24;
-				this.btnSize.xl = 24 - (6* nFields) % 24;
+				this.btnSize.lg = 24 - (6 * nFields) % 24;
+				this.btnSize.xl = 24 - (6 * nFields) % 24;
 			},
 
 			_requestUserManage: function (param) { // 0刷新  1重置  2搜索
@@ -536,40 +564,40 @@
 					this.currentPage = 1;
 				}
 				var url = jasTools.base.rootPath + "/jasframework/privilege/user/getList.do";
-				this.unitIdList='';
-				var unitId=this.currentNodeId;
-				if(this.form.userRange){
+				this.unitIdList = '';
+				var unitId = this.currentNodeId;
+				if (this.form.userRange) {
 					this.getChildrenIds(this.$refs.orgtree.getCurrentNode());
-					unitId=null;
+					unitId = null;
 				}
 				var paramData = {};
 				if (that.isMulti) {
 					paramData = {
-						projectOid:'platform',
+						projectOid: 'platform',
 						unitId: unitId,
 						loginName: this.form.loginName,
 						userName: this.form.userName,
-						userRange:this.form.userRange?1:0,
-						unitIdList:this.unitIdList,
+						userRange: this.form.userRange ? 1 : 0,
+						unitIdList: this.unitIdList,
 						pageNo: this.currentPage,
 						pageSize: this.pageSize,
 						page: this.currentPage,
 						rows: this.pageSize,
 					}
-				}else{
+				} else {
 					paramData = {
 						unitId: unitId,
 						loginName: this.form.loginName,
 						userName: this.form.userName,
-						userRange:this.form.userRange?1:0,
-						unitIdList:this.unitIdList,
+						userRange: this.form.userRange ? 1 : 0,
+						unitIdList: this.unitIdList,
 						pageNo: this.currentPage,
 						pageSize: this.pageSize,
 						page: this.currentPage,
 						rows: this.pageSize,
 					}
 				}
-				that.loading = true;
+				that.loading.userManage = true;
 				jasTools.ajax.postForm(url, paramData, function (data) {
 					that.loading.userManage = false;
 					that.total = data.total;
@@ -605,12 +633,12 @@
 					}
 				});
 			},
-			resetPwd: function(){
+			resetPwd: function () {
 				var that = this;
-				var url = jasTools.base.rootPath + "/jasframework/privilege/user/resetUserPWD.do?ids="+that.selectedRowOids;
-				jasTools.ajax.post(url, {
-				}, function (data) {
-					if(data.success==1){
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/resetUserPWD.do?ids=" + that
+					.selectedRowOids;
+				jasTools.ajax.post(url, {}, function (data) {
+					if (data.success == 1) {
 						top.Vue.prototype.$message({
 							type: 'success',
 							message: '重置密码成功'
@@ -620,8 +648,9 @@
 					that._requestTable();
 				});
 			},
-			getDetail: function(row){
-				var baseSrc = jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/detail-user.html';
+			getDetail: function (row) {
+				var baseSrc = jasTools.base.rootPath +
+					'/jasmvvm/pages/module-privilege/org-manage/dialogs/detail-user.html';
 				var src = jasTools.base.setParamsToUrl(baseSrc, {
 					oid: row.oid
 				});
@@ -647,9 +676,9 @@
 					callback: function (action) {
 						if (action === 'confirm') {
 							if (that.selectedRowOids.length >= 1) {
-								var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids="+that.selectedRowOids;
-								jasTools.ajax.get(url, {
-								}, function (data) {
+								var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids=" + that
+									.selectedRowOids;
+								jasTools.ajax.get(url, {}, function (data) {
 									afterDelete();
 								});
 							}
@@ -671,11 +700,11 @@
 					type: 'warning',
 					callback: function (action) {
 						if (action === 'confirm') {
-								var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids="+row.oid;
-								jasTools.ajax.get(url, {
-								}, function (data) {
-									afterDelete();
-								});
+							var url = jasTools.base.rootPath + "/jasframework/privilege/user/deleteUser.do?oids=" + row
+							.oid;
+							jasTools.ajax.get(url, {}, function (data) {
+								afterDelete();
+							});
 						}
 					}
 				});
@@ -684,26 +713,30 @@
 				var that = this;
 				var isMulti = sessionStorage.getItem("multiProject");
 				// 判断是否多项目
-				if(isMulti === "1"){
+				if (isMulti === "1") {
 					//新接口页面
 					top.jasTools.dialog.show({
 						width: '840px',
 						height: '80%',
 						title: '角色分配',
-						src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/project-org-manage/dialogs/role-allocation.html?userOid=' + that.selectedRows[0].oid,
+						src: jasTools.base.rootPath +
+							'/jasmvvm/pages/module-privilege/project-org-manage/dialogs/role-allocation.html?userOid=' + that
+							.selectedRows[0].oid,
 						cbForClose: function (param) {
 							if (param == 1) {
 								that._requestUserManage(0);
 							}
 						}
 					})
-				}else {
+				} else {
 					//旧接口页面
 					top.jasTools.dialog.show({
 						width: '840px',
 						height: '80%',
 						title: '角色分配',
-						src: jasTools.base.rootPath + '/jasmvvm/pages/module-privilege/org-manage/dialogs/role-allocation.html?userId=' + that.selectedRowOids,
+						src: jasTools.base.rootPath +
+							'/jasmvvm/pages/module-privilege/org-manage/dialogs/role-allocation.html?userId=' + that
+							.selectedRowOids,
 						cbForClose: function (param) {
 							if (param == 1) {
 								that._requestUserManage(0);
@@ -727,19 +760,21 @@
 				this.currentPage = val;
 				this._requestUserManage(0);
 			},
-			copyRole:function(row){
+			copyRole: function (row) {
 				var that = this;
 				// 清空copyObj且赋值，以便粘贴的时候判断是否相同行操作
 				that.copyObj = {};
 				that.copyObj.oid = row.oid;
 				that.copyObj.userName = row.userName;
-				var obj = {oid: row.oid};
+				var obj = {
+					oid: row.oid
+				};
 				var param = {};
 				param.clipboardItemList = [];
 				param.clipboardItemList.push(obj);
 				var url = jasTools.base.rootPath + "/clipboard/copy.do";
 				jasTools.ajax.post(url, param, function (data) {
-					if(data.status==1){
+					if (data.status == 1) {
 						top.Vue.prototype.$message({
 							type: 'success',
 							message: '复制成功'
@@ -747,49 +782,51 @@
 					}
 				});
 			},
-			confirmPasteRole:function(row){
+			confirmPasteRole: function (row) {
 				var that = this;
-				if(that.copyObj.oid == row.oid){
+				if (that.copyObj.oid == row.oid) {
 					top.Vue.prototype.$message({
 						type: 'warning',
 						message: '请勿操作同一行数据'
 					});
-				}else{
-					window.top.Vue.prototype.$confirm('您确定要将 '+that.copyObj.userName+' 拥有的角色赋给 '+row.userName+' 吗？', '提示', {
-						type: 'warning',
-						callback: function (action) {
-							if (action === 'confirm') {
-								that.pasteRole(row);
+				} else {
+					window.top.Vue.prototype.$confirm('您确定要将 ' + that.copyObj.userName + ' 拥有的角色赋给 ' + row.userName + ' 吗？',
+						'提示', {
+							type: 'warning',
+							callback: function (action) {
+								if (action === 'confirm') {
+									that.pasteRole(row);
+								}
 							}
-						}
-					});
+						});
 				}
 			},
-			pasteRole: function(row){
+			pasteRole: function (row) {
 				var that = this;
 				var entityClass = "cn.jasgroup.jasframework.security.dao.entity.PriRole";
-				var url = jasTools.base.rootPath + "/jasframework/privilege/user/pasteRole.do?targetUserOid="+row.oid+ "&entityClass=" + entityClass;
+				var url = jasTools.base.rootPath + "/jasframework/privilege/user/pasteRole.do?targetUserOid=" + row.oid +
+					"&entityClass=" + entityClass;
 				jasTools.ajax.get(url, {}, function (data) {
-					if(data.status==1){
+					if (data.status == 1) {
 						top.Vue.prototype.$message({
 							type: 'success',
-							message: '已将 '+that.copyObj.userName+' 拥有的角色赋给了 '+row.userName
+							message: '已将 ' + that.copyObj.userName + ' 拥有的角色赋给了 ' + row.userName
 						});
 					}
 				});
 			},
-			getChildrenIds: function(currentNodeData){
-				var childrens=currentNodeData.children;
-				if(childrens==null){
-					this.unitIdList+=(currentNodeData.id+',');
-					return ;
+			getChildrenIds: function (currentNodeData) {
+				var childrens = currentNodeData.children;
+				if (childrens == null) {
+					this.unitIdList += (currentNodeData.id + ',');
+					return;
 				}
-				for(var i=0;i<childrens.length;i++){
+				for (var i = 0; i < childrens.length; i++) {
 					this.getChildrenIds(childrens[i]);
 				}
-				this.unitIdList+=currentNodeData.id+',';
+				this.unitIdList += currentNodeData.id + ',';
 				console.log(this.unitIdList);
-				return ;
+				return;
 			}
 		},
 	});

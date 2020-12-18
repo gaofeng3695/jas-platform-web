@@ -50,8 +50,8 @@
 				<el-row :gutter="10">
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="部门名称" prop="unitId">
-							<el-cascader :options="treeData" :props="treeProps" v-model="unitIdArr" :show-all-levels="false" change-on-select clearable
-								placeholder="请选择所属部门" size="small">
+							<el-cascader :options="treeData" :props="treeProps" v-model="unitIdArr" :show-all-levels="false"
+								change-on-select clearable placeholder="请选择所属部门" size="small">
 							</el-cascader>
 						</el-form-item>
 					</el-col>
@@ -75,13 +75,27 @@
 				</el-row>
 				<el-row>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="职位" prop="position">
+							<el-input v-model="tableFormData.position" clearable placeholder="请输入职位" size="small"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
+						<el-form-item label="排序" prop="phone">
+							<el-input-number v-model="tableFormData.orderNum" :precision="0" :min="1" :step="1" clearable placeholder="请输入排序" size="small">
+							</el-input-number>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="Email" prop="email">
 							<el-input v-model="tableFormData.email" clearable placeholder="请输入Email地址" size="small"></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="8">
 						<el-form-item label="密码到期时间" prop="passwordExpiredDate">
-							<el-date-picker v-model="tableFormData.passwordExpiredDate" :picker-options="disabledToday"  type="date" placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
+							<el-date-picker v-model="tableFormData.passwordExpiredDate" :picker-options="disabledToday" type="date"
+								placeholder="选择日期" size="small" style="width:255px;"></el-date-picker>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -89,7 +103,8 @@
 				<el-row>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 						<el-form-item label="描述" prop="description">
-							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small" v-model="tableFormData.description"></el-input>
+							<el-input type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :rows="2" size="small"
+								v-model="tableFormData.description"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -120,15 +135,16 @@
 				} else {
 					callback()
 				}
-			};//进行手机号码的正则验证
+			}; //进行手机号码的正则验证
 			var validateEmail = function (rule, value, callback) {
-				let reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+				let reg =
+					/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 				if (value && !reg.test(value)) {
 					callback(new Error('邮箱格式错误'))
 				} else {
 					callback()
 				}
-			};//进行邮箱的正则验证
+			}; //进行邮箱的正则验证
 			return {
 				but_disabled: false,
 				disabledToday: {
@@ -167,7 +183,7 @@
 					}]
 				},
 				tableFormData: {
-					"unitId": "",//部门
+					"unitId": "", //部门
 					"loginName": "", //用户名
 					"userName": "", //姓名
 					"phone": "", //电话
@@ -268,7 +284,6 @@
 			}
 		},
 	});
-
 </script>
 
 </html>
